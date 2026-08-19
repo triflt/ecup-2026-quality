@@ -1,0 +1,13 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.py[cod]
+*.csv
+*.zip
+data/
+images/
+outputs/
+wheels/
+*credentials*
+*secrets*
