@@ -1,0 +1,16 @@
+{
+  "experiment_id": "243",
+  "status": "prepared",
+  "dataset_sha256": null,
+  "code_revision": "maksimcrewceo",
+  "seed": 42,
+  "validation": {
+    "protocol": "nested_grouped_v1; outer folds selected on other four folds",
+    "primary_metric": "macro_f1",
+    "baseline_macro_f1": 0.9118425206,
+    "macro_f1": null,
+    "fold_scores": []
+  },
+  "notes": "Wave 1 of 241 showed negative result with LR/KNN head and no hard mining. This experiment tests the same embedding model with LinearSVC head + hard mining + category-specific adapters, aligned with Danek's champion architecture.",
+  "decision": null
+}

@@ -1,0 +1,44 @@
+[experiment]
+id = "243"
+slug = "embedder_tuning_for_top"
+title = "Embedder tuning for the top solution (category-specific adapters + LinearSVC)"
+status = "prepared"
+entrypoint = "experiments/241_qwen3vl_contrastive/src/train_contrastive.py"
+result_file = "experiments/243_embedder_tuning_for_top/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "nested_grouped_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "190_shingle_neighbor_prior"
+changed_factor = "Fine-tune Qwen3-VL-Embedding-2B on train data with hard mining; evaluate via LinearSVC + integrate into champion rank fusion"
+mechanism = "Current champion relies on zero-shot/frozen embeddings; task-specific fine-tuning should improve the image head and transfer to the full ensemble"
+expected_macro_f1_delta = 0.005
+falsification = "After full ablation (hard mining, SVM head, higher r/epochs) no gain ≥ +0.005 on nested grouped CV over current champion"
+precedents = ["190_shingle_neighbor_prior", "030_qwen3vl_embedding", "060_multiview_fusion", "241_qwen3vl_contrastive"]
+
+[acceptance]
+baseline_macro_f1 = 0.9118425206
+required_fold_wins = 4
+max_category_f1_drop = 0.005
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 10.0
+planned_public_submissions = 1
+runtime_limit_minutes = 60
+
+[execution]
+arguments = ["--r", "32-64", "--alpha", "match_r", "--lr", "1e-4", "--epochs", "5-10", "--loss_type", "sigmoid", "--hard_mining", "true", "--n_images", "2|5", "--head", "linear_svc"]
+
+[artifacts]
+directory = "artifacts"
+publish = false
+local_artifacts_path = "/home/jovyan/shares/SR008.fs2/litvinov/tmp/QC/exps"

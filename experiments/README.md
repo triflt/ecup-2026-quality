@@ -20,6 +20,7 @@
 | 240 | Gemma-4 LoRA SFT (QC) | Running | Multi-image LoRA, loss на вердикте; zero-shot 0.34-0.38 macro |
 | 241 | Qwen3-VL contrastive (QC) | Running ablations | First attempt negative; checking SVM head, hard mining, higher r before final decision |
 | 242 | Fusion grid (QC) | Prepared | Фьюжн скоров треков 240/241, ждёт их завершения |
+| 243 | Embedder tuning for top | Prepared | Fine-tune Qwen3-VL embeddings + LinearSVC + integrate into champion |
 | 900 | Infrastructure checks | Completed | Runtime/schema/preprocessing safeguards |
 
 Новый experiment создаётся из `templates/experiment/`, затем добавляется отдельной строкой в `reports/experiment-log.csv`.
