@@ -294,7 +294,15 @@ def main():
         optimizers=(optimizer, None),
     )
 
-    trainer.train()
+    checkpoints_dir = os.path.join(exp_dir, 'checkpoints')
+    resume_checkpoint = None
+    if os.path.isdir(checkpoints_dir):
+        ckpts = [d for d in os.listdir(checkpoints_dir) if d.startswith('checkpoint-')]
+        if ckpts:
+            resume_checkpoint = os.path.join(checkpoints_dir, sorted(ckpts, key=lambda x: int(x.split('-')[-1]))[-1])
+            print(f'[train] resuming from {resume_checkpoint}')
+
+    trainer.train(resume_from_checkpoint=resume_checkpoint)
 
     adapter_dir = os.path.join(exp_dir, 'adapter')
     model.save_pretrained(adapter_dir)
