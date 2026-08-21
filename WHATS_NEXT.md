@@ -32,11 +32,12 @@
 
 ## QC-треки (Максим / maksimcrewceo)
 
-- **241 Qwen3-VL contrastive** — отклонён на Wave 1: дообучение ухудшило
-  embedding-head относительно zero-shot (LR macro-F1 0.7401 → 0.54–0.58).
+- **241 Qwen3-VL contrastive** — негативный первый заход: дообучение
+  ухудшило LR/KNN head на r16/3ep. Финальный reject преждевременен, потому
+  что лучшее решение команды построено на эмбеддерах. План Wave 1.5:
+  LinearSVC-эвал (как у Данека), hard mining, больше r/alpha/эпох, абляция
+  n_images/OCR. Сравнение с zero-shot на том же head.
   Адаптеры и метрики сохранены в `experiments/241_qwen3vl_contrastive/`.
-  Если возвращаться — пробовать hard mining / higher r / SVM вместо LR,
-  но только после успеха Track A.
 - **240 Gemma LoRA SFT** — A01-A04 в процессе обучения (GPU 0-3), ожидаем
   диагностические результаты. Порог: macro-F1 ≥ 0.45 для продолжения,
   ≥ 0.55 для пересчёта на grouped folds.

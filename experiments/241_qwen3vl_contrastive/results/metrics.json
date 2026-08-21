@@ -1,6 +1,6 @@
 {
   "experiment_id": "241",
-  "status": "rejected_wave1",
+  "status": "negative_first_attempt",
   "dataset_sha256": null,
   "code_revision": "maksimcrewceo",
   "seed": 42,
@@ -52,5 +52,5 @@
     "tmp/QC/exps/expB02/",
     "tmp/QC/exps/zero_embed/"
   ],
-  "decision": "rejected: contrastive training degraded embedding-head macro-F1 vs zero-shot (LR -0.1961, KNN -0.0328); do not use in fusion; consider hard mining or higher r if revisiting"
+  "decision": "negative_first_attempt: contrastive training degraded LR/KNN macro-F1 vs zero-shot on this config. Not rejected yet — top solution relies on embeddings, so planned ablations: LinearSVC head (like Danek), hard mining, higher r/alpha, more epochs, n_images ablation before final decision"
 }
