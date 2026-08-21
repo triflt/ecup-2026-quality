@@ -67,3 +67,4 @@ date,experiment_group,experiment,validation,bad_f1,flammable_f1,macro_f1,status,
 2026-08-21,230_qwen35_second_seed,Second-seed data-binding attempt,Portable training command with missing external data binding,,,,Error,Failed before GPU optimization; no model evidence
 2026-08-21,230_qwen35_second_seed,Second-seed inline-payload attempts,Portable training command with oversized attached dataset,,,,Error,Rejected by runner request-size limit; no model evidence
 2026-08-21,230_qwen35_second_seed,Second-seed Qwen3.5 training,Five grouped outer folds plus full-data adapter; seed 31415,,,,Success,All six training jobs completed; OOF artifacts and full adapter await aggregation
+2026-08-21,190_shingle_neighbor_prior,Dual-LoRA shingle-prior Public leaderboard,Platform Public leaderboard,,,0.8919244236941932,Success,Новый лучший Public; +0.0853452605 к прежнему результату 0.8065791632; отправка подтверждает всю архитектуру, но не изолирует вклад одного prior

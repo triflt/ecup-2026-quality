@@ -4,7 +4,8 @@
 
 ## Подтверждено leaderboard
 
-- Лучший Public Macro F1: **0.806579** — category-specific text/Qwen3-VL late fusion.
+- Лучший Public Macro F1: **0.8919244237** — Dual-LoRA с точными, числовыми и редкими фразовыми совпадениями товарных семейств.
+- Прирост относительно прежнего лидера 0.8065791632: **+0.0853452605**.
 - Advanced mixed ensemble: 0.785500, что подтвердило риск duplicate/photo overfitting.
 - Prompt-only Qwen branches существенно слабее supervised models.
 
@@ -16,15 +17,15 @@ Robust base + Qwen3-VL rsLoRA + Qwen3.5 rsLoRA:
 - nested flammable F1: 0.871921;
 - nested Macro F1: **0.911843**.
 
-Rare-shingle BAD prior поверх production branch даёт donor-only +0.000853 BAD F1 и выигрывает 20/20 recurrence simulations. Это основной готовый submission candidate.
+Rare-shingle BAD prior поверх production branch даёт donor-only +0.000853 BAD F1 и выигрывает 20/20 моделирований повторяемости. Полная система подтвердила перенос на Public, однако вклад самого prior нельзя отделить от вклада двух LoRA-моделей по одной отправке.
 
 ## Риски
 
 - Flammable содержит только 198 positives.
-- Product recurrence в hidden неизвестна.
+- Точная доля повторяющихся товарных семейств в hidden неизвестна.
 - Старые leave-one-out recurrence metrics имеют transductive leakage и не используются как честный grouped score.
-- Public result для LoRA candidates ещё отсутствует.
+- Public не должен использоваться для подбора порогов после получения результата.
 
 ## Активная точка
 
-Второй seed Qwen3.5 обучен на пяти folds и full data. Следующая операция — скачать OOF artifacts, агрегировать и принять/reject ensemble по nested Macro F1.
+Вторая независимо обученная версия Qwen3.5 готова. Следующая операция — собрать её прогнозы, проверить различие ошибок и принять или отклонить объединение на вложенной групповой проверке. Затем перейти к вероятностной оценке похожих товаров и устойчивому обучению при противоречивых метках.

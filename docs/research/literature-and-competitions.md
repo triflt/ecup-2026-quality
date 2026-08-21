@@ -15,18 +15,29 @@
 | [Confident Learning](https://arxiv.org/abs/1911.00068) | Out-of-sample probabilities позволяют находить вероятные label errors | Использовать для аудита, но не удалять строки без controlled ablation |
 | [LoRA-Ensemble](https://arxiv.org/abs/2405.14438) | Независимые adapters могут образовывать дешёвый ensemble | Проверить второй Qwen3.5 seed и принимать только по nested CV |
 | [SoREL](https://openaccess.thecvf.com/content/CVPR2026F/html/Hsieh_SoREL_Soft-Label_Refurbishment_with_Ensemble_Learning_for_Noisy_Long-Tailed_Classification_CVPRF_2026_paper.html) | Ensemble disagreement полезен при noisy long-tail labels | Сохранять soft scores и оценивать rare flammable отдельно |
+| [Early-Learning Regularization](https://proceedings.neurips.cc/paper_files/paper/2020/hash/ea89621bee7c88b2c5be6681c8ef4906-Abstract.html) | Модель сначала учит общую закономерность, затем запоминает ошибочные метки | Сохранять историю обучения карточек и уменьшать влияние устойчивых противоречий |
+| [DivideMix](https://openreview.net/pdf?id=HJgExaVtwr) | Распределение потерь помогает разделять вероятно чистые и шумные примеры | Сравнить две согласующиеся LoRA-модели и мягкие метки, не удаляя данные вслепую |
+| [R-Drop](https://proceedings.neurips.cc/paper_files/paper/2021/hash/5a66b9200f29ac3fa0ae244cc2a51b39-Abstract.html) | Согласование двух проходов с разными dropout-масками улучшает дообучение | Недорогая проверка устойчивости Qwen-адаптеров |
+| [Model Soups](https://proceedings.mlr.press/v162/wortsman22a.html) | Усреднение весов нескольких дообученных моделей может улучшить качество без роста времени применения | Проверить усреднение двух независимо обученных Qwen3.5-адаптеров |
+| [Class-Balanced Loss](https://openaccess.thecvf.com/content_CVPR_2019/html/Cui_Class-Balanced_Loss_Based_on_Effective_Number_of_Samples_CVPR_2019_paper.html) | Повторяющиеся примеры дают меньше новой информации, чем независимые | Считать баланс по товарным семействам, особенно для редких положительных flammable |
+| [Logit Adjustment](https://openreview.net/pdf?id=37nvvqkCo5) | Поправка прогнозов с учётом частоты классов улучшает обучение на несбалансированных данных | Сравнить с текущими весами классов внутри вложенной проверки |
+| [Noisy Student](https://openaccess.thecvf.com/content_CVPR_2020/html/Xie_Self-Training_With_Noisy_Student_Improves_ImageNet_Classification_CVPR_2020_paper.html) | Учитель выдаёт чистые псевдометки, а ученик обучается с умеренными возмущениями | Использовать открытую большую модель для спорных карточек и обучить воспроизводимого малого ученика |
 
 ## Что подтвердилось экспериментально
 
-1. **Late fusion переносится лучше сложного stacker.** Public 0.806579 у двухголовой fusion против 0.785500 у advanced mixed ensemble.
-2. **Targeted adaptation лучше prompting.** Qwen3.5 direct VLM prompt дал 0.468403 Public; supervised Qwen3.5 LoRA улучшил nested three-head fusion.
-3. **Hard mining полезнее механической очистки.** Clean-filtered Qwen3-VL на одном и том же fold существенно проиграл hard-mined варианту.
-4. **Первое изображение — сильнейший visual view.** Multi-image LoRA не улучшил first-image model.
-5. **Diversity важнее глобального OOF.** Gemma имела высокий global fusion score, но проиграла в nested calibration из-за нестабильного flammable fold.
+1. **Dual-LoRA с товарными семействами переносится на hidden.** Новая система получила 0.891924 Public против прежнего лидера 0.806579. Одна отправка подтверждает всю архитектуру, но не позволяет отдельно измерить вклад каждого компонента.
+2. **Late fusion переносится лучше сложного stacker.** Public 0.806579 у двухголовой fusion против 0.785500 у advanced mixed ensemble.
+3. **Целевое дообучение лучше прямых запросов к модели.** Qwen3.5 direct VLM prompt дал 0.468403 Public; supervised Qwen3.5 LoRA улучшил nested three-head fusion.
+4. **Выбор сложных примеров полезнее механической очистки.** Отфильтрованный Qwen3-VL на одном и том же разбиении существенно проиграл варианту, обученному на сложных примерах.
+5. **Первое изображение — сильнейший проверенный зрительный источник.** Multi-image LoRA не улучшил first-image model.
+6. **Разнообразие ошибок важнее общей метрики на всех прогнозах.** Gemma имела высокий общий результат, но проиграла во вложенной проверке из-за нестабильности редкой категории.
 
 ## Открытые исследовательские вопросы
 
 - Насколько ошибки второго Qwen3.5 seed декоррелированы с первым?
-- Повторяются ли product families в hidden в доле, близкой к random 70/30 simulation?
+- Какова доля повторяющихся товарных семейств в hidden и насколько надёжны их метки?
 - Можно ли получить orthogonal gain от OCR/attribute extraction без превышения runtime?
-- Стабильно ли улучшение shingle prior после Public/Private проверки?
+- Улучшает ли поиск редких общих фраз систему отдельно от Dual-LoRA?
+- Можно ли воспроизводимо исправить спорные метки с помощью большой открытой модели?
+
+Подробная очередность опытов и критерии принятия находятся в [`next-research-program.md`](next-research-program.md).

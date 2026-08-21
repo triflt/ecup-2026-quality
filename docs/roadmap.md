@@ -12,17 +12,22 @@
 - exact/name, numeric-family, shingle, image-hash и neighbour priors;
 - official-container schema/runtime smokes;
 - Public calibration сложного и устойчивого ensemble.
+- Public 0.8919244237 у Dual-LoRA с поиском похожих карточек.
 
 ## В работе
 
 - агрегация второго Qwen3.5 seed;
 - обновление primary candidate после независимой seed validation;
-- Public submission Dual-LoRA + shingle prior.
+- проверка второй независимо обученной версии Qwen3.5;
+- вероятностная оценка товарных семейств.
 
 ## Запланировано
 
-- Public/Private result logging;
+- Private result logging;
 - bootstrap significance для seed ensemble;
+- устойчивое к ошибкам меток обучение;
+- воспроизводимая разметка спорных случаев большой открытой моделью;
+- отдельный классификатор свойств легковоспламеняющихся товаров;
 - второй финальный candidate с orthogonal failure mode;
 - финальный full-data refit только после фиксации architecture/configuration.
 

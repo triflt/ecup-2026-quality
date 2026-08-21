@@ -2,14 +2,17 @@
 
 Воспроизводимый research repository для классификации качества карточек товаров в категориях `БАД` и `Легковоспламеняющиеся`. Цель команды — первое место; process и evidence quality соответствуют уровню DS Master / Kaggle Grandmaster.
 
-Лучший подтверждённый Public результат: **0.806579 Macro F1**. Текущий основной кандидат — category-specific late fusion из TF-IDF, Qwen3-VL representation, supervised Qwen3-VL LoRA и Qwen3.5 LoRA с консервативным product-family prior.
+Лучший подтверждённый Public результат: **0.891924 Macro F1**. Его дала система из текстовой модели, двух дообученных Qwen-моделей и осторожного поиска похожих товарных карточек.
 
 ## Навигация
 
 - [`CODEX.md`](CODEX.md) — правила работы AI-агентов.
 - [`WHATS_NEXT.md`](WHATS_NEXT.md) — точка продолжения и приоритеты.
 - [`docs/current-status.md`](docs/current-status.md) — текущий model/leaderboard status.
+- [`docs/hackathon/task-and-rules.md`](docs/hackathon/task-and-rules.md) — задача, проверка и ограничения соревнования.
+- [`docs/hackathon/data-and-models.md`](docs/hackathon/data-and-models.md) — данные, правила классов и доступные модели.
 - [`docs/research/literature-and-competitions.md`](docs/research/literature-and-competitions.md) — статьи и похожие соревнования.
+- [`docs/research/next-research-program.md`](docs/research/next-research-program.md) — приоритетная программа дальнейших исследований.
 - [`docs/research/data-audit.md`](docs/research/data-audit.md) — исследование данных и рисков валидации.
 - [`docs/operations/experiment-cli.md`](docs/operations/experiment-cli.md) — переносимый CLI contract.
 - [`docs/operations/publication.md`](docs/operations/publication.md) — безопасная публикация без legacy binaries.

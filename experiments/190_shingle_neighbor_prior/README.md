@@ -27,6 +27,6 @@ Source directory: `experiments/190_shingle_neighbor_prior/submission`. Лока�
 
 ## Результат
 
-Donor-only BAD +0.000853; 20/20 recurrence wins; основной готовый candidate.
+Donor-only BAD +0.000853; 20/20 проверок повторяемости выиграны. Полная система получила **0.8919244237 Public Macro F1**. Этот результат подтверждает архитектуру целиком, но сам по себе не измеряет отдельный вклад shingle prior.
 
 Подробные machine-readable результаты находятся в `results/metrics.json` и `reports/experiment-log.csv`.
