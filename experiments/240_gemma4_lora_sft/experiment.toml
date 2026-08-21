@@ -1,0 +1,45 @@
+[experiment]
+id = "240"
+slug = "gemma4_lora_sft"
+title = "Gemma-4-E4B-it LoRA SFT (Track A, QC)"
+status = "running"
+entrypoint = "experiments/240_gemma4_lora_sft/src/train_lora.py"
+result_file = "experiments/240_gemma4_lora_sft/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "grouped_text_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+diagnostic_split = "stratified 90/10 by (category,label), seed=42, tmp/QC/split.json"
+
+[hypothesis]
+parent_experiment = "150_gemma_lora"
+changed_factor = "Мультиизображение (5 vs first-image) + OCR-абляция + loss только на вердикте"
+mechanism = "Больше визуального покрытия упаковки и узкий таргет должны снизить parse/verdict ошибки zero-shot"
+expected_macro_f1_delta = 0.3
+falsification = "macro-F1 на val < zero-shot + 0.03 на всех конфигах Track A"
+precedents = ["150_gemma_lora", "110_qwen3vl_lora"]
+
+[acceptance]
+baseline_macro_f1 = 0.3776
+required_fold_wins = 4
+max_category_f1_drop = 0.005
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 12.0
+planned_public_submissions = 1
+runtime_limit_minutes = 40
+
+[execution]
+arguments = ["--dataset", "std|noocr|ocrlong", "--r", "32-128", "--lr", "1e-4"]
+
+[artifacts]
+directory = "artifacts"
+publish = false
+local_artifacts_path = "/home/jovyan/shares/SR008.fs2/litvinov/tmp/QC/exps"

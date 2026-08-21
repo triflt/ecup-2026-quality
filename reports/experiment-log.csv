@@ -68,3 +68,7 @@ date,experiment_group,experiment,validation,bad_f1,flammable_f1,macro_f1,status,
 2026-08-21,230_qwen35_second_seed,Second-seed inline-payload attempts,Portable training command with oversized attached dataset,,,,Error,Rejected by runner request-size limit; no model evidence
 2026-08-21,230_qwen35_second_seed,Second-seed Qwen3.5 training,Five grouped outer folds plus full-data adapter; seed 31415,,,,Success,All six training jobs completed; OOF artifacts and full adapter await aggregation
 2026-08-21,190_shingle_neighbor_prior,Dual-LoRA shingle-prior Public leaderboard,Platform Public leaderboard,,,0.8919244236941932,Success,Новый лучший Public; +0.0853452605 к прежнему результату 0.8065791632; отправка подтверждает всю архитектуру, но не изолирует вклад одного prior
+2026-08-21,240_gemma4_lora_sft,Gemma-4-E4B-it zero-shot std,"Diagnostic stratified 90/10 (category,label) seed=42, n=1298",,,0.3379,Success,Label mapping raw 1 = бан / 0 = не бан (инвертирован относительно спеки)
+2026-08-21,240_gemma4_lora_sft,Gemma-4-E4B-it zero-shot noocr,Same diagnostic split,,,0.3776,Success,No-OCR prompt сильнее std на zero-shot
+2026-08-21,240_gemma4_lora_sft,LoRA A01-A04 training,"Wave 1: noocr r64/r32, ocrlong r64, std r64, lr 1e-4, 730 steps",,,,Running,NaN backward fixed via NaNProofAdamW; 7 skipped batches on A04; GPU 0-3
+2026-08-21,241_qwen3vl_contrastive,Contrastive B01/B02 training,"Sigmoid / triplet loss, bs 8 (2x4), grad_accum 4, n_images 2",,,,Success,Adapters saved after 69 steps (~26 min each); embedding eval running on GPU 4-5

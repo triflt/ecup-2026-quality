@@ -1,0 +1,29 @@
+{
+  "experiment_id": "240",
+  "status": "running",
+  "dataset_sha256": null,
+  "code_revision": "maksimcrewceo",
+  "seed": 42,
+  "label_mapping": {"raw_1": "бан", "raw_0": "не бан", "note": "inverted vs spec example; verified visually"},
+  "validation": {
+    "protocol": "diagnostic stratified 90/10 (category,label) seed=42; NOT grouped folds",
+    "n_train": 11673,
+    "n_val": 1298,
+    "bad_f1": null,
+    "flammable_f1": null,
+    "macro_f1": null,
+    "fold_scores": []
+  },
+  "zero_shot_baseline": {
+    "gemma_std_macro_f1": 0.3379,
+    "gemma_noocr_macro_f1": 0.3776
+  },
+  "runtime": {},
+  "artifacts": [
+    "tmp/QC/split.json",
+    "tmp/QC/ocr_cache.parquet",
+    "tmp/QC/sft_{std,noocr,ocrlong}_{train,val}.jsonl",
+    "tmp/QC/exps/expA01..expA04/"
+  ],
+  "decision": null
+}
