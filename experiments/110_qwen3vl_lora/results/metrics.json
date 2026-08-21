@@ -1,0 +1,109 @@
+{
+  "experiment_id": "110",
+  "slug": "qwen3vl_lora",
+  "status": "accepted",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "conclusion": "Nested grouped Macro F1 fusion 0.906395, +0.00710 к robust base.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "110_qwen3vl_lora",
+      "experiment": "Qwen3-VL rsLoRA backward",
+      "validation": "Exact competition image; real image; assistant-suffix-only loss; PEFT 0.20.0 --no-deps",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "6.42M trainable parameters; finite loss/gradients; 4.38 GiB peak H100 memory"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "110_qwen3vl_lora",
+      "experiment": "Qwen3-VL supervised rsLoRA holdout r1",
+      "validation": "Outer grouped fold 4 excluded from sampling and training",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Error",
+      "notes": "All 7,352 images downloaded; failed before optimization because a standalone digit token was assumed"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "110_qwen3vl_lora",
+      "experiment": "Qwen3-VL supervised rsLoRA holdout r2",
+      "validation": "Outer grouped fold 4 excluded from sampling and training",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Error",
+      "notes": "All 7,352 images downloaded; a 1,024-token truncated card removed the assistant suffix before optimization"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "110_qwen3vl_lora",
+      "experiment": "Qwen3-VL supervised rsLoRA holdout r3",
+      "validation": "Outer grouped fold 4 excluded; bounded text + 1,536-token context",
+      "bad_f1": "0.9517058041648205",
+      "flammable_f1": "0.9230769230769231",
+      "macro_f1": "0.9373913636208718",
+      "status": "Success",
+      "notes": "Balanced hard-example training; first-image VLM; fold-4 late fusion with four-head OOF reaches 0.954419"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "110_qwen3vl_lora",
+      "experiment": "Qwen3-VL rsLoRA clean holdout f4",
+      "validation": "Top 10% suspicious training contradictions removed; untouched fold 4",
+      "bad_f1": "0.947416",
+      "flammable_f1": "0.876712",
+      "macro_f1": "0.912064",
+      "status": "Success",
+      "notes": "Below hard mining, especially on rare flammable positives; clean filter rejected"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "110_qwen3vl_lora",
+      "experiment": "Qwen3-VL rsLoRA 5-fold OOF",
+      "validation": "All five outer grouped folds; first image; hard-example training",
+      "bad_f1": "0.940979",
+      "flammable_f1": "0.819095",
+      "macro_f1": "0.880037",
+      "status": "Success",
+      "notes": "LoRA alone; no fold sees its validation labels during training"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "110_qwen3vl_lora",
+      "experiment": "Robust late fusion + Qwen3-VL rsLoRA",
+      "validation": "Five-fold rank fusion calibrated against Public-winning two-head OOF",
+      "bad_f1": "0.95408895",
+      "flammable_f1": "0.86631016",
+      "macro_f1": "0.91019956",
+      "status": "Success",
+      "notes": "Base/LoRA weights: BAD 40/60, flammable 75/25; +0.01090 macro over robust base"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "110_qwen3vl_lora",
+      "experiment": "Nested LoRA calibration",
+      "validation": "Each fold weight/threshold selected only on the other four grouped folds",
+      "bad_f1": "0.953415312808545",
+      "flammable_f1": "0.859375",
+      "macro_f1": "0.9063951564042725",
+      "status": "Success",
+      "notes": "Leakage-free gain +0.00710 over robust base; validates next submission"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "110_qwen3vl_lora",
+      "experiment": "Qwen3-VL-2B LoRA compatibility",
+      "validation": "Registry/model load smoke",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "2.128B parameters loaded in 6.16 s; PEFT is absent from base image and must be vendored or added via custom Docker"
+    }
+  ]
+}

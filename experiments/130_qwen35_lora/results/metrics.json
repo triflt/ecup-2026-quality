@@ -1,0 +1,54 @@
+{
+  "experiment_id": "130",
+  "slug": "qwen35_lora",
+  "status": "accepted",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "conclusion": "Подтверждено: three-head nested Macro F1 0.911843.",
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "130_qwen35_lora",
+      "experiment": "Qwen3.5-4B rsLoRA backward",
+      "validation": "Official image; real product image; multimodal classification suffix",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "3.15M trainable parameters; 9.10 GiB peak H100; full clean holdout running"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "130_qwen35_lora",
+      "experiment": "Qwen3.5-4B clean rsLoRA holdout f4",
+      "validation": "Same clean-filtered untouched outer fold 4",
+      "bad_f1": "0.9546690843155031",
+      "flammable_f1": "0.868421052631579",
+      "macro_f1": "0.9115450684735411",
+      "status": "Success",
+      "notes": "Fused with robust base: 0.945805; comparable to Qwen3-VL clean"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "130_qwen35_lora",
+      "experiment": "Qwen3.5-4B hard rsLoRA holdout f4",
+      "validation": "Hard-mined first-image adapter; untouched outer fold 4",
+      "bad_f1": "0.9488789237668162",
+      "flammable_f1": "0.8888888888888888",
+      "macro_f1": "0.9188839063278524",
+      "status": "Success",
+      "notes": "Robust-base fusion reaches 0.954843; full five-fold evaluation launched"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "130_qwen35_lora",
+      "experiment": "Qwen3.5-4B hard rsLoRA full OOF",
+      "validation": "Outer grouped folds 0--4; hard-mined first-image adapter",
+      "bad_f1": "0.9448917516550367",
+      "flammable_f1": "0.8578431372549019",
+      "macro_f1": "0.9013674444549693",
+      "status": "Success",
+      "notes": "Global robust-base fusion 0.917507; nested pair with base 0.903330"
+    }
+  ]
+}

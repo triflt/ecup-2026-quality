@@ -1,0 +1,25 @@
+[experiment]
+id = "140"
+slug = "dual_lora_fusion"
+title = "Dual-LoRA fusion"
+status = "accepted"
+entrypoint = "research/nested_multimodel_fusion.py"
+result_file = "experiments/140_dual_lora_fusion/results/metrics.json"
+submission_source = "experiments/140_dual_lora_fusion/submission"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "nested_grouped_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false

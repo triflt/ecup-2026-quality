@@ -1,0 +1,17 @@
+# Agent operating rules
+
+Этот файл обязателен для любого AI-агента, продолжающего работу в репозитории.
+
+1. Мы работаем как будущие чемпионы: quality bar — DS Master / Kaggle Grandmaster и первое место на Private/Final leaderboard, а не косметическое улучшение Public score.
+2. Сначала прочитать `CODEX.md`, локальный `CODEX.local.md` (если он существует), `WHATS_NEXT.md`, `docs/validation.md`, `docs/research/literature-and-competitions.md`, `reports/experiment-log.csv` и README целевого experiment package. `CODEX.local.md` никогда не коммитить.
+3. Для новой гипотезы записать релевантный SOTA/champion precedent и проверяемый механизм переноса на наши данные.
+4. Не выбирать модель по random split. Основной selection protocol — frozen grouped outer folds; любые random 70/30 проверки помечать как recurrence simulation.
+5. Не использовать Public leaderboard для последовательного подбора мелких thresholds. Public — независимая проверка архитектурной гипотезы.
+6. Новый эксперимент создаётся копированием `templates/experiment/` и получает уникальный числовой prefix.
+7. Каждый эксперимент фиксирует dataset/evaluation versions из реестров; существующие версии не редактируются, новая корзина получает новый version ID.
+8. Код должен работать с обычными `--data`, `--images`, `--output-dir`, без зависимости от private scheduler.
+9. Private execution presets, URLs, credentials, tenant/project names и internal registry paths не коммитить. Локальная папка preset-файлов — `experiments/<id>/.local/compute/`.
+10. Raw data, model weights, embeddings и submission ZIP не коммитить; они лежат локально в `artifacts/`.
+11. Результат пригоден только после schema check, leakage audit, category F1, macro F1, fold dispersion и runtime estimate.
+12. Любой rejected/failed experiment остаётся в журнале с причиной. Не переписывать историю.
+13. После эксперимента обновить `results/metrics.json`, `reports/experiment-log.csv`, `WHATS_NEXT.md` и при необходимости `reports/submissions.csv`.

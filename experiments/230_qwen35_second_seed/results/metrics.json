@@ -1,0 +1,43 @@
+{
+  "experiment_id": "230",
+  "slug": "qwen35_second_seed",
+  "status": "ready_for_aggregation",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "conclusion": "Пять OOF jobs и full-data training завершены; artifacts ещё не агрегированы.",
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "230_qwen35_second_seed",
+      "experiment": "Second-seed data-binding attempt",
+      "validation": "Portable training command with missing external data binding",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Error",
+      "notes": "Failed before GPU optimization; no model evidence"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "230_qwen35_second_seed",
+      "experiment": "Second-seed inline-payload attempts",
+      "validation": "Portable training command with oversized attached dataset",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Error",
+      "notes": "Rejected by runner request-size limit; no model evidence"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "230_qwen35_second_seed",
+      "experiment": "Second-seed Qwen3.5 training",
+      "validation": "Five grouped outer folds plus full-data adapter; seed 31415",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "All six training jobs completed; OOF artifacts and full adapter await aggregation"
+    }
+  ]
+}

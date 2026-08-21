@@ -1,0 +1,24 @@
+[experiment]
+id = "170"
+slug = "annotator_prior"
+title = "Exact/name annotator prior"
+status = "completed"
+entrypoint = "research/annotator_prior_random_split.py"
+result_file = "experiments/170_annotator_prior/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "recurrence_70_30_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false

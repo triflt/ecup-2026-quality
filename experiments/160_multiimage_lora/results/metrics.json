@@ -1,0 +1,21 @@
+{
+  "experiment_id": "160",
+  "slug": "multiimage_lora",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "conclusion": "Отклонено на untouched fold: дополнительные gallery images размывают first-image signal.",
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "160_multiimage_lora",
+      "experiment": "Qwen3-VL multi-image hard rsLoRA holdout f4",
+      "validation": "First, second and last product images; untouched outer fold 4",
+      "bad_f1": "0.9431767337807606",
+      "flammable_f1": "0.8974358974358975",
+      "macro_f1": "0.9203063156083291",
+      "status": "Rejected",
+      "notes": "Robust-base fusion 0.953082; below first-image Qwen3-VL on the same fold, so no remaining folds"
+    }
+  ]
+}

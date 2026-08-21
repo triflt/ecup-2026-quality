@@ -1,0 +1,24 @@
+[experiment]
+id = "160"
+slug = "multiimage_lora"
+title = "Qwen3-VL multi-image LoRA"
+status = "rejected"
+entrypoint = "research/qwen3vl_multiimage_lora_holdout.py"
+result_file = "experiments/160_multiimage_lora/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "nested_grouped_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false

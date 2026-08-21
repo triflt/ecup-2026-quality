@@ -1,0 +1,43 @@
+{
+  "experiment_id": "090",
+  "slug": "advanced_mixed",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "conclusion": "Отклонено: Public 0.785500 против 0.806579 у simpler late fusion.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "090_advanced_mixed",
+      "experiment": "Category-mixed advanced ensemble",
+      "validation": "BAD cross-modal interaction + flammable four-head; same grouped folds",
+      "bad_f1": "0.9485450674237047",
+      "flammable_f1": "0.8658227848101265",
+      "macro_f1": "0.9071839261169156",
+      "status": "Success",
+      "notes": "Best standard grouped CV; packaged as advanced-mixed submission"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "090_advanced_mixed",
+      "experiment": "Advanced-mixed submission smoke",
+      "validation": "Official Docker image, H100, 3 products / 11 images / three selective Qwen views",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "Output schema valid; model loaded once; only category-required views are computed"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "090_advanced_mixed",
+      "experiment": "Public calibration: robust vs advanced fusion",
+      "validation": "Actual platform Public scores",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "Late 0.806579 beats advanced 0.785500 despite lower ordinary grouped CV; prioritize duplicate-stress stability"
+    }
+  ]
+}

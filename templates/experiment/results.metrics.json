@@ -1,0 +1,17 @@
+{
+  "experiment_id": "XXX",
+  "status": "planned",
+  "dataset_sha256": null,
+  "code_revision": null,
+  "seed": 42,
+  "validation": {
+    "protocol": "frozen grouped outer folds",
+    "bad_f1": null,
+    "flammable_f1": null,
+    "macro_f1": null,
+    "fold_scores": []
+  },
+  "runtime": {},
+  "artifacts": [],
+  "decision": null
+}

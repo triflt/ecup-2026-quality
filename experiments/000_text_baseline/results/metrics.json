@@ -1,0 +1,32 @@
+{
+  "experiment_id": "000",
+  "slug": "text_baseline",
+  "status": "completed",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "conclusion": "Гипотеза подтверждена, но random holdout оказался оптимистичным; grouped Macro F1 0.889576, Public 0.713026.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "000_text_baseline",
+      "experiment": "Rule-based hard overrides",
+      "validation": "Grouped OOF applied on top of late fusion",
+      "bad_f1": "0.8915079108814983",
+      "flammable_f1": "0.7125748502994012",
+      "macro_f1": "0.8020413805904497",
+      "status": "Rejected",
+      "notes": "Both category overrides materially reduce F1; retain rules as features only"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "000_text_baseline",
+      "experiment": "Explicit rule-feature CV",
+      "validation": "Same 5 grouped folds; learned regex/count interactions appended to text SVM",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Timeout",
+      "notes": "12-minute CPU limit expired during the broad LinearSVC grid; no metric produced; lower priority than validated VLM gains"
+    }
+  ]
+}

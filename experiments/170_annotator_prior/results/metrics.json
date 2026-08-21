@@ -1,0 +1,54 @@
+{
+  "experiment_id": "170",
+  "slug": "annotator_prior",
+  "status": "completed",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "recurrence_70_30_v1",
+  "conclusion": "Сильный 70/30 эффект, особенно для flammable; применять как отдельную distributional гипотезу.",
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "170_annotator_prior",
+      "experiment": "Dual-LoRA annotator prior",
+      "validation": "Three-head OOF plus nested repeated-card prior",
+      "bad_f1": "0.9619227653254119",
+      "flammable_f1": "0.9238329238329238",
+      "macro_f1": "0.9428778445791679",
+      "status": "Success",
+      "notes": "70/30 simulation 0.961793/0.920390; new primary submission candidate"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "170_annotator_prior",
+      "experiment": "Annotator/product-family prior",
+      "validation": "Leave-one-out repeated-card labels; outer-fold parameter selection",
+      "bad_f1": "0.9607720489679207",
+      "flammable_f1": "0.9052631578947369",
+      "macro_f1": "0.9330176034313288",
+      "status": "Success",
+      "notes": "Organizer confirmed same ambiguous annotation process in test; +0.00868 macro over current consistent lookup"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "170_annotator_prior",
+      "experiment": "Annotator prior 70/30 simulation",
+      "validation": "20 stratified row splits matching 12,971 train / ~5,400 hidden proportion",
+      "bad_f1": "0.960363931336311",
+      "flammable_f1": "0.9092393677220043",
+      "macro_f1": "0.9348016495291577",
+      "status": "Success",
+      "notes": "Prior beats current lookup by +0.00174 BAD and +0.01868 flammable; exact-repeat coverage ~36% flammable"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "170_annotator_prior",
+      "experiment": "LoRA annotator-prior smoke",
+      "validation": "Official image; both Qwen registry models; compressed 0.5 MB prior",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "Offline inference and exact output schema passed"
+    }
+  ]
+}

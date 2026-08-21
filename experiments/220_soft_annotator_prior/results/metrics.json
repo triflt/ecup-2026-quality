@@ -1,0 +1,21 @@
+{
+  "experiment_id": "220",
+  "slug": "soft_annotator_prior",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "recurrence_70_30_v1",
+  "conclusion": "Donor-only Macro gain только +0.000330; confirmation random split подготовлен, но не запущен.",
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "220_soft_annotator_prior",
+      "experiment": "Beta-smoothed soft family prior",
+      "validation": "Donor-only nested grouped CV with exact/name/canonical posterior",
+      "bad_f1": "0.9554232088070745",
+      "flammable_f1": "0.8975609756097561",
+      "macro_f1": "0.9264920922084153",
+      "status": "Rejected",
+      "notes": "Only +0.000330 macro over continuous-model baseline and below selected hard/shingle branch"
+    }
+  ]
+}

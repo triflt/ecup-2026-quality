@@ -1,0 +1,21 @@
+{
+  "experiment_id": "200",
+  "slug": "image_hash_prior",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "recurrence_70_30_v1",
+  "conclusion": "Отклонено: Macro gain только +0.000095, flammable overrides не выбраны.",
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "200_image_hash_prior",
+      "experiment": "Exact/perceptual image-hash prior",
+      "validation": "All 49,456 train images; leave-one-row-out hashes layered after text prior",
+      "bad_f1": "0.9609625668449198",
+      "flammable_f1": "0.9052631578947369",
+      "macro_f1": "0.9331128623698284",
+      "status": "Rejected",
+      "notes": "Only +0.000095 macro over text annotator prior; flammable selects no image overrides; 0 download failures"
+    }
+  ]
+}

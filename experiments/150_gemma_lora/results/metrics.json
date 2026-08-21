@@ -1,0 +1,76 @@
+{
+  "experiment_id": "150",
+  "slug": "gemma_lora",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "conclusion": "Отклонено после пяти folds: nested fusion 0.902686 и высокая variance flammable.",
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "150_gemma_lora",
+      "experiment": "Gemma-4-E4B rsLoRA backward",
+      "validation": "Language attention projections only; vision tower frozen",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "144 supported projections; 9.47M trainable; 16.13 GiB peak H100; clean holdout running"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "150_gemma_lora",
+      "experiment": "Gemma-4-E4B clean rsLoRA holdout f4",
+      "validation": "Same clean-filtered untouched outer fold 4",
+      "bad_f1": "0.9513609995537706",
+      "flammable_f1": "0.8493150684931506",
+      "macro_f1": "0.9003380340234606",
+      "status": "Success",
+      "notes": "Fused with robust base: 0.945685; below Qwen3-VL on the same fold"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "150_gemma_lora",
+      "experiment": "Gemma-4-E4B hard rsLoRA holdout f4",
+      "validation": "Hard-mined first-image adapter; untouched outer fold 4",
+      "bad_f1": "0.9452780229479258",
+      "flammable_f1": "0.9230769230769231",
+      "macro_f1": "0.9341774730124245",
+      "status": "Success",
+      "notes": "Robust-base fusion reaches 0.965924 (BAD 0.958165; flammable 0.973684); full five-fold evaluation launched"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "150_gemma_lora",
+      "experiment": "Gemma-4-E4B hard rsLoRA full OOF",
+      "validation": "Outer grouped folds 0--4; hard-mined first-image adapter",
+      "bad_f1": "0.9397590361445783",
+      "flammable_f1": "0.8608247422680413",
+      "macro_f1": "0.9002918892063099",
+      "status": "Success",
+      "notes": "Global robust-base fusion 0.918231; flammable fold F1 ranges 0.810--0.974, so nested validation is required"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "150_gemma_lora",
+      "experiment": "Nested robust-base + Gemma fusion",
+      "validation": "Each fold calibrated only on the other four grouped folds",
+      "bad_f1": "0.9518362970243947",
+      "flammable_f1": "0.8535353535353535",
+      "macro_f1": "0.9026858252798741",
+      "status": "Rejected",
+      "notes": "Below nested robust-base + Qwen3-VL at 0.906395; global 0.918231 is optimistic"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "150_gemma_lora",
+      "experiment": "Nested robust-base + Qwen3-VL + Gemma",
+      "validation": "Three-head simplex weights selected on four folds, applied to the fifth",
+      "bad_f1": "0.9521930217956768",
+      "flammable_f1": "0.8514851485148515",
+      "macro_f1": "0.9018390851552641",
+      "status": "Rejected",
+      "notes": "Gemma destabilizes rare flammable calibration; capped 25% variant is also lower at 0.901413"
+    }
+  ]
+}

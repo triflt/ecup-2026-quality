@@ -1,0 +1,9 @@
+{
+  "experiment_id": "120",
+  "slug": "qwen3vl_lora_prior",
+  "status": "completed",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "recurrence_70_30_v1",
+  "conclusion": "70/30 recurrence simulations положительны; grouped leave-one-out metric имеет transductive leakage и не используется как основной.",
+  "historical_results": []
+}

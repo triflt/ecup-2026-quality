@@ -1,0 +1,35 @@
+schema_version = 1
+
+[[evaluations]]
+version = "grouped_text_v1"
+dataset_version = "competition_train_v1"
+purpose = "Primary novel-product generalization estimate"
+protocol = "Five category-specific StratifiedGroupKFold folds grouped by normalized name and description"
+manifest = "validation/grouped_text_v1/manifest.json"
+folds = "validation/grouped_text_v1/folds.csv"
+basket = "validation/grouped_text_v1/basket.csv"
+immutable = true
+
+[[evaluations]]
+version = "nested_grouped_v1"
+dataset_version = "competition_train_v1"
+purpose = "Leakage-safe model, fusion weight and threshold selection"
+protocol = "Outer grouped_text_v1 folds; all tuning is performed only on the other four folds"
+base_folds = "validation/grouped_text_v1/folds.csv"
+immutable = true
+
+[[evaluations]]
+version = "image_duplicate_stress_v1"
+dataset_version = "competition_train_v1"
+purpose = "Stress test against text and exact/near-image duplicate leakage"
+protocol = "Groups are connected components of normalized full text and image duplicate relations"
+base_folds = "validation/grouped_text_v1/folds.csv"
+immutable = true
+
+[[evaluations]]
+version = "recurrence_70_30_v1"
+dataset_version = "competition_train_v1"
+purpose = "Estimate benefit from product-family recurrence in hidden data"
+protocol = "Repeated stratified 70/30 simulations; priors are fit only on simulated train donors"
+base_folds = "validation/grouped_text_v1/folds.csv"
+immutable = true

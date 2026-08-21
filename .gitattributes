@@ -1,0 +1,2 @@
+# Frozen validation CSVs are checksum-addressed and intentionally preserve their original CRLF bytes.
+validation/**/*.csv binary

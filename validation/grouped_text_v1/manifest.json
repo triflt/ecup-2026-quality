@@ -1,0 +1,28 @@
+{
+  "evaluation_version": "grouped_text_v1",
+  "dataset_version": "competition_train_v1",
+  "protocol": "frozen category-specific StratifiedGroupKFold by normalized full text",
+  "n_splits": 5,
+  "random_state": 42,
+  "fold_source": "historical OOF cache",
+  "data_rows": 12971,
+  "basket_fold": 4,
+  "basket_rows": 2593,
+  "fold_rows": {
+    "0": 2594,
+    "1": 2596,
+    "2": 2594,
+    "3": 2594,
+    "4": 2593
+  },
+  "fold_positives": {
+    "0": 1153,
+    "1": 1153,
+    "2": 1152,
+    "3": 1153,
+    "4": 1151
+  },
+  "source_data_sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+  "folds_sha256": "03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d",
+  "basket_sha256": "741a91cf0ec7fd694963b504e199a342a0e9dbad762108a6d7771b0ae2bb41d1"
+}
