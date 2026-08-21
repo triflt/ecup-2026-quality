@@ -81,3 +81,14 @@ GPU-политика: только GPU 0-5; GPU 6-7 заняты чужими п
 | Fusion scripts | `run_fusion_grid.py`, `eval_fusion.py` | `experiments/242_fusion_grid/src/` |
 | Сводный статус | — | `docs/status/2026-08-21-maksimcrewceo-qc-tracks.md` |
 | Регистры | — | `experiments/README.md`, `reports/hypothesis-board.csv`, `reports/experiment-log.csv` |
+
+## Инженерный фикс (2026-08-21 15:45)
+
+`eval_embedder.py` падал на этапе `evaluate` из-за перебора по словарю `results`,
+в который уже были добавлены скаляры `macro_f1_lr`/`macro_f1_knn`.
+Пофиксил — теперь macro-F1 считается только по категориям.
+Перезапущены zero_embed, B01 и B02 eval-ы; логи `.bak` сохранены.
+
+## Update после B-эвалов
+
+(будет дописано автоматически, как only B01/B02/zero_embed метрики посчитаются)

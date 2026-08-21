@@ -142,9 +142,10 @@ def evaluate(train_embs, train_items, val_embs, val_items):
                 'pred_knn': 'бан' if pred_knn[j] == 1 else 'не бан',
             })
 
-    f1s = [results[cat]['f1_ban_lr'] for cat in results]
+    cats = ['БАД', 'Легковоспламеняющиеся']
+    f1s = [results[cat]['f1_ban_lr'] for cat in cats]
     results['macro_f1_lr'] = float(np.mean(f1s))
-    f1s_knn = [results[cat]['knn_f1_ban'] for cat in results]
+    f1s_knn = [results[cat]['knn_f1_ban'] for cat in cats]
     results['macro_f1_knn'] = float(np.mean(f1s_knn))
     return results, pd.DataFrame(p_ban_records)
 
