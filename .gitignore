@@ -12,6 +12,7 @@ __pycache__/
 # Competition data and local caches
 /data/
 /images/
+notebooks/data_overview_ru/assets/images/
 research/data.csv
 research/data.csv.gz
 research/data_parts/

@@ -9,12 +9,15 @@
 - [`CODEX.md`](CODEX.md) — правила работы AI-агентов.
 - [`WHATS_NEXT.md`](WHATS_NEXT.md) — точка продолжения и приоритеты.
 - [`docs/current-status.md`](docs/current-status.md) — текущий model/leaderboard status.
+- [`docs/solutions/two-best-solutions.md`](docs/solutions/two-best-solutions.md) — понятный разбор двух лучших решений.
+- [`notebooks/data_overview_ru/`](notebooks/data_overview_ru/) — русский notebook-отчёт по данным с графиками и локальной галереей.
 - [`docs/hackathon/task-and-rules.md`](docs/hackathon/task-and-rules.md) — задача, проверка и ограничения соревнования.
 - [`docs/hackathon/data-and-models.md`](docs/hackathon/data-and-models.md) — данные, правила классов и доступные модели.
 - [`docs/research/literature-and-competitions.md`](docs/research/literature-and-competitions.md) — статьи и похожие соревнования.
 - [`docs/research/next-research-program.md`](docs/research/next-research-program.md) — приоритетная программа дальнейших исследований.
 - [`docs/research/data-audit.md`](docs/research/data-audit.md) — исследование данных и рисков валидации.
 - [`docs/operations/experiment-cli.md`](docs/operations/experiment-cli.md) — переносимый CLI contract.
+- [`docs/operations/agent-research-loop.md`](docs/operations/agent-research-loop.md) — управляемый цикл работы исследовательских агентов.
 - [`docs/operations/publication.md`](docs/operations/publication.md) — безопасная публикация без legacy binaries.
 - [`validation/`](validation/) — frozen fold assignment и validation basket.
 - [`datasets/registry.toml`](datasets/registry.toml) — immutable версии исходных данных.
@@ -22,6 +25,8 @@
 - [`experiments/`](experiments/) — изолированные experiment packages.
 - [`reports/experiment-log.csv`](reports/experiment-log.csv) — полный machine-readable журнал.
 - [`reports/submissions.csv`](reports/submissions.csv) — leaderboard и готовые submission candidates.
+- [`reports/hypothesis-board.csv`](reports/hypothesis-board.csv) — очередь гипотез до дорогого запуска.
+- [`reports/champion.json`](reports/champion.json) — единственный указатель на текущее лучшее решение и состояние его проверки.
 - [`research/`](research/) — legacy research scripts и JSON-отчёты; новые эксперименты должны оформляться через `experiments/`.
 
 ## Быстрый старт

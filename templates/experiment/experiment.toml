@@ -16,6 +16,25 @@ registry = "validation/registry.toml"
 folds = "validation/grouped_text_v1/folds.csv"
 primary_metric = "macro_f1"
 
+[hypothesis]
+parent_experiment = ""
+changed_factor = "Одна конкретная часть решения"
+mechanism = "Почему изменение должно исправить известный тип ошибок"
+expected_macro_f1_delta = 0.0
+falsification = "Какой результат заставит отклонить гипотезу"
+precedents = []
+
+[acceptance]
+baseline_macro_f1 = 0.0
+required_fold_wins = 4
+max_category_f1_drop = 0.005
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 0.0
+planned_public_submissions = 0
+runtime_limit_minutes = 40
+
 [execution]
 arguments = []
 
