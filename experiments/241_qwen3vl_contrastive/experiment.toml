@@ -2,7 +2,7 @@
 id = "241"
 slug = "qwen3vl_contrastive"
 title = "Qwen3-VL-Embedding-2B Contrastive (Track B, QC)"
-status = "running"
+status = "rejected"
 entrypoint = "experiments/241_qwen3vl_contrastive/src/train_contrastive.py"
 result_file = "experiments/241_qwen3vl_contrastive/results/metrics.json"
 

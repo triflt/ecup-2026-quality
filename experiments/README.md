@@ -18,7 +18,7 @@
 | 200–220 | Alternative priors | Rejected | Gain отсутствует либо слишком мал |
 | 230 | Second Qwen3.5 seed | Running | Training завершён, aggregation pending |
 | 240 | Gemma-4 LoRA SFT (QC) | Running | Multi-image LoRA, loss на вердикте; zero-shot 0.34-0.38 macro |
-| 241 | Qwen3-VL contrastive (QC) | Running | Sigmoid/triplet дообучение эмбеддера; B01/B02 train done |
+| 241 | Qwen3-VL contrastive (QC) | Rejected | Sigmoid/triplet дообучение эмбеддера ухудшило head относительно zero-shot |
 | 242 | Fusion grid (QC) | Prepared | Фьюжн скоров треков 240/241, ждёт их завершения |
 | 900 | Infrastructure checks | Completed | Runtime/schema/preprocessing safeguards |
 

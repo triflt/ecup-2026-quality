@@ -72,3 +72,8 @@ date,experiment_group,experiment,validation,bad_f1,flammable_f1,macro_f1,status,
 2026-08-21,240_gemma4_lora_sft,Gemma-4-E4B-it zero-shot noocr,Same diagnostic split,,,0.3776,Success,No-OCR prompt сильнее std на zero-shot
 2026-08-21,240_gemma4_lora_sft,LoRA A01-A04 training,"Wave 1: noocr r64/r32, ocrlong r64, std r64, lr 1e-4, 730 steps",,,,Running,NaN backward fixed via NaNProofAdamW; 7 skipped batches on A04; GPU 0-3
 2026-08-21,241_qwen3vl_contrastive,Contrastive B01/B02 training,"Sigmoid / triplet loss, bs 8 (2x4), grad_accum 4, n_images 2",,,,Success,Adapters saved after 69 steps (~26 min each); embedding eval running on GPU 4-5
+2026-08-21,241_qwen3vl_contrastive,Zero-shot Qwen3-VL embedding LR (diagnostic n_images=2),Diagnostic stratified 90/10 (category,label) seed=42,0.9130,0.5672,0.7401,Success,Baseline for B01/B02; LR classifier on 2-image embeddings
+2026-08-21,241_qwen3vl_contrastive,Zero-shot Qwen3-VL embedding KNN (diagnostic n_images=2),Same diagnostic split,0.9309,0.8235,0.8772,Success,KNN baseline stronger than LR on this setup
+2026-08-21,241_qwen3vl_contrastive,B01 sigmoid contrastive embedding LR,Same diagnostic split,0.8413,0.2466,0.5439,Rejected,LoRA r16 a16 lr1e-4 3 epochs; LR macro-F1 dropped -0.1961 vs zero-shot
+2026-08-21,241_qwen3vl_contrastive,B02 triplet contrastive embedding LR,Same diagnostic split,0.8702,0.2857,0.5780,Rejected,LoRA r16 a16 lr1e-4 3 epochs; LR macro-F1 dropped -0.1621 vs zero-shot
+2026-08-21,241_qwen3vl_contrastive,B01/B02 contrastive embedding KNN,Same diagnostic split,0.9242/0.9299,0.7647/0.7647,0.8444/0.8473,Rejected,KNN also degraded vs zero-shot KNN 0.8772; contrastive config not useful
