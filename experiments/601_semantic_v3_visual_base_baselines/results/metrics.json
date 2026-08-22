@@ -1,6 +1,6 @@
 {
   "experiment_id": "601",
-  "status": "qwen_training_running",
+  "status": "complete",
   "training_launched": true,
   "input_audit_status": "ready",
   "input_audit_file": "analysis/input_audit.json",
@@ -30,11 +30,26 @@
     }
   ],
   "qwen3vl_fold_status": {
-    "0": "running",
-    "1": "running",
-    "2": "running",
-    "3": "running",
-    "4": "running"
+    "0": "complete",
+    "1": "complete",
+    "2": "complete",
+    "3": "complete",
+    "4": "complete"
+  },
+  "qwen3vl_strict_nested": {
+    "score_transform": "sigmoid_raw_logit",
+    "threshold_protocol": "fit_each_category_on_other_four_outer_folds",
+    "macro_f1": 0.8954056291,
+    "bad_f1": 0.9408112583,
+    "flammable_f1": 0.85,
+    "delta_vs_robust_base": 0.0018676197,
+    "fold_wins_vs_robust_base": 3,
+    "component_bootstrap_probability_positive": 0.5379,
+    "corrected": 273,
+    "regressed": 312,
+    "accepted_as_standalone_replacement": false,
+    "accepted_as_baseline_component": true,
+    "component_bundle_sha256": "b917ffe9f11702f7b041de4b2699dbe367682e02cfb19dc77d65d05be3b3a13d"
   },
   "sealed_holdout_used": false,
   "development_rows": 11118,

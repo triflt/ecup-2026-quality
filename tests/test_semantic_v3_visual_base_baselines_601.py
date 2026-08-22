@@ -273,4 +273,8 @@ def test_card_records_completed_robust_base_and_running_qwen_jobs() -> None:
     assert config["execution"]["launch_authorized"] is True
     assert config["execution"]["commit_authorized"] is True
     assert metrics["training_launched"] is True
+    assert metrics["status"] == "complete"
+    assert metrics["qwen3vl_strict_nested"]["macro_f1"] == pytest.approx(0.8954056291)
+    assert metrics["qwen3vl_strict_nested"]["fold_wins_vs_robust_base"] == 3
+    assert metrics["qwen3vl_strict_nested"]["accepted_as_standalone_replacement"] is False
     assert metrics["sealed_holdout_used"] is False
