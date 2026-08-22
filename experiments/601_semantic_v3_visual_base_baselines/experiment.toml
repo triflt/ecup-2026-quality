@@ -2,7 +2,7 @@
 id = "601"
 slug = "semantic_v3_visual_base_baselines"
 title = "Semantic-v3 reproducible robust-base and Qwen3-VL baselines"
-status = "prepared_not_launched"
+status = "strict_cpu_rerun"
 entrypoint = "experiments/601_semantic_v3_visual_base_baselines/train_robust_base.py"
 result_file = "experiments/601_semantic_v3_visual_base_baselines/results/metrics.json"
 
@@ -22,7 +22,7 @@ primary_metric = "macro_f1"
 
 [robust_base]
 historical_parent = "080_four_head_ensemble"
-status = "reproducible"
+status = "strict_nested_v2_running_numpy_2_3_1"
 protocol_version = "semantic_v3_robust_base_strict_nested_v2"
 heads = ["tfidf_linear_svc", "all_image_linear_svc", "first_image_linear_svc", "all_image_extra_trees"]
 outer_protocol = "fit on four development folds, evaluate fifth"
@@ -67,8 +67,8 @@ qwen_serial_gpu_hours_min = 1.7
 qwen_serial_gpu_hours_max = 3.4
 
 [execution]
-launch_authorized = false
-commit_authorized = false
+launch_authorized = true
+commit_authorized = true
 private_runtime_presets = "experiments/601_semantic_v3_visual_base_baselines/.local/runtime"
 
 [artifacts]

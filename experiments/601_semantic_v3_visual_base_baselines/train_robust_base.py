@@ -9,6 +9,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import scipy
+import sklearn
 from scipy import sparse
 from semantic_v3_contract import (
     DEFAULT_ALL_EMBEDDINGS,
@@ -436,6 +438,11 @@ def train(
         "numerical_safety": {
             "runtime_and_convergence_warnings": "fatal",
             "nonfinite_features_coefficients_or_scores": "fatal",
+            "library_versions": {
+                "numpy": np.__version__,
+                "scipy": scipy.__version__,
+                "scikit_learn": sklearn.__version__,
+            },
             "input_embedding_stats": feature_audit,
         },
         "category_f1": category_f1,

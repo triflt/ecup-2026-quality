@@ -1,12 +1,20 @@
 {
   "experiment_id": "601",
-  "status": "prepared_not_launched",
+  "status": "strict_cpu_rerun",
   "training_launched": false,
   "input_audit_status": "ready",
   "input_audit_file": "analysis/input_audit.json",
   "input_id_order_verified": true,
   "development_sealed_id_overlap": 0,
-  "robust_base_status": "pending_strict_nested_v2_cpu_rerun",
+  "robust_base_status": "running_strict_nested_v2_numpy_2_3_1",
+  "strict_v2_first_attempt": {
+    "accepted": false,
+    "artifact_created": false,
+    "cause": "known false floating-point flags from the ARM macOS BLAS path in NumPy 2.2.6",
+    "minimal_reproduction_finite_and_exact": true,
+    "rerun_numpy_version": "2.3.1",
+    "warnings_remain_fatal": true
+  },
   "robust_base_required_protocol": "semantic_v3_robust_base_strict_nested_v2",
   "invalidated_local_protocols": [
     {
