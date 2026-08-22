@@ -1,0 +1,70 @@
+{
+  "audit_version": "validation_integrity_post470_v1",
+  "created_at": "2026-08-22",
+  "decision": {
+    "validated_champion": "190_shingle_neighbor_prior",
+    "experiment_400_status": "strong_public_probe_not_locally_confirmed_replacement",
+    "experiment_480_status": "paused_pending_validation_redesign"
+  },
+  "sound_properties": [
+    "immutable row and fold alignment with checksums",
+    "one historical OOF prediction per row",
+    "post-processing threshold selection excludes the nominal scoring fold",
+    "connected safe mask removes every crossing component under exact full-text and exact first-image-fp16 edges",
+    "large consistent negative deltas remain useful rejection evidence"
+  ],
+  "limitations": {
+    "historical_folds": "grouped_text_v1 was imported from historical OOF assignments; current group hashes were attached later",
+    "near_family_crossings_connected_safe": {
+      "exact_normalized_name": {"groups": 184, "rows": 778},
+      "digit_masked_name": {"groups": 535, "rows": 2001},
+      "digit_masked_first_8_title_tokens": {"groups": 702, "rows": 2672},
+      "digit_masked_full_text": {"groups": 286, "rows": 914}
+    },
+    "selector_leakage": "donor hard-mining uses global OOF scores whose generating model may have trained on the nominal outer holdout",
+    "adaptive_reuse": "the same five folds and row-level errors informed dozens of later hypotheses",
+    "rank_normalization": "within-holdout rank normalization is label-free but transductive and may shift on hidden batches"
+  },
+  "public_transfer_evidence": {
+    "190": {"public_macro_f1": 0.8919244236941932},
+    "230": {
+      "offline_delta_to_baseline": 0.007394,
+      "public_macro_f1": 0.8639458233,
+      "public_delta_to_190": -0.0279786003941932
+    },
+    "280": {
+      "offline_nested_delta_to_190": 0.0072044647,
+      "offline_production_threshold_delta_to_190": 0.001453,
+      "public_macro_f1": 0.8919244237,
+      "public_delta_at_recorded_precision": 0.0
+    }
+  },
+  "experiment_400_exact_production_replay": {
+    "all_rows_delta_macro_f1": 0.0023473317439940966,
+    "connected_safe_delta_macro_f1": 0.00238565426568238,
+    "changed": 25,
+    "corrected": 14,
+    "regressed": 11,
+    "fold_deltas": [
+      0.021496005809731267,
+      -0.0037763253449528134,
+      0.012499999999999956,
+      -0.027327935222672073,
+      0.00572116832279429
+    ],
+    "passes_nonnegative_every_fold_gate": false
+  },
+  "required_counterchecks": [
+    "retain immutable historical validation for comparability",
+    "build a label-blind cross-category semantic and perceptual family graph using all gallery images",
+    "seal a component-level inductive holdout before the next deep candidate",
+    "rebuild selector uncertainty scores, hard mining, fusion and thresholds strictly inside each outer-train set",
+    "build prior vocabularies and neighbor indices from donors only"
+  ],
+  "evidence": [
+    "research/agent_notes/validation_architecture_audit_post470.md",
+    "validation/grouped_text_v1/manifest.json",
+    "validation/connected_family_guard_v2/manifest.json",
+    "experiments/400_qwen35_category_routed_adapters/results/routed_predictions.npz"
+  ]
+}

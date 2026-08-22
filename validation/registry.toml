@@ -1,0 +1,144 @@
+schema_version = 1
+
+[[evaluations]]
+version = "grouped_text_v1"
+dataset_version = "competition_train_v1"
+purpose = "Primary novel-product generalization estimate"
+protocol = "Five category-specific StratifiedGroupKFold folds grouped by normalized name and description"
+manifest = "validation/grouped_text_v1/manifest.json"
+folds = "validation/grouped_text_v1/folds.csv"
+basket = "validation/grouped_text_v1/basket.csv"
+immutable = true
+
+[[evaluations]]
+version = "nested_grouped_v1"
+dataset_version = "competition_train_v1"
+purpose = "Leakage-safe model, fusion weight and threshold selection"
+protocol = "Outer grouped_text_v1 folds; all tuning is performed only on the other four folds"
+base_folds = "validation/grouped_text_v1/folds.csv"
+immutable = true
+
+[[evaluations]]
+version = "image_duplicate_stress_v1"
+dataset_version = "competition_train_v1"
+purpose = "Stress test against text and exact/near-image duplicate leakage"
+protocol = "Groups are connected components of normalized full text and image duplicate relations"
+base_folds = "validation/grouped_text_v1/folds.csv"
+immutable = true
+
+[[evaluations]]
+version = "recurrence_70_30_v1"
+dataset_version = "competition_train_v1"
+purpose = "Estimate benefit from product-family recurrence in hidden data"
+protocol = "Repeated stratified 70/30 simulations; priors are fit only on simulated train donors"
+base_folds = "validation/grouped_text_v1/folds.csv"
+immutable = true
+
+[[evaluations]]
+version = "locked_190_nested_v1"
+dataset_version = "competition_train_v1"
+purpose = "Causal adapter replacement inside the fixed Public-190 architecture"
+protocol = "Public-190 fusion weights are fixed before candidate training; only category thresholds are fit on the other four grouped outer folds"
+base_folds = "validation/grouped_text_v1/folds.csv"
+manifest = "validation/locked_190_nested_v1/manifest.json"
+immutable = true
+
+[[evaluations]]
+version = "minicpm_two_fold_screen_v1"
+dataset_version = "competition_train_v1"
+purpose = "Predeclared low-cost screen of a distinct first-image VLM before full five-fold evaluation"
+protocol = "Locked Public-190 weights on folds 0 and 3; each fold threshold is fitted only on the other fold; passing only authorizes full locked_190_nested_v1"
+base_folds = "validation/grouped_text_v1/folds.csv"
+manifest = "validation/minicpm_two_fold_screen_v1/manifest.json"
+immutable = true
+
+[[evaluations]]
+version = "component_transfer_gate_v1"
+dataset_version = "competition_train_v1"
+purpose = "Post-280 promotion gate for learned components under repeated-selection and hidden-shift risk"
+protocol = "Full locked_190_nested_v1 plus downstream prior replay, group bootstrap, two-fold second-seed repeat and runtime reserve"
+base_folds = "validation/grouped_text_v1/folds.csv"
+manifest = "validation/component_transfer_gate_v1/manifest.json"
+immutable = true
+
+[[evaluations]]
+version = "connected_family_guard_v2"
+dataset_version = "competition_train_v1"
+purpose = "Leakage-resistant selection guard for nearest-family, residual-head and other local methods evaluated on historical OOF predictions"
+protocol = "Keep grouped_text_v1 fold ids immutable but exclude every category-specific connected component spanning folds; edges are exact normalized full text and exact first-image fp16 embedding equality"
+base_folds = "validation/grouped_text_v1/folds.csv"
+rows = "validation/connected_family_guard_v2/rows.csv"
+manifest = "validation/connected_family_guard_v2/manifest.json"
+immutable = true
+
+[[evaluations]]
+version = "component_transfer_gate_v2"
+dataset_version = "competition_train_v1"
+purpose = "Promotion gate requiring agreement between historical locked OOF and the connected-safe exclusion guard"
+protocol = "Pass component_transfer_gate_v1 and repeat category, fold and connected-component bootstrap guardrails on connected_family_guard_v2 safe rows"
+base_folds = "validation/grouped_text_v1/folds.csv"
+connected_guard = "validation/connected_family_guard_v2/rows.csv"
+manifest = "validation/component_transfer_gate_v2/manifest.json"
+immutable = true
+
+[[evaluations]]
+version = "connected_family_repeated_v1"
+dataset_version = "competition_train_v1"
+purpose = "Predeclared topology-sensitivity check for cheap residual and metric heads after selection on historical folds"
+protocol = "Three category-specific five-fold StratifiedGroupKFold repeats with seeds 17, 31415 and 20260822 over connected_family_guard_v2 safe components only"
+connected_guard = "validation/connected_family_guard_v2/rows.csv"
+rows = "validation/connected_family_repeated_v1/rows.csv"
+manifest = "validation/connected_family_repeated_v1/manifest.json"
+immutable = true
+
+[[evaluations]]
+version = "component_transfer_gate_v3"
+dataset_version = "competition_train_v1"
+purpose = "Promotion gate for deterministic or stochastic local heads with model-appropriate stability repeats"
+protocol = "All component_transfer_gate_v2 gates plus connected_family_repeated_v1; stochastic heads repeat seed 31415, deterministic heads repeat best/worst folds after a fixed donor-order permutation"
+base_folds = "validation/grouped_text_v1/folds.csv"
+connected_guard = "validation/connected_family_guard_v2/rows.csv"
+repeated_topologies = "validation/connected_family_repeated_v1/rows.csv"
+manifest = "validation/component_transfer_gate_v3/manifest.json"
+immutable = true
+
+[[evaluations]]
+version = "component_transfer_gate_v4"
+dataset_version = "competition_train_v1"
+purpose = "Fail-closed promotion gate with exactly one model-appropriate stability protocol and semantic decision binding"
+protocol = "All component_transfer_gate_v3 gates; deterministic heads use order-permutation stability, stochastic heads use seed repeat, and every branch/final verdict is recomputed from canonical evidence"
+base_folds = "validation/grouped_text_v1/folds.csv"
+connected_guard = "validation/connected_family_guard_v2/rows.csv"
+repeated_topologies = "validation/connected_family_repeated_v1/rows.csv"
+manifest = "validation/component_transfer_gate_v4/manifest.json"
+immutable = true
+
+[[evaluations]]
+version = "qwen3vl_rdrop_two_fold_screen_v1"
+dataset_version = "competition_train_v1"
+purpose = "Reject-only objective-isolation screen for Qwen3-VL R-Drop before full five-fold training"
+protocol = "Locked experiment-400 routing and fusion weights on folds 0 and 3; hybrid parent ranks elsewhere; each tested fold excluded from threshold selection"
+base_folds = "validation/grouped_text_v1/folds.csv"
+connected_guard = "validation/connected_family_guard_v2/rows.csv"
+manifest = "validation/qwen3vl_rdrop_two_fold_screen_v1/manifest.json"
+immutable = true
+
+[[evaluations]]
+version = "qwen35_adapter_soup_seed_repeat_screen_v1"
+dataset_version = "competition_train_v1"
+purpose = "Independent-seed reject-only confirmation of the fixed alpha-0.50 Qwen3.5 adapter interpolation"
+protocol = "Seed 31415 on predeclared folds 0 and 3; alpha, fusion weights and thresholds transferred unchanged from experiment 430; pure specialist and soup use the same threshold"
+base_folds = "validation/grouped_text_v1/folds.csv"
+connected_guard = "validation/connected_family_guard_v2/rows.csv"
+manifest = "validation/qwen35_adapter_soup_seed_repeat_screen_v1/manifest.json"
+immutable = true
+
+[[evaluations]]
+version = "qwen35_fisher_blockwise_soup_screen_v1"
+dataset_version = "competition_train_v1"
+purpose = "Reject-only test of train-only blockwise Fisher coefficients against the same-seed global alpha-0.50 Qwen3.5 adapter soup"
+protocol = "Seed 31415 on predeclared folds 0 and 3; one family per calibration group; lambda, alpha clip, fusion weights and thresholds frozen before predictions; holdout labels excluded from Fisher estimation"
+base_folds = "validation/grouped_text_v1/folds.csv"
+connected_guard = "validation/connected_family_guard_v2/rows.csv"
+manifest = "validation/qwen35_fisher_blockwise_soup_screen_v1/manifest.json"
+immutable = true

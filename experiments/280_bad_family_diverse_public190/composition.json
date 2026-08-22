@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "experiment": "280_bad_family_diverse_public190",
+  "base_submission": {
+    "experiment": "190_shingle_neighbor_prior",
+    "path": "experiments/190_shingle_neighbor_prior/submission",
+    "tree_sha256": "7e20c891d9e73e45e4404e321d1856014aff8bf7a0217192703ebb98c82e8e7f"
+  },
+  "overrides": [
+    {
+      "destination": "adapter_qwen35",
+      "component_id": "qwen35_lora_bad_positive_family_seed42_v260",
+      "source": "experiments/260_bad_family_diverse_positives/artifacts/seed_42_diverse_positives/full/adapter",
+      "tree_sha256": "67d97f732cc12bf9d07d60c065c3661e5bf572f348f78f486b196506eac1c902"
+    }
+  ],
+  "assembled_submission": {
+    "path": "experiments/280_bad_family_diverse_public190/submission",
+    "tree_sha256": "ee18bc1eb7f50670e5cfe8d31a5014e2724bd67cd3050121736ce5756e469e78"
+  }
+}

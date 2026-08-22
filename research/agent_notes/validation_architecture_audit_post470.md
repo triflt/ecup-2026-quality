@@ -1,0 +1,208 @@
+# Validation architecture audit after 190/230/280/400–470
+
+Date: 2026-08-22
+Mode: independent read-only audit; no experiments were launched.
+Scope: `grouped_text_v1`, `connected_family_guard_v2`, connected repeats, nested threshold/fusion selection, OOF-based training selectors and priors, experiments 190/230/280/400–470, and the known Public results. Experiment 470 was still in progress at the time of inspection, so this note does not treat it as evidence.
+
+## Executive verdict
+
+The validation stack has strong artifact discipline and useful exact-family safeguards, but it is **not strict end-to-end nested validation**. Its most defensible use is rejecting candidates with large, consistent negative deltas. Small positive deltas obtained after repeated iteration on the same OOF matrix — including the current evidence for 400 — can be systematically optimistic for four independent reasons:
+
+1. outer-fold thresholds, fusion weights, and hard-example selectors are derived from OOF scores whose generating models generally trained on the nominal outer holdout;
+2. the main 400 gate scores candidate-specific nested thresholds rather than the frozen production-threshold recipe that would actually be submitted;
+3. `connected_family_guard_v2` audits exact connected families after the fact but does not retrain the expensive models on connected-component folds;
+4. the same five historical folds and their error rows have been adaptively reused across many hypotheses, so ordinary fold bootstrap intervals do not account for research-loop post-selection.
+
+This does not mean all local evidence is invalid. It means the evidence supports a narrower claim: 400 repairs a stable set of historical OOF errors under the current scoring construction. It does not yet prove that the submitted 400 recipe will beat 190 on new data.
+
+## Audit of each validation layer
+
+### 1. `grouped_text_v1`
+
+Relevant implementation and artifacts:
+
+- `validation/build_folds.py`
+- `src/ecup_quality/data/text.py`
+- `src/ecup_quality/validation/splits.py`
+- `validation/grouped_text_v1/manifest.json`
+
+What is sound:
+
+- row ids, fold ids, source checksums, and deterministic metadata are frozen;
+- fold sizes and total positive counts are well balanced;
+- all later artifacts use the same historical fold identity, avoiding accidental row reshuffles.
+
+What the name overstates:
+
+- the committed fold assignment is loaded from the historical OOF cache; the current normalized-text group hash is computed afterward. It is therefore not guaranteed that the historical folds satisfy the current `compose_text` grouping rule;
+- the repository's own later audits found two current exact-text families, nine rows total, crossing historical folds;
+- grouping is category-specific, so an identical item represented under BAD and flammable is not joined;
+- exact normalized full-text equality does not cover paraphrases, formatting/numeric variants, or partial copied descriptions.
+
+Conclusion: the artifact is a stable historical OOF partition, not a proof that all current duplicate families are fold-isolated.
+
+### 2. `connected_family_guard_v2`
+
+Relevant implementation and artifact:
+
+- `validation/build_connected_guard.py`
+- `validation/connected_family_guard_v2/manifest.json`
+
+The guard constructs category-specific DSU components from either exact normalized-text identity or exact equality of the first-image fp16 embedding bytes. A whole component is unsafe if it spans historical folds.
+
+Strong, directly proved invariants:
+
+- 12,971 rows are assigned exactly once;
+- 11,207 rows are safe and 1,764 unsafe;
+- 8,690 connected components are formed, 344 of them crossing folds;
+- among safe rows, no component spans more than one historical fold;
+- every exact edge represented by those two edge definitions is removed from the safe evaluation set when it connects folds.
+
+Limits that matter:
+
+- exact fp16-vector equality is a narrow image duplicate test; near-identical crops, resizes, recompressions, perceptual duplicates, and additional gallery images are not connected;
+- components remain category-specific;
+- the guard is applied to predictions from models already trained using the historical folds. It is not equivalent to retraining the base/adapters with connected components as groups;
+- excluding unsafe validation rows does not remove their possible influence as training donors for the already-produced model scores.
+
+Therefore the connected-safe gain is valid only under the guard's exact edge definition. It is not a connected-CV estimate of the complete learning pipeline.
+
+### 3. Connected repeated folds
+
+`validation/build_connected_repeats.py` correctly creates category-stratified repeated folds over safe connected components, with deterministic seeds and clean component invariants. This is useful when a cheap head is genuinely retrained for every repeat.
+
+It is not three independent validation repetitions for expensive frozen OOF predictions. A base score for row `j` was generated by the original fold model, and that model can have trained on rows assigned to the validation side of a later connected repeat. Regrouping fixed scores measures sensitivity of a downstream head to partition geometry; it does not reproduce the uncertainty of retraining the full model under those topologies.
+
+### 4. Nested thresholds and fusion weights
+
+Relevant implementations:
+
+- `research/qwen35_locked_190_audit.py`
+- `research/qwen35_seed_ensemble_cv.py`
+- `research/nested_lora_calibration.py`
+- `research/nested_multimodel_fusion.py`
+
+For outer fold `k`, the code excludes `k` from the rows used by `best_threshold`, or by the simplex weight plus threshold search, and then applies the selected rule to `k`. That is correctly cross-fitted at the **post-processing row level**.
+
+It is not strict nested CV for the full model. For a donor row `j != k`, its OOF score was produced by a model trained without `j`'s historical fold, but normally with fold `k` included. Hence fold `k`'s data and labels can influence the donor score surface used to choose the rule eventually evaluated on `k`. No outer-fold label is passed directly to `best_threshold`, but the learned donor features are not independent of the outer holdout.
+
+A strict construction would, for every outer `k`, train inner models using only the other four folds, generate inner OOF scores only within that outer-training subset, choose all weights/thresholds there, and evaluate exactly once on `k`.
+
+Threshold variance is especially material for flammable: the class has only about 198 positives in the full dataset, while the implementation scans all attainable score cuts. Candidate-specific cut selection can turn a small score-direction change into a much larger apparent F1 change.
+
+### 5. Production-parity mismatch
+
+The most concrete local warning is experiment 280:
+
+- candidate-specific nested evaluation: 0.930613 versus 0.923409, delta **+0.007204**;
+- diagnostic using the actual frozen production threshold: 0.927615 versus 0.926162, delta only **+0.001453**;
+- Public: exactly tied with 190 at the recorded precision, delta **0.000000**.
+
+Experiment 400 repeats the risky choice in `experiments/400_targeted_flammable_adapter_routing/run.py`:
+
+- both `routed_nested` and `routed_production` are constructed;
+- the score, fold wins, correction/regression table, connected-safe audit, priors replay, and acceptance decision use `routed_nested`;
+- `routed_production` is saved but is not the primary acceptance object.
+
+Thus the reported 400 delta of +0.008236 is not an offline score of the exact fixed-threshold submission recipe. The 280 gap demonstrates that this is not a merely terminological distinction.
+
+Even a fixed-threshold OOF diagnostic is not an untouched validation estimate because that threshold was originally selected on the same OOF set. It is nevertheless the correct cheap parity check for whether the locally claimed delta survives the actual deployment decision rule.
+
+### 6. OOF reuse in training selectors
+
+Relevant example:
+
+- `research/qwen35_bad_family_diverse_positives_lora.py`
+
+The LoRA data selectors mask out the outer holdout rows, but rank the remaining rows using uncertainty/hardness computed from the shared fused OOF scores. The comment that holdout labels do not affect adaptation is too strong.
+
+For outer fold `k`, a donor row's OOF score can come from a model whose training set included `k`. Consequently outer-fold information can influence which donor rows are labelled “hard” and selected to train the adapter evaluated on `k`. This pattern is inherited by the relevant 110/130/230/260/410 lineages. The row membership is outer-train-only; the selector representation is not outer-nested.
+
+Family diversification in 260 improves coverage but does not fix the provenance of the uncertainty score. The Public tie of 280 despite a +0.007204 nested local delta is consistent with this source of optimism, although it cannot by itself identify it as the sole cause.
+
+### 7. Priors and transductive graph construction
+
+Two cases should be distinguished:
+
+- In `research/annotator_prior_cv.py`, the early leave-one-row-out family statistics are computed over all rows. Because exact family members live in the same historical fold, a validation row can use labels of other validation rows in its family. The resulting “nested annotator prior” number is recurrence/leave-one-row-out evidence, not honest grouped generalization evidence.
+- The later shingle-neighbor implementation restricts label aggregation to donor folds, which is substantially safer. However, shingle frequencies and candidate neighborhoods are first built transductively using all rows. Target-fold text can determine which shingles survive frequency filters and which graph edges exist. Production instead builds an index from train only; hidden queries do not reshape that index.
+
+Therefore Public 190 validates the whole submitted 190 system, but does not isolate or prove the offline incremental gain attributed to either prior.
+
+### 8. Post-selection overfitting
+
+The same five historical folds and 11,207-row safe mask have supported dozens of model, selector, threshold, prior, residual, cohort, and counterfactual decisions. The research loop has seen fold-level and often row-level outcomes. This creates an adaptive multiple-comparisons problem outside the mathematical scope of the reported CV.
+
+Specific consequences:
+
+- folds 0 and 3 are repeatedly used because their contrast was already observed; a two-fold screen on them is useful for rejection, not independent confirmation;
+- bootstrapping the final corrected/regressed component vector resamples an adaptively selected error surface. It measures conditional sampling uncertainty but not research-loop selection bias;
+- 400's reported bootstrap probability 0.8585 and interval crossing zero are already below a strong confirmatory standard even before correcting for repeated search;
+- a seed repeat such as 470 can test optimizer/adapter stochasticity, but cannot test fold-selection bias, connected-topology shift, deployment-threshold mismatch, or hidden-distribution shift;
+- the connected guard was created after historical models and experiments. It is a valuable retrospective diagnostic, not retroactive proof that those models were trained under a leakage-free connected split.
+
+## Public evidence versus offline claims
+
+| Submission | Offline evidence used for promotion | Public | What the comparison proves |
+|---|---:|---:|---|
+| 190 | Current locked references are roughly 0.923–0.927 depending on the exact diagnostic/prior replay | **0.8919244237** | The whole frozen 190 artifact is genuinely strong online. It does not identify which local component or prior caused the strength. |
+| 230 | 0.919237; delta **+0.007394**, 4/5 fold wins; bootstrap probability 0.8867 with interval crossing zero | **0.8639458233**, delta to 190 **−0.0279786004** | A locally positive candidate can rank much worse online. Several recipe dimensions changed together, so this is a validation failure example, not clean mechanism attribution. |
+| 280 | 0.930613; delta **+0.007204**, 4/5 wins; bootstrap probability 0.8275 with interval crossing zero | **0.8919244237**, exact recorded tie with 190 | Even the more isolated adapter replacement did not transfer its claimed local gain. The fixed-production-threshold local delta was already much smaller (+0.001453). |
+| 400 | 0.931645; delta **+0.008236**, 4/5 wins; connected-safe delta **+0.008503**; bootstrap probability 0.8585; 17 corrections/9 regressions | not available | 400 is a plausible targeted hypothesis, but is not validated as a replacement for 190. Its main metric inherits the 260 flammable score and candidate-specific nested-threshold evaluation. |
+
+Public 230 and 280 are direct evidence that the local framework has produced optimistic rankings after 190. They should outweigh an assumption that a similarly sized post-190 OOF delta automatically transfers. Public 190 remains the only positive online confirmation of the current lineage.
+
+## What is actually proved
+
+1. Artifact identity, row alignment, checksum discipline, and most stated safe-mask/component invariants are strong and reproducible.
+2. Under the exact edge definitions of `connected_family_guard_v2`, safe evaluation rows have no component that crosses historical folds.
+3. Historical base OOF generation excludes the evaluated row's own fold from direct model training. This does **not** imply that later thresholds, selectors, or heads are outer-nested.
+4. 190 is strong on Public; the complete 230 recipe is materially worse; the complete 280 recipe does not improve aggregate Public.
+5. The large negative results of 450 and 460 are credible rejection evidence under the present protocol. The identified biases could distort small rankings, but are unlikely to turn a broad, repeatable loss into a winner.
+
+## What is not proved
+
+- that `grouped_text_v1` isolates every duplicate or semantic family;
+- that any reported “nested” score is strict end-to-end nested CV;
+- that connected-safe scores estimate a model retrained with connected component grouping;
+- that regrouping fixed OOF predictions supplies independent repeated-CV evidence for an expensive adapter;
+- that the OOF-hardness training selectors are independent of their outer validation folds;
+- that the component-level bootstrap corrects for adaptive experiment selection;
+- that 400's exact submitted recipe beats 190, either locally under fixed production decisions or on Public;
+- that any isolated prior contributes its claimed local increment on novel hidden families.
+
+## Three required counterchecks
+
+### Countercheck 1 — frozen production-parity screen (cheap, run first)
+
+Before looking at any more row cohorts, freeze the existing 190 and 400 artifacts, frozen global weights, frozen production thresholds, routing rule, and prior. On the already-saved OOF arrays, score the exact production outputs — `routed_production`, not `routed_nested` — on all rows and on `connected_family_guard_v2` safe rows. Do not optimize any cut, weight, alpha, category route, or subset.
+
+Predeclare one gate: 400 proceeds only if its exact production-parity macro delta is positive overall, positive on connected-safe rows, and non-negative in every leave-one-original-fold-out report. Report corrections/regressions only after the gate is computed. This is cheap and directly targets the mismatch that reduced 280 from +0.007204 to +0.001453 before its Public tie. It does not solve selector leakage; it determines whether there is a production-shaped claim worth testing expensively.
+
+### Countercheck 2 — strict outer-nested selector/threshold audit
+
+For a frozen comparison of 190 versus the flammable 260/400 branch, preselect outer folds without reference to their prior candidate deltas (ideally all five; if cost prohibits this, choose two by a deterministic hash of the validation manifest, not folds 0/3 by observed behavior).
+
+For each outer fold `k`:
+
+1. remove `k` before computing every uncertainty/hardness score or family-diverse training choice;
+2. train inner models only on the other four folds and generate inner OOF scores within that subset;
+3. freeze the selector, adapter recipe, fusion weights, route, and threshold using only those inner products;
+4. train the final outer-training model and evaluate once on `k`;
+5. prohibit any cached global OOF score as a selector feature.
+
+The gate is a positive aggregate delta, no catastrophic outer-fold loss, and the same direction under a fixed production threshold. This is the decisive test for the current threshold/selector dependence channel.
+
+### Countercheck 3 — new immutable inductive connected holdout
+
+Before proposing another mechanism, create and checksum a v3 component graph that connects across categories and uses frozen label-free edges for current normalized text, canonicalized numeric/text variants, exact image identity, perceptual near-duplicate identity, and all available gallery images. Deterministically reserve a component-level holdout and never inspect its row errors during development.
+
+Retrain the full baseline and at most a predeclared small batch of candidates on the complement. Build prior/shingle vocabularies and neighbor graphs from training donors only; the holdout's text and images must not affect frequency filtering or topology. Choose all selectors and thresholds inside training data, then unlock the holdout once for the predeclared comparison.
+
+The gate is superiority of the exact production recipe on that sealed set with a component-bootstrap interval not materially below zero. After unlocking, retire that holdout from confirmatory use. This is the only proposed check that jointly addresses near-family leakage, graph transduction, and human post-selection on the historical folds.
+
+## Bottom line
+
+The validation stack is well engineered for reproducibility and increasingly good at exposing obvious leakage and rejecting bad branches. Its current positive estimates should not be read as unbiased estimates of hidden-test improvement. The combination of non-strict nestedness, OOF-derived training selectors, candidate-specific threshold scoring, incomplete connected edges, and extensive adaptive reuse can systematically favor small targeted gains.
+
+Keep 190 as the validated champion. Treat 400 as a high-quality hypothesis, not a validated replacement. The minimum next action is Countercheck 1; promotion requires Countercheck 2 or, preferably, the sealed inductive evidence of Countercheck 3. Results from 430/470 can add mechanism evidence, but cannot substitute for these architecture-level checks.

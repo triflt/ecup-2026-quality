@@ -1,0 +1,43 @@
+{
+  "experiment_id": "210",
+  "slug": "neighbor_priors",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "conclusion": "ID, character-TFIDF и rare-token variants не дали надёжного nested gain.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "210_neighbor_priors",
+      "experiment": "ID-neighbour prior",
+      "validation": "Same grouped folds; k-NN over numeric product id",
+      "bad_f1": "0.9473215081558071",
+      "flammable_f1": "0.8512820512820513",
+      "macro_f1": "0.8993017797189291",
+      "status": "Rejected",
+      "notes": "Only +0.000005 macro at 2% ID weight; brittle and immaterial"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "210_neighbor_priors",
+      "experiment": "Character TF-IDF neighbour prior",
+      "validation": "Donor-only nested grouped CV after production shingle prior",
+      "bad_f1": "0.9561853351327035",
+      "flammable_f1": "0.8975609756097561",
+      "macro_f1": "0.9268731553712298",
+      "status": "Rejected",
+      "notes": "Below baseline 0.9274014258; no stable production configuration selected"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "210_neighbor_priors",
+      "experiment": "Rare-token graph prior",
+      "validation": "Donor-only nested grouped CV after production shingle prior",
+      "bad_f1": "0.956998920474991",
+      "flammable_f1": "0.8932038834951457",
+      "macro_f1": "0.9251014019850684",
+      "status": "Rejected",
+      "notes": "Below baseline by 0.002300; flammable degrades materially"
+    }
+  ]
+}

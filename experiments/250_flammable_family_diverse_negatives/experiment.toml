@@ -1,0 +1,44 @@
+[experiment]
+id = "250"
+slug = "flammable_family_diverse_negatives"
+title = "Family-diverse hard negatives for Qwen3.5"
+status = "superseded_before_training"
+entrypoint = "research/qwen35_family_diverse_negatives_lora.py"
+result_file = "experiments/250_flammable_family_diverse_negatives/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "nested_grouped_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "230_qwen35_second_seed"
+changed_factor = "Select flammable hard negatives by distinct normalized product family instead of row"
+mechanism = "Repeated negative families currently occupy 301-347 of 1600 slots and 206-237 of the hard half, reducing coverage of independent negative mechanisms"
+primary_comparison = "Replace seed42 with family-diverse-negative seed42 in the fixed mean-probability pair with seed31415; also audit category-routed transfer into locked 190"
+expected_macro_f1_delta = 0.0015
+falsification = "Reject if nested Macro F1 gains less than 0.001, fewer than four folds improve, or either category drops by more than 0.005"
+precedents = ["Class-Balanced Loss, CVPR 2019", "Rakuten SIGIR 2020 winning solution"]
+
+[acceptance]
+baseline_macro_f1 = 0.0
+required_fold_wins = 4
+max_category_f1_drop = 0.005
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 4.8
+planned_public_submissions = 0
+runtime_limit_minutes = 40
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false

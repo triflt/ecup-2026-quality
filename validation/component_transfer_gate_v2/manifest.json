@@ -1,0 +1,60 @@
+{
+  "version": "component_transfer_gate_v2",
+  "dataset_version": "competition_train_v1",
+  "created_after_validation_audit": "connected_family_guard_v2",
+  "parent_evaluations": [
+    "locked_190_nested_v1",
+    "component_transfer_gate_v1",
+    "connected_family_guard_v2"
+  ],
+  "purpose": "Require learned components to improve both historical comparable OOF and rows without exact-text or exact-first-image connected components crossing folds",
+  "historical_comparability_gate": {
+    "evaluation": "locked_190_nested_v1",
+    "minimum_macro_f1_delta": 0.003,
+    "required_fold_wins": 4,
+    "maximum_category_f1_drop": 0.005,
+    "minimum_group_bootstrap_probability_positive": 0.9
+  },
+  "connected_safe_gate": {
+    "evaluation": "connected_family_guard_v2",
+    "selection_rows": 11207,
+    "excluded_unsafe_rows": 1764,
+    "minimum_macro_f1_delta": 0.003,
+    "required_fold_wins": 4,
+    "maximum_category_f1_drop": 0.005,
+    "minimum_component_bootstrap_probability_positive": 0.9,
+    "bootstrap_unit": "category-specific connected component",
+    "training_rule_for_local_methods": "Rows in components spanning historical folds cannot be used as donors, prototypes, hard negatives, gate-training rows or selection rows"
+  },
+  "topology_repeat_gate": {
+    "evaluation": "connected_family_repeated_v1",
+    "required_for": ["residual heads", "metric heads", "nearest/prototype methods", "learned gates"],
+    "seeds": [17, 31415, 20260822],
+    "acceptance": "All three repeated grouped topologies have positive Macro delta, their mean delta is at least 0.003, and at least 11 of 15 category-combined folds improve",
+    "expensive_pretrained_component_rule": "If retraining all foundation adapters on repeats is disproportionate, fixed OOF candidate predictions may only provide topology-dispersion evidence and cannot satisfy this gate for a new local head"
+  },
+  "downstream_replay": {
+    "required": true,
+    "stack": ["exact", "normalized-name", "numeric-family", "rare-shingle"],
+    "minimum_change_survival_rate": 0.8,
+    "require_positive_macro_delta_after_priors": true
+  },
+  "stochastic_repeat": {
+    "required_before_production_promotion": true,
+    "folds": ["best primary-seed fold", "worst primary-seed fold"],
+    "seed": 31415,
+    "acceptance": "Positive mean delta across the two repeated folds and no category drop over 0.005 on both full and connected-safe rows"
+  },
+  "runtime": {
+    "public_limit_minutes": 20,
+    "target_public_minutes_with_reserve": 16,
+    "private_limit_minutes": 40,
+    "target_private_minutes_with_reserve": 32
+  },
+  "known_limitations": [
+    "This is a sealed exclusion guard over historical folds, not a fully retrained connected-component split for expensive LoRA baselines.",
+    "It removes exact normalized-text and exact first-image embedding paths but not every near-duplicate or hidden distribution shift.",
+    "Retrospective audits calibrate trust and cannot promote previously rejected candidates."
+  ],
+  "immutable": true
+}

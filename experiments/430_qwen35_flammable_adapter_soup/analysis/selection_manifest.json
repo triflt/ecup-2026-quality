@@ -1,0 +1,22 @@
+{
+  "experiment_id": "430",
+  "immutable": true,
+  "created_before_intermediate_predictions": true,
+  "parent_experiment": "400_qwen35_category_routed_adapters",
+  "alpha_260_grid": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "new_inference_alphas": [0.25, 0.5, 0.75],
+  "outer_folds": [0, 1, 2, 3, 4],
+  "selection": "For each outer fold choose alpha and flammable threshold using only the other four folds; ties choose the smaller alpha",
+  "frozen_weights": {"robust_base": 0.15, "qwen3vl": 0.10, "qwen35": 0.75},
+  "bad_route": "experiment 190 adapter and predictions remain unchanged",
+  "gates": {
+    "minimum_macro_delta_vs_400": 0.003,
+    "minimum_flammable_delta": 0.006,
+    "minimum_fold_wins": 4,
+    "maximum_flammable_false_negative_increase": 0,
+    "maximum_safety_union_false_negative_increase": 0,
+    "minimum_corrected_to_regressed_ratio": 1.5,
+    "minimum_connected_bootstrap_probability_positive": 0.90,
+    "minimum_prior_survival_rate": 0.80
+  }
+}

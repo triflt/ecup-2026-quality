@@ -1,0 +1,26 @@
+{
+  "experiment_id": "380",
+  "status": "rejected_offline_promising_signal",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "all_image_flammable_metric_connected_replication_v1",
+  "parent_experiment": "370_flammable_metric_disagreement_replication",
+  "all_image_embedding_sha256": "de350949c0f17e93b842686bb471d446a637718dbc163e6c5c48eb6b36e6d96f",
+  "validation": {
+    "repeat_macro_deltas": [0.0026501417364360735, 0.0014860208831960486, -0.0011046526919334942],
+    "mean_macro_delta": 0.001010503309232876,
+    "total_fold_wins": 6,
+    "total_folds": 15,
+    "total_corrected": 15,
+    "total_regressed": 10,
+    "bootstrap_probability_delta_positive": [0.7628, 0.6692, 0.385],
+    "changed_bad": 0,
+    "changed_unsafe": 0,
+    "acceptance_passed": false
+  },
+  "artifacts": {
+    "source_sha256": "aaffd8bfa871afcb2ad8209e4ba543fa7702b9696a46339e88f1aa771e6d7172",
+    "replication_audit_sha256": "8c35b3fb21473203dc7d017aa0e0ff4f51f15ee3c4966447348a54196156dda4",
+    "replication_predictions_sha256": "281bb75193c672617f0df0176e02d655e86682e7d328872f9f841479eb1f8af8"
+  },
+  "decision": "Reject the single-metric production-parity rule: repeat 2 is negative, only 6/15 folds win, corrected-to-regressed is 1.5 and every bootstrap probability is below 0.80. Preserve the positive mean as evidence for a weak real signal and test predeclared family-bagging stability rather than tuning the threshold."
+}

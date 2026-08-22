@@ -1,0 +1,52 @@
+{
+  "experiment_id": "330",
+  "status": "rejected_offline",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "component_transfer_gate_v4",
+  "parent_experiment": "190_shingle_neighbor_prior",
+  "frozen_recipe": {
+    "production_inputs_only": ["robust_base_rank", "qwen3vl_rank", "qwen35_rank"],
+    "minimum_opposing_components": [2, 3],
+    "confidence_advantages": [0.0, 0.05, 0.1, 0.15],
+    "baseline_confidence_caps": [0.6, 0.7, 0.8, 0.9],
+    "mandatory_noop": true,
+    "source_sha256": "393e811e3e1154e93524e85830d119bf1b67ef4020841ed9a6740d15e7753142",
+    "implementation_revision": "r1 replaces a warning-producing but finite LBFGS numerical path by liblinear; recipe and grid unchanged"
+  },
+  "validation": {
+    "historical": {
+      "baseline_macro_f1": 0.9234086336846878,
+      "candidate_macro_f1": 0.9230390385283134,
+      "delta_macro_f1": -0.00036959515637446927,
+      "bad_delta": -0.0007391903127487165,
+      "flammable_delta": 0.0,
+      "folds_won": 0,
+      "changed": 10,
+      "corrected": 1,
+      "regressed": 9,
+      "bootstrap_probability_delta_positive": 0.0052,
+      "bootstrap_ci95": [-0.0007778892297940904, -0.00004925679669368079]
+    },
+    "connected_safe": {
+      "rows": 11207,
+      "baseline_macro_f1": 0.9193528162236431,
+      "candidate_macro_f1": 0.9187173451164267,
+      "delta_macro_f1": -0.000635471107216401,
+      "folds_won": 0,
+      "changed": 18,
+      "corrected": 3,
+      "regressed": 15,
+      "bootstrap_probability_delta_positive": 0.0068,
+      "bootstrap_ci95": [-0.0011927620039269339, -0.00013924450880677423]
+    },
+    "connected_repeat_deltas": [-0.0002599847837464475, -0.0004463513140540165, -0.00047533195440152554],
+    "downstream_prior_delta": -0.00022705356665775334,
+    "accepted_for_full_refit": false
+  },
+  "artifacts": {
+    "selective_gate_audit_sha256": "cc33eb443d10b2364a22a2e8d19415c725b2ccd01ddd48afed4df883a9b8de09",
+    "selective_gate_predictions_sha256": "6e715c37458a1121862cd5ed1fa4393a72bfceb1a2adc48c0b94fcdb80a6833d",
+    "prior_replay_sha256": "4d6fb6653790ca83efd6495a1868524774c4104ff49e8bf2880fadf00d216878"
+  },
+  "decision": "Rejected offline. Production-score consensus is not a reliable gate: historical delta -0.000370 with 1 correction and 9 regressions; connected-safe delta -0.000635 with 3 corrections and 15 regressions; every repeat is negative and priors leave a -0.000227 delta. Do not refit or package."
+}

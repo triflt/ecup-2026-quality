@@ -1,0 +1,47 @@
+{
+  "experiment_id": "460",
+  "evaluation_version": "qwen3vl_embedding_transfer_v1",
+  "created_before_model_execution": true,
+  "parent_experiment": "400_qwen35_category_routed_adapters",
+  "model": "Qwen/Qwen3-VL-Embedding-2B",
+  "model_registry_mrid": "huggingface-proxy/Qwen/Qwen3-VL-Embedding-2B/latest",
+  "license": "Apache-2.0",
+  "single_changed_factor": "Add one normalized 2048-dimensional embedding of title, description and first image",
+  "input": {
+    "instruction": "Represent this marketplace product for deciding whether the sold item itself or an included item is a flammable substance, gas, fuel, ignition source, or pyrotechnic product.",
+    "title_repeats": 2,
+    "description_character_limit": 1600,
+    "image": "first image decoded as RGB, resized within 448x448, then passed to the official processor",
+    "all_images": false
+  },
+  "classifier": {
+    "type": "LinearSVC",
+    "C": 1.0,
+    "class_weight": "balanced",
+    "seed": 46042,
+    "cross_fit": "Fit on four frozen outer folds and predict the fifth"
+  },
+  "integration": {
+    "route": "Flammable only; copy experiment-400 BAD decisions",
+    "embedding_weight_grid": [0.05, 0.10, 0.15, 0.20],
+    "tie_break": "Prefer the smallest embedding weight",
+    "threshold": "Fit on the other four outer folds"
+  },
+  "acceptance": {
+    "minimum_macro_delta": 0.003,
+    "minimum_flammable_delta": 0.006,
+    "minimum_fold_wins": 4,
+    "minimum_corrected_to_regressed_ratio": 1.5,
+    "maximum_flammable_false_negative_increase": 0,
+    "maximum_safety_union_false_negative_increase": 0,
+    "minimum_connected_bootstrap_probability": 0.90,
+    "maximum_public_minutes": 16,
+    "maximum_private_minutes": 32
+  },
+  "stage_order": [
+    "One-image compatibility smoke",
+    "Frozen full-train embedding extraction only if smoke passes",
+    "Five-fold cross-fitted classifier and nested integration",
+    "Full model and submission package only if all quality and runtime gates pass"
+  ]
+}

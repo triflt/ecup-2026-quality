@@ -1,0 +1,20 @@
+id = "390"
+slug = "bagged_all_image_hard_negative_metric"
+status = "rejected_offline_promising_signal"
+data_version = "competition_train_v1"
+evaluation_version = "bagged_all_image_flammable_metric_connected_v1"
+parent_experiment = "380_all_image_hard_negative_metric_parity"
+
+[hypothesis]
+statement = "Family-level bagging stabilizes the weak positive all-image hard-negative signal across connected topologies."
+changed_factor = "Three 80-percent donor-family metrics with unanimous direction replace one full-donor metric."
+
+[entrypoints]
+run = "python experiments/390_bagged_all_image_hard_negative_metric/run.py"
+
+[acceptance]
+minimum_repeat_mean_macro_delta = 0.001
+minimum_total_fold_wins = 10
+minimum_corrected_to_regressed = 2.0
+minimum_each_bootstrap_probability = 0.75
+all_repeat_deltas_positive = true

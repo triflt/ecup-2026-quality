@@ -1,0 +1,23 @@
+id = "350"
+slug = "sports_bad_counterfactual_ablation"
+status = "prepared"
+data_version = "competition_train_v1"
+evaluation_version = "component_transfer_gate_v4_counterfactual_extension"
+parent_experiment = "190_shingle_neighbor_prior"
+
+[hypothesis]
+statement = "Counterfactual sensitivity to regulatory and sports spans separates sports-BAD corrections from consensus regressions."
+changed_factor = "Two additional sparse strong-text transforms inside a connected-safe sports-BAD selector."
+
+[entrypoints]
+run = "python experiments/350_sports_bad_counterfactual_ablation/run.py"
+
+[acceptance]
+minimum_macro_delta = 0.003
+minimum_bad_delta = 0.006
+minimum_sports_delta = 0.01
+minimum_fold_wins = 4
+minimum_corrected_to_regressed = 2.0
+minimum_bootstrap_probability = 0.90
+all_repeat_deltas_positive = true
+positive_after_priors = true

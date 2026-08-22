@@ -1,0 +1,102 @@
+{
+  "experiment_id": "420",
+  "status": "rejected_at_screen",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "locked_190_category_routing_v2",
+  "selection_guard": "connected_family_guard_v2",
+  "seed": 42,
+  "parent_experiment": "400_qwen35_category_routed_adapters",
+  "training_parent_component": "qwen35_lora_bad_positive_family_seed42_v260",
+  "validation": {
+    "screen_folds": [0, 3],
+    "screen_passed": false,
+    "full_five_fold_cycle_allowed": false,
+    "fold_scores": [
+      {
+        "fold": 0,
+        "baseline_macro_f1": 0.9312591699999442,
+        "candidate_macro_f1": 0.9048487933785971,
+        "delta_macro_f1": -0.026410376621347043,
+        "baseline_flammable_f1": 0.9135802469135802,
+        "candidate_flammable_f1": 0.8607594936708861,
+        "changed": 4,
+        "corrected": 0,
+        "regressed": 4,
+        "flammable_false_negative_delta": 3,
+        "safety_union_false_negative_delta": 0,
+        "passed": false
+      },
+      {
+        "fold": 3,
+        "baseline_macro_f1": 0.9166759475813936,
+        "candidate_macro_f1": 0.9088753387533876,
+        "delta_macro_f1": -0.007800608828006039,
+        "baseline_flammable_f1": 0.8767123287671232,
+        "candidate_flammable_f1": 0.8611111111111112,
+        "changed": 1,
+        "corrected": 0,
+        "regressed": 1,
+        "flammable_false_negative_delta": 1,
+        "safety_union_false_negative_delta": 1,
+        "passed": false
+      }
+    ]
+  },
+  "runtime": {
+    "screen_jobs": ["redacted-job", "redacted-job"],
+    "hardware": "two independent one-H100 jobs on private-gpu-pool and private-gpu-pool"
+  },
+  "reproducibility": {
+    "training_manifest_sha256": "b24dde15bc6d643b9c804c09ab0f9b2e79b83170de2019f88169fa4850cd90e3",
+    "manifest_builder_sha256": "cf79e6911a0d9c3b918c2356c123f2779fa0795ad75a90f484eda71a9c6d6ae7",
+    "training_code_sha256": "e0be1f180c9d524b901cca62f2cd9c76153849abc7d14509782b03d06514ee0b",
+    "cycle_code_sha256": "bff5a35b92295bb0ca06a42c9c58de88614901c92c553d40ef7fce0729006782",
+    "screen_evaluator_sha256": "ec0e865281349b73c4ee71a1f81cf6395eb30b0108db7c0b5091aacb638fd1c5",
+    "screen_ingest_sha256": "3a140249981538b705355809dfc4d5ddba4cf2a722bc101a690f137517dc87df",
+    "screen_parent_adapter_sha256": {
+      "fold_0": "d34880ebb682f815d64d4bc32fc1874c99bc041be686cea5da196911c1d872ec",
+      "fold_3": "05a3f3be53c21a0a878e28849bac5151b161a7f115c9cb860f8a02d8fbb3774c"
+    },
+    "screen_parent_adapter_s3": {
+      "fold_0": "s3://private-artifact-store/private-prefix/experiments/420/parent-v260-fold_0.zip",
+      "fold_3": "s3://private-artifact-store/private-prefix/experiments/420/parent-v260-fold_3.zip"
+    },
+    "screen_training_records": {"fold_0": 1510, "fold_3": 1530},
+    "full_training_records": 1900
+  },
+  "artifacts": [
+    {
+      "path": "analysis/training_manifest.json",
+      "sha256": "b24dde15bc6d643b9c804c09ab0f9b2e79b83170de2019f88169fa4850cd90e3",
+      "created_before_candidate_predictions": true
+    },
+    {
+      "path": "analysis/null_screen_control.json",
+      "sha256": "81764f5ceeb002f6be38ca2899cb4b3bfdebb967b25aa7f97225bb5f5d7dc324",
+      "expected_result": "zero changes and zero delta on both screen folds"
+    },
+    {
+      "path": "analysis/ingest_screen_fold_0.json",
+      "sha256": "d59e22da43be8e4ba717d8b9d6b64aa0a1a62f89db6dd63ed7de480270664c04",
+      "bundle_sha256": "0abf3eb5a05f0764a6d14337ecb3ce5c6f14fd87193f28472a14c1c5af197055",
+      "adapter_sha256": "672e9c995caffc52edcddaf38055d5c7b9a059fb8d923acc271b57469d28bb09",
+      "predictions_sha256": "afba4c51a7ab07519e5862e244a678abc801a35764018621ec3c4e77d0ecadea"
+    },
+    {
+      "path": "analysis/ingest_screen_fold_3.json",
+      "sha256": "053003d6f4ca07ebcb0082bd00f86feef04eb036b6deb6be328d0b357f77625b",
+      "bundle_sha256": "7a9d10444cd58a538bf8db24d8058ec25f2d3100f52d1b88aaee039907bd3aa7",
+      "adapter_sha256": "9ffa6b56b12fb014442d8de90056c66feaaa28c81bb22e2fc7378f7dc30f22db",
+      "predictions_sha256": "80f2b63d7ec36ff39508fec32ba72550863b4b8984424b975b044adf26d5990f"
+    },
+    {
+      "path": "results/screen_audit.json",
+      "sha256": "d689be6c3ae350f7e1f854e6bd78f38b6ad8310a6bedebfa615c33548c118b07"
+    },
+    {
+      "path": "results/screen_predictions.npz",
+      "sha256": "9ede31823cc06a9179f65cdb806cafd50bfc32bf0a6770fd2aaa00270389de8e"
+    }
+  ],
+  "decision": "Rejected at the frozen two-fold screen. Both folds lost routed Macro F1, corrected no errors, added flammable false negatives, and fold 3 also harmed the safety union. Do not launch the full cycle, repeat seed, continue the full adapter, or integrate this component into a submission."
+}

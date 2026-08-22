@@ -1,66 +1,49 @@
-# E-CUP 2026 — контроль качества карточек товаров
+# E-CUP 2026 Quality Research
 
-Text-only решение для классификации карточек в категориях `БАД` и
-`Легковоспламеняющиеся`. Изображения и внешние API не используются.
+Воспроизводимый research repository для классификации качества карточек товаров в категориях `БАД` и `Легковоспламеняющиеся`. Цель команды — первое место; process и evidence quality соответствуют уровню DS Master / Kaggle Grandmaster.
 
-## Результат
+Лучший подтверждённый Public результат: **0.891924 Macro F1**. Его дала система из текстовой модели, двух дообученных Qwen-моделей и осторожного поиска похожих товарных карточек.
 
-- Public leaderboard: **0.7130258381** Macro Averaged F1.
-- Локальный stratified holdout 22%: **0.9043**.
-- Контейнер успешно прошёл проверку формата соревнования.
+## Навигация
 
-Разница между локальной и публичной оценкой показывает, что случайный holdout
-переоценивает качество из-за повторяющихся карточек и сдвига данных.
+- [`CODEX.md`](CODEX.md) — правила работы AI-агентов.
+- [`WHATS_NEXT.md`](WHATS_NEXT.md) — точка продолжения и приоритеты.
+- [`docs/current-status.md`](docs/current-status.md) — текущий model/leaderboard status.
+- [`docs/solutions/two-best-solutions.md`](docs/solutions/two-best-solutions.md) — понятный разбор двух лучших решений.
+- [`notebooks/data_overview_ru/`](notebooks/data_overview_ru/) — русский notebook-отчёт по данным с графиками и локальной галереей.
+- [`docs/hackathon/task-and-rules.md`](docs/hackathon/task-and-rules.md) — задача, проверка и ограничения соревнования.
+- [`docs/hackathon/data-and-models.md`](docs/hackathon/data-and-models.md) — данные, правила классов и доступные модели.
+- [`docs/research/literature-and-competitions.md`](docs/research/literature-and-competitions.md) — статьи и похожие соревнования.
+- [`docs/research/next-research-program.md`](docs/research/next-research-program.md) — приоритетная программа дальнейших исследований.
+- [`docs/research/data-audit.md`](docs/research/data-audit.md) — исследование данных и рисков валидации.
+- [`docs/operations/experiment-cli.md`](docs/operations/experiment-cli.md) — переносимый CLI contract.
+- [`docs/operations/agent-research-loop.md`](docs/operations/agent-research-loop.md) — управляемый цикл работы исследовательских агентов.
+- [`docs/operations/publication.md`](docs/operations/publication.md) — безопасная публикация без legacy binaries.
+- [`validation/`](validation/) — frozen fold assignment и validation basket.
+- [`datasets/registry.toml`](datasets/registry.toml) — immutable версии исходных данных.
+- [`validation/registry.toml`](validation/registry.toml) — immutable версии evaluation protocols.
+- [`experiments/`](experiments/) — изолированные experiment packages.
+- [`reports/experiment-log.csv`](reports/experiment-log.csv) — полный machine-readable журнал.
+- [`reports/submissions.csv`](reports/submissions.csv) — leaderboard и готовые submission candidates.
+- [`reports/hypothesis-board.csv`](reports/hypothesis-board.csv) — очередь гипотез до дорогого запуска.
+- [`reports/champion.json`](reports/champion.json) — единственный указатель на текущее лучшее решение и состояние его проверки.
+- [`research/`](research/) — legacy research scripts и JSON-отчёты; новые эксперименты должны оформляться через `experiments/`.
 
-## Модель
-
-- word TF-IDF: униграммы и биграммы;
-- character TF-IDF: `char_wb`, n-граммы 3–5;
-- отдельный `LinearSVC` для каждой категории;
-- отдельный F1-порог для каждой категории;
-- lookup только для повторов с непротиворечивыми train-метками;
-- детерминированные объяснения длиной 50–300 символов.
-
-`label=1` означает, что заявленная категория подтверждена, поэтому итоговый
-вердикт — `не бан`. `label=0` отображается в `бан`.
-
-## Структура
-
-```text
-submission/              минимальный архив для отправки
-  metadata.json
-  run.py
-  strong_text.joblib
-  src/
-train.py                 воспроизводимое обучение
-Dockerfile.train         изолированная training-среда
-requirements-train.txt   зафиксированные зависимости
-```
-
-Данные и изображения намеренно не входят в репозиторий.
-
-## Обучение
-
-Через локальную Python-среду:
+## Быстрый старт
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements-train.txt
-make train TRAIN_DATA=/absolute/path/to/data.csv
+pip install -e '.[dev]'
+python validation/build_folds.py --data /path/to/data.csv
+python tools/list_experiments.py
+python experiments/040_late_fusion/run.py --data /path/to/data.csv --images /path/to/images
 ```
 
-Через Docker:
+Все experiment runners принимают обычные filesystem paths и не зависят от конкретной compute platform. Private runner может передать те же аргументы из локального preset в `experiments/<id>/.local/compute/`, но такие presets намеренно исключены из Git. Submission ZIP и веса лежат локально в `experiments/<id>/artifacts/`.
 
-```bash
-make docker-train TRAIN_DATA=/absolute/path/to/data.csv
-```
+## Политика публикации
 
-## Проверка и упаковка
+В репозиторий не входят исходные competition data и изображения, submission ZIP archives, model weights, adapters, embeddings, joblib artifacts, vendor-копии библиотек, credentials, internal URLs, job names и private execution presets.
 
-```bash
-make smoke TRAIN_DATA=/absolute/path/to/data.csv
-make package
-```
-
-Полученный `quality-text-strong-submit.zip` можно отправлять в соревнование.
+Публикуются код, конфигурации экспериментов, frozen split assignments, агрегированные метрики, отчёты и submission source code без весов.

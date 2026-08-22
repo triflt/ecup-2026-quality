@@ -1,0 +1,65 @@
+{
+  "experiment_id": "040",
+  "slug": "late_fusion",
+  "status": "accepted",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "conclusion": "Подтверждено: grouped Macro F1 0.899297 и лучший Public 0.806579.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "040_late_fusion",
+      "experiment": "Strong text SVM",
+      "validation": "5-fold StratifiedGroupKFold by normalized full text",
+      "bad_f1": "0.9449265096511422",
+      "flammable_f1": "0.8342245989304813",
+      "macro_f1": "0.8895755542908117",
+      "status": "Success",
+      "notes": "Leakage-resistant model selection"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "040_late_fusion",
+      "experiment": "Qwen3-VL embedding SVM",
+      "validation": "5-fold StratifiedGroupKFold by normalized full text",
+      "bad_f1": "0.9315955213435969",
+      "flammable_f1": "0.7846153846153846",
+      "macro_f1": "0.8581054529794907",
+      "status": "Success",
+      "notes": "Images useful but weaker alone"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "040_late_fusion",
+      "experiment": "Category-specific late fusion",
+      "validation": "5-fold StratifiedGroupKFold by normalized full text",
+      "bad_f1": "0.9473120200035721",
+      "flammable_f1": "0.8512820512820513",
+      "macro_f1": "0.8992970356428116",
+      "status": "Success",
+      "notes": "Best grouped CV"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "040_late_fusion",
+      "experiment": "Qwen3-VL embedding SVM",
+      "validation": "Random 5-fold OOF",
+      "bad_f1": "0.9392647842301545",
+      "flammable_f1": "0.8654353562005277",
+      "macro_f1": "0.9023500702153411",
+      "status": "Leakage warning",
+      "notes": "Optimistic because duplicate products cross folds"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "040_late_fusion",
+      "experiment": "Late-fusion submission smoke",
+      "validation": "Official Docker image, H100, 3 products / 11 images",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "Output format valid; eager-attention fallback"
+    }
+  ]
+}

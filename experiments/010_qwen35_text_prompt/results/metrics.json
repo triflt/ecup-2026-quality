@@ -1,0 +1,9 @@
+{
+  "experiment_id": "010",
+  "slug": "qwen35_text_prompt",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "conclusion": "Отклонено: Public 0.579901, существенно ниже supervised text model.",
+  "historical_results": []
+}

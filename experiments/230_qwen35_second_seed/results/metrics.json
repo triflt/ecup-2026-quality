@@ -1,0 +1,131 @@
+{
+  "experiment_id": "230",
+  "slug": "qwen35_second_seed",
+  "status": "rejected_online",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "conclusion": "Среднее вероятностей Qwen3.5 seed 42 и 31415 улучшило nested_grouped_v1 до 0.919237, но получило только 0.8639458233 Public против 0.8919244237 у эксперимента 190. Рецепт отклонён онлайн; локальная валидация переоценила перенос, а второй seed и заново подобранные веса не были изолированы друг от друга в Public-проверке.",
+  "leaderboard": {
+    "public_macro_f1": 0.8639458233,
+    "champion_public_macro_f1": 0.8919244236941932,
+    "delta_to_champion": -0.027978600394193198,
+    "status": "Success",
+    "decision": "rejected_online"
+  },
+  "runtime_smoke": {
+    "job": "redacted-job",
+    "hardware": "one H100",
+    "sample_rows": 600,
+    "sample_images": 2274,
+    "inference_seconds": 320.24251287057996,
+    "seconds_per_row": 0.5337375214509666,
+    "projected_public_1600_minutes": 14.233000572025776,
+    "projected_private_3800_minutes": 33.80337635856122,
+    "schema_valid": true,
+    "public_20_percent_reserve_passed": true,
+    "private_20_percent_reserve_passed": false,
+    "absolute_limits_passed": true
+  },
+  "recurrence_70_30_diagnostic": {
+    "repeats": 20,
+    "protocol": "same stratified row splits with exact/name family priors",
+    "old_dual_lora_macro_f1": 0.9410916906282543,
+    "two_seed_macro_f1": 0.9426495120652822,
+    "delta_macro_f1": 0.0015578214370279841,
+    "bad_delta_f1": 0.00017092410667718383,
+    "flammable_delta_f1": 0.0029447187673788955,
+    "macro_repeats_won": 11,
+    "warning": "diagnostic row-split simulation; nested grouped validation remains primary"
+  },
+  "selected_result": {
+    "method": "mean_probability_three_head",
+    "bad_f1": 0.9518755059818297,
+    "flammable_f1": 0.8865979381443299,
+    "macro_f1": 0.9192367220630797,
+    "baseline_macro_f1": 0.9118425205786493,
+    "delta_macro_f1": 0.007394201484430374,
+    "folds_won": 4,
+    "group_bootstrap_delta_ci95": [-0.0046963679954054064, 0.020076482639340535],
+    "group_bootstrap_probability_positive": 0.8867
+  },
+  "rejected_one_pass_result": {
+    "method": "exact rank-32 concatenation of two rank-16 LoRA deltas",
+    "bad_f1": 0.9534695346953469,
+    "flammable_f1": 0.8664987405541562,
+    "macro_f1": 0.9099841376247515,
+    "baseline_macro_f1": 0.9118425205786493,
+    "delta_macro_f1": -0.0018583829538978414,
+    "folds_won": 2,
+    "group_bootstrap_delta_ci95": [-0.014205534116031709, 0.010090317306182857],
+    "group_bootstrap_probability_positive": 0.381,
+    "decision": "rejected"
+  },
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "230_qwen35_second_seed",
+      "experiment": "Second-seed data-binding attempt",
+      "validation": "Portable training command with missing external data binding",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Error",
+      "notes": "Failed before GPU optimization; no model evidence"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "230_qwen35_second_seed",
+      "experiment": "Second-seed inline-payload attempts",
+      "validation": "Portable training command with oversized attached dataset",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Error",
+      "notes": "Rejected by runner request-size limit; no model evidence"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "230_qwen35_second_seed",
+      "experiment": "Second-seed Qwen3.5 training",
+      "validation": "Five grouped outer folds plus full-data adapter; seed 31415",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "All six training jobs completed; OOF artifacts and full adapter await aggregation"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "230_qwen35_second_seed",
+      "experiment": "Qwen3.5 two-seed probability ensemble",
+      "validation": "Nested grouped outer folds; weights and thresholds selected on the other four folds",
+      "bad_f1": 0.9518755059818297,
+      "flammable_f1": 0.8865979381443299,
+      "macro_f1": 0.9192367220630797,
+      "status": "Success",
+      "notes": "+0.007394 macro; 4/5 fold wins; group bootstrap P(delta>0)=0.8867 and 95% CI crosses zero; production runtime not yet accepted"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "230_qwen35_second_seed",
+      "experiment": "One-pass rank-32 Qwen3.5 LoRA concatenation",
+      "validation": "Nested grouped outer folds; exact factor reconstruction; one model pass",
+      "bad_f1": 0.9534695346953469,
+      "flammable_f1": 0.8664987405541562,
+      "macro_f1": 0.9099841376247515,
+      "status": "Rejected",
+      "notes": "Below Dual-LoRA by 0.001858; 2/5 fold wins; flammable drops 0.005422; grouped bootstrap P(delta>0)=0.381"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "230_qwen35_second_seed",
+      "experiment": "Qwen3.5 two-seed Public leaderboard",
+      "validation": "Platform Public leaderboard",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": 0.8639458233,
+      "status": "Rejected",
+      "notes": "Public ниже эксперимента 190 на 0.0279786004; локальный прирост не перенёсся"
+    }
+  ]
+}

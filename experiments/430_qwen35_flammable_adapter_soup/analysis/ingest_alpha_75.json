@@ -1,0 +1,11 @@
+{
+  "experiment_id": "430",
+  "alpha_260": 0.75,
+  "bundle": "/tmp/qwen-soup-a75.3lofXC/qwen_soup_a75.zip",
+  "bundle_bytes": 59887,
+  "bundle_sha256": "421ae5a56c1f62b5bdc94d5884d11b8134cc172860565fb0b0fda1bffcb64869",
+  "prediction_rows": 5502,
+  "predictions_sha256": "ce2ae4d83256414a646e3242ef93f6a5166c533ce13999f62ebbb0001ccc4352",
+  "report_sha256": "3b9885de892bb43d07e7a3e1ceab8d128a85824c4814fb2bd812c5246a077445",
+  "passed": true
+}

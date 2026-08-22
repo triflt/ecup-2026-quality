@@ -1,0 +1,21 @@
+{
+  "experiment_id": "050",
+  "slug": "duplicate_stress",
+  "status": "completed",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "image_duplicate_stress_v1",
+  "conclusion": "Подтверждено: ExtraTrees теряет вес, Macro F1 снижается до 0.900610.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "050_duplicate_stress",
+      "experiment": "Image-duplicate grouped stress",
+      "validation": "Union of exact full text and exact first-image embedding groups",
+      "bad_f1": "0.9471090381061339",
+      "flammable_f1": "0.8541114058355438",
+      "macro_f1": "0.9006102219708388",
+      "status": "Success",
+      "notes": "ExtraTrees weight falls to zero; quantifies duplicate-photo sensitivity"
+    }
+  ]
+}

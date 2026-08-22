@@ -1,0 +1,32 @@
+{
+  "experiment_id": "080",
+  "slug": "four_head_ensemble",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "conclusion": "Обычная grouped CV улучшается, duplicate-stress и Public показывают overfitting.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "080_four_head_ensemble",
+      "experiment": "Alternative embedding-head ensemble",
+      "validation": "Same 5 grouped folds; text + LinearSVC + ExtraTrees",
+      "bad_f1": "0.9473120200035721",
+      "flammable_f1": "0.8556149732620321",
+      "macro_f1": "0.9014634966328021",
+      "status": "Success",
+      "notes": "ExtraTrees receives 5% only for flammable; +0.002166 macro over two-head fusion"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "080_four_head_ensemble",
+      "experiment": "Four-head rank fusion",
+      "validation": "Same grouped folds; text/all-images/first-image/ExtraTrees",
+      "bad_f1": "0.9479603677586361",
+      "flammable_f1": "0.8658227848101265",
+      "macro_f1": "0.9068915762843813",
+      "status": "Success",
+      "notes": "Best flammable head; ExtraTrees gets 35% on standard grouped folds"
+    }
+  ]
+}

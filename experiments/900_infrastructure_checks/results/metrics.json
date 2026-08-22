@@ -1,0 +1,54 @@
+{
+  "experiment_id": "900",
+  "slug": "infrastructure_checks",
+  "status": "completed",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "conclusion": "Обнаружены и исправлены image-size mismatch, cross-batch OCR contamination и empty-category crash.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "900_infrastructure_checks",
+      "experiment": "Full-data text submission smoke",
+      "validation": "Official Docker image, CPU, 4 products",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "Output schema valid"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "900_infrastructure_checks",
+      "experiment": "Logistic meta-fusion",
+      "validation": "Nested inner/outer grouped stacking over scores and data features",
+      "bad_f1": "0.9526881720430107",
+      "flammable_f1": "0.856396866840731",
+      "macro_f1": "0.9045425194418708",
+      "status": "Rejected",
+      "notes": "Below simple rank fusion; extra metadata interactions do not justify Public risk"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "900_infrastructure_checks",
+      "experiment": "S3 image extraction audit",
+      "validation": "All data ids vs extracted S3 keys vs remote ZIP64 central directory",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "12,971 products, 49,456 images; missing/extra/noncontiguous/duplicate = 0; extracted set exactly equals ZIP"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "900_infrastructure_checks",
+      "experiment": "LoRA fusion submission smoke",
+      "validation": "Official image; two mounted Qwen models; vendored PEFT; 3 products / 11 images",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "Offline load, inference, output schema and adapter compatibility passed"
+    }
+  ]
+}

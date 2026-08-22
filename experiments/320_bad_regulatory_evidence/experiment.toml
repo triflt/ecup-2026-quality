@@ -1,0 +1,47 @@
+[experiment]
+id = "320"
+slug = "bad_regulatory_evidence"
+title = "Sports-regulatory BAD residual head"
+status = "selector_frozen_waiting_for_310"
+entrypoint = "experiments/320_bad_regulatory_evidence/run.py"
+result_file = "experiments/320_bad_regulatory_evidence/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "component_transfer_gate_v4"
+secondary_version = "component_transfer_gate_v2"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "190_shingle_neighbor_prior"
+changed_factor = "Add one family-weighted linear residual score only on a frozen regulatory BAD selector"
+mechanism = "Explicit supplement status interacts with sports, medicine, food and veterinary context; a local residual can restore this interaction without perturbing unrelated products"
+expected_macro_f1_delta = 0.003
+falsification = "Reject if BAD gains less than 0.006, Macro gains less than 0.003, sports F1 gains less than 0.01, corrected-to-regressed is below 2, any non-selector or flammable prediction changes, or transfer/topology gates fail"
+precedents = [
+  "https://amazonkddcup.github.io/papers/3782.pdf",
+  "https://arxiv.org/abs/2008.06179",
+]
+
+[acceptance]
+baseline_macro_f1 = 0.9234086336846878
+required_fold_wins = 4
+max_category_f1_drop = 0.005
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 0.0
+planned_public_submissions = 0
+runtime_limit_minutes = 20
+
+[execution]
+arguments = ["--family-weighted", "--linear-residual", "--frozen-selector"]
+
+[artifacts]
+directory = "artifacts"
+publish = false

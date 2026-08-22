@@ -1,0 +1,54 @@
+{
+  "experiment_id": "190",
+  "slug": "shingle_neighbor_prior",
+  "status": "accepted",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "recurrence_70_30_v1",
+  "conclusion": "Public Macro F1 0.8919244237; архитектура принята. Отдельный вклад shingle prior требует контрольной отправки или независимой проверки.",
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "190_shingle_neighbor_prior",
+      "experiment": "Dual-LoRA shingle-prior Public leaderboard",
+      "validation": "Platform Public leaderboard",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "0.8919244236941932",
+      "status": "Success",
+      "notes": "Новый лучший Public; +0.0853452605 к прежнему результату 0.8065791632; отправка подтверждает всю архитектуру, но не изолирует вклад одного prior"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "190_shingle_neighbor_prior",
+      "experiment": "Dual-LoRA rare-shingle neighbour prior",
+      "validation": "Donor-only grouped OOF after exact/name and numeric-family prior; 20 repeated stratified 70/30 splits",
+      "bad_f1": "0.9572418759564317",
+      "flammable_f1": "0.8975609756097561",
+      "macro_f1": "0.9274014257830939",
+      "status": "Success",
+      "notes": "BAD +0.000853 fixed OOF and +0.000726 mean 70/30 (20/20 wins); 13 decisions changed, manual audit 11/13 correct after vs 2/13 before; flammable disabled"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "190_shingle_neighbor_prior",
+      "experiment": "Dual-LoRA shingle-prior smoke r1",
+      "validation": "Official image; one BAD product with no exact/name/numeric-family hit",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Error",
+      "notes": "Found common empty-category crash in LinearSVC.decision_function; exact, fuzzy and shingle archives patched"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "190_shingle_neighbor_prior",
+      "experiment": "Dual-LoRA shingle-prior smoke r2",
+      "validation": "Official image; one BAD product; empty flammable category; compact shingle index",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "Valid one-row output; empty category skipped safely; prior hits exact=0, name=0, fuzzy=0, shingle=1"
+    }
+  ]
+}

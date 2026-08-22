@@ -1,0 +1,37 @@
+{
+  "experiment_id": "440",
+  "evaluation_version": "qwen3vl_rdrop_two_fold_screen_v1",
+  "mode": "null_control",
+  "candidate": "unchanged parent Qwen3-VL ranks",
+  "screen_folds": [0, 3],
+  "mean_screen_delta_macro_f1": 0.0,
+  "changed_predictions": 0,
+  "null_control_passed": true,
+  "folds": [
+    {
+      "fold": 0,
+      "delta_macro_f1": 0.0,
+      "changed": 0,
+      "corrected": 0,
+      "regressed": 0,
+      "flammable_false_negative_delta": 0,
+      "safety_union_false_negative_delta": 0
+    },
+    {
+      "fold": 3,
+      "delta_macro_f1": 0.0,
+      "changed": 0,
+      "corrected": 0,
+      "regressed": 0,
+      "flammable_false_negative_delta": 0,
+      "safety_union_false_negative_delta": 0
+    }
+  ],
+  "integrity": {
+    "evaluator_sha256": "a02509ece2b995e27ceff049f1dec77c2ec1b6adad5aeb72c0473b170c86379b",
+    "route400_sha256": "58aa9feb3e6a276fda27666b11e479e052549523999bf2fb3c9af660904ab174",
+    "connected_guard_sha256": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "data_sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+  },
+  "command": "uv run python experiments/440_qwen3vl_rdrop/evaluate_screen.py --null-control --output-dir /tmp/qwen3vl-rdrop-null"
+}

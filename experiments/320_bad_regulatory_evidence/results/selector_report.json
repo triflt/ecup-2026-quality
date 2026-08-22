@@ -1,0 +1,60 @@
+{
+  "selector_version": "bad_regulatory_selector_v1",
+  "selection_uses_labels": false,
+  "category": "БАД",
+  "selector_cues": [
+    "sports_nutrition",
+    "medicine_language",
+    "food_beverage",
+    "pet_veterinary"
+  ],
+  "frozen_feature_cues": [
+    "sports_nutrition",
+    "explicit_bad",
+    "medicine_language",
+    "dosage_form",
+    "food_beverage",
+    "pet_veterinary",
+    "not_a_drug"
+  ],
+  "frozen_interactions": [
+    "sports_x_explicit_bad",
+    "sports_x_not_a_drug",
+    "sports_x_dosage_form",
+    "sports_x_medicine",
+    "sports_x_food"
+  ],
+  "bad_rows": 7469,
+  "selected_rows": 6210,
+  "selected_safe_rows": 5439,
+  "selected_unsafe_rows": 771,
+  "selected_by_fold": {
+    "0": 1251,
+    "1": 1212,
+    "2": 1249,
+    "3": 1233,
+    "4": 1265
+  },
+  "selected_by_cue": {
+    "sports_nutrition": 2255,
+    "medicine_language": 4954,
+    "food_beverage": 2276,
+    "pet_veterinary": 25
+  },
+  "post_selection_diagnostic_not_used_by_selector": {
+    "selected_positives": 4506,
+    "selected_baseline_errors": 427,
+    "sports_rows": 2255,
+    "sports_baseline_errors": 270,
+    "sports_safe_rows": 1876,
+    "sports_safe_baseline_errors": 251
+  },
+  "input_sha256": {
+    "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "folds": "03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d",
+    "guard": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "qwen3vl": "ba432e13624e6c3b1c7304ced8cacf580f4ffcc0a0cde1af8b6afb098bf6dc01",
+    "qwen35": "147f2b2b87d8220566526b38ab0e085c0bc44cd82b0442baca6b019516c3f1d8",
+    "locked": "176b76b0b0fd3527e9e15c8f2edd6a43f90fd3a24db1567a32a4b05e215139e8"
+  }
+}

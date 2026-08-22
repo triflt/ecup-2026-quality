@@ -1,0 +1,32 @@
+{
+  "experiment_id": "180",
+  "slug": "fuzzy_family_prior",
+  "status": "accepted",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "recurrence_70_30_v1",
+  "conclusion": "Donor-only BAD +0.000761; 17/20 recurrence wins; flammable отключён.",
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "180_fuzzy_family_prior",
+      "experiment": "Dual-LoRA fuzzy family prior",
+      "validation": "Honest donor-only grouped OOF after exact/name prior; 20 repeated stratified 70/30 splits",
+      "bad_f1": "0.956388538475401",
+      "flammable_f1": "0.8975609756097561",
+      "macro_f1": "0.9269747570425786",
+      "status": "Success",
+      "notes": "BAD +0.000761 fixed OOF and +0.000821 mean 70/30 (17/20 wins); 10 decisions changed, manual audit 9/10 correct after vs 1/10 before; disabled for flammable"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "180_fuzzy_family_prior",
+      "experiment": "Dual-LoRA fuzzy-prior submission smoke",
+      "validation": "Official image; three mounted Qwen models; both adapters; compressed hashed fuzzy prior",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "3/3 rows valid; prior path exercised in-container with exact=1 and fuzzy=2 hits"
+    }
+  ]
+}

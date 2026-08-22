@@ -1,0 +1,76 @@
+{
+  "experiment_id": "100",
+  "slug": "paddleocr_hard_cases",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "conclusion": "Помогает слабому flammable baseline, но не складывается с сильной LoRA fusion.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "100_paddleocr_hard_cases",
+      "experiment": "PaddleOCR-VL-1.5 compatibility",
+      "validation": "Official Docker image, one real product image",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "Correct OCR; model load 5.23 s, total 8.25 s; pinned Transformers 4.55 + compatibility adapter"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "100_paddleocr_hard_cases",
+      "experiment": "PaddleOCR short batch",
+      "validation": "4 images, batch=4, max_new_tokens=64",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "19.51 s generation total; 4.88 s/image; 256-token variant rejected at 19.42 s/image"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "100_paddleocr_hard_cases",
+      "experiment": "PaddleOCR hard-case correction",
+      "validation": "300 label-blind hard cases; batch=4",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Invalid",
+      "notes": "Cross-sample OCR contamination found by visual audit; results must not be used"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "100_paddleocr_hard_cases",
+      "experiment": "PaddleOCR hard-case correction r2",
+      "validation": "300 label-blind hard cases; strict batch=1",
+      "bad_f1": "0.9465553977272727",
+      "flammable_f1": "0.8601583113456465",
+      "macro_f1": "0.9033568545364596",
+      "status": "Success",
+      "notes": "Visual audit passed; helps flammable but slightly hurts BAD"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "100_paddleocr_hard_cases",
+      "experiment": "Four-head + OCR correction",
+      "validation": "Same grouped folds; OCR on 150 selected flammable hard cases",
+      "bad_f1": "0.9479603677586361",
+      "flammable_f1": "0.8534704370179949",
+      "macro_f1": "0.9007154023883155",
+      "status": "Rejected",
+      "notes": "OCR correction does not stack with the stronger four-head baseline"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "100_paddleocr_hard_cases",
+      "experiment": "OCR correction on LoRA fusion",
+      "validation": "Nested inner/outer CV on 150 label-blind hard cases per category",
+      "bad_f1": "0.9535426008968609",
+      "flammable_f1": "0.859375",
+      "macro_f1": "0.9064588004484304",
+      "status": "Rejected",
+      "notes": "Below uncorrected LoRA 0.910200; OCR correction does not stack and is excluded"
+    }
+  ]
+}

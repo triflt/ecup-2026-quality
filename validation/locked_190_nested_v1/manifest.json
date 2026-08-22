@@ -1,0 +1,34 @@
+{
+  "evaluation_version": "locked_190_nested_v1",
+  "dataset_version": "competition_train_v1",
+  "base_folds": "validation/grouped_text_v1/folds.csv",
+  "baseline_experiment": "190_shingle_neighbor_prior",
+  "changed_factor": "Qwen3.5 seed42 adapter only",
+  "fixed_components": [
+    "robust_base OOF scores",
+    "Qwen3-VL seed42 OOF scores",
+    "Public-190 fusion weights"
+  ],
+  "weights": {
+    "БАД": [0.5, 0.25, 0.25],
+    "Легковоспламеняющиеся": [0.15, 0.1, 0.75]
+  },
+  "threshold_selection": "For each category and outer fold, fit one threshold on the other four folds and apply it once to the held-out fold",
+  "production_threshold_diagnostic": {
+    "БАД": 0.27193570137023926,
+    "Легковоспламеняющиеся": 0.953912615776062
+  },
+  "acceptance": {
+    "minimum_macro_f1_delta": 0.001,
+    "required_fold_wins": 4,
+    "maximum_category_f1_drop": 0.005
+  },
+  "checksums": {
+    "folds_sha256": "03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d",
+    "robust_base_oof_sha256": "5d7467c48fc8a5a73f947f5aa1300071c77ba699b29c12250caf1bcd3176d7ac",
+    "qwen3vl_oof_sha256": "ba432e13624e6c3b1c7304ced8cacf580f4ffcc0a0cde1af8b6afb098bf6dc01",
+    "qwen35_seed42_oof_sha256": "147f2b2b87d8220566526b38ab0e085c0bc44cd82b0442baca6b019516c3f1d8",
+    "adapter_replacement_report_sha256": "8aa8ad1399622c0f607ecd4c55dc1a2c2a1bf20f40d0cb82f6eb3c39af230abc"
+  },
+  "immutable": true
+}

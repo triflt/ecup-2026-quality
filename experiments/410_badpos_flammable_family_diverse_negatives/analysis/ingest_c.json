@@ -1,0 +1,26 @@
+{
+  "bundle": "experiments/410_badpos_flammable_family_diverse_negatives/.local/downloads/c-xiki7p/qwen_negdiv_c.zip",
+  "bundle_bytes": 93302672,
+  "bundle_sha256": "14cd93fb1421225e68836f5c2da3787c1f6515ea22f44b1b4d726d8e06778260",
+  "payload_location": "outer",
+  "expected_stages": [
+    "fold_4",
+    "full"
+  ],
+  "stages": [
+    {
+      "stage": "fold_4",
+      "adapter_bytes": 12592424,
+      "adapter_sha256": "5a67c19ce7abdc94ae57d3ea3e03b11ee01ba564751e8a2207c109ef2d0779a8",
+      "prediction_rows": 2593,
+      "predictions_sha256": "4fb37d81dcb214c851f67fa78da6a1bbb25c996eed8ed1e9d178708ab56a9d83"
+    },
+    {
+      "stage": "full",
+      "adapter_bytes": 12592424,
+      "adapter_sha256": "b5ab55a8746a2048549390c7e65034e336fd83703e77818a2ebe58ad0ae0791a",
+      "train_records": 6790
+    }
+  ],
+  "passed": true
+}

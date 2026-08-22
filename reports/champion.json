@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-08-21",
+  "experiment": "190_shingle_neighbor_prior",
+  "submission_filename": "quality-qwen3vl-qwen35-dual-lora-shingle-prior-submit.zip",
+  "submission_sha256": "fb6dd3c0ec53a0d4810f423fcde78fee7b0cdd1b74c9ee61333b4c61a5f9978f",
+  "data_version": "competition_train_v1",
+  "evaluation_versions": [
+    "nested_grouped_v1",
+    "recurrence_70_30_v1"
+  ],
+  "validation": {
+    "dual_lora_nested_bad_f1": 0.9517638588912887,
+    "dual_lora_nested_flammable_f1": 0.8719211822660099,
+    "dual_lora_nested_macro_f1": 0.9118425205786493,
+    "shingle_recurrence_macro_f1": 0.9274014257830939
+  },
+  "leaderboard": {
+    "public_macro_f1": 0.8919244236941932,
+    "private_macro_f1": null
+  },
+  "runtime": {
+    "measured_rows": 600,
+    "measured_seconds": 228.76,
+    "projected_public_minutes": 10.17,
+    "projected_private_minutes": 24.15
+  },
+  "verification": {
+    "official_container_smoke": true,
+    "output_schema": true,
+    "empty_category_safe": true,
+    "adapter_checksums_recorded": false,
+    "clean_rebuild_after_public": false
+  },
+  "acceptance_reason": "Новый лучший Public с большим запасом; групповые и повторные проверки пройдены. До финального выбора нужно записать контрольные суммы адаптеров и повторить чистую сборку."
+}

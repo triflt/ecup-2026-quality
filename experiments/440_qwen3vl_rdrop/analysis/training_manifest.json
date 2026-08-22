@@ -1,0 +1,65 @@
+{
+  "experiment_id": "440",
+  "version": "qwen3vl_rdrop_training_manifest_v1",
+  "created_before_candidate_predictions": true,
+  "data_version": "competition_train_v1",
+  "evaluation_version": "qwen3vl_rdrop_two_fold_screen_v1",
+  "training_parent": "110_qwen3vl_lora",
+  "seed": 42,
+  "training_mode": "hard",
+  "rdrop_alpha": 1.0,
+  "objective": "mean assistant-suffix CE plus alpha times symmetric binary class-token KL",
+  "selector_bundle": {
+    "path": "experiments/440_qwen3vl_rdrop/artifacts/selector_probe/qwen_rdrop_selector.zip",
+    "sha256": "79b5738b72cccf84e7906e1c235ea63b3c9d1643649c76353eb5c9c5f18b69a0",
+    "job": "redacted-job",
+    "runtime": "odsai/ecup26-quality-baseline:1.0"
+  },
+  "selector": {
+    "bad_positive": "750 hardest plus 750 random",
+    "bad_negative": "750 hardest plus 750 random",
+    "flammable_positive": "all outer-train positives repeated five times",
+    "flammable_negative": "800 hardest plus 800 random",
+    "shuffle": "python random.Random(42)",
+    "uses_candidate_predictions": false
+  },
+  "sources": {
+    "data": {
+      "path": "research/data.csv",
+      "sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+    },
+    "oof": {
+      "path": "research/four-head-r2-extracted/four_head_oof.npz",
+      "sha256": "d78bb7df897e244e030fa388e1b9c770d15434cc33aa1f56b238c7d057646116"
+    },
+    "image_manifest": {
+      "path": "research/lora_image_manifest_complete.tsv.gz",
+      "sha256": "d6193215ce2d6145440bd484ea225e77fe10784c4c2c06b7c6b0b85dc8efc7d9"
+    }
+  },
+  "stages": {
+    "fold_0": {
+      "records": 5390,
+      "unique_rows": 4758,
+      "ordered_id_sha256": "6b7e30d4f861c206260c4ad023367e202e9bc981069d65f2e2faf436f2a2534f",
+      "class_records": {
+        "bad_negative": 1500,
+        "bad_positive": 1500,
+        "flammable_negative": 1600,
+        "flammable_positive": 790
+      }
+    },
+    "fold_3": {
+      "records": 5390,
+      "unique_rows": 4758,
+      "ordered_id_sha256": "3ba836bd7f4f49d20c703d02918e490cddcd6e2690bee12cd2dca57d3186f10e",
+      "class_records": {
+        "bad_negative": 1500,
+        "bad_positive": 1500,
+        "flammable_negative": 1600,
+        "flammable_positive": 790
+      }
+    }
+  },
+  "authorization": "Only folds 0 and 3 are authorized. Add a new manifest version only after the reject-only screen passes."
+}

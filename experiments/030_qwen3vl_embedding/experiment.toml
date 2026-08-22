@@ -1,0 +1,25 @@
+[experiment]
+id = "030"
+slug = "qwen3vl_embedding"
+title = "Qwen3-VL embedding classifier"
+status = "completed"
+entrypoint = "research/qwen-train-code/run_train.py"
+result_file = "experiments/030_qwen3vl_embedding/results/metrics.json"
+submission_source = "experiments/030_qwen3vl_embedding/submission"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "grouped_text_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false

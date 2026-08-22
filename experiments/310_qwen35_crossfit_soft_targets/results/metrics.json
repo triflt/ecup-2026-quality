@@ -1,0 +1,137 @@
+{
+  "experiment_id": "310",
+  "status": "rejected_offline",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "locked_190_nested_v1",
+  "secondary_evaluation_versions": [
+    "connected_family_guard_v2",
+    "offline_core_gate_v1"
+  ],
+  "seed": 42,
+  "teacher_targets": {
+    "path": "research/qwen35_crossfit_soft_targets.csv",
+    "sha256": "392b1d098883ecf0c5de7c250bb4e9dd8ac8d296c8ef39b766e27b9fa2a5d007",
+    "construction": "outer-fold model predictions with outer-fold-excluded calibration"
+  },
+  "validation": {
+    "locked_190_nested": {
+      "baseline_macro_f1": 0.9234086336846878,
+      "candidate_macro_f1": 0.9112457222135184,
+      "delta_macro_f1": -0.012162911471169435,
+      "candidate_bad_f1": 0.9531447107586952,
+      "candidate_flammable_f1": 0.8693467336683417,
+      "category_delta": {
+        "БАД": -0.0015156938655822572,
+        "Легковоспламеняющиеся": -0.02281012907675639
+      },
+      "folds_won": 1,
+      "changed_predictions": 86,
+      "corrected": 30,
+      "regressed": 56,
+      "bootstrap_probability_delta_positive": 0.0345,
+      "bootstrap_ci95": [-0.026706058239148525, 0.00092631653469656]
+    },
+    "connected_safe": {
+      "rows": 11207,
+      "baseline_macro_f1": 0.9193528162236431,
+      "candidate_macro_f1": 0.9065258765367888,
+      "delta_macro_f1": -0.012826939686854222,
+      "folds_won": 1,
+      "corrected": 27,
+      "regressed": 53,
+      "bootstrap_probability_delta_positive": 0.0315,
+      "bootstrap_ci95": [-0.027554873181640786, 0.0006634426635480916]
+    },
+    "downstream_priors": {
+      "change_survival_rate": 0.9651162790697675,
+      "macro_delta_after_priors": -0.012116588282307661
+    },
+    "sports_error_transfer": {
+      "frozen_errors": 243,
+      "fixed": 6,
+      "remaining": 237,
+      "corrected_in_cue_cohort": 9,
+      "new_errors": 13,
+      "guardrail_breach": true
+    },
+    "offline_core_gate_passed": false
+  },
+  "runtime": {
+    "job": "redacted-job",
+    "gpus": 2,
+    "accelerator": "H100",
+    "time_limit_minutes": 240,
+    "status": "succeeded",
+    "full_refit_runtime_minutes": 43.29353024168328,
+    "download_failures": 0
+  },
+  "live_progress": {
+    "completed_folds": [0, 1, 2, 3, 4],
+    "running_folds": [],
+    "running_full_refit": false,
+    "pending_stages": [],
+    "fold_0_runtime_minutes": 40.665102694917,
+    "fold_1_runtime_minutes": 40.56983039211676,
+    "fold_2_runtime_minutes": 38.87562866150014,
+    "fold_3_runtime_minutes": 38.21554353085036,
+    "fold_4_runtime_minutes": 39.73401635755047,
+    "download_failures": 0,
+    "diagnostic_only_not_selection": {
+      "fold_0_macro_base_plus_soft_lora": 0.9055082848186295,
+      "fold_1_macro_base_plus_soft_lora": 0.9032636215866723,
+      "fold_2_macro_base_plus_soft_lora": 0.9526003381992615,
+      "fold_3_macro_base_plus_soft_lora": 0.9268821536055356,
+      "fold_4_macro_base_plus_soft_lora": 0.9528885504901494,
+      "global_macro_lora": 0.8978247616295186,
+      "global_macro_fused": 0.9185954186914738
+    }
+  },
+  "compatibility_smoke": {
+    "job": "redacted-job",
+    "status": "succeeded",
+    "target": 0.2,
+    "loss": 1.0484445095062256,
+    "gradient_tensors": 64,
+    "gradient_norm": 59.39239501953125,
+    "trainable_parameters": 3145728,
+    "peak_cuda_gib": 8.755341053009033
+  },
+  "runtime_optimization": {
+    "aborted_job": "redacted-job",
+    "observed_minutes_at_update_25": [6.970566009605924, 7.1251852876817185],
+    "projected_training_minutes_for_six_stages": 570.0,
+    "confirmed_cause": "The unoptimized soft-loss path materialized full-sequence vocabulary logits although only the final binary token was used",
+    "fix": "Qwen3.5 native logits_to_keep=1 for soft training and validation"
+  },
+  "postprocessing_pipeline": {
+    "runner": "experiments/310_qwen35_crossfit_soft_targets/process_completed_artifacts.sh",
+    "runner_sha256": "02ef8ac36d17e2141865448fb5987428a49677d091c8a14344e942f9489808a9",
+    "connected_auditor_sha256": "f4f701058172273bae75792237be83556c57d04a1dbab81f211088e9711feb44",
+    "sports_auditor_sha256": "628d40c3009b77db7e2e66cf806ccb7bdc294e3d659d0166a4e850709ab96935",
+    "decision_aggregator_sha256": "dd3bb99ca2a3227f669144f2eae90ae184ad20fb6b620d054ec00d4159b66364",
+    "decision_gate_name": "offline_core_gate_passed",
+    "smoke_evidence": "Generic connected audit reproduced experiment 260 delta +0.0074614519 and 4/5 wins; sports audit recovered exactly 243 frozen common errors"
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/private-runtime_qwen_soft_b91s2l/qwen_soft.zip",
+      "size_bytes": 279988127,
+      "sha256": "e2e2ff3628291033cc7dfb097e0e5f84439558ca95dcf65b33fe277c615b7340"
+    },
+    {
+      "path": "artifacts/private-runtime_qwen_soft_b91s2l/extracted_outer/output_bundle.zip",
+      "size_bytes": 140039671,
+      "sha256": "77548c9bba32cc7b01955fdc0f1d5af93a0eac08bb5eff7aaa5b16bead5d0686"
+    },
+    {
+      "path": "artifacts/private-runtime_qwen_soft_b91s2l/extracted_bundle/full/adapter/adapter_model.safetensors",
+      "size_bytes": 12592424,
+      "sha256": "967af97a70a4111bec5d1757374cdeefa0a57c83c128e1ed2da86e69567ba3ca"
+    },
+    {
+      "path": "results/post310_decision.json",
+      "sha256": "9bfded528512cc6c5b0cf5b9f0f7732a8ce41e0f023c9047848ff8291f29b3d0"
+    }
+  ],
+  "decision": "Rejected offline: locked Macro delta -0.0121629 with 1/5 fold wins; connected-safe delta -0.0128269; downstream priors preserve the negative change; only 6/243 frozen sports errors fixed while 13 new cue-cohort errors are created. Do not build or submit experiment 310. The frozen branch authorizes experiment 320."
+}

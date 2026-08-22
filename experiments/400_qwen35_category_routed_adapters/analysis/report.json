@@ -1,0 +1,168 @@
+{
+  "experiment_id": "400",
+  "scope": "all 26 locked nested decisions changed by category routing",
+  "rows": 26,
+  "corrected": 17,
+  "regressed": 9,
+  "transitions": {
+    "1->0": 20,
+    "0->1": 6
+  },
+  "label_distribution": {
+    "1": 13,
+    "0": 13
+  },
+  "connected_safe_rows": 26,
+  "singleton_components": 17,
+  "folds": [
+    {
+      "fold": 0,
+      "changed": 11,
+      "corrected": 8,
+      "regressed": 3,
+      "false_positive_to_negative": 4,
+      "false_negative_to_positive": 4
+    },
+    {
+      "fold": 1,
+      "changed": 3,
+      "corrected": 2,
+      "regressed": 1,
+      "false_positive_to_negative": 2,
+      "false_negative_to_positive": 0
+    },
+    {
+      "fold": 2,
+      "changed": 3,
+      "corrected": 3,
+      "regressed": 0,
+      "false_positive_to_negative": 2,
+      "false_negative_to_positive": 1
+    },
+    {
+      "fold": 3,
+      "changed": 5,
+      "corrected": 1,
+      "regressed": 4,
+      "false_positive_to_negative": 1,
+      "false_negative_to_positive": 0
+    },
+    {
+      "fold": 4,
+      "changed": 4,
+      "corrected": 3,
+      "regressed": 1,
+      "false_positive_to_negative": 3,
+      "false_negative_to_positive": 0
+    }
+  ],
+  "cohorts": [
+    {
+      "cohort": "gas_fuel",
+      "rows": 10,
+      "corrected": 10,
+      "regressed": 0,
+      "net": 10,
+      "fold3_rows": 0
+    },
+    {
+      "cohort": "ignition_source",
+      "rows": 9,
+      "corrected": 4,
+      "regressed": 5,
+      "net": -1,
+      "fold3_rows": 2
+    },
+    {
+      "cohort": "paint_solvent",
+      "rows": 1,
+      "corrected": 1,
+      "regressed": 0,
+      "net": 1,
+      "fold3_rows": 0
+    },
+    {
+      "cohort": "alcohol_perfume",
+      "rows": 0,
+      "corrected": 0,
+      "regressed": 0,
+      "net": 0,
+      "fold3_rows": 0
+    },
+    {
+      "cohort": "pyrotechnics",
+      "rows": 4,
+      "corrected": 1,
+      "regressed": 3,
+      "net": -2,
+      "fold3_rows": 2
+    },
+    {
+      "cohort": "empty_equipment",
+      "rows": 0,
+      "corrected": 0,
+      "regressed": 0,
+      "net": 0,
+      "fold3_rows": 0
+    },
+    {
+      "cohort": "battery_electronics",
+      "rows": 1,
+      "corrected": 1,
+      "regressed": 0,
+      "net": 1,
+      "fold3_rows": 1
+    },
+    {
+      "cohort": "other",
+      "rows": 1,
+      "corrected": 0,
+      "regressed": 1,
+      "net": -1,
+      "fold3_rows": 0
+    }
+  ],
+  "fold3_regressions": [
+    {
+      "id": "44",
+      "name": "Набор ведьмы Гадание на Таро",
+      "label": 1,
+      "transition": "1->0",
+      "primary_cohort": "ignition_source",
+      "component_size": 1,
+      "image_count": 1
+    },
+    {
+      "id": "2698",
+      "name": "Подарочный набор *Верь в чудеса*",
+      "label": 1,
+      "transition": "1->0",
+      "primary_cohort": "pyrotechnics",
+      "component_size": 1,
+      "image_count": 1
+    },
+    {
+      "id": "5499",
+      "name": "Дымогенератор \"Hobbi Smoke\" 1.0, 1 л",
+      "label": 1,
+      "transition": "1->0",
+      "primary_cohort": "ignition_source",
+      "component_size": 1,
+      "image_count": 1
+    },
+    {
+      "id": "12462",
+      "name": "Свеча-Фонтан для торта 17,5см 4шт",
+      "label": 1,
+      "transition": "1->0",
+      "primary_cohort": "pyrotechnics",
+      "component_size": 1,
+      "image_count": 1
+    }
+  ],
+  "input_sha256": {
+    "experiments/400_qwen35_category_routed_adapters/results/routed_predictions.npz": "58aa9feb3e6a276fda27666b11e479e052549523999bf2fb3c9af660904ab174",
+    "research/data.csv": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "validation/connected_family_guard_v2/rows.csv": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a"
+  }
+}

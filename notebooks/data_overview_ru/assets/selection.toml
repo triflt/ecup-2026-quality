@@ -1,0 +1,22 @@
+source = "competition_images_archive_v1"
+data_version = "competition_train_v1"
+selected_ids = [4424, 5192, 4040]
+selected_image_count = 11
+
+[[examples]]
+id = 4424
+category = "БАД"
+label = 1
+purpose = "Явная положительная карточка: маркировка и вид упаковки поддерживают заявленную категорию."
+
+[[examples]]
+id = 5192
+category = "БАД"
+label = 0
+purpose = "Сложный отрицательный пример: продукт похож на добавку, но этого недостаточно по формальным правилам."
+
+[[examples]]
+id = 4040
+category = "Легковоспламеняющиеся"
+label = 0
+purpose = "Важное исключение: горелка использует газ, но продаётся без горючего содержимого."

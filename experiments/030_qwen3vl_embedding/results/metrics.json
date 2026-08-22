@@ -1,0 +1,9 @@
+{
+  "experiment_id": "030",
+  "slug": "qwen3vl_embedding",
+  "status": "completed",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "conclusion": "Изображения полезны, но random OOF 0.902350 не перенёсся: Public 0.722013.",
+  "historical_results": []
+}

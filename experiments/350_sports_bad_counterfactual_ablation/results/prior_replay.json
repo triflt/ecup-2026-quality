@@ -1,0 +1,53 @@
+{
+  "category": {
+    "БАД": {
+      "baseline_f1": 0.9571402845308842,
+      "candidate_f1": 0.9568493765138603
+    },
+    "Легковоспламеняющиеся": {
+      "baseline_f1": 0.8921568627450981,
+      "candidate_f1": 0.8921568627450981
+    }
+  },
+  "baseline_macro_f1": 0.9246485736379911,
+  "candidate_macro_f1": 0.9245031196294792,
+  "delta_macro_f1": -0.00014545400851195822,
+  "changed_before": 44,
+  "changed_after": 41,
+  "baseline_prior_hits": {
+    "БАД": {
+      "rows": 7469,
+      "exact_hits": 7,
+      "name_hits": 291,
+      "canonical_hits": 603,
+      "shingle_hits": 280,
+      "shingle_changes": 13
+    },
+    "Легковоспламеняющиеся": {
+      "rows": 5502,
+      "exact_hits": 0,
+      "name_hits": 0,
+      "canonical_hits": 0,
+      "shingle_hits": 0,
+      "shingle_changes": 0
+    }
+  },
+  "candidate_prior_hits": {
+    "БАД": {
+      "rows": 7469,
+      "exact_hits": 7,
+      "name_hits": 291,
+      "canonical_hits": 603,
+      "shingle_hits": 280,
+      "shingle_changes": 14
+    },
+    "Легковоспламеняющиеся": {
+      "rows": 5502,
+      "exact_hits": 0,
+      "name_hits": 0,
+      "canonical_hits": 0,
+      "shingle_hits": 0,
+      "shingle_changes": 0
+    }
+  }
+}

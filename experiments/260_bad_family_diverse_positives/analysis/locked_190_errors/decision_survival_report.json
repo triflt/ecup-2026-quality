@@ -1,0 +1,111 @@
+{
+  "protocol": "donor-only outer-fold replay of Public-190 exact/name/numeric-family/shingle priors",
+  "candidate": "exp260",
+  "shingle_config": [
+    0.95,
+    2,
+    3,
+    0.999
+  ],
+  "baseline_before_priors": {
+    "bad_f1": 0.9546604046242775,
+    "flammable_f1": 0.8921568627450981,
+    "macro_f1": 0.9234086336846878
+  },
+  "candidate_before_priors": {
+    "bad_f1": 0.9525967551889786,
+    "flammable_f1": 0.9086294416243654,
+    "macro_f1": 0.9306130984066721
+  },
+  "baseline_after_priors": {
+    "bad_f1": 0.9571402845308842,
+    "flammable_f1": 0.8921568627450981,
+    "macro_f1": 0.9246485736379911
+  },
+  "candidate_after_priors": {
+    "bad_f1": 0.9553829479768786,
+    "flammable_f1": 0.9086294416243654,
+    "macro_f1": 0.932006194800622
+  },
+  "change_survival": {
+    "changed_before_priors": {
+      "rows": 97,
+      "bad_rows": 71,
+      "flammable_rows": 26
+    },
+    "overridden_by_priors": {
+      "rows": 5,
+      "bad_rows": 5,
+      "flammable_rows": 0
+    },
+    "survived_after_priors": {
+      "rows": 92,
+      "bad_rows": 66,
+      "flammable_rows": 26
+    },
+    "introduced_by_different_prior_resolution": {
+      "rows": 0,
+      "bad_rows": 0,
+      "flammable_rows": 0
+    },
+    "survival_rate": 0.9484536082474226,
+    "before_priors": {
+      "corrected": 42,
+      "regressed": 55
+    },
+    "after_priors": {
+      "corrected": 41,
+      "regressed": 51
+    }
+  },
+  "baseline_prior_hits": {
+    "БАД": {
+      "rows": 7469,
+      "exact_hits": 7,
+      "name_hits": 291,
+      "canonical_hits": 603,
+      "shingle_hits": 280,
+      "shingle_changes": 13
+    },
+    "Легковоспламеняющиеся": {
+      "rows": 5502,
+      "exact_hits": 0,
+      "name_hits": 0,
+      "canonical_hits": 0,
+      "shingle_hits": 0,
+      "shingle_changes": 0
+    }
+  },
+  "candidate_prior_hits": {
+    "БАД": {
+      "rows": 7469,
+      "exact_hits": 7,
+      "name_hits": 291,
+      "canonical_hits": 603,
+      "shingle_hits": 280,
+      "shingle_changes": 13
+    },
+    "Легковоспламеняющиеся": {
+      "rows": 5502,
+      "exact_hits": 0,
+      "name_hits": 0,
+      "canonical_hits": 0,
+      "shingle_hits": 0,
+      "shingle_changes": 0
+    }
+  },
+  "limitations": [
+    "Donor-only grouped OOF replay estimates downstream masking without hidden labels.",
+    "Hidden repeat rate can differ from train, so this audit explains mechanism but cannot reconstruct Public predictions."
+  ],
+  "delta_before_priors": {
+    "bad_f1": -0.0020636494352989088,
+    "flammable_f1": 0.01647257887926734,
+    "macro_f1": 0.007204464721984216
+  },
+  "delta_after_priors": {
+    "bad_f1": -0.0017573365540055619,
+    "flammable_f1": 0.01647257887926734,
+    "macro_f1": 0.007357621162630834
+  }
+}

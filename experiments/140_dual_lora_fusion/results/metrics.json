@@ -1,0 +1,54 @@
+{
+  "experiment_id": "140",
+  "slug": "dual_lora_fusion",
+  "status": "accepted",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "conclusion": "Главная architecture: nested Macro F1 0.911843; scaled runtime укладывается в лимит.",
+  "historical_results": [
+    {
+      "date": "2026-08-21",
+      "experiment_group": "140_dual_lora_fusion",
+      "experiment": "Nested robust-base + Qwen3-VL + Qwen3.5",
+      "validation": "Three-head simplex weights selected on four folds, applied to the fifth",
+      "bad_f1": "0.9517638588912887",
+      "flammable_f1": "0.8719211822660099",
+      "macro_f1": "0.9118425205786493",
+      "status": "Success",
+      "notes": "+0.00545 over nested Qwen3-VL pair; global weights 50/25/25 BAD and 15/10/75 flammable"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "140_dual_lora_fusion",
+      "experiment": "Dual-LoRA submission smoke r1",
+      "validation": "Official image; three mounted Qwen models; 3 products / 11 images",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Error",
+      "notes": "Caught train/inference image-size mismatch before submission; fixed by matching 448px training thumbnails"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "140_dual_lora_fusion",
+      "experiment": "Dual-LoRA submission smoke r2",
+      "validation": "Official image; three mounted Qwen models; corrected 448px preprocessing",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "Both adapters loaded; 3/3 unique ids and output regex valid"
+    },
+    {
+      "date": "2026-08-21",
+      "experiment_group": "140_dual_lora_fusion",
+      "experiment": "Dual-LoRA scaled runtime smoke",
+      "validation": "Official image; 600 products / 2,274 images; all three model stages",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "228.76 s end-to-end inference; projected Public 1,600 = 10.17 min, Private 3,800 = 24.15 min; schema valid"
+    }
+  ]
+}

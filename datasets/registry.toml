@@ -1,0 +1,10 @@
+schema_version = 1
+
+[[datasets]]
+version = "competition_train_v1"
+description = "Исходная обучающая выборка E-CUP 2026 Quality, использованная во всех исторических экспериментах."
+sha256 = "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+rows = 12971
+bad_rows = 7469
+flammable_rows = 5502
+immutable = true

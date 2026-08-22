@@ -1,0 +1,167 @@
+{
+  "protocol": "internvl_attribute_nested_gate_v1",
+  "selector_rows": 909,
+  "valid_attribute_rows": 573,
+  "invalid_rows_keep_baseline": 336,
+  "features": [
+    "fuel_or_gas",
+    "empty_equipment",
+    "ignition_source",
+    "fuel_included",
+    "combustible_material",
+    "absence_or_negation",
+    "locked_score",
+    "locked_uncertainty"
+  ],
+  "gate": "C=0.3 balanced logistic; threshold from four donor-fold inner OOF predictions",
+  "baseline_macro_f1": 0.9234086336846878,
+  "candidate_macro_f1": 0.9168363751516448,
+  "delta_macro_f1": -0.006572258533042996,
+  "baseline_category_f1": {
+    "БАД": 0.9546604046242775,
+    "Легковоспламеняющиеся": 0.8921568627450981
+  },
+  "candidate_category_f1": {
+    "БАД": 0.9546604046242775,
+    "Легковоспламеняющиеся": 0.8790123456790123
+  },
+  "category_delta": {
+    "БАД": 0.0,
+    "Легковоспламеняющиеся": -0.01314451706608577
+  },
+  "folds_won": 2,
+  "folds": [
+    {
+      "fold": 0,
+      "baseline_macro_f1": 0.9030404751145826,
+      "candidate_macro_f1": 0.8795323376823946,
+      "delta": -0.023508137432188048,
+      "baseline_category_f1": {
+        "БАД": 0.9489380930863082,
+        "Легковоспламеняющиеся": 0.8571428571428571
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9489380930863082,
+        "Легковоспламеняющиеся": 0.810126582278481
+      }
+    },
+    {
+      "fold": 1,
+      "baseline_macro_f1": 0.8932643264326433,
+      "candidate_macro_f1": 0.8952023109287673,
+      "delta": 0.0019379844961240345,
+      "baseline_category_f1": {
+        "БАД": 0.9531953195319532,
+        "Легковоспламеняющиеся": 0.8333333333333334
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9531953195319532,
+        "Легковоспламеняющиеся": 0.8372093023255814
+      }
+    },
+    {
+      "fold": 2,
+      "baseline_macro_f1": 0.9403481012658228,
+      "candidate_macro_f1": 0.9403481012658228,
+      "delta": 0.0,
+      "baseline_category_f1": {
+        "БАД": 0.9556962025316456,
+        "Легковоспламеняющиеся": 0.925
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9556962025316456,
+        "Легковоспламеняющиеся": 0.925
+      }
+    },
+    {
+      "fold": 3,
+      "baseline_macro_f1": 0.9398582447362935,
+      "candidate_macro_f1": 0.9227642276422764,
+      "delta": -0.017094017094017144,
+      "baseline_category_f1": {
+        "БАД": 0.9566395663956639,
+        "Легковоспламеняющиеся": 0.9230769230769231
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9566395663956639,
+        "Легковоспламеняющиеся": 0.8888888888888888
+      }
+    },
+    {
+      "fold": 4,
+      "baseline_macro_f1": 0.9428357105823433,
+      "candidate_macro_f1": 0.9477755068157486,
+      "delta": 0.004939796233405347,
+      "baseline_category_f1": {
+        "БАД": 0.9588421528720036,
+        "Легковоспламеняющиеся": 0.926829268292683
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9588421528720036,
+        "Легковоспламеняющиеся": 0.9367088607594937
+      }
+    }
+  ],
+  "gate_fold_detail": [
+    {
+      "outer_fold": 0,
+      "donor_rows": 469,
+      "outer_rows": 104,
+      "threshold_from_inner_oof": 0.7560943611524902,
+      "selected_outer_baseline_f1": 0.7659574468085106,
+      "selected_outer_candidate_f1": 0.6666666666666666
+    },
+    {
+      "outer_fold": 1,
+      "donor_rows": 453,
+      "outer_rows": 120,
+      "threshold_from_inner_oof": 0.7314491704805438,
+      "selected_outer_baseline_f1": 0.8260869565217391,
+      "selected_outer_candidate_f1": 0.8333333333333334
+    },
+    {
+      "outer_fold": 2,
+      "donor_rows": 458,
+      "outer_rows": 115,
+      "threshold_from_inner_oof": 0.691544340251532,
+      "selected_outer_baseline_f1": 0.9090909090909091,
+      "selected_outer_candidate_f1": 0.9090909090909091
+    },
+    {
+      "outer_fold": 3,
+      "donor_rows": 462,
+      "outer_rows": 111,
+      "threshold_from_inner_oof": 0.7194564569438004,
+      "selected_outer_baseline_f1": 0.9230769230769231,
+      "selected_outer_candidate_f1": 0.8571428571428571
+    },
+    {
+      "outer_fold": 4,
+      "donor_rows": 450,
+      "outer_rows": 123,
+      "threshold_from_inner_oof": 0.6927477138000049,
+      "selected_outer_baseline_f1": 0.9444444444444444,
+      "selected_outer_candidate_f1": 0.9696969696969697
+    }
+  ],
+  "changed_predictions": 13,
+  "corrected": 4,
+  "regressed": 9,
+  "group_bootstrap": {
+    "iterations": 10000,
+    "seed": 30042,
+    "probability_delta_positive": 0.0742,
+    "delta_ci95": [
+      -0.0168139150638958,
+      0.002478066983072626
+    ]
+  },
+  "downstream_prior_replay": "No flammable production family prior exists in experiment 190; BAD predictions remain byte-identical.",
+  "acceptance": {
+    "delta_at_least_0_003": false,
+    "wins_at_least_4_of_5_folds": false,
+    "no_category_drop_over_0_005": false,
+    "bootstrap_probability_at_least_0_90": false
+  },
+  "accepted": false
+}

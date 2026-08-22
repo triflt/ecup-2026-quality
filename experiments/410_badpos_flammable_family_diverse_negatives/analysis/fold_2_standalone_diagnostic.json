@@ -1,0 +1,30 @@
+{
+  "experiment_id": "410",
+  "fold": 2,
+  "diagnostic_only": true,
+  "not_an_acceptance_metric": "LoRA thresholds and best-fusion weights in these reports are selected on the same holdout fold. The frozen locked category-routed audit is still required.",
+  "parent_260": {
+    "bad_lora_f1": 0.9483610237988325,
+    "flammable_lora_f1": 0.9473684210526315,
+    "macro_lora": 0.9478647224257319,
+    "macro_best_fusion": 0.9592540220681353,
+    "runtime_minutes": 35.882415662985295
+  },
+  "candidate_410": {
+    "bad_lora_f1": 0.9522091974752029,
+    "flammable_lora_f1": 0.9210526315789473,
+    "macro_lora": 0.9366309145270751,
+    "macro_best_fusion": 0.9526001348304158,
+    "runtime_minutes": 36.629930150322615,
+    "download_failures": 0,
+    "selected_flammable_negative_rows": 1600,
+    "selected_flammable_negative_families": 1600
+  },
+  "delta": {
+    "bad_lora_f1": 0.00384817367637047,
+    "flammable_lora_f1": -0.02631578947368418,
+    "macro_lora": -0.0112338078986568,
+    "macro_best_fusion": -0.006653887237719425
+  },
+  "interim_decision": "third negative standalone warning; family-diverse negatives consistently reduce flammable-positive performance"
+}

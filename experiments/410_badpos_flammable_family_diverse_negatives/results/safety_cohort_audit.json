@@ -1,0 +1,39 @@
+{
+  "definitions": {
+    "ignition_source": "(?iu)\\b(?:зажигалк|спич|огнив|факел|свеч|горелк)\\w*\\b",
+    "pyrotechnics": "(?iu)\\b(?:фейерверк|салют|петард|бенгал|пиротех|дымогенератор|свеч\\w*\\s*фонтан|фонтан\\w*\\s+для\\s+торт)\\w*\\b",
+    "charcoal_wood": "(?iu)\\b(?:угол|уголь|дров|брик|розжиг)\\w*\\b"
+  },
+  "cohorts": {
+    "ignition_source": {
+      "positive_rows": 86,
+      "baseline_false_negatives": 15,
+      "candidate_false_negatives": 18,
+      "false_negative_delta": 3,
+      "baseline_recall": 0.8255813953488372,
+      "candidate_recall": 0.7906976744186046
+    },
+    "pyrotechnics": {
+      "positive_rows": 42,
+      "baseline_false_negatives": 4,
+      "candidate_false_negatives": 3,
+      "false_negative_delta": -1,
+      "baseline_recall": 0.9047619047619048,
+      "candidate_recall": 0.9285714285714286
+    },
+    "charcoal_wood": {
+      "positive_rows": 96,
+      "baseline_false_negatives": 13,
+      "candidate_false_negatives": 10,
+      "false_negative_delta": -3,
+      "baseline_recall": 0.8645833333333334,
+      "candidate_recall": 0.8958333333333334
+    }
+  },
+  "union": {
+    "positive_rows": 166,
+    "baseline_false_negatives": 19,
+    "candidate_false_negatives": 22,
+    "false_negative_delta": 3
+  }
+}

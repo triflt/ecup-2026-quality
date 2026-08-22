@@ -1,0 +1,133 @@
+{
+  "experiment_id": "400",
+  "analysis": "posthoc_descriptive_residual_error_geometry_v1",
+  "descriptive_only": true,
+  "selection_authority": false,
+  "warning": "Cohorts were inspected after labels and cannot authorize a rule or threshold without a separately frozen validation experiment.",
+  "rows": 12971,
+  "errors": 538,
+  "categories": {
+    "БАД": {
+      "errors": 502,
+      "false_negatives": 279,
+      "false_positives": 223,
+      "connected_safe_errors": 467,
+      "connected_unsafe_errors": 35,
+      "mixed_label_component_errors": 122,
+      "cohorts": {
+        "gas_or_liquid_fuel": {
+          "rows": 6,
+          "false_negatives": 1,
+          "false_positives": 5
+        },
+        "ignition_or_pyrotechnics": {
+          "rows": 0,
+          "false_negatives": 0,
+          "false_positives": 0
+        },
+        "solid_fuel": {
+          "rows": 4,
+          "false_negatives": 3,
+          "false_positives": 1
+        },
+        "included_or_kit_scope": {
+          "rows": 186,
+          "false_negatives": 117,
+          "false_positives": 69
+        },
+        "empty_equipment_scope": {
+          "rows": 9,
+          "false_negatives": 5,
+          "false_positives": 4
+        },
+        "explicit_bad_marker": {
+          "rows": 315,
+          "false_negatives": 214,
+          "false_positives": 101
+        },
+        "sports_nutrition": {
+          "rows": 258,
+          "false_negatives": 163,
+          "false_positives": 95
+        },
+        "raw_herb_or_ingredient": {
+          "rows": 63,
+          "false_negatives": 47,
+          "false_positives": 16
+        },
+        "dosage_form": {
+          "rows": 407,
+          "false_negatives": 214,
+          "false_positives": 193
+        }
+      }
+    },
+    "Легковоспламеняющиеся": {
+      "errors": 36,
+      "false_negatives": 19,
+      "false_positives": 17,
+      "connected_safe_errors": 36,
+      "connected_unsafe_errors": 0,
+      "mixed_label_component_errors": 1,
+      "cohorts": {
+        "gas_or_liquid_fuel": {
+          "rows": 15,
+          "false_negatives": 9,
+          "false_positives": 6
+        },
+        "ignition_or_pyrotechnics": {
+          "rows": 31,
+          "false_negatives": 16,
+          "false_positives": 15
+        },
+        "solid_fuel": {
+          "rows": 19,
+          "false_negatives": 13,
+          "false_positives": 6
+        },
+        "included_or_kit_scope": {
+          "rows": 19,
+          "false_negatives": 9,
+          "false_positives": 10
+        },
+        "empty_equipment_scope": {
+          "rows": 3,
+          "false_negatives": 1,
+          "false_positives": 2
+        },
+        "explicit_bad_marker": {
+          "rows": 0,
+          "false_negatives": 0,
+          "false_positives": 0
+        },
+        "sports_nutrition": {
+          "rows": 0,
+          "false_negatives": 0,
+          "false_positives": 0
+        },
+        "raw_herb_or_ingredient": {
+          "rows": 0,
+          "false_negatives": 0,
+          "false_positives": 0
+        },
+        "dosage_form": {
+          "rows": 2,
+          "false_negatives": 0,
+          "false_positives": 2
+        }
+      }
+    }
+  },
+  "key_observations": {
+    "all_flammable_residual_errors_connected_safe": true,
+    "bad_error_share_in_mixed_label_components": 0.24302788844621515
+  },
+  "input_sha256": {
+    "experiments/400_qwen35_category_routed_adapters/results/routed_predictions.npz": "58aa9feb3e6a276fda27666b11e479e052549523999bf2fb3c9af660904ab174",
+    "research/data.csv": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "validation/connected_family_guard_v2/rows.csv": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a"
+  },
+  "output_sha256": {
+    "errors": "bf9c0b66bd4b7783b9989ed746aa525eecf9a8154ea5999ac33bed45620ab0da"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "experiment_id": "070",
+  "slug": "cross_modal_interaction",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "conclusion": "Локально улучшает BAD, но advanced submission проигрывает robust late fusion на Public.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "070_cross_modal_interaction",
+      "experiment": "Cross-modal text/image consistency",
+      "validation": "Same grouped folds; text, image, |difference| and interaction features",
+      "bad_f1": "0.9485450674237047",
+      "flammable_f1": "0.8564102564102564",
+      "macro_f1": "0.9024776619169805",
+      "status": "Success",
+      "notes": "Best BAD head: 70% TF-IDF + 30% cross-modal interaction"
+    }
+  ]
+}

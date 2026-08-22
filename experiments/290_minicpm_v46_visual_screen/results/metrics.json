@@ -1,0 +1,81 @@
+{
+  "experiment_id": "290",
+  "status": "rejected_offline",
+  "dataset_version": "competition_train_v1",
+  "evaluation_version": "minicpm_two_fold_screen_v1",
+  "dataset_sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+  "code_revision": null,
+  "seed": 42,
+  "model": {
+    "id": "openbmb/MiniCPM-V-4.6",
+    "revision": "36f34a661a4bd35d0dc2294cb044d2584646c7d3",
+    "transformers": "5.7.0",
+    "parameters": 1304605936,
+    "lora_trainable_parameters": 4177920,
+    "image_mode": "first image, 448px thumbnail, 4x visual downsampling"
+  },
+  "validation": {
+    "protocol": "predeclared folds 0 and 3 screen, then full locked_190_nested_v1 only if accepted",
+    "bad_f1": 0.948822463768116,
+    "flammable_f1": 0.7567567567567568,
+    "macro_f1": 0.8527896102624364,
+    "baseline_macro_f1": 0.8946843034958715,
+    "delta_macro_f1": -0.04189469323343509,
+    "folds_won": 0,
+    "fold_scores": [0.8100440446814721, 0.8895350159163256],
+    "fold_deltas": [-0.07713949962232536, -0.012314179046212237],
+    "bootstrap_probability_delta_positive": 0.0223,
+    "bootstrap_delta_ci95": [-0.09463982402175898, -0.001235416885438147],
+    "report": "results/two_fold_screen_report.json",
+    "report_sha256": "aad15e3119a9463dc1cda225b9969543c97ca2087649133b692134492b5bb0bc"
+  },
+  "runtime": {
+    "compatibility_smoke_peak_cuda_gib": 3.5025076866149902,
+    "compatibility_smoke_loss": 0.2793596088886261,
+    "fold0_observed_update": 337,
+    "fold0_total_updates": 337,
+    "fold0_elapsed_minutes_at_observed_update": 23.803304945739608,
+    "fold0_peak_cuda_gib_at_observed_update": 20.203460693359375,
+    "fold0_running_loss_at_observed_update": 0.13329779856144544,
+    "fold0_total_runtime_minutes": 26.006035286405435,
+    "fold3_observed_update": 337,
+    "fold3_total_updates": 337,
+    "fold3_total_runtime_minutes": 25.47625676219662
+  },
+  "fold0_same_fold_diagnostic": {
+    "status": "optimistic_diagnostic_not_selection",
+    "lora_bad_f1": 0.9439088518843121,
+    "lora_flammable_f1": 0.7368421052631579,
+    "oracle_fused_macro_f1": 0.8785142816625109,
+    "note": "Weights and thresholds were optimized on fold 0 itself; honest screen score requires fold 3 cross-calibration"
+  },
+  "execution": {
+    "compatibility_jobs": ["redacted-job", "redacted-job"],
+    "screen_job": "redacted-job",
+    "project": "private-project",
+    "gpus": 1
+  },
+  "hard_error_audit": {
+    "status": "reproduced_locally",
+    "scope": "shared locked-190 and exp260 errors after donor-only production-prior replay",
+    "bad_shared_errors": 452,
+    "flammable_shared_errors": 27,
+    "bad_sports_nutrition_errors": 243,
+    "bad_conflicting_family_errors": 95,
+    "flammable_major_attribute_union_errors": 24,
+    "report": "analysis/agent_hard_errors/REPORT.md",
+    "report_sha256": "2d2feaa13e4a8e89c915c0dac63a5bc94cf3649011980401f522bc2f62ee93a7",
+    "script_sha256": "a88183f28db8c702726135a0fe32d291bb5e39b67ba2aba13fc92f4cb0bebe7a"
+  },
+  "artifacts": [
+    {
+      "name": "minicpm_screen",
+      "job": "redacted-job",
+      "status": "downloaded_and_verified",
+      "path": "artifacts/private_compute_o4kqgh/minicpm_screen.zip",
+      "size_bytes": 121237195,
+      "sha256": "ae1faa2cb8dee4a3ee4cb19fcdf7cfb0690aa1b5e39c475f3c27191e8e4c6d92"
+    }
+  ],
+  "decision": "Rejected at the predeclared two-fold gate: 0/2 wins, Macro delta -0.041895, flammable delta -0.079607, and the 95% grouped-bootstrap interval is entirely below zero. Do not train remaining folds or a full adapter."
+}

@@ -1,0 +1,367 @@
+{
+  "experiment_id": "450",
+  "status": "rejected_offline",
+  "evaluation_version": "flammable_transaction_scope_nested_v1",
+  "single_changed_factor": "Cross-fitted label-blind transaction-scope text view added to flammable route",
+  "selection_uses_outer_labels": false,
+  "baseline": {
+    "category_f1": {
+      "БАД": 0.9546604046242775,
+      "Легковоспламеняющиеся": 0.9086294416243654
+    },
+    "macro_f1": 0.9316449231243215
+  },
+  "candidate": {
+    "category_f1": {
+      "БАД": 0.9546604046242775,
+      "Легковоспламеняющиеся": 0.8951406649616368
+    },
+    "macro_f1": 0.9249005347929571
+  },
+  "delta_macro_f1": -0.0067443883313643704,
+  "flammable_delta_f1": -0.01348877666272863,
+  "folds_won": 0,
+  "folds": [
+    {
+      "fold": 0,
+      "baseline_macro_f1": 0.9312591699999442,
+      "candidate_macro_f1": 0.9086795728589436,
+      "delta_macro_f1": -0.02257959714100055,
+      "baseline_category_f1": {
+        "БАД": 0.9489380930863082,
+        "Легковоспламеняющиеся": 0.9135802469135802
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9489380930863082,
+        "Легковоспламеняющиеся": 0.868421052631579
+      }
+    },
+    {
+      "fold": 1,
+      "baseline_macro_f1": 0.8963507461857296,
+      "candidate_macro_f1": 0.8963507461857296,
+      "delta_macro_f1": 0.0,
+      "baseline_category_f1": {
+        "БАД": 0.9531953195319532,
+        "Легковоспламеняющиеся": 0.8395061728395061
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9531953195319532,
+        "Легковоспламеняющиеся": 0.8395061728395061
+      }
+    },
+    {
+      "fold": 2,
+      "baseline_macro_f1": 0.9588607594936709,
+      "candidate_macro_f1": 0.9588607594936709,
+      "delta_macro_f1": 0.0,
+      "baseline_category_f1": {
+        "БАД": 0.9556962025316456,
+        "Легковоспламеняющиеся": 0.9620253164556962
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9556962025316456,
+        "Легковоспламеняющиеся": 0.9620253164556962
+      }
+    },
+    {
+      "fold": 3,
+      "baseline_macro_f1": 0.9166759475813936,
+      "candidate_macro_f1": 0.9107522156302644,
+      "delta_macro_f1": -0.005923731951129163,
+      "baseline_category_f1": {
+        "БАД": 0.9566395663956639,
+        "Легковоспламеняющиеся": 0.8767123287671232
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9566395663956639,
+        "Легковоспламеняющиеся": 0.8648648648648649
+      }
+    },
+    {
+      "fold": 4,
+      "baseline_macro_f1": 0.9544210764360017,
+      "candidate_macro_f1": 0.9485568789051375,
+      "delta_macro_f1": -0.005864197530864201,
+      "baseline_category_f1": {
+        "БАД": 0.9588421528720036,
+        "Легковоспламеняющиеся": 0.95
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9588421528720036,
+        "Легковоспламеняющиеся": 0.9382716049382716
+      }
+    }
+  ],
+  "fold_selection": [
+    {
+      "fold": 0,
+      "scope_weight": 0.05,
+      "threshold": 0.9580482244491577,
+      "validation_f1": 0.868421052631579
+    },
+    {
+      "fold": 1,
+      "scope_weight": 0.05,
+      "threshold": 0.9566730856895447,
+      "validation_f1": 0.8395061728395061
+    },
+    {
+      "fold": 2,
+      "scope_weight": 0.05,
+      "threshold": 0.9566730856895447,
+      "validation_f1": 0.9620253164556962
+    },
+    {
+      "fold": 3,
+      "scope_weight": 0.05,
+      "threshold": 0.9565650820732117,
+      "validation_f1": 0.8648648648648649
+    },
+    {
+      "fold": 4,
+      "scope_weight": 0.05,
+      "threshold": 0.9555470943450928,
+      "validation_f1": 0.9382716049382716
+    }
+  ],
+  "changed": 7,
+  "corrected": 1,
+  "regressed": 6,
+  "flammable_false_negatives": {
+    "baseline": 19,
+    "candidate": 23,
+    "delta": 4
+  },
+  "safety_union_false_negatives": {
+    "baseline": 19,
+    "candidate": 21,
+    "delta": 2
+  },
+  "scope_view": {
+    "flammable_rows": 5502,
+    "rows_with_selected_sentence": 5334,
+    "mean_characters": 793.2519083969465
+  },
+  "connected_safe": {
+    "full_rows": {
+      "baseline": {
+        "БАД": 0.9546604046242775,
+        "Легковоспламеняющиеся": 0.9086294416243654,
+        "Macro": 0.9316449231243215
+      },
+      "candidate": {
+        "БАД": 0.9546604046242775,
+        "Легковоспламеняющиеся": 0.8951406649616368,
+        "Macro": 0.9249005347929571
+      },
+      "delta_macro_f1": -0.0067443883313643704
+    },
+    "connected_safe_rows": {
+      "rows": 11207,
+      "baseline": {
+        "БАД": 0.9509505304064699,
+        "Легковоспламеняющиеся": 0.9047619047619048,
+        "Macro": 0.9278562175841873
+      },
+      "candidate": {
+        "БАД": 0.9509505304064699,
+        "Легковоспламеняющиеся": 0.8906666666666667,
+        "Macro": 0.9208085985365684
+      },
+      "delta_macro_f1": -0.007047619047618969,
+      "folds_won": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "safe_rows": 2225,
+          "baseline_macro_f1": 0.9272236107274945,
+          "candidate_macro_f1": 0.9039598406282814,
+          "delta": -0.0232637700992131,
+          "baseline_category_f1": {
+            "БАД": 0.9430548163916977,
+            "Легковоспламеняющиеся": 0.9113924050632911
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9430548163916977,
+            "Легковоспламеняющиеся": 0.8648648648648649
+          }
+        },
+        {
+          "fold": 1,
+          "safe_rows": 2268,
+          "baseline_macro_f1": 0.8928800813552065,
+          "candidate_macro_f1": 0.8928800813552065,
+          "delta": 0.0,
+          "baseline_category_f1": {
+            "БАД": 0.9503171247357294,
+            "Легковоспламеняющиеся": 0.8354430379746836
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9503171247357294,
+            "Легковоспламеняющиеся": 0.8354430379746836
+          }
+        },
+        {
+          "fold": 2,
+          "safe_rows": 2239,
+          "baseline_macro_f1": 0.9572413109928677,
+          "candidate_macro_f1": 0.9572413109928677,
+          "delta": 0.0,
+          "baseline_category_f1": {
+            "БАД": 0.9555785123966942,
+            "Легковоспламеняющиеся": 0.958904109589041
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9555785123966942,
+            "Легковоспламеняющиеся": 0.958904109589041
+          }
+        },
+        {
+          "fold": 3,
+          "safe_rows": 2226,
+          "baseline_macro_f1": 0.9079828011200013,
+          "candidate_macro_f1": 0.9016175684597729,
+          "delta": -0.00636523266022837,
+          "baseline_category_f1": {
+            "БАД": 0.9502939604489578,
+            "Легковоспламеняющиеся": 0.8656716417910447
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9502939604489578,
+            "Легковоспламеняющиеся": 0.8529411764705882
+          }
+        },
+        {
+          "fold": 4,
+          "safe_rows": 2249,
+          "baseline_macro_f1": 0.9526119402985074,
+          "candidate_macro_f1": 0.9467477427676432,
+          "delta": -0.005864197530864201,
+          "baseline_category_f1": {
+            "БАД": 0.9552238805970149,
+            "Легковоспламеняющиеся": 0.95
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9552238805970149,
+            "Легковоспламеняющиеся": 0.9382716049382716
+          }
+        }
+      ],
+      "changed_predictions": 7,
+      "corrected": 1,
+      "regressed": 6,
+      "component_bootstrap": {
+        "iterations": 10000,
+        "seed": 45042,
+        "probability_delta_positive": 0.0158,
+        "delta_ci95": [
+          -0.016247201777286318,
+          0.0
+        ]
+      }
+    }
+  },
+  "gates": {
+    "macro_delta_at_least_0_003": false,
+    "flammable_delta_at_least_0_006": false,
+    "folds_won_at_least_4": false,
+    "corrected_to_regressed_at_least_1_5": false,
+    "flammable_false_negatives_not_increased": false,
+    "safety_union_false_negatives_not_increased": false,
+    "connected_bootstrap_probability_at_least_0_90": false
+  },
+  "accepted": false,
+  "baseline_detail": {
+    "БАД": {
+      "weights": {
+        "robust_base": 0.5,
+        "qwen3vl": 0.25,
+        "qwen35": 0.25
+      },
+      "nested_f1": 0.9546604046242775,
+      "nested_folds": [
+        {
+          "fold": 0,
+          "threshold": 0.27193570137023926,
+          "train_f1": 0.9563254711657826,
+          "validation_f1": 0.9489380930863082
+        },
+        {
+          "fold": 1,
+          "threshold": 0.2720194160938263,
+          "train_f1": 0.9551361735789354,
+          "validation_f1": 0.9531953195319532
+        },
+        {
+          "fold": 2,
+          "threshold": 0.27193570137023926,
+          "train_f1": 0.9547455140503329,
+          "validation_f1": 0.9556962025316456
+        },
+        {
+          "fold": 3,
+          "threshold": 0.27193570137023926,
+          "train_f1": 0.9545095383226098,
+          "validation_f1": 0.9566395663956639
+        },
+        {
+          "fold": 4,
+          "threshold": 0.27193570137023926,
+          "train_f1": 0.953960731211916,
+          "validation_f1": 0.9588421528720036
+        }
+      ],
+      "production_threshold": 0.27193570137023926,
+      "production_threshold_oof_f1": 0.954762979683973
+    },
+    "Легковоспламеняющиеся": {
+      "weights": {
+        "robust_base": 0.15000000596046448,
+        "qwen3vl": 0.10000000149011612,
+        "qwen35": 0.75
+      },
+      "nested_f1": 0.9086294416243654,
+      "nested_folds": [
+        {
+          "fold": 0,
+          "threshold": 0.9564604759216309,
+          "train_f1": 0.910828025477707,
+          "validation_f1": 0.9135802469135802
+        },
+        {
+          "fold": 1,
+          "threshold": 0.9569836854934692,
+          "train_f1": 0.9329073482428115,
+          "validation_f1": 0.8395061728395061
+        },
+        {
+          "fold": 2,
+          "threshold": 0.9569836854934692,
+          "train_f1": 0.9015873015873016,
+          "validation_f1": 0.9620253164556962
+        },
+        {
+          "fold": 3,
+          "threshold": 0.9570291638374329,
+          "train_f1": 0.91875,
+          "validation_f1": 0.8767123287671232
+        },
+        {
+          "fold": 4,
+          "threshold": 0.9569836854934692,
+          "train_f1": 0.9044585987261147,
+          "validation_f1": 0.95
+        }
+      ],
+      "production_threshold": 0.953912615776062,
+      "production_threshold_oof_f1": 0.9022556390977443
+    }
+  },
+  "input_sha256": {
+    "research/data.csv": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "validation/connected_family_guard_v2/rows.csv": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "experiments/400_qwen35_category_routed_adapters/results/routed_predictions.npz": "58aa9feb3e6a276fda27666b11e479e052549523999bf2fb3c9af660904ab174",
+    "experiments/450_flammable_transaction_scope/analysis/selection_manifest.json": "8c1c875cc7ede9f53900f44b99998f143f8413d5e8896125efc9c9a2c880a0df"
+  }
+}

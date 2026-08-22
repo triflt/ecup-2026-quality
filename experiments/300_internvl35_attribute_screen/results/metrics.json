@@ -1,0 +1,138 @@
+{
+  "experiment_id": "300",
+  "status": "rejected_offline",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "component_transfer_gate_v1",
+  "seed": 42,
+  "model": {
+    "id": "OpenGVLab/InternVL3_5-2B",
+    "license": "apache-2.0",
+    "role": "standalone structured flammable attribute component"
+  },
+  "validation": {
+    "protocol": "internvl_attribute_nested_gate_v1 inside component_transfer_gate_v1",
+    "baseline_bad_f1": 0.9546604046242775,
+    "baseline_flammable_f1": 0.8921568627450981,
+    "baseline_macro_f1": 0.9234086336846878,
+    "bad_f1": 0.9546604046242775,
+    "flammable_f1": 0.8790123456790123,
+    "macro_f1": 0.9168363751516448,
+    "delta_macro_f1": -0.006572258533042996,
+    "folds_won": 2,
+    "fold_deltas": [-0.023508137432188048, 0.0019379844961240345, 0.0, -0.017094017094017144, 0.004939796233405347],
+    "changed_predictions": 13,
+    "corrected": 4,
+    "regressed": 9,
+    "group_bootstrap": {
+      "iterations": 10000,
+      "probability_delta_positive": 0.0742,
+      "delta_ci95": [-0.0168139150638958, 0.002478066983072626]
+    },
+    "report": "results/attribute_gate_report.json",
+    "report_sha256": "1aefa83c528f583cc828b92f72008272e2f9ddeda38a9d2643f3d29677b9c681"
+  },
+  "compatibility_smoke": {
+    "job": "redacted-job",
+    "status": "succeeded",
+    "model_parameters": 2354769920,
+    "trainable_parameters": 6422528,
+    "language_attention_targets": 112,
+    "image_tiles": 1,
+    "image_tokens_per_tile": 256,
+    "loss": 4.96875,
+    "gradient_tensors": 224,
+    "gradient_norm": 119.19981384277344,
+    "peak_cuda_gib": 4.843537330627441
+  },
+  "attribute_probe_selector": {
+    "version": "internvl_attribute_probe_selector_v1",
+    "selection_uses_labels": false,
+    "uncertainty_fraction": 0.2,
+    "category_rows": 5502,
+    "selected_rows": 909,
+    "selected_fraction": 0.16521264994547438,
+    "post_selection_diagnostic_error_coverage": 0.8409090909090909,
+    "report": "results/attribute_probe_selector_report.json",
+    "report_sha256": "8fe3a0c086903e9455fdeb1af04974098506720765373dfe16ecd3d397701dd7",
+    "manifest_sha256": "6a82dc96a52cd0e496455457b0e1bd2bfa69f1f8065944e4c809e629ca5681e7"
+  },
+  "attribute_probe_attempts": [
+    {
+      "job": "redacted-job",
+      "status": "serialization_incomplete_not_scored",
+      "rows": 909,
+      "strict_contiguous_rows": 214,
+      "recoverable_separated_rows": 162,
+      "single_bit_rows": 484,
+      "download_failures": 0,
+      "runtime_minutes": 1.1870247996101777,
+      "peak_cuda_gib": 7.482447624206543,
+      "artifact": "artifacts/private_compute_kv0ajw/internvl_attributes.zip",
+      "artifact_size_bytes": 5424,
+      "artifact_sha256": "89023ef07226cfafb71e5f05a700bc78f9963e8ca13af690a4a897f1e8a5d330",
+      "confirmed_cause": "InternVL often emitted one digit followed by EOS; the strict six-contiguous-bit parser also rejected unambiguous newline- or separator-delimited answers",
+      "decision": "Do not interpret as model quality; repeat the identical 909-row probe with a minimum six generated tokens and a parser that accepts exactly six separated bits"
+    },
+    {
+      "job": "redacted-job",
+      "status": "succeeded",
+      "single_changed_factor": "Response serialization only: min_new_tokens=6, explicit CODE prefix and flexible exact-six-bit parser",
+      "rows": 909,
+      "valid_rows": 573,
+      "valid_rate": 0.6303630363036303,
+      "download_failures": 0,
+      "runtime_minutes": 1.6335152522350351,
+      "peak_cuda_gib": 7.586790561676025,
+      "artifact": "artifacts/private_compute_7ia5hq/internvl_attributes.zip",
+      "artifact_size_bytes": 8987,
+      "artifact_sha256": "2b768ae7938aaf359582b7ad90d8ba595a4f40b9279c8894042609e96e99270a"
+    }
+  ],
+  "runtime": {
+    "job": "redacted-job",
+    "gpus": 1,
+    "accelerator": "H100",
+    "time_limit_minutes": 90,
+    "measured_probe_minutes": 1.6335152522350351,
+    "projected_full_flammable_minutes": 9.886,
+    "public_runtime_gate": "Probe was conditional and cheap, but quality failed before any submission integration"
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/private_compute_7ia5hq/internvl_attributes.zip",
+      "size_bytes": 8987,
+      "sha256": "2b768ae7938aaf359582b7ad90d8ba595a4f40b9279c8894042609e96e99270a"
+    },
+    {
+      "path": "results/attribute_gate_report.npz",
+      "sha256": "ffa08b8a2a6dc19baeaeffcb06a12e0a2571cd5fe54d27cb7f6f66a918dcc1f4"
+    }
+  ],
+  "compatibility_attempts": [
+    {
+      "job": "redacted-job",
+      "status": "failed_before_model_load",
+      "confirmed_cause": "The bootstrap reused a stale /work/vendor/transformers57 tree without the requests dependency instead of installing the requested isolated Transformers 4.57.3 environment",
+      "model_registry_initialization": "completed_successfully"
+    },
+    {
+      "job": "redacted-job",
+      "status": "failed_before_model_load",
+      "confirmed_cause": "Transformers 4.57.3 provides AutoModelForImageTextToText but not AutoModelForMultimodalLM; importing both unconditionally aborted the image-text branch",
+      "model_registry_initialization": "reused_successfully"
+    },
+    {
+      "job": "redacted-job",
+      "status": "failed_during_generic_processor_construction",
+      "confirmed_cause": "The selected checkpoint is InternVL GitHub format; its official path uses AutoModel plus AutoTokenizer and explicit image tiling, while generic AutoProcessor expects tokenizer attributes absent from this format",
+      "model_registry_initialization": "reused_successfully"
+    },
+    {
+      "job": "redacted-job",
+      "status": "failed_during_native_custom_code_import",
+      "confirmed_cause": "The baseline image lacks the official custom-code dependencies einops and timm; model loading stopped before weights or CUDA allocation",
+      "model_registry_initialization": "reused_successfully"
+    }
+  ],
+  "decision": "Rejected offline. The honest donor-to-outer attribute gate reduced Macro F1 by 0.006572, reduced flammable F1 by 0.013145, won only 2/5 folds and had bootstrap P(delta>0)=0.0742. Keep experiment 190 unchanged; do not submit or expand this InternVL zero-shot attribute recipe."
+}

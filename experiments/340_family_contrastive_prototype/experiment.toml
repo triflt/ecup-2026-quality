@@ -1,0 +1,47 @@
+[experiment]
+id = "340"
+slug = "family_contrastive_prototype"
+title = "Family-contrastive prototype score over existing Qwen3-VL embeddings"
+status = "cancelled_pre_metric"
+entrypoint = "research/evaluate_family_contrastive_prototypes.py"
+result_file = "experiments/340_family_contrastive_prototype/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "component_transfer_gate_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "190_shingle_neighbor_prior"
+changed_factor = "Add a fixed 5 percent family-prototype rank over already computed Qwen3-VL embeddings"
+mechanism = "Nearest opposite-label product-family prototypes can retain local fuel-equipment and supplement-food contrasts that a global linear embedding head smooths out"
+expected_macro_f1_delta = 0.003
+falsification = "Cancel before metrics if the recipe repeats a closed nearest-neighbour branch or the validation topology allows an exact family to cross folds; otherwise reject if transfer gates fail"
+precedents = [
+  "https://arxiv.org/abs/2508.11999",
+  "https://arxiv.org/abs/2511.12449",
+  "https://arxiv.org/abs/2008.06179",
+]
+
+[acceptance]
+baseline_macro_f1 = 0.9234086336846878
+required_fold_wins = 4
+max_category_f1_drop = 0.005
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 0.0
+planned_public_submissions = 0
+runtime_limit_minutes = 20
+
+[execution]
+arguments = ["--projection-dim", "256", "--neighbors", "3", "--weight", "0.05"]
+
+[artifacts]
+directory = "artifacts"
+publish = false

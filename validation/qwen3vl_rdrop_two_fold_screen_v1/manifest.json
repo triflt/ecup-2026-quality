@@ -1,0 +1,34 @@
+{
+  "version": "qwen3vl_rdrop_two_fold_screen_v1",
+  "dataset_version": "competition_train_v1",
+  "parent_evaluation": "locked_190_category_routing_v2",
+  "purpose": "Reject-only causal screen of R-Drop on the existing Qwen3-VL head before full five-fold training",
+  "screen_folds": [0, 3],
+  "selection_time_rationale": {
+    "fold_0": "largest positive fold effect in the category-routed parent analysis",
+    "fold_3": "largest adverse and recall-sensitive fold in the category-routed parent analysis"
+  },
+  "changed_factor": "training objective only: alpha 1.0 symmetric KL between two dropout passes",
+  "calibration": "Candidate Qwen3-VL ranks replace parent ranks only on folds 0 and 3; other folds remain parent; each tested fold threshold excludes that fold",
+  "fixed_fusion_weights": {
+    "БАД": [0.5, 0.25, 0.25],
+    "Легковоспламеняющиеся": [0.15, 0.1, 0.75]
+  },
+  "acceptance": {
+    "required_each_fold_delta_positive": true,
+    "minimum_mean_delta": 0.001,
+    "maximum_category_f1_drop": 0.005,
+    "maximum_flammable_false_negative_increase": 0,
+    "maximum_safety_union_false_negative_increase": 0,
+    "corrected_must_exceed_regressed": true
+  },
+  "limitations": "Passing authorizes only a full five-fold cycle and new immutable manifest; it cannot accept, refit, package, or submit the candidate.",
+  "null_control": {
+    "report": "experiments/440_qwen3vl_rdrop/analysis/null_screen_control.json",
+    "candidate": "unchanged parent Qwen3-VL ranks",
+    "delta_macro_f1": 0.0,
+    "changed_predictions": 0,
+    "status": "passed"
+  },
+  "immutable": true
+}

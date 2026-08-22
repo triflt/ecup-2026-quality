@@ -1,0 +1,25 @@
+{
+  "audit_complete": false,
+  "offline_core_gate_passed": false,
+  "sports_errors_fixed_out_of_243": 0,
+  "guardrail_breach": false,
+  "launch_experiment_320": false,
+  "evidence": [
+    {
+      "path": "experiments/310_qwen35_crossfit_soft_targets/results/acceptance_audit.json",
+      "sha256": "replace-after-complete-audit"
+    },
+    {
+      "path": "experiments/310_qwen35_crossfit_soft_targets/results/connected_safe_audit.json",
+      "sha256": "replace-after-complete-audit"
+    },
+    {
+      "path": "experiments/310_qwen35_crossfit_soft_targets/results/sports_error_audit.json",
+      "sha256": "replace-after-complete-audit"
+    },
+    {
+      "path": "experiments/310_qwen35_crossfit_soft_targets/results/prior_replay.json",
+      "sha256": "replace-after-complete-audit"
+    }
+  ]
+}

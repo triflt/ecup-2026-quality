@@ -1,0 +1,43 @@
+{
+  "experiment_id": "060",
+  "slug": "multiview_fusion",
+  "status": "completed",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "conclusion": "Небольшой first-image head улучшает fusion; supervised multi-image LoRA не улучшает first-image LoRA.",
+  "historical_results": [
+    {
+      "date": "2026-08-20",
+      "experiment_group": "060_multiview_fusion",
+      "experiment": "First-image-only Qwen embedding",
+      "validation": "Higher resolution, no title/description; same grouped folds",
+      "bad_f1": "0.9156835530881332",
+      "flammable_f1": "0.73224043715847",
+      "macro_f1": "0.8239619951233016",
+      "status": "Success",
+      "notes": "Weak alone but provides independent packaging/kit signal"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "060_multiview_fusion",
+      "experiment": "Three-view rank fusion",
+      "validation": "Text + all-images Qwen + first-image-only Qwen; same grouped folds",
+      "bad_f1": "0.947809795699884",
+      "flammable_f1": "0.8564102564102564",
+      "macro_f1": "0.9021100260550702",
+      "status": "Success",
+      "notes": "Best grouped CV so far; stable 70/25/5 weights in both categories"
+    },
+    {
+      "date": "2026-08-20",
+      "experiment_group": "060_multiview_fusion",
+      "experiment": "Qwen3-VL text-only embedding",
+      "validation": "No images; aligned with image-only embedding space",
+      "bad_f1": "",
+      "flammable_f1": "",
+      "macro_f1": "",
+      "status": "Success",
+      "notes": "12,971 vectors in 6.7 min embedding time"
+    }
+  ]
+}

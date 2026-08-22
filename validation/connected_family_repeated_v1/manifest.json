@@ -1,0 +1,153 @@
+{
+  "evaluation_version": "connected_family_repeated_v1",
+  "dataset_version": "competition_train_v1",
+  "immutable": true,
+  "protocol": "Three predeclared category-specific StratifiedGroupKFold repeats over connected_family_guard_v2 safe components; unsafe rows receive fold -1 and are never selected",
+  "guard": "validation/connected_family_guard_v2/rows.csv",
+  "rows_total": 12971,
+  "safe_rows": 11207,
+  "unsafe_rows": 1764,
+  "n_splits": 5,
+  "seeds": [
+    17,
+    31415,
+    20260822
+  ],
+  "repeats": {
+    "0": {
+      "seed": 17,
+      "categories": {
+        "БАД": {
+          "rows": 6548,
+          "components": 5017,
+          "fold_rows": {
+            "0": 1331,
+            "1": 1302,
+            "2": 1249,
+            "3": 1347,
+            "4": 1319
+          },
+          "fold_positives": {
+            "0": 1009,
+            "1": 943,
+            "2": 900,
+            "3": 955,
+            "4": 971
+          },
+          "component_max_fold_count": 1
+        },
+        "Легковоспламеняющиеся": {
+          "rows": 4659,
+          "components": 3329,
+          "fold_rows": {
+            "0": 958,
+            "1": 949,
+            "2": 903,
+            "3": 950,
+            "4": 899
+          },
+          "fold_positives": {
+            "0": 57,
+            "1": 27,
+            "2": 31,
+            "3": 42,
+            "4": 33
+          },
+          "component_max_fold_count": 1
+        }
+      }
+    },
+    "1": {
+      "seed": 31415,
+      "categories": {
+        "БАД": {
+          "rows": 6548,
+          "components": 5017,
+          "fold_rows": {
+            "0": 1348,
+            "1": 1244,
+            "2": 1324,
+            "3": 1316,
+            "4": 1316
+          },
+          "fold_positives": {
+            "0": 1035,
+            "1": 881,
+            "2": 943,
+            "3": 946,
+            "4": 973
+          },
+          "component_max_fold_count": 1
+        },
+        "Легковоспламеняющиеся": {
+          "rows": 4659,
+          "components": 3329,
+          "fold_rows": {
+            "0": 913,
+            "1": 940,
+            "2": 942,
+            "3": 904,
+            "4": 960
+          },
+          "fold_positives": {
+            "0": 40,
+            "1": 45,
+            "2": 32,
+            "3": 34,
+            "4": 39
+          },
+          "component_max_fold_count": 1
+        }
+      }
+    },
+    "2": {
+      "seed": 20260822,
+      "categories": {
+        "БАД": {
+          "rows": 6548,
+          "components": 5017,
+          "fold_rows": {
+            "0": 1337,
+            "1": 1330,
+            "2": 1313,
+            "3": 1304,
+            "4": 1264
+          },
+          "fold_positives": {
+            "0": 944,
+            "1": 983,
+            "2": 986,
+            "3": 929,
+            "4": 936
+          },
+          "component_max_fold_count": 1
+        },
+        "Легковоспламеняющиеся": {
+          "rows": 4659,
+          "components": 3329,
+          "fold_rows": {
+            "0": 900,
+            "1": 998,
+            "2": 906,
+            "3": 888,
+            "4": 967
+          },
+          "fold_positives": {
+            "0": 40,
+            "1": 39,
+            "2": 34,
+            "3": 41,
+            "4": 36
+          },
+          "component_max_fold_count": 1
+        }
+      }
+    }
+  },
+  "input_sha256": {
+    "guard": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a"
+  },
+  "output_sha256": {
+    "rows": "4dea3dbb832edc7134120963e031b86562d1948845eb8669ac6e46d800b7a7dc"
+  }
+}
