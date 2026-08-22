@@ -2,7 +2,7 @@
 id = "600"
 slug = "semantic_v3_qwen35_baselines"
 title = "Semantic-family-v3 Qwen3.5 route baselines"
-status = "training_running"
+status = "complete_baselines_specialist_not_promoted"
 entrypoint = "experiments/600_semantic_v3_qwen35_baselines/train_component.py"
 result_file = "experiments/600_semantic_v3_qwen35_baselines/results/metrics.json"
 
@@ -21,6 +21,9 @@ sealed_holdout_used_for_training = false
 sealed_holdout_used_for_selection = false
 sealed_holdout_used_for_thresholds = false
 sealed_holdout_used_for_evaluation = false
+threshold_calibration = "leave-one-fold-out over fixed OOF scores"
+fully_nested_meta_validation = false
+validation_limitation = "donor OOF base models may have trained on labels of the currently evaluated fold"
 
 [components.original]
 source = "190"
@@ -65,9 +68,12 @@ components = ["original", "specialist"]
 folds = [0, 1, 2, 3, 4]
 jobs = 10
 gpu_per_job = 1
-launch_authorized = true
+launch_authorized = false
 launched = true
 blocked_on = ""
+completed_jobs = 10
+completed = true
+all_runtime_contracts_verified = true
 
 [budget]
 expected_gpu_hours_min = 6.0

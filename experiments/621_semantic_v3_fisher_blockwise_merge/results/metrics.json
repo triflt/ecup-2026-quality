@@ -1,0 +1,14 @@
+{
+  "experiment_id": "621",
+  "name": "semantic_v3_fisher_blockwise_merge",
+  "status": "runnable_not_launched",
+  "validation_version": "semantic_family_v3",
+  "validation_complete": false,
+  "sealed_holdout_used": false,
+  "labels_loaded_by_preflight": false,
+  "folds": [],
+  "metrics": {},
+  "note": "No training, validation, model download, or submission has been performed.",
+  "expected_fold_minutes": [50, 90],
+  "expected_vram_gb": [24, 40]
+}

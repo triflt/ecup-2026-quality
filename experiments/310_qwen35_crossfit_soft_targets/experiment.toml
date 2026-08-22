@@ -2,7 +2,7 @@
 id = "310"
 slug = "qwen35_crossfit_soft_targets"
 title = "Qwen3.5 cross-fitted soft-target training"
-status = "five_fold_validation_running"
+status = "rejected_offline"
 entrypoint = "research/qwen3vl_lora_holdout.py"
 result_file = "experiments/310_qwen35_crossfit_soft_targets/results/metrics.json"
 

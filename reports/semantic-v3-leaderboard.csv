@@ -1,0 +1,12 @@
+group_rank,experiment_id,variant,system_level,bad_f1,flammable_f1,macro_f1,status,notes
+1,603,fixed_four_seed_probability_mean_route,full_route,0.9549342792,0.8842729970,0.9196036381,not_promoted,"Best development score; only 3/5 fold wins and 29/25 corrected/regressed"
+2,603,original_route_baseline,full_route,0.9548589342,0.8724035608,0.9136312475,reference,"Frozen semantic-v3 reference route"
+3,603,category_routed_specialist_400,full_route,0.9548589342,0.8588235294,0.9068412318,rejected,"Delta -0.006790; 1/5 fold wins; 6/11 corrected/regressed"
+1,602,seed_161803,qwen35_component,0.9440166493,0.8545454545,0.8992810519,not_promoted,"Best individual seed; only 2/5 fold wins"
+2,602,fixed_four_seed_probability_mean,qwen35_component,0.9418825016,0.8493975904,0.8956400460,rejected,"3/5 fold wins; bootstrap P=0.8205; 130/120 corrected/regressed"
+3,601,qwen3vl_strict_nested,visual_component,0.9408112583,0.8500000000,0.8954056291,component_only,"3/5 wins versus robust base; retained as a fusion component"
+4,601,robust_base,robust_component,0.9452849741,0.8417910448,0.8935380094,reference,"Strict nested non-neural baseline"
+5,602,seed_31415,qwen35_component,0.9412505245,0.8358208955,0.8885357100,not_promoted,"Only 2/5 fold wins"
+6,600,original_seed_42,qwen35_component,0.9418774828,0.8333333333,0.8876054080,reference,"Original Qwen3.5 component"
+7,600,specialist_seed_42,qwen35_component,0.9450433312,0.8292682927,0.8871558120,rejected,"Delta -0.000450 versus original"
+8,602,seed_271828,qwen35_component,0.9365988126,0.8323353293,0.8844670709,rejected,"Delta -0.003138 versus seed 42"

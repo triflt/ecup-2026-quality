@@ -2,7 +2,7 @@
 id = "240"
 slug = "flammable_family_balanced_lora"
 title = "Family-balanced Qwen3.5 rsLoRA for flammable products"
-status = "running"
+status = "inconclusive_output_not_retained"
 entrypoint = "research/qwen35_family_balanced_lora.py"
 result_file = "experiments/240_flammable_family_balanced_lora/results/metrics.json"
 

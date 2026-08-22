@@ -1,0 +1,80 @@
+{
+  "experiment_id": "603",
+  "status": "complete_reference_only_four_seed_not_promoted",
+  "validation_version": "semantic_family_v3",
+  "development_rows": 11118,
+  "sealed_holdout_used": false,
+  "gpu_jobs_launched": 0,
+  "weights_tuned": false,
+  "threshold_calibration": "leave_one_fold_out_over_fixed_oof_scores",
+  "fully_nested_meta_validation": false,
+  "validation_limitation": "Donor OOF base models may have trained on labels of the currently evaluated fold; only threshold fitting leaves that fold out.",
+  "comparisons_frozen": [
+    "original_route_baseline",
+    "category_routed_specialist_400",
+    "fixed_four_seed_probability_mean_route"
+  ],
+  "results": {
+    "original_route_baseline": {
+      "bad_f1": 0.954858934169279,
+      "flammable_f1": 0.8724035608308606,
+      "macro_f1": 0.9136312475000699,
+      "fold_macro_f1": [
+        0.9125893972074015,
+        0.8688630702674358,
+        0.9094762408430289,
+        0.9210729104919977,
+        0.9538521491757921
+      ]
+    },
+    "category_routed_specialist_400": {
+      "bad_f1": 0.954858934169279,
+      "flammable_f1": 0.8588235294117647,
+      "macro_f1": 0.9068412317905219,
+      "delta_vs_original": -0.0067900157095479585,
+      "fold_wins": 1,
+      "changed": 17,
+      "corrected": 6,
+      "regressed": 11,
+      "corrected_to_regressed": 0.5454545454545454
+    },
+    "fixed_four_seed_probability_mean_route": {
+      "bad_f1": 0.9549342791571042,
+      "flammable_f1": 0.884272997032641,
+      "macro_f1": 0.9196036380948726,
+      "delta_vs_original": 0.005972390594802701,
+      "fold_wins": 3,
+      "fold_deltas": [
+        0.00666640532237861,
+        0.03641442534619421,
+        -0.009515800934808305,
+        0.005922659080728865,
+        -0.00714368522594877
+      ],
+      "changed": 54,
+      "corrected": 29,
+      "regressed": 25,
+      "corrected_to_regressed": 1.16,
+      "promoted": false,
+      "rejection_reasons": [
+        "only 3 of 5 folds improve",
+        "corrected-to-regressed ratio 1.16 is below 1.5"
+      ]
+    }
+  },
+  "reference_checks": {
+    "maximum_absolute_error": 0.0,
+    "tolerance": 1e-12,
+    "passed": true
+  },
+  "provenance": {
+    "frozen_protocol_sha256": "9a713a650e02979cb3f22f29be0be5eb58a28247a879b7dfbf3678720df9b6c0",
+    "semantic_v3_folds_sha256": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+    "visual_bundle_sha256": "b917ffe9f11702f7b041de4b2699dbe367682e02cfb19dc77d65d05be3b3a13d",
+    "full_local_summary_sha256": "5ae97d48a6cdaf1b760f4cf4e667b46fab2f599640f69026edb71d184c462b7b",
+    "local_predictions_sha256": "ba661d21d04b6a882fd6944f4fcc0d9f7e143085bf743092d5e1215f3116ffd1",
+    "runtime_contracts_verified": 25,
+    "local_paths_or_job_names_published": false
+  },
+  "decision": "FOUR_SEED_SIGNAL_RETAINED_NOT_PROMOTED"
+}

@@ -1,0 +1,52 @@
+{
+  "experiment_id": "620",
+  "protocol_version": "semantic_v3_evidence_disagreement_router_v2",
+  "scope": "development_only_label_free",
+  "decision": "GO",
+  "rows": 11118,
+  "labels_loaded": false,
+  "sealed_rows_in_inputs": 0,
+  "sealed_rows_in_outputs": 0,
+  "exact_offset_failures": 0,
+  "blocked_forbidden_candidates": 2319,
+  "forbidden_flip_evidence": 0,
+  "extractor_conflict_abstentions": 1550,
+  "resolved_opposite_evidence_conflicts": 0,
+  "unresolved_conflicts": 0,
+  "per_category": {
+    "БАД": {
+      "rows": 6402,
+      "direct_0_rows": 189,
+      "direct_1_rows": 4744,
+      "direct_any_rows": 4933,
+      "direct_any_coverage": 0.7705404561074665,
+      "raw_both_rows": 0
+    },
+    "Легковоспламеняющиеся": {
+      "rows": 4716,
+      "direct_0_rows": 621,
+      "direct_1_rows": 2031,
+      "direct_any_rows": 2652,
+      "direct_any_coverage": 0.5623409669211196,
+      "raw_both_rows": 0
+    }
+  },
+  "gates": {
+    "row_count_exact": true,
+    "exact_offsets": true,
+    "conflicts_fail_closed": true,
+    "forbidden_absence_evidence": true,
+    "minimum_direct_coverage_per_category": true,
+    "labels_not_loaded": true,
+    "zero_sealed_rows_in_input_or_output": true
+  },
+  "input_sha256": {
+    "development_data": "6e6a2b8b0973f035639a75b8da01d19884de4da96bce47cad1e93be611131f10",
+    "folds": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+    "frozen_spec": "7fe311f9124c9934e1f4d0e06cdc68b8efd04153361abd422250cecce5cd34cb"
+  },
+  "frozen_spec_canonical_sha256": "d7560d2580fa8b99c3feaf5ee9e6c89fae39ff6ab69fff8c76f828244d1cb729",
+  "output_manifest_sha256": "bae8b85912a62778a785126a5d3077a6449084f7d3daa10814e86a7277c699a6",
+  "output_manifest_committed": false,
+  "note": "The raw JSONL manifest contains development product spans and remains an untracked local artifact. This public audit contains counts and checksums only."
+}

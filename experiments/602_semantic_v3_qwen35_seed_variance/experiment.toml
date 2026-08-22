@@ -2,7 +2,7 @@
 id = "602"
 slug = "semantic_v3_qwen35_seed_variance"
 title = "Semantic-family-v3 independent Qwen3.5 seed variance"
-status = "training_running"
+status = "complete_no_go"
 entrypoint = "experiments/602_semantic_v3_qwen35_seed_variance/train_seed.py"
 result_file = "experiments/602_semantic_v3_qwen35_seed_variance/results/metrics.json"
 
@@ -27,6 +27,9 @@ sealed_holdout_used_for_training = false
 sealed_holdout_used_for_selection = false
 sealed_holdout_used_for_thresholds = false
 sealed_holdout_used_for_evaluation = false
+threshold_calibration = "leave-one-fold-out over fixed OOF scores"
+fully_nested_meta_validation = false
+validation_limitation = "donor OOF base models may have trained on labels of the currently evaluated fold"
 
 [training]
 parent_experiment = "190"
@@ -48,7 +51,8 @@ full_train = false
 type = "fixed_arithmetic_probability_mean"
 weights = [0.25, 0.25, 0.25, 0.25]
 weight_tuning = false
-threshold_tuning = "strictly_nested_per_category_per_outer_fold_only"
+threshold_tuning = "leave_one_fold_out_over_fixed_oof_scores"
+fully_nested_meta_validation = false
 
 [acceptance]
 macro_delta_at_least = 0.003
@@ -61,9 +65,12 @@ corrected_to_regressed_at_least = 1.5
 reference_seed_source = "600 original seed42"
 new_seed_jobs = 15
 gpu_per_job = 1
-launch_authorized = true
+launch_authorized = false
 launched = true
 blocked_on = ""
+completed_jobs = 15
+completed = true
+result = "NO_GO"
 
 [budget]
 expected_gpu_hours_min = 9.0

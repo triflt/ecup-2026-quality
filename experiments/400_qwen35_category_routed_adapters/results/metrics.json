@@ -1,6 +1,6 @@
 {
   "experiment_id": "400",
-  "status": "ready_for_manual_public",
+  "status": "public_champion",
   "data_version": "competition_train_v1",
   "evaluation_version": "locked_190_category_routing_v1",
   "parent_experiment": "280_bad_family_diverse_public190",
@@ -37,5 +37,7 @@
     "acceptance_audit_sha256": "a271ed7564873cfc428f1137ab6ac5069b98eeef903c90594344dc5755ca187c",
     "routed_predictions_sha256": "58aa9feb3e6a276fda27666b11e479e052549523999bf2fb3c9af660904ab174"
   },
-  "decision": "Ready for one manual Public upload. This isolates the positive flammable effect of adapter 260 while preserving the original BAD adapter and all other experiment 190 components."
+  "public_macro_f1": 0.8922900010951702,
+  "public_delta_vs_190": 0.0003655774009770001,
+  "decision": "Accepted as the current Public champion after a successful platform run. The positive direction transferred, but by much less than the locked local estimate."
 }

@@ -1,0 +1,36 @@
+{
+  "experiment_id": "620",
+  "protocol_version": "semantic_v3_evidence_disagreement_router_v2",
+  "decision": "GO",
+  "labels_loaded": false,
+  "sealed_rows_loaded": 0,
+  "competition_trained_adapter_used": false,
+  "natural_component_vote_thresholds": {
+    "robust_base_probability": 0.5,
+    "qwen3vl_logit": 0.0
+  },
+  "possible_category_hypothesis_pairs_without_prefilter": 55590,
+  "selected_pairs": 1563,
+  "selected_hypotheses": {
+    "BAD_DIRECT_MARKING": 25,
+    "BAD_EXPLICIT_NEGATION": 2,
+    "FL_PRODUCT_IS_FUEL": 550,
+    "FL_INCLUDED_HAZARD": 10,
+    "FL_IGNITION_PYRO_SOLID": 976
+  },
+  "zero_selected_hypotheses_not_launched": [
+    "BAD_SUPPLEMENT_MARKING",
+    "BAD_FOOD_OR_SPORTS_CONTEXT",
+    "BAD_RAW_INGREDIENT",
+    "FL_EMPTY_EQUIPMENT",
+    "FL_EXTERNAL_CONSUMABLE"
+  ],
+  "gates": {
+    "all_selected_rows_disagree_with_baseline": true,
+    "all_selected_rows_have_independent_component_support": true,
+    "all_selected_rows_have_compatible_exact_evidence": true,
+    "all_selected_spans_survive_model_input_truncation": true,
+    "no_low_score_is_used_as_opposite_evidence": true
+  },
+  "runtime_archive_sha256": "0c1beac70a8114c38bc8fa228523d594cfb052604579fbfdf234ccac48007925"
+}

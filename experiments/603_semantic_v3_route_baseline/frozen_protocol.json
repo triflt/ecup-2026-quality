@@ -1,0 +1,51 @@
+{
+  "version": "semantic_v3_route_baseline_v1",
+  "status": "frozen_before_public_evaluator_run",
+  "development_rows": 11118,
+  "folds": [0, 1, 2, 3, 4],
+  "seeds": [42, 31415, 271828, 161803],
+  "comparisons": [
+    "original_route_baseline",
+    "category_routed_specialist_400",
+    "fixed_four_seed_probability_mean_route"
+  ],
+  "additional_variants_allowed": false,
+  "route": {
+    "БАД": {
+      "weights": {
+        "robust_base_rank": 0.5,
+        "qwen3vl_rank": 0.25,
+        "qwen35_rank": 0.25
+      },
+      "production_threshold_diagnostic": 0.27193570137023926
+    },
+    "Легковоспламеняющиеся": {
+      "weights": {
+        "robust_base_rank": 0.15,
+        "qwen3vl_rank": 0.1,
+        "qwen35_rank": 0.75
+      },
+      "production_threshold_diagnostic": 0.953912615776062
+    }
+  },
+  "ranking": "stable fold-category rank01",
+  "thresholds": "exact locked-190 leave-one-fold-out calibration over fixed OOF scores: threshold for one fold is fitted on scores and labels of the other four folds",
+  "fully_nested_meta_validation": false,
+  "validation_limitation": "Donor OOF scores can come from base models whose training included labels of the currently evaluated fold. Leaving that fold out of threshold fitting therefore prevents direct threshold-label use but is not fully end-to-end nested meta-validation.",
+  "four_seed_combination": "arithmetic mean of sigmoid probabilities before fold-category ranking",
+  "four_seed_weights": {
+    "42": 0.25,
+    "31415": 0.25,
+    "271828": 0.25,
+    "161803": 0.25
+  },
+  "expected_macro_f1": {
+    "original_route_baseline": 0.9136312475000699,
+    "category_routed_specialist_400": 0.9068412317905219,
+    "fixed_four_seed_probability_mean_route": 0.9196036380948726
+  },
+  "maximum_reference_absolute_error": 1e-12,
+  "sealed_holdout_allowed": false,
+  "public_feedback_used": false,
+  "gpu_jobs": 0
+}

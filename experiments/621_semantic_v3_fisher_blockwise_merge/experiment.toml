@@ -1,0 +1,42 @@
+id = "621"
+name = "semantic_v3_fisher_blockwise_merge"
+status = "runnable_not_launched"
+description = "Deterministic train-only Fisher-weighted merge of two same-base adapters."
+fold_worker = "experiments/621_semantic_v3_fisher_blockwise_merge/fold_worker.py"
+fold_evaluator = "experiments/621_semantic_v3_fisher_blockwise_merge/evaluate_fold.py"
+
+[hypothesis]
+mechanism = "Keep broad behavior from the original adapter and import specialist capacity only in blocks with higher train-only Fisher energy."
+single_changed_factor = "Per-target-module conservative Fisher-derived specialist coefficient; all prompts, data, thresholds, and inference remain fixed."
+expected_effect = "Preserve broad macro F1 while recovering specialist rare-category decisions."
+falsification = "Reject when the merged adapter loses category F1, increases rare-category false negatives, or fails the frozen grouped-fold gate."
+
+[protocol]
+validation_version = "semantic_family_v3"
+outer_folds = [0, 1, 2, 3, 4]
+uses_old_oof_predictions = false
+uses_sealed_holdout = false
+uses_large_teacher = false
+full_refit_allowed = false
+
+[merge]
+max_specialist_alpha = 0.5
+svd_rank_policy = "same_as_input_rank"
+svd_sign_policy = "largest_absolute_left_singular_vector_pivot_nonnegative"
+max_relative_reconstruction_error = 0.05
+
+[compute]
+one_gpu_jobs = 5
+job_names = ["621-fold0", "621-fold1", "621-fold2", "621-fold3", "621-fold4"]
+runtime_multiplier_limit = 1.20
+expected_vram_gb = [24, 40]
+expected_fold_minutes = [50, 90]
+temporary_working_space_gb = 4
+launch_authorized = false
+
+[acceptance]
+minimum_winning_folds = 4
+minimum_mean_macro_delta = 0.001
+maximum_category_drop = 0.005
+maximum_rare_category_false_negative_delta = 0
+minimum_corrected_to_regressed_ratio = 1.5

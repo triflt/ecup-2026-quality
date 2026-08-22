@@ -1,6 +1,6 @@
 id = "360"
 slug = "hard_negative_diagonal_metric"
-status = "prepared"
+status = "rejected_stage1"
 data_version = "competition_train_v1"
 evaluation_version = "connected_hard_negative_metric_screen_v1"
 parent_experiment = "190_shingle_neighbor_prior"

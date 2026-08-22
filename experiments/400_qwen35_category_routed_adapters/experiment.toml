@@ -2,7 +2,7 @@
 id = "400"
 slug = "qwen35_category_routed_adapters"
 title = "Category-routed Qwen3.5 adapters in the locked Public-190 architecture"
-status = "ready_for_manual_public"
+status = "public_champion"
 entrypoint = "experiments/400_qwen35_category_routed_adapters/run.py"
 result_file = "experiments/400_qwen35_category_routed_adapters/results/metrics.json"
 submission_source = "experiments/400_qwen35_category_routed_adapters/submission"

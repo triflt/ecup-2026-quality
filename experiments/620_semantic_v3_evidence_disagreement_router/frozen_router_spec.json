@@ -1,0 +1,151 @@
+{
+  "version": "semantic_v3_evidence_disagreement_router_v2",
+  "status": "frozen_before_features_and_predictions",
+  "backbone_status": "label_independent_open_backbone_pending_compatibility_probe",
+  "teacher": {
+    "used": false,
+    "maximum_parameters": 0,
+    "pseudo_labels_used": false
+  },
+  "hypotheses": {
+    "БАД": [
+      {
+        "id": "BAD_DIRECT_MARKING",
+        "supports_verdict": 1,
+        "text": "Товар прямо назван БАД или биологически активной добавкой к пище."
+      },
+      {
+        "id": "BAD_SUPPLEMENT_MARKING",
+        "supports_verdict": 1,
+        "text": "На товаре прямо указано dietary supplement или food supplement."
+      },
+      {
+        "id": "BAD_EXPLICIT_NEGATION",
+        "supports_verdict": 0,
+        "text": "Карточка прямо говорит, что товар не является БАД."
+      },
+      {
+        "id": "BAD_FOOD_OR_SPORTS_CONTEXT",
+        "supports_verdict": 0,
+        "text": "Продаётся обычный пищевой или спортивный продукт без заявленного статуса БАД."
+      },
+      {
+        "id": "BAD_RAW_INGREDIENT",
+        "supports_verdict": 0,
+        "text": "Продаётся сырьё или ингредиент, а не готовая биологически активная добавка."
+      }
+    ],
+    "Легковоспламеняющиеся": [
+      {
+        "id": "FL_PRODUCT_IS_FUEL",
+        "supports_verdict": 1,
+        "text": "Продаваемый товар сам является горючим веществом или топливом."
+      },
+      {
+        "id": "FL_INCLUDED_HAZARD",
+        "supports_verdict": 1,
+        "text": "Горючее вещество или источник огня входит в продаваемый комплект."
+      },
+      {
+        "id": "FL_IGNITION_PYRO_SOLID",
+        "supports_verdict": 1,
+        "text": "Продаваемый товар является самостоятельным источником огня, пиротехническим изделием или твёрдым топливом."
+      },
+      {
+        "id": "FL_EMPTY_EQUIPMENT",
+        "supports_verdict": 0,
+        "text": "Продаётся только пустое устройство или аксессуар без горючего содержимого."
+      },
+      {
+        "id": "FL_EXTERNAL_CONSUMABLE",
+        "supports_verdict": 0,
+        "text": "Топливо или источник огня лишь упомянут как внешний совместимый расходник."
+      }
+    ]
+  },
+  "direct_extractive_concepts": {
+    "0": [
+      "BAD_EXPLICIT_NEGATION",
+      "FL_FUEL_EXCLUDED",
+      "FL_EMPTY_CONTAINER",
+      "FL_COMPATIBILITY_ONLY",
+      "FL_INTEGRATED_IGNITION_ONLY"
+    ],
+    "1": [
+      "BAD_EXPLICIT_MARKING",
+      "BAD_EXPLICIT_SUPPLEMENT_MARKING",
+      "FL_STANDALONE_IGNITION_SOURCE",
+      "FL_PYROTECHNIC_PRODUCT",
+      "FL_COMBUSTIBLE_PRODUCT",
+      "FL_INCLUDED_QUALIFYING_ITEM",
+      "FL_EXPLICIT_HAZARD_MARKING"
+    ]
+  },
+  "hypothesis_concept_compatibility": {
+    "BAD_DIRECT_MARKING": ["BAD_EXPLICIT_MARKING"],
+    "BAD_SUPPLEMENT_MARKING": ["BAD_EXPLICIT_SUPPLEMENT_MARKING"],
+    "BAD_EXPLICIT_NEGATION": ["BAD_EXPLICIT_NEGATION"],
+    "BAD_FOOD_OR_SPORTS_CONTEXT": [],
+    "BAD_RAW_INGREDIENT": [],
+    "FL_PRODUCT_IS_FUEL": ["FL_COMBUSTIBLE_PRODUCT", "FL_EXPLICIT_HAZARD_MARKING"],
+    "FL_INCLUDED_HAZARD": ["FL_INCLUDED_QUALIFYING_ITEM"],
+    "FL_IGNITION_PYRO_SOLID": ["FL_STANDALONE_IGNITION_SOURCE", "FL_PYROTECHNIC_PRODUCT", "FL_COMBUSTIBLE_PRODUCT"],
+    "FL_EMPTY_EQUIPMENT": ["FL_EMPTY_CONTAINER", "FL_FUEL_EXCLUDED"],
+    "FL_EXTERNAL_CONSUMABLE": ["FL_COMPATIBILITY_ONLY"]
+  },
+  "scored_hypothesis_ids": [
+    "BAD_DIRECT_MARKING",
+    "BAD_EXPLICIT_NEGATION",
+    "FL_PRODUCT_IS_FUEL",
+    "FL_INCLUDED_HAZARD",
+    "FL_IGNITION_PYRO_SOLID"
+  ],
+  "forbidden_as_flip_evidence": [
+    "BAD_TEXT_MARKING_NOT_FOUND",
+    "FL_QUALIFYING_ITEM_NOT_FOUND"
+  ],
+  "router": {
+    "minimum_binary_normalized_support_score": 0.9,
+    "low_score_implies_opposite_verdict": false,
+    "requires_exact_direct_span": true,
+    "requires_support_from_robust_or_qwen3vl": true,
+    "requires_hypothesis_concept_compatibility": true,
+    "opposite_high_support_requires_abstention": true,
+    "span_must_survive_model_input_truncation": true,
+    "competition_trained_adapter_used_for_hypothesis_scores": false,
+    "trainable_meta_router": false,
+    "label_independent_logical_router": true,
+    "uses_old_190_260_400_oof_as_features": false,
+    "uses_production_scores_during_head_fit": false,
+    "changes_outside_selector_allowed": 0,
+    "hyperparameter_grid_allowed": false
+  },
+  "preflight_gates": {
+    "minimum_any_direct_span_coverage_per_category": 0.15,
+    "maximum_exact_offset_failures": 0,
+    "maximum_unresolved_span_conflicts": 0,
+    "maximum_forbidden_flip_evidence": 0,
+    "labels_allowed_in_feature_runtime": false,
+    "sealed_rows_allowed": 0
+  },
+  "screen_gates": {
+    "folds": [0, 3],
+    "require_each_fold_macro_delta_positive": true,
+    "minimum_mean_macro_delta": 0.0015,
+    "minimum_corrected_to_regressed_ratio": 1.5,
+    "maximum_category_f1_drop": 0.002,
+    "maximum_flammable_false_negative_increase": 0,
+    "maximum_safety_false_negative_increase": 0
+  },
+  "full_gates": {
+    "minimum_macro_delta": 0.003,
+    "minimum_fold_wins": 4,
+    "minimum_category_delta": 0.0,
+    "minimum_corrected_to_regressed_ratio": 1.5,
+    "minimum_component_bootstrap_probability_positive": 0.9,
+    "require_singleton_delta_positive": true,
+    "require_repeated_delta_nonnegative": true,
+    "require_post_prior_delta_positive": true,
+    "maximum_private_runtime_minutes": 32.0
+  }
+}

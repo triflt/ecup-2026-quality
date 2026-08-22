@@ -7,6 +7,7 @@ import tomllib
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import pytest
 import yaml
 
@@ -25,6 +26,7 @@ def _load(name: str, path: Path):
 
 protocol = _load("exp602_seed_protocol_test", EXP / "seed_protocol.py")
 trainer = _load("exp602_trainer_test", EXP / "train_seed.py")
+evaluator = _load("exp602_evaluator_test", EXP / "evaluate_seed_variance.py")
 
 
 def test_predeclared_grid_is_exactly_three_new_seeds_by_five_folds() -> None:
@@ -69,7 +71,34 @@ def test_missing_shared_runtime_inputs_fail_closed(tmp_path: Path) -> None:
         protocol.runtime_input_paths(tmp_path)
 
 
-def test_fixed_probability_mean_and_strict_nested_calibration() -> None:
+def test_reference_seed_accepts_exp600_original_contract(tmp_path: Path) -> None:
+    predictions = pd.DataFrame(
+        {
+            "id": ["a"],
+            "category": ["БАД"],
+            "label": [1],
+            "fold": [0],
+            "lora_score": [0.5],
+        }
+    )
+    prediction_path = tmp_path / "lora_holdout_predictions.csv"
+    predictions.to_csv(prediction_path, index=False)
+    contract = {
+        "experiment_id": "600",
+        "component": "original",
+        "outer_fold": 0,
+        "decision": "GO",
+        "sealed_rows_in_predictions": 0,
+        "predictions_sha256": protocol.sha256_file(prediction_path),
+    }
+    (tmp_path / "output_contract.runtime.json").write_text(json.dumps(contract))
+
+    actual = evaluator._read_completed_predictions(tmp_path, seed=42, fold=0)
+
+    assert actual["id"].tolist() == ["a"]
+
+
+def test_fixed_probability_mean_and_leave_one_fold_out_calibration() -> None:
     labels = np.asarray([0, 1] * 5, dtype=np.int8)
     categories = np.asarray(["БАД"] * 10)
     folds = np.repeat(np.arange(5, dtype=np.int8), 2)
@@ -130,13 +159,18 @@ def test_runtime_presets_cover_fifteen_neutral_one_gpu_jobs() -> None:
     assert observed == {(seed, fold) for seed in protocol.NEW_SEEDS for fold in protocol.FOLDS}
 
 
-def test_card_and_metrics_record_running_grid() -> None:
+def test_card_and_metrics_record_completed_no_go_grid() -> None:
     card = tomllib.loads((EXP / "experiment.toml").read_text(encoding="utf-8"))
     metrics = json.loads((EXP / "results/metrics.json").read_text(encoding="utf-8"))
     assert card["execution"]["new_seed_jobs"] == 15
     assert card["ensemble"]["weights"] == [0.25, 0.25, 0.25, 0.25]
     assert card["ensemble"]["weight_tuning"] is False
     assert metrics["launched"] is True
+    assert metrics["status"] == "complete_no_go"
+    assert metrics["completed_jobs"] == 15
+    assert metrics["working_jobs"] == 0
+    assert metrics["fully_nested_meta_validation"] is False
+    assert metrics["decision"] == "NO_GO"
     assert metrics["sealed_holdout_used"] is False
 
 

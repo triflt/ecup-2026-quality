@@ -1,0 +1,18 @@
+{
+  "experiment_id": "622",
+  "status": "blocked_pre_gpu_human_audit",
+  "validation_complete": false,
+  "gpu_jobs_launched": 0,
+  "screen_folds": [0, 3],
+  "human_gate": {
+    "sample_size": 300,
+    "minimum_strict_pass": 282,
+    "maximum_critical_unsupported": 0,
+    "maximum_scope_or_negation_failure": 0,
+    "observed_strict_pass": null,
+    "observed_critical_unsupported": null,
+    "observed_scope_or_negation_failure": null,
+    "status": "pending_human_review"
+  },
+  "decision": "PRE_GPU_BLOCKER"
+}

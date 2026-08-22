@@ -1,6 +1,6 @@
 id = "330"
 slug = "label_blind_uncertainty_gate"
-status = "prepared"
+status = "rejected_offline"
 data_version = "competition_train_v1"
 evaluation_version = "component_transfer_gate_v4"
 parent_experiment = "190_shingle_neighbor_prior"

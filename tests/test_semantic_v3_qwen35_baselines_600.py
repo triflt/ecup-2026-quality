@@ -246,15 +246,17 @@ def test_output_contract_accepts_only_outer_development_predictions(tmp_path: Pa
     assert contract["decision"] == "GO"
 
 
-def test_null_parity_is_exact_and_experiment_is_running() -> None:
+def test_null_parity_is_exact_and_experiment_is_complete() -> None:
     parity = json.loads((EXP / "analysis/null_selector_parity.json").read_text(encoding="utf-8"))
     metrics = json.loads((EXP / "results/metrics.json").read_text(encoding="utf-8"))
     assert parity["decision"] == "PASS"
     assert parity["original_all_exact"] is True
     assert parity["specialist_all_exact"] is True
-    assert metrics["status"] == "training_running"
+    assert metrics["status"] == "complete_baselines_specialist_not_promoted"
     assert metrics["launched"] is True
-    assert metrics["completed_jobs"] == 0
+    assert metrics["completed_jobs"] == 10
+    assert metrics["working_jobs"] == 0
+    assert metrics["fully_nested_meta_validation"] is False
     assert metrics["sealed_holdout_used"] is False
 
 

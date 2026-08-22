@@ -45,12 +45,21 @@ def parse_args() -> argparse.Namespace:
 
 
 def _read_completed_predictions(directory: Path, *, seed: int, fold: int) -> pd.DataFrame:
-    contract_path = directory / "seed_output_contract.runtime.json"
+    reference = seed == REFERENCE_SEED
+    contract_path = directory / (
+        "output_contract.runtime.json" if reference else "seed_output_contract.runtime.json"
+    )
     prediction_path = directory / "lora_holdout_predictions.csv"
     if not contract_path.is_file() or not prediction_path.is_file():
         raise FileNotFoundError("completed seed task lacks its output contract or predictions")
     contract = json.loads(contract_path.read_text(encoding="utf-8"))
-    if contract.get("experiment_id") != EXPERIMENT_ID or contract.get("seed") != seed or contract.get("outer_fold") != fold:
+    expected_experiment = "600" if reference else EXPERIMENT_ID
+    identity_matches = (
+        contract.get("experiment_id") == expected_experiment
+        and contract.get("outer_fold") == fold
+        and (contract.get("component") == "original" if reference else contract.get("seed") == seed)
+    )
+    if not identity_matches:
         raise ValueError("completed seed task contract does not match the requested seed/fold")
     if contract.get("decision") != "GO" or contract.get("sealed_rows_in_predictions") != 0:
         raise ValueError("completed seed task contract is not an eligible development-only output")

@@ -1,12 +1,12 @@
 {
   "experiment_id": "600",
-  "status": "training_running",
+  "status": "complete_baselines_specialist_not_promoted",
   "launched": true,
   "protocol": "semantic_family_v3",
   "components": ["original", "specialist"],
   "development_folds": [0, 1, 2, 3, 4],
   "planned_jobs": 10,
-  "completed_jobs": 0,
+  "completed_jobs": 10,
   "development_rows": 11118,
   "sealed_holdout_rows": 1853,
   "sealed_holdout_used": false,
@@ -16,9 +16,26 @@
   },
   "blockers": [],
   "runtime_archive_sha256": "1490e7349433b30d7773202327851e376d09f183af1abe6d771e2bf17c2d758e",
-  "working_jobs": 10,
+  "working_jobs": 0,
   "technical_pretraining_failures": 20,
   "expected_gpu_hours": [6.0, 8.5],
-  "fold_results": {},
-  "decision": "PENDING_RESULTS"
+  "threshold_calibration": "leave_one_fold_out_over_fixed_oof_scores",
+  "fully_nested_meta_validation": false,
+  "validation_limitation": "Donor OOF base models may have trained on labels of the currently evaluated fold; only threshold fitting leaves that fold out.",
+  "components_results": {
+    "original_seed_42": {
+      "bad_f1": 0.9418774827514113,
+      "flammable_f1": 0.8333333333333334,
+      "macro_f1": 0.8876054080423723
+    },
+    "specialist_seed_42": {
+      "bad_f1": 0.9450433312368973,
+      "flammable_f1": 0.8292682926829268,
+      "macro_f1": 0.8871558119599121,
+      "delta_vs_original": -0.0004495960824602012,
+      "promoted": false
+    }
+  },
+  "runtime_contracts_verified": 10,
+  "decision": "BASELINES_COMPLETE_SPECIALIST_NOT_PROMOTED"
 }
