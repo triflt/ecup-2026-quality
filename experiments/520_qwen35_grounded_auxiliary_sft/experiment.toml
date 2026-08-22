@@ -1,0 +1,79 @@
+[experiment]
+id = "520"
+slug = "qwen35_grounded_auxiliary_sft"
+title = "Qwen3.5 grounded structured auxiliary SFT"
+status = "rejected_at_screen"
+entrypoint = "experiments/520_qwen35_grounded_auxiliary_sft/trainer.py"
+result_file = "experiments/520_qwen35_grounded_auxiliary_sft/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+parent_experiment = "400_qwen35_category_routed_adapters"
+screen_folds = [0, 3]
+primary_metric = "macro_f1"
+inference_passes = 1
+
+[hypothesis]
+changed_factor = "Replace the one-digit assistant SFT suffix with a deterministic six-line verdict, closed concept, source, surface offsets and exact evidence span target"
+mechanism = "Gold-verdict-aligned grounded auxiliary tokens may teach the existing adapter to attend to decision-bearing evidence while preserving the first atomic verdict token"
+falsification = "Reject if SAFE evidence is not the majority of selected training occurrences, any cohort lacks grounded signal, either screen fold regresses, safety false negatives grow, or generated evidence fails exact-span checks"
+teacher_model = false
+
+[target]
+format_version = "grounded_auxiliary_target_v1"
+first_line = "atomic 0 or 1"
+fields = ["CONCEPT", "SOURCE", "START", "END", "EVIDENCE"]
+fallback_concept = "NO_SAFE_EVIDENCE"
+extractor_experiment = "490_evidence_grounded_explanations"
+extractor_vocabulary = "policy_concepts_v1"
+gold_verdict_training_only = true
+loss = "unchanged unit-weight causal CE over the full assistant suffix"
+auxiliary_loss_weight = 1.0
+hyperparameter_grid = false
+
+[training]
+parent_entrypoint = "research/qwen35_bad_family_diverse_positives_lora.py"
+training_mode = "hard"
+model_class = "multimodal"
+family_balance_flammable = false
+family_diverse_bad_positives = true
+family_diverse_flammable_negatives = false
+epochs = 1
+batch_size = 4
+gradient_accumulation = 4
+learning_rate = 0.0002
+seed = 42
+changes_training_records = false
+changes_steps = false
+
+[coverage_gate]
+min_overall_safe_occurrence_rate = 0.50
+min_cohort_safe_occurrence_rate = 0.25
+min_cohort_safe_occurrences = 25
+require_zero_outer_validation_occurrences = true
+require_exact_offsets = true
+
+[acceptance.screen]
+folds = [0, 3]
+require_each_macro_delta_positive = true
+required_mean_macro_delta = 0.001
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+require_first_token_valid_rate = 1.0
+require_exact_evidence_rate_on_well_formed = 1.0
+
+[budget]
+planned_gpu_hours = 2.5
+planned_public_submissions = 0
+
+[execution]
+arguments = []
+full_train_allowed = false
+teacher_required = false
+
+[artifacts]
+directory = "artifacts"
+publish = false

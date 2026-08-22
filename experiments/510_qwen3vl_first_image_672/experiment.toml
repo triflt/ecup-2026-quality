@@ -1,0 +1,89 @@
+[experiment]
+id = "510"
+slug = "qwen3vl_first_image_672"
+title = "Qwen3-VL first-image 672-pixel resolution screen"
+status = "rejected_two_fold_screen"
+entrypoint = "experiments/510_qwen3vl_first_image_672/train_screen.py"
+result_file = "experiments/510_qwen3vl_first_image_672/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "qwen3vl_first_image_672_two_fold_screen_v1"
+full_version = "component_transfer_gate_v2"
+selection_guard = "connected_family_guard_v2"
+folds = "validation/grouped_text_v1/folds.csv"
+screen_folds = [0, 3]
+reject_only = true
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+training_parent = "110_qwen3vl_lora"
+changed_factor = "Increase only the single first-image edge cap from 448 to 672 pixels and processor max_pixels to 451584 at training and fold inference"
+mechanism = "More visual tokens may preserve small packaging text and product details without adding another image or inference pass"
+falsification = "Reject on a failed 200-image blind rendering audit, non-positive delta on either locked fold, mean delta below 0.001, safety regression, insufficient changed inputs, or failed 600-row runtime projection"
+uses_teacher = false
+uses_pseudo_labels = false
+
+[training]
+model = "Qwen/Qwen3-VL-2B-Instruct"
+seed = 42
+training_mode = "hard"
+image_view = "first_image_only"
+baseline_max_edge = 448
+candidate_max_edge = 672
+candidate_max_pixels = 451584
+epochs = 1
+learning_rate = 0.0002
+weight_decay = 0.01
+batch_size = 4
+gradient_accumulation = 4
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+prompt = "byte-identical training parent"
+crop = false
+gallery_images = false
+tta = false
+inference_passes = 1
+
+[preflight.rendering]
+required = true
+label_blind = true
+sample_size = 200
+required_decode_failures = 0
+required_aspect_failures = 0
+required_same_cover_failures = 0
+additional_pixel_gain_threshold = 0.25
+required_fraction_above_gain = 0.20
+
+[acceptance.screen]
+folds = [0, 3]
+required_each_fold_delta_positive = true
+required_mean_macro_f1_delta = 0.001
+max_bad_f1_drop = 0.003
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+min_corrected_to_regressed_ratio = 1.0
+minimum_changed_inputs_per_fold = 10
+minimum_changed_predictions_total = 5
+
+[runtime]
+required_before_full_cycle = true
+probe_rows = 600
+public_rows = 1600
+private_rows = 3800
+max_projected_public_minutes = 16
+max_projected_private_minutes = 32
+
+[execution]
+arguments = []
+launch_authorized = false
+screen_evaluator = "experiments/510_qwen3vl_first_image_672/evaluate_screen.py"
+
+[artifacts]
+directory = "artifacts"
+publish = false

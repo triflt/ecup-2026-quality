@@ -1,0 +1,14 @@
+{
+  "experiment_id": "500",
+  "status": "rejected_pre_gpu",
+  "launched": false,
+  "result": {
+    "semantic_audit_rows": 73,
+    "mechanical_pass_rows": 73,
+    "strict_semantic_pass_rows": 62,
+    "strict_semantic_pass_rate": 0.8493150684931506,
+    "required_strict_semantic_pass_rate": 0.98,
+    "decision": "NO_GO"
+  },
+  "note": "The label-blind semantic-preservation gate failed; no training or inference was launched."
+}

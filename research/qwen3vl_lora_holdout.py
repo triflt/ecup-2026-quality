@@ -49,6 +49,8 @@ DOWNSAMPLE_MODE = os.environ.get("DOWNSAMPLE_MODE", "").strip()
 MAX_SLICE_NUMS = int(os.environ.get("MAX_SLICE_NUMS", "0"))
 SOFT_TARGETS = Path(os.environ["SOFT_TARGETS"]) if os.environ.get("SOFT_TARGETS") else None
 LAST_LOGIT_ONLY = os.environ.get("LAST_LOGIT_ONLY") == "1"
+FIRST_IMAGE_MAX_EDGE = int(os.environ.get("QWEN3VL_FIRST_IMAGE_MAX_EDGE", "448"))
+FIRST_IMAGE_MAX_PIXELS = int(os.environ.get("QWEN3VL_FIRST_IMAGE_MAX_PIXELS", "262144"))
 
 
 RULES = {
@@ -118,7 +120,9 @@ def download_one(item_id, url):
             with urllib.request.urlopen(url, timeout=60) as response:
                 payload = response.read()
             image = Image.open(io.BytesIO(payload)).convert("RGB")
-            image.thumbnail((448, 448), Image.Resampling.LANCZOS)
+            image.thumbnail(
+                (FIRST_IMAGE_MAX_EDGE, FIRST_IMAGE_MAX_EDGE), Image.Resampling.LANCZOS
+            )
             image.save(destination, format="JPEG", quality=92)
             return item_id, True, ""
         except Exception as error:
@@ -485,11 +489,16 @@ def main():
         "soft_targets": SOFT_TARGETS is not None,
         "soft_target_mean": float(frame.loc[train_records, "soft_target"].mean())
         if SOFT_TARGETS is not None else None,
+        "first_image_max_edge": FIRST_IMAGE_MAX_EDGE,
+        "first_image_max_pixels": FIRST_IMAGE_MAX_PIXELS,
     }), flush=True)
 
     processor_kwargs = {"local_files_only": True, "trust_remote_code": True}
     if MODEL_CLASS == "image_text":
-        processor_kwargs.update(min_pixels=4 * 28 * 28, max_pixels=262144)
+        processor_kwargs.update(
+            min_pixels=4 * 28 * 28,
+            max_pixels=FIRST_IMAGE_MAX_PIXELS,
+        )
     processor = AutoProcessor.from_pretrained(MODEL, **processor_kwargs)
     processor.tokenizer.padding_side = "left"
     token_zero_ids = processor.tokenizer.encode("0", add_special_tokens=False)
@@ -611,6 +620,8 @@ def main():
             "runtime_minutes": (time.monotonic() - started) / 60,
             "soft_targets": SOFT_TARGETS is not None,
             "last_logit_only": LAST_LOGIT_ONLY,
+            "first_image_max_edge": FIRST_IMAGE_MAX_EDGE,
+            "first_image_max_pixels": FIRST_IMAGE_MAX_PIXELS,
         }
         (OUTPUT / "full_train_report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -629,6 +640,8 @@ def main():
         "download_failures": len(failures),
         "soft_targets": SOFT_TARGETS is not None,
         "last_logit_only": LAST_LOGIT_ONLY,
+        "first_image_max_edge": FIRST_IMAGE_MAX_EDGE,
+        "first_image_max_pixels": FIRST_IMAGE_MAX_PIXELS,
         "categories": {},
     }
     macro_lora, macro_fused = [], []

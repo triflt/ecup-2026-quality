@@ -1,0 +1,17 @@
+{
+  "experiment_id": "550",
+  "status": "audit_go_not_launched",
+  "launched": false,
+  "audit": {
+    "decision": "GO",
+    "long_evidence_rows": 2059,
+    "strictly_improved_rows": 390,
+    "strict_improvement_fraction": 0.1894123360854784,
+    "regressed_rows": 0,
+    "provenance_fraction": 1.0,
+    "determinism_fraction": 1.0
+  },
+  "screen_folds": [0, 3],
+  "fold_results": {},
+  "decision": "PENDING_GPU_SCREEN"
+}

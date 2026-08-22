@@ -1,0 +1,39 @@
+{
+  "experiment_id": "510",
+  "status": "rejected_two_fold_screen",
+  "training_launched": true,
+  "rendering_audit": {
+    "status": "go_for_two_fold_screen",
+    "sample_size": 200,
+    "decode_failures": 0,
+    "same_cover_failures": 0,
+    "aspect_failures": 0,
+    "more_than_25_percent_additional_pixels": 197,
+    "additional_pixel_fraction": 0.985
+  },
+  "runtime_projection": "not_required_after_rejection",
+  "null_control": {
+    "status": "passed",
+    "mean_delta_macro_f1": 0.0,
+    "changed_predictions": 0,
+    "route_400_reconstructed_exactly": true
+  },
+  "screen_folds": {
+    "0": {
+      "delta_macro_f1": -0.007181874045288805,
+      "corrected": 11,
+      "regressed": 20,
+      "passed": false
+    },
+    "3": {
+      "delta_macro_f1": -0.009628529458026058,
+      "corrected": 2,
+      "regressed": 11,
+      "passed": false
+    }
+  },
+  "mean_delta_macro_f1": -0.008405201751657432,
+  "changed_predictions_in_evaluated_folds": 44,
+  "macro_f1": null,
+  "decision": "reject_higher_resolution_regressed_both_folds"
+}

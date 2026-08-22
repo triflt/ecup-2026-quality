@@ -1,0 +1,15 @@
+{
+  "experiment_id": "520",
+  "evaluation_version": "qwen35_grounded_auxiliary_route400_screen_v1",
+  "screen_folds": [0, 3],
+  "mean_screen_delta_macro_f1": -0.03434412542799947,
+  "corrected": 5,
+  "regressed": 15,
+  "folds": {
+    "0": {"delta_macro_f1": -0.05138471805138467, "flammable_false_negative_delta": 7, "safety_union_false_negative_delta": 3},
+    "3": {"delta_macro_f1": -0.017303532804614274, "flammable_false_negative_delta": 0, "safety_union_false_negative_delta": 0}
+  },
+  "screen_passed": false,
+  "full_five_fold_cycle_allowed": false,
+  "decision": "REJECT"
+}

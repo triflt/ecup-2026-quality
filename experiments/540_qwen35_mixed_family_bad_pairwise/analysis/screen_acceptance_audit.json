@@ -1,0 +1,16 @@
+{
+  "experiment_id": "540",
+  "evaluation_version": "qwen35_bad_pairwise_route400_screen_v1",
+  "screen_folds": [0, 3],
+  "mean_screen_delta_macro_f1": -0.000741795703959991,
+  "corrected": 9,
+  "regressed": 16,
+  "folds": {
+    "0": {"delta_macro_f1": -0.0013071160063926612, "delta_bad_f1": -0.0026142320127854335},
+    "3": {"delta_macro_f1": -0.00017647540152732066, "delta_bad_f1": -0.0003529508030546413}
+  },
+  "flammable_predictions_identical": true,
+  "screen_passed": false,
+  "full_five_fold_cycle_allowed": false,
+  "decision": "REJECT"
+}

@@ -1,0 +1,73 @@
+{
+  "audit_version": "semantic_family_graph_manual_audit_v3",
+  "counts": {
+    "category_label_rows": {
+      "БАД|0": 1905,
+      "БАД|1": 5564,
+      "Легковоспламеняющиеся|0": 5304,
+      "Легковоспламеняющиеся|1": 198
+    },
+    "components": 9853,
+    "development_fold_rows": {
+      "0": 2224,
+      "1": 2223,
+      "2": 2224,
+      "3": 2224,
+      "4": 2223
+    },
+    "largest_component": 58,
+    "rows": 12971,
+    "split_components": {
+      "development": 8448,
+      "sealed_holdout": 1405
+    },
+    "split_rows": {
+      "development": 11118,
+      "sealed_holdout": 1853
+    }
+  },
+  "criterion_checks": {
+    "accepted_risky_precision": true,
+    "all_known_false_replays_blocked": true,
+    "largest_component_boundary_pass_rate": true
+  },
+  "immutable": true,
+  "invariants": {
+    "all_ids_unique": true,
+    "all_rows_accounted_for": true,
+    "component_crosses_category": 0,
+    "component_crosses_development_fold": 0,
+    "component_crosses_split": 0,
+    "holdout_development_fold_is_minus_one": true,
+    "no_raw_text_or_images": true
+  },
+  "output_sha256": {
+    "folds": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae"
+  },
+  "promotion": {
+    "development_fold_rule": "preserve draft_dev_fold_5 exactly",
+    "holdout_rule": "draft_partition_7 == 0",
+    "repartitioned": false
+  },
+  "sealed": true,
+  "source_graph_version": "semantic_family_graph_audit_draft_v3",
+  "source_sha256": {
+    "draft_input": {
+      "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+      "reused_fingerprints": "bb7dfc180aea8449c196a7d315dc272bbcdeca90e23aaba0d5f0aef442be0558"
+    },
+    "draft_manifest": "3f547396416365c46b952573365bb7011cdb819af3abb5d351b31793f8bdae24",
+    "manual_audit": "dd98a80e8474fa63ad290bdd0773d17df1d0536472cdeca81bab65e0d7453f3f",
+    "verified_draft_outputs": {
+      "edges": "4b373931cc97d4a0d07c5c3c066ee9551e40f9c2081efd5eeb75fe7d97c74e6a",
+      "fingerprints": "94fdff0ed9a2c67e985932e38f263ec46408ed253296828d3df033fcf00e322c",
+      "incremental": "f11a8b2ab6ab68a2d391beae6939412f22d8c76f5ec22058e69ab1788da0c20b",
+      "key_degrees": "2414eb2ee57e1ac40b63964eea383a950f7b0ebdc31d2072f15fc17748110865",
+      "manual_samples": "07ef191d7372a40c332755b8441666c1b713bf709b39b2a70c505a732c7b6453",
+      "rows": "792c2dd50e47bf853790c1fb41540590b1f51c798939ada712117e5390a30c44"
+    }
+  },
+  "status": "sealed",
+  "valid_for_candidate_scoring": true,
+  "version": "semantic_family_v3"
+}

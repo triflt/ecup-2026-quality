@@ -1,0 +1,288 @@
+{
+  "audit_version": "semantic_family_graph_manual_audit_v3",
+  "graph_candidate": "semantic_family_graph_audit_draft_v3",
+  "status": "complete",
+  "decision": "GO",
+  "seal_candidate": true,
+  "audit_protocol": {
+    "independent_from_v2_decisions": true,
+    "label_blind": true,
+    "deterministic_samples_reviewed": true,
+    "allowed_evidence": [
+      "public_row_id",
+      "name",
+      "description",
+      "images",
+      "edge_provenance",
+      "component_topology"
+    ],
+    "target_annotations_inspected": false,
+    "model_outputs_inspected": false,
+    "data_partitions_inspected": false
+  },
+  "scope": {
+    "accepted_exact_auxiliary_samples": 32,
+    "accepted_perceptual_samples": 32,
+    "accepted_risky_samples_total": 64,
+    "largest_component_boundaries": 20,
+    "known_false_replay_cases": 12
+  },
+  "seal_criteria": {
+    "accepted_risky_precision_minimum": 0.99,
+    "largest_component_boundary_pass_rate_minimum": 0.95,
+    "known_false_replays_must_all_be_blocked": true
+  },
+  "results": {
+    "accepted_exact_auxiliary": {
+      "strict_pass": 32,
+      "reviewed": 32,
+      "precision_estimate": 1.0
+    },
+    "accepted_perceptual": {
+      "strict_pass": 32,
+      "reviewed": 32,
+      "precision_estimate": 1.0
+    },
+    "accepted_risky_aggregate": {
+      "strict_pass": 64,
+      "reviewed": 64,
+      "precision_estimate": 1.0
+    },
+    "largest_component_boundaries": {
+      "strict_pass": 20,
+      "reviewed": 20,
+      "pass_rate": 1.0
+    },
+    "known_false_replays": {
+      "blocked": 12,
+      "reviewed": 12,
+      "block_rate": 1.0,
+      "all_pairs_in_separate_components": true
+    }
+  },
+  "criterion_checks": {
+    "accepted_risky_precision": true,
+    "largest_component_boundary_pass_rate": true,
+    "all_known_false_replays_blocked": true
+  },
+  "risky_sample_coverage": {
+    "accepted_exact_auxiliary": {
+      "sample_ids": "R001-R032",
+      "strict_pass_sample_ids": "R001-R032",
+      "false_accept_sample_ids": []
+    },
+    "accepted_perceptual": {
+      "sample_ids": "R033-R064",
+      "strict_pass_sample_ids": "R033-R064",
+      "false_accept_sample_ids": []
+    }
+  },
+  "largest_component_boundary_reviews": [
+    {
+      "audit_id": "C01-36dbf158",
+      "component_size": 58,
+      "strict_pass": true,
+      "review_note": "One named commercial product; presentation variants preserve identity."
+    },
+    {
+      "audit_id": "C02-5b2916fb",
+      "component_size": 33,
+      "strict_pass": true,
+      "review_note": "One model-specific product family with consistent imagery and purpose."
+    },
+    {
+      "audit_id": "C03-a6ed3798",
+      "component_size": 20,
+      "strict_pass": true,
+      "review_note": "One brand-and-model-specific commodity product."
+    },
+    {
+      "audit_id": "C04-8cd1e121",
+      "component_size": 19,
+      "strict_pass": true,
+      "review_note": "One supplement formulation; packaging variations do not change identity."
+    },
+    {
+      "audit_id": "C05-3c9b9267",
+      "component_size": 18,
+      "strict_pass": true,
+      "review_note": "One supplement formulation with consistent branded evidence."
+    },
+    {
+      "audit_id": "C06-458bd05e",
+      "component_size": 18,
+      "strict_pass": true,
+      "review_note": "One named product; previously observed generic-text neighbor is absent."
+    },
+    {
+      "audit_id": "C07-38f7defd",
+      "component_size": 17,
+      "strict_pass": true,
+      "review_note": "One day-and-night product family with consistent kit identity."
+    },
+    {
+      "audit_id": "C08-9e4d3924",
+      "component_size": 16,
+      "strict_pass": true,
+      "review_note": "One model-specific appliance family."
+    },
+    {
+      "audit_id": "C09-3af1aee1",
+      "component_size": 15,
+      "strict_pass": true,
+      "review_note": "One supplement formulation; only presentation details vary."
+    },
+    {
+      "audit_id": "C10-5e27dc7e",
+      "component_size": 15,
+      "strict_pass": true,
+      "review_note": "One branded formulation with identical use and packaging evidence."
+    },
+    {
+      "audit_id": "C11-78635303",
+      "component_size": 15,
+      "strict_pass": true,
+      "review_note": "One brand-and-model-specific commodity product."
+    },
+    {
+      "audit_id": "C12-7bb9c01c",
+      "component_size": 15,
+      "strict_pass": true,
+      "review_note": "One supplement formulation; count badges are presentation variants."
+    },
+    {
+      "audit_id": "C13-fd505db2",
+      "component_size": 15,
+      "strict_pass": true,
+      "review_note": "One named formulation with consistent packaging and instructions."
+    },
+    {
+      "audit_id": "C14-29e39038",
+      "component_size": 14,
+      "strict_pass": true,
+      "review_note": "One branded formulation; a shortened generic listing is grounded by the same product imagery."
+    },
+    {
+      "audit_id": "C15-377a7641",
+      "component_size": 14,
+      "strict_pass": true,
+      "review_note": "One material product family; diameter and length are legitimate variants."
+    },
+    {
+      "audit_id": "C16-68d6bfb1",
+      "component_size": 14,
+      "strict_pass": true,
+      "review_note": "One model-specific appliance with consistent included accessories."
+    },
+    {
+      "audit_id": "C17-89481fa9",
+      "component_size": 14,
+      "strict_pass": true,
+      "review_note": "One named product with consistent pack and claimed purpose."
+    },
+    {
+      "audit_id": "C18-c595a122",
+      "component_size": 14,
+      "strict_pass": true,
+      "review_note": "One branded formulation with consistent count and packaging."
+    },
+    {
+      "audit_id": "C19-1c3928d1",
+      "component_size": 13,
+      "strict_pass": true,
+      "review_note": "One branded formulation with reordered but consistent images."
+    },
+    {
+      "audit_id": "C20-1d73dc35",
+      "component_size": 13,
+      "strict_pass": true,
+      "review_note": "One brand-, material-, and size-specific commodity product."
+    }
+  ],
+  "known_false_replay_reviews": [
+    {
+      "public_row_ids": ["100", "8785"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["10537", "17869"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["17869", "285"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["17869", "781"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["6776", "7213"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["932", "9462"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["10400", "153"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["153", "7198"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["2163", "3563"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["11833", "10643"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["2820", "714"],
+      "blocked": true,
+      "separate_components": true
+    },
+    {
+      "public_row_ids": ["245", "13818"],
+      "blocked": true,
+      "separate_components": true
+    }
+  ],
+  "failure_taxonomy": {
+    "accepted_false_identity": 0,
+    "marketing_auxiliary_without_identity": 0,
+    "first_image_conflict": 0,
+    "copied_content_non_independence": 0,
+    "weak_transitive_closure": 0,
+    "commodity_without_specific_identity": 0,
+    "heterogeneous_component_boundary": 0
+  },
+  "implemented_fail_closed_rules": [
+    "Inflected generic and marketing identity terms are reduced by conservative stem matching before an identity signature can be considered informative.",
+    "Marketing auxiliary images cannot establish product identity without independent product-specific evidence.",
+    "Conflicting informative first images veto text- or auxiliary-driven links.",
+    "Copied or generic content is not treated as independent identity evidence.",
+    "Every cross-component pair must retain a strong product-specific identity or image anchor before a merge is allowed.",
+    "Commodity links require brand, model, dimensions, or another product-specific identity anchor.",
+    "A deterministic post-merge component veto blocks transitive unions that would create unsupported cross-boundary pairs."
+  ],
+  "decision_reasons": [
+    "All 64 deterministic risky accepted samples passed independent label-blind review.",
+    "All 20 largest component boundaries remained semantically homogeneous.",
+    "All 12 known false replay pairs were blocked as direct edges and remained in separate components.",
+    "All three predeclared seal-candidate thresholds were met."
+  ]
+}

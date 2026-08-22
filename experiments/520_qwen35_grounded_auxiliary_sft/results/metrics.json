@@ -1,0 +1,32 @@
+{
+  "experiment_id": "520",
+  "status": "rejected_at_screen",
+  "launched": true,
+  "coverage_decision": "GO",
+  "coverage": {
+    "fold_0_safe_occurrence_rate": 0.5747680890538034,
+    "fold_3_safe_occurrence_rate": 0.562152133580705
+  },
+  "folds": {
+    "0": {
+      "delta_macro_f1": -0.05138471805138467,
+      "delta_flammable_f1": -0.10276943610276934,
+      "corrected": 3,
+      "regressed": 10,
+      "flammable_false_negative_delta": 7,
+      "safety_union_false_negative_delta": 3
+    },
+    "3": {
+      "delta_macro_f1": -0.017303532804614274,
+      "delta_flammable_f1": -0.03460706560922855,
+      "corrected": 2,
+      "regressed": 5,
+      "flammable_false_negative_delta": 0,
+      "safety_union_false_negative_delta": 0
+    }
+  },
+  "mean_screen_delta_macro_f1": -0.03434412542799947,
+  "screen_passed": false,
+  "decision": "REJECT",
+  "note": "The structured suffix sharply reduced flammable route quality; no full cycle or seed repeat."
+}

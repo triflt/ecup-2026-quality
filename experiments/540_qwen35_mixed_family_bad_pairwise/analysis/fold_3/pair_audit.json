@@ -1,0 +1,64 @@
+{
+  "audit_sha256": "6d8ec8e1161f25ddd85680b6210646ab42091eba3180c62a02894438536e39ec",
+  "candidate_record_multiset_sha256": "fa85627009b4145ff1394691b72e28dce8a76da98674b02578ad3ff40c5ff4a7",
+  "decision": "GO",
+  "experiment_id": "540",
+  "failures": [],
+  "holdout_fold": 3,
+  "input_sha256": {
+    "connected_guard": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "oof": "d78bb7df897e244e030fa388e1b9c770d15434cc33aa1f56b238c7d057646116"
+  },
+  "logical_pairs": 416,
+  "manifest_sha256": "619db7144d706ff096f1d76e419d3837ebd382e7dfc6ebc01cfca5d9c4cae774",
+  "max_negative_reuse": 1,
+  "max_pairs_per_positive": 1,
+  "multiplicity_unchanged": true,
+  "nearest_family_pairs": 137,
+  "negative_reuse_cap": 4,
+  "ordered_records_sha256": "288929f8704f881128e33ed9e1dbe98963f142eab5ed6da2fedb1cdbe7a0a105",
+  "ordered_training_records": 5390,
+  "outer_validation_pairs": 0,
+  "pair_batches": 80,
+  "parent_record_multiset_sha256": "fa85627009b4145ff1394691b72e28dce8a76da98674b02578ad3ff40c5ff4a7",
+  "parent_selection": {
+    "bad_positive_selection": {
+      "control_rng_consumed": true,
+      "eligible_families": 3117,
+      "eligible_rows": 4451,
+      "family_diverse": true,
+      "hard_families": 750,
+      "max_family_exposures": 1,
+      "random_families": 750,
+      "selected_families": 1500,
+      "selected_rows": 1500
+    },
+    "family_balanced": false,
+    "negative_selection": {
+      "family_diverse": false,
+      "selected_rows": 1600
+    },
+    "positive_rows": 158,
+    "selector_version": "exp260_fixed_hard_selector_dependency_light_v1",
+    "total_exposures": 790
+  },
+  "positive_pair_cap": 4,
+  "realized_pairs": 160,
+  "same_family_pairs": 23,
+  "seed": 42,
+  "steps_unchanged": true,
+  "topology": {
+    "eligible_safe_bad_rows": 5252,
+    "families": 4004,
+    "label_blind": true,
+    "min_name_jaccard": 0.45,
+    "min_shared_tokens": 2,
+    "nearest_edges": 4586,
+    "nearest_families_cap": 8,
+    "pairing_version": "bad_pairwise_connected_guard_v1",
+    "topology_sha256": "bf1a748f110689731f24f1b770f65dc91d78d0a1573f1b18cd5f8be1ebb02c7a"
+  },
+  "training_records": 5390,
+  "unsafe_component_pairs": 0
+}

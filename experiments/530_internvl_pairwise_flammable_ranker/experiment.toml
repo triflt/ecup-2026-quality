@@ -1,0 +1,89 @@
+[experiment]
+id = "530"
+slug = "internvl_pairwise_flammable_ranker"
+title = "InternVL pairwise flammable rank-replacement screen"
+status = "prepared_not_launched"
+entrypoint = "experiments/530_internvl_pairwise_flammable_ranker/train_screen.py"
+result_file = "experiments/530_internvl_pairwise_flammable_ranker/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+selector_version = "internvl_attribute_probe_selector_v1"
+selector_rows = 909
+selector_label_blind = true
+
+[validation]
+primary_version = "internvl_pairwise_rank_replacement_screen_v1"
+selection_guard = "connected_family_guard_v2"
+folds = "validation/grouped_text_v1/folds.csv"
+screen_folds = [0, 3]
+reject_only = true
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+model_loader_parent = "300_internvl35_attribute_screen"
+changed_factor = "Replace the Qwen3-VL rank only on the frozen flammable selector with a pairwise-trained InternVL rank at fixed weight 0.10"
+mechanism = "Relative training on similar positive-negative product pairs may learn the competition boundary more reliably than a generic visual verdict"
+uses_teacher = false
+uses_pseudo_labels = false
+
+[pairs]
+source = "outer-train donor rows allowed by connected-family guard"
+negatives_per_positive = 4
+maximum_negative_reuse = 8
+similarity = "donor-only char_wb TF-IDF cosine, ngram 3-5"
+priority = "same frozen six-bit cue mask, then all donor negatives"
+tie_break = "string item id"
+
+[training]
+model = "InternVL3.5-2B"
+seed = 42
+image_view = "first_image_only"
+image_source = "frozen_selector_manifest"
+image_download_attempts = 3
+image_download_fail_closed = true
+image_fallback = false
+image_size = 448
+image_tiles = 1
+optimizer_updates = 96
+pair_batch_size = 4
+gradient_accumulation = 4
+learning_rate = 0.0002
+weight_decay = 0.01
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+rslora = true
+vision_frozen = true
+language_attention_only = true
+objective = "softplus(-(score_positive-score_negative))"
+
+[inference]
+rank_mapping = "empirical donor CDF without labels"
+replacement_weight = 0.10
+selector_only = true
+fold_0_threshold = 0.9564604759216309
+fold_3_threshold = 0.9570291638374329
+
+[acceptance.screen]
+required_each_fold_delta_positive = true
+required_mean_macro_f1_delta = 0.003
+min_corrected_to_regressed_ratio = 1.5
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+required_each_fold_connected_safe_delta_positive = true
+component_bootstrap_samples = 10000
+component_bootstrap_seed = 48042
+minimum_component_bootstrap_probability = 0.80
+bad_predictions_must_be_identical = true
+
+[execution]
+launch_authorized = false
+allowed_image_sources = ["manifest"]
+screen_evaluator = "experiments/530_internvl_pairwise_flammable_ranker/evaluate_screen.py"
+
+[artifacts]
+directory = "artifacts"
+publish = false

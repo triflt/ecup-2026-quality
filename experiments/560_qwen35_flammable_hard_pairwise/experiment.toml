@@ -1,0 +1,80 @@
+[experiment]
+id = "560"
+slug = "qwen35_flammable_hard_pairwise"
+title = "Qwen3.5 flammable batch-local hard-pair margin"
+status = "pair_manifest_ready_not_run"
+entrypoint = "experiments/560_qwen35_flammable_hard_pairwise/trainer.py"
+result_file = "experiments/560_qwen35_flammable_hard_pairwise/results/metrics.json"
+
+[validation]
+primary_version = "qwen35_flammable_hard_pairwise_route400_screen_v1"
+selection_guard = "exp530_label_blind_909_row_topology"
+screen_folds = [0, 3]
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+training_parent = "260_bad_family_diverse_positives"
+changed_factor = "Add a batch-local donor-only flammable first-token pairwise hinge"
+mechanism = "Hard opposite-label donors from frozen label-blind topology should sharpen flammable ordering without changing pointwise CE or inference"
+falsification = "Reject on insufficient realizable pairs, leakage, contract mismatch, either non-positive fold, safety regression, BAD change, or connected-safe regression"
+uses_teacher = false
+uses_pseudo_labels = false
+
+[pairwise]
+topology = "frozen exp530 label-blind 909-row selector intersected with exact parent multiset"
+labels_used_only_for = "orienting outer-train donors as positive and negative"
+margin = 1.0
+weight = 0.10
+score = "first-token logit(1) minus logit(0)"
+max_pairs_per_positive = 4
+max_negative_reuse = 8
+min_realized_pairs = 64
+min_pair_batches = 64
+
+[training]
+parent_entrypoint = "research/qwen35_bad_family_diverse_positives_lora.py"
+model = "Qwen3.5-4B"
+seed = 42
+training_mode = "hard"
+epochs = 1
+learning_rate = 0.0002
+weight_decay = 0.01
+batch_size = 4
+gradient_accumulation = 4
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+changes_record_multiset = false
+changes_steps = false
+changes_inference = false
+ordered_hash_membership_gate = false
+exact_runtime_parent_light_equality = true
+
+[evaluation]
+route400_bad_weights = [0.50, 0.25, 0.25]
+route400_flammable_weights = [0.15, 0.10, 0.75]
+candidate_replaces = "flammable Qwen3.5 rank only"
+replacement_weight = 0.75
+weight_grid = false
+null_control_required = true
+
+[acceptance.screen]
+folds = [0, 3]
+required_each_fold_delta_positive = true
+required_mean_macro_delta = 0.001
+required_flammable_delta_positive = true
+require_bad_byte_identical = true
+require_connected_safe_delta_positive = true
+require_corrected_greater_than_regressed = true
+require_flammable_false_negatives_nonincreasing = true
+require_safety_false_negatives_nonincreasing = true
+
+[execution]
+arguments = []
+full_train_allowed = false
+planned_public_submissions = 0
+
+[artifacts]
+directory = "artifacts"
+publish = false

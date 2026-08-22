@@ -1,0 +1,16 @@
+{
+  "experiment_id": "560",
+  "status": "pair_manifest_ready_not_run",
+  "launched": false,
+  "manifest_decision": {
+    "fold_0": "GO",
+    "fold_3": "GO"
+  },
+  "realized_pairs": {
+    "fold_0": 88,
+    "fold_3": 88
+  },
+  "null_control_passed": true,
+  "folds": {},
+  "note": "CPU manifests and evaluator null-control only; no GPU training or candidate inference was launched."
+}

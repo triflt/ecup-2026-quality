@@ -52,7 +52,6 @@
   "execution": {
     "compatibility_jobs": ["redacted-job", "redacted-job"],
     "screen_job": "redacted-job",
-    "project": "private-project",
     "gpus": 1
   },
   "hard_error_audit": {

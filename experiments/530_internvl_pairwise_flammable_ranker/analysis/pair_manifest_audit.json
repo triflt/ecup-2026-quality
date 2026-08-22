@@ -1,0 +1,56 @@
+{
+  "version": "internvl_pairwise_flammable_manifests_v1",
+  "status": "frozen_not_trained",
+  "selector_version": "internvl_attribute_probe_selector_v1",
+  "selector_label_blind": true,
+  "pair_labels_source": "outer-donor train labels only",
+  "selector_rows": 909,
+  "screen_folds": [
+    0,
+    3
+  ],
+  "pair_rule": {
+    "negatives_per_positive": 4,
+    "maximum_negative_reuse": 8,
+    "similarity": "donor-only char_wb TF-IDF cosine, ngram 3-5",
+    "priority": "same six-bit cue mask, then all donor negatives",
+    "tie_break": "string item id"
+  },
+  "folds": {
+    "0": {
+      "pairs": 336,
+      "positive_rows": 84,
+      "negative_rows_used": 116,
+      "same_cue_mask_pairs": 318,
+      "global_fallback_pairs": 18,
+      "maximum_negative_reuse": 8,
+      "outer_fold_ids_in_pairs": 0,
+      "unsafe_ids_in_pairs": 0,
+      "ordered_pair_sha256": "b511e41e52803128a4f8c32f2896a889d1d7612c2d2259fb1d0a30ec9fcf6826",
+      "file_sha256": "06e592569170023c71307ffc5d67347f9accaa8f59b5a2458ed62cfd4f451a8c"
+    },
+    "3": {
+      "pairs": 360,
+      "positive_rows": 90,
+      "negative_rows_used": 121,
+      "same_cue_mask_pairs": 335,
+      "global_fallback_pairs": 25,
+      "maximum_negative_reuse": 8,
+      "outer_fold_ids_in_pairs": 0,
+      "unsafe_ids_in_pairs": 0,
+      "ordered_pair_sha256": "df7cbc52a0c410eacf93966572a380d5802aaebe15e65efe53323c2b21d819fa",
+      "file_sha256": "747539476a9f51098ba27f457455013cf6b2b42b42404bd1e62c08ec6fe44b1d"
+    }
+  },
+  "input_sha256": {
+    "selector_manifest": "6a82dc96a52cd0e496455457b0e1bd2bfa69f1f8065944e4c809e629ca5681e7",
+    "selector_report": "8fe3a0c086903e9455fdeb1af04974098506720765373dfe16ecd3d397701dd7",
+    "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "guard": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a"
+  },
+  "output_sha256": {
+    "selector_membership": "2b5b4c5cf1903cb02c457837b2df7a7471c3af5a4f98af6f4eaf23da9b9de32a",
+    "pair_manifest_fold_0": "06e592569170023c71307ffc5d67347f9accaa8f59b5a2458ed62cfd4f451a8c",
+    "pair_manifest_fold_3": "747539476a9f51098ba27f457455013cf6b2b42b42404bd1e62c08ec6fe44b1d"
+  }
+}

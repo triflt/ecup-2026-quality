@@ -1,0 +1,58 @@
+[experiment]
+id = "490"
+slug = "evidence_grounded_explanations"
+title = "Verdict-locked deterministic text evidence extractor"
+status = "rejected_manual_audit"
+entrypoint = "experiments/490_evidence_grounded_explanations/extract_evidence.py"
+result_file = "experiments/490_evidence_grounded_explanations/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "explanation_manual_audit_200_v1"
+family_graph_status = "not_accepted"
+frozen_200_status = "completed_no_go"
+primary_metric = "strict_supported_coverage"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+changed_factor = "Add a deterministic post-verdict text evidence layer"
+mechanism = "Map an exact title or description span to one closed policy concept and render a verdict-locked comment"
+expected_macro_f1_delta = 0.0
+falsification = "Reject if any comment changes the verdict, quotes a non-exact span, inverts negation or scope, or makes an unsupported claim"
+precedents = [
+  "https://aclanthology.org/2020.acl-main.408/",
+  "https://aclanthology.org/2020.acl-main.409/",
+  "https://aclanthology.org/2025.starsem-1.33/",
+]
+
+[acceptance]
+required_verdict_lock = 1.0
+required_exact_span = 1.0
+max_critical_unsupported_claims = 0
+manual_strict_pass_required = 189
+manual_audit_rows = 200
+
+[budget]
+planned_gpu_hours = 0.0
+planned_public_submissions = 0
+runtime_limit_minutes = 40
+
+[execution]
+hardware = "CPU"
+free_chain_of_thought = false
+reads_gold_label = false
+uses_images = false
+
+[result]
+decision = "NO_GO"
+manual_rows = 200
+verdict_and_format_pass = 200
+strict_relevant_pass = 141
+critical_unsupported_claims = 12
+
+[artifacts]
+directory = "artifacts"
+publish = false
