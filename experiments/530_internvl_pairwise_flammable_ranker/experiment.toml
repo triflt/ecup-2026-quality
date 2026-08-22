@@ -2,7 +2,7 @@
 id = "530"
 slug = "internvl_pairwise_flammable_ranker"
 title = "InternVL pairwise flammable rank-replacement screen"
-status = "prepared_not_launched"
+status = "rejected_at_screen"
 entrypoint = "experiments/530_internvl_pairwise_flammable_ranker/train_screen.py"
 result_file = "experiments/530_internvl_pairwise_flammable_ranker/results/metrics.json"
 
@@ -80,7 +80,7 @@ minimum_component_bootstrap_probability = 0.80
 bad_predictions_must_be_identical = true
 
 [execution]
-launch_authorized = false
+launch_authorized = true
 allowed_image_sources = ["manifest"]
 screen_evaluator = "experiments/530_internvl_pairwise_flammable_ranker/evaluate_screen.py"
 

@@ -1,8 +1,13 @@
 {
   "experiment_id": "530",
-  "status": "prepared_not_launched",
-  "launched": false,
+  "status": "rejected_at_screen",
+  "launched": true,
   "screen_folds": [0, 3],
-  "fold_results": {},
-  "decision": "PENDING"
+  "fold_results": {
+    "0": {"delta_macro_f1": -0.09741512345679015, "delta_flammable_f1": -0.1948302469135802, "corrected": 3, "regressed": 14, "flammable_false_negative_delta": 14, "safety_union_false_negative_delta": 9},
+    "3": {"delta_macro_f1": -0.03255906293428623, "delta_flammable_f1": -0.06511812586857246, "corrected": 0, "regressed": 4, "flammable_false_negative_delta": 4, "safety_union_false_negative_delta": 4}
+  },
+  "mean_screen_delta_macro_f1": -0.06498709319553819,
+  "screen_passed": false,
+  "decision": "REJECT"
 }

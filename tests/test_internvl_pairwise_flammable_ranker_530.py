@@ -382,9 +382,10 @@ def test_experiment_card_is_locked_and_not_launched() -> None:
     assert config["training"]["image_fallback"] is False
     assert config["execution"]["allowed_image_sources"] == ["manifest"]
     assert config["inference"]["replacement_weight"] == pytest.approx(0.10)
-    assert config["execution"]["launch_authorized"] is False
-    assert metrics["launched"] is False
-    assert metrics["decision"] == "PENDING"
+    assert config["execution"]["launch_authorized"] is True
+    assert metrics["launched"] is True
+    assert metrics["screen_passed"] is False
+    assert metrics["decision"] == "REJECT"
 
     null_control = json.loads((EXPERIMENT / "analysis/null_screen_control_audit.json").read_text())
     assert null_control["null_control_passed"] is True
