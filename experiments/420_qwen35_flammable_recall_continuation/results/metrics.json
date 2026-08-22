@@ -58,8 +58,8 @@
       "fold_3": "05a3f3be53c21a0a878e28849bac5151b161a7f115c9cb860f8a02d8fbb3774c"
     },
     "screen_parent_adapter_s3": {
-      "fold_0": "s3://private-artifact-store/private-prefix/experiments/420/parent-v260-fold_0.zip",
-      "fold_3": "s3://private-artifact-store/private-prefix/experiments/420/parent-v260-fold_3.zip"
+      "fold_0": "private://competition-artifacts/experiments/420/parent-v260-fold_0.zip",
+      "fold_3": "private://competition-artifacts/experiments/420/parent-v260-fold_3.zip"
     },
     "screen_training_records": {"fold_0": 1510, "fold_3": 1530},
     "full_training_records": 1900

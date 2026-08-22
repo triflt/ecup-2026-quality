@@ -39,7 +39,7 @@ binary loss, но вычисляет только последний logit. Ча
 
 Оптимизированный цикл `redacted-job` успешно завершил все пять folds и full
 refit без ошибок загрузки. Архив сохранён локально в
-`artifacts/private-runtime_qwen_soft_b91s2l/`; SHA-256 внешнего ZIP:
+`artifacts/compute_qwen_soft_b91s2l/`; SHA-256 внешнего ZIP:
 `e2e2ff3628291033cc7dfb097e0e5f84439558ca95dcf65b33fe277c615b7340`, full
 adapter:
 `967af97a70a4111bec5d1757374cdeefa0a57c83c128e1ed2da86e69567ba3ca`.

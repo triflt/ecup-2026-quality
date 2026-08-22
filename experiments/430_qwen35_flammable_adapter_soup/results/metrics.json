@@ -37,12 +37,12 @@
     "scorer_sha256": "c9b566da08d367707471dde5e707547df0c1dc52339d9c5d44254a916f68d7cf",
     "runner_sha256": "5230ca1668fe9a4866c8fe84345a7616cd1eab8bf1de29c375ebf1e96bb6ef5d",
     "source_190": {
-      "s3": "s3://private-artifact-store/private-prefix/experiments/430/source190-folds.zip",
+      "s3": "private://competition-artifacts/experiments/430/source190-folds.zip",
       "sha256": "6620effa11fede9c4ead4e91a0f0e753519176b547ef30f684c018cf5ff17f46",
       "size_bytes": 58311570
     },
     "source_260": {
-      "s3": "s3://private-artifact-store/private-prefix/experiments/430/source260-folds.zip",
+      "s3": "private://competition-artifacts/experiments/430/source260-folds.zip",
       "sha256": "fccf4952fba67886e2ca2b6a6eb4ac2ae4892eea614f5515025cdfc271cea782",
       "size_bytes": 58313413
     },

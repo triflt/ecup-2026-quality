@@ -44,6 +44,15 @@
    отрицательные результаты, validation audits и research notes находятся в
    Git. Сырые данные, веса, embeddings, ZIP-архивы, `.local` и внутренние
    параметры исполнения исключены.
+6. Повторно скачанные `data.csv` и `images.zip` полностью совпали с объектами на
+   S3. Короткое доказательство находится в
+   `reports/data-completeness-audit-2026-08-22.json`, подробный локальный
+   инвентарь — в `research/agent_notes/downloaded_data_inventory.md`.
+7. Перед запуском новых дорогих веток прочитать два решения:
+   `research/agent_notes/grpo_reasoning_decision.md` и
+   `research/agent_notes/contrastive_embedder_decision.md`. GRPO сейчас не
+   запускается: сначала детерминированное evidence, слепой аудит и grounded SFT.
+   Contrastive projection допускается только после аудита semantic-family graph.
 
 ## Что показал разбор ошибок 190 → 260
 

@@ -185,7 +185,7 @@
       "type": "lora_adapter_candidate",
       "base_model": "Qwen/Qwen3.5-4B",
       "role": "first-image classification trained with outer-fold cross-fitted probability targets",
-      "canonical_path": "experiments/310_qwen35_crossfit_soft_targets/artifacts/private-runtime_qwen_soft_b91s2l/extracted_bundle/full/adapter/adapter_model.safetensors",
+      "canonical_path": "experiments/310_qwen35_crossfit_soft_targets/artifacts/compute_qwen_soft_b91s2l/extracted_bundle/full/adapter/adapter_model.safetensors",
       "producer_experiments": ["310_qwen35_crossfit_soft_targets"],
       "used_by_experiments": ["310_qwen35_crossfit_soft_targets"],
       "parent_component_ids": ["qwen35_lora_hard_seed42_v130"],

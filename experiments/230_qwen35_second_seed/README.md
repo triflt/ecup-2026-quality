@@ -39,7 +39,7 @@ Entrypoint: `research/qwen35_seed_ensemble_cv.py`. Platform-specific preset до
 
 ## Submission
 
-Локально собран `artifacts/quality-qwen35-two-seed-submit.zip` с контрольной суммой `94fb93d731ce8884a45e6874c15f8a4e51e920ffdcea35cef3ee780d8e08b4c0`. Адаптеры и проверочные результаты остаются локально; при необходимости удалённого хранения разрешён только `s3://private-artifact-store/private-prefix/`.
+Локально собран `artifacts/quality-qwen35-two-seed-submit.zip` с контрольной суммой `94fb93d731ce8884a45e6874c15f8a4e51e920ffdcea35cef3ee780d8e08b4c0`. Адаптеры и проверочные результаты остаются локально; при необходимости удалённого хранения разрешён только `private://competition-artifacts/`.
 
 ## Результат
 

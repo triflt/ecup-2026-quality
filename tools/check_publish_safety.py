@@ -7,8 +7,8 @@ from pathlib import Path
 FORBIDDEN_CONTENT = [
     re.compile(pattern, re.IGNORECASE)
     for pattern in [
-        r"(?:private-bank|private-storage|private-tech)",
-        r"private-object-store\.",
+        r"t[a-z]{2,8}(?:bank|tech)",
+        r"\b(?:s3|registry|api|compute)[.-][a-z0-9.-]+\.ru\b",
         r"artifactory\.",
         r"model-registry(?:-old)?\.",
         r"X-Amz-(?:Credential|Signature|Security-Token)",

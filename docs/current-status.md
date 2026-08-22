@@ -19,6 +19,21 @@
 - Advanced mixed ensemble: 0.785500, что подтвердило риск duplicate/photo overfitting.
 - Prompt-only Qwen branches существенно слабее supervised models.
 
+## Данные и новые исследовательские решения
+
+- Свежие `data.csv` и `images.zip` из Downloads точно сверены с каноническими
+  объектами на S3: 12 971 товар, 49 456 изображений, без пропущенных или лишних
+  ID. Архив прошёл полную CRC-проверку; контрольные суммы записаны в
+  `reports/data-completeness-audit-2026-08-22.json`.
+- GRPO для объяснений пока отклонён как преждевременный: сначала нужен
+  verdict-locked извлекатель точного evidence, слепая ручная проверка и
+  grounded SFT/rationale distillation. Обоснование и критерии допуска находятся
+  в `research/agent_notes/grpo_reasoning_decision.md`.
+- Собственный contrastive embedder не запускается против чемпиона до фиксации
+  semantic-family graph. После аудита допустим один label-blind projection-head
+  pilot; решение и гейты находятся в
+  `research/agent_notes/contrastive_embedder_decision.md`.
+
 ## Локальная проверка и расхождение с Public
 
 Robust base + Qwen3-VL rsLoRA + среднее вероятностей двух независимо обученных Qwen3.5 rsLoRA локально получили:

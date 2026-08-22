@@ -270,9 +270,9 @@ needed. Reference it through the public-model HF proxy as
 has **not** been verified, so first-use delivery/download time is a real
 uncertainty. Do not use the private compute platform S3 model importer, whose documented large
 model limit is 100GB. Local platform sources:
-[`flavors`](../../../private-platform-docs/docs/jobs/flavors/index.mdx),
-[`distributed jobs`](../../../private-platform-docs/docs/jobs/distributed/index.mdx), and
-[`Hugging Face proxy`](../../../private-platform-docs/docs/model_registry/hugging_face_proxy/index.md).
+[`flavors`](../../../private compute-user-docs/docs/jobs/flavors/index.mdx),
+[`distributed jobs`](../../../private compute-user-docs/docs/jobs/distributed/index.mdx), and
+[`Hugging Face proxy`](../../../private compute-user-docs/docs/model_registry/hugging_face_proxy/index.md).
 
 Use a short 8K--16K serving context; the model's 256K maximum is unnecessary and
 would waste KV-cache memory. Before the pilot, a 16-card throughput-only smoke

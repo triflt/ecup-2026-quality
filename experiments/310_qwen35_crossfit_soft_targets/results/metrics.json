@@ -114,17 +114,17 @@
   },
   "artifacts": [
     {
-      "path": "artifacts/private-runtime_qwen_soft_b91s2l/qwen_soft.zip",
+      "path": "artifacts/compute_qwen_soft_b91s2l/qwen_soft.zip",
       "size_bytes": 279988127,
       "sha256": "e2e2ff3628291033cc7dfb097e0e5f84439558ca95dcf65b33fe277c615b7340"
     },
     {
-      "path": "artifacts/private-runtime_qwen_soft_b91s2l/extracted_outer/output_bundle.zip",
+      "path": "artifacts/compute_qwen_soft_b91s2l/extracted_outer/output_bundle.zip",
       "size_bytes": 140039671,
       "sha256": "77548c9bba32cc7b01955fdc0f1d5af93a0eac08bb5eff7aaa5b16bead5d0686"
     },
     {
-      "path": "artifacts/private-runtime_qwen_soft_b91s2l/extracted_bundle/full/adapter/adapter_model.safetensors",
+      "path": "artifacts/compute_qwen_soft_b91s2l/extracted_bundle/full/adapter/adapter_model.safetensors",
       "size_bytes": 12592424,
       "sha256": "967af97a70a4111bec5d1757374cdeefa0a57c83c128e1ed2da86e69567ba3ca"
     },

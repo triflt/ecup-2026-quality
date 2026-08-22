@@ -33,7 +33,7 @@
     "submission": "artifacts/quality-public190-category-route-v400.zip",
     "submission_sha256": "2a99472be1d2b753ae93036becdaee5595f44c4694d161e11fd9d59d2c52a373",
     "submission_size_bytes": 59422077,
-    "s3_uri": "s3://private-artifact-store/private-prefix/experiments/400/quality-public190-category-route-v400.zip",
+    "s3_uri": "private://competition-artifacts/experiments/400/quality-public190-category-route-v400.zip",
     "acceptance_audit_sha256": "a271ed7564873cfc428f1137ab6ac5069b98eeef903c90594344dc5755ca187c",
     "routed_predictions_sha256": "58aa9feb3e6a276fda27666b11e479e052549523999bf2fb3c9af660904ab174"
   },

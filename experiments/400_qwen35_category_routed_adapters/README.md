@@ -45,7 +45,7 @@ Qwen3-VL, robust base, веса, пороги и downstream priors не меня
 `artifacts/quality-public190-category-route-v400.zip`, SHA-256
 `2a99472be1d2b753ae93036becdaee5595f44c4694d161e11fd9d59d2c52a373`.
 Копия хранится в
-`s3://private-artifact-store/private-prefix/experiments/400/`.
+`private://competition-artifacts/experiments/400/`.
 
 ## Public-результат
 
