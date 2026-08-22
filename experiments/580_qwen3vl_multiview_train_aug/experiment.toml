@@ -2,7 +2,7 @@
 id = "580"
 slug = "qwen3vl_multiview_train_aug"
 title = "Qwen3-VL deterministic single-gallery-view training augmentation"
-status = "running_two_fold_screen"
+status = "rejected_screen"
 entrypoint = "experiments/580_qwen3vl_multiview_train_aug/train_screen.py"
 result_file = "experiments/580_qwen3vl_multiview_train_aug/results/metrics.json"
 
@@ -77,7 +77,7 @@ required_corrected_exceeds_regressed = true
 
 [execution]
 gpu_count = 1
-launch_authorized = true
+launch_authorized = false
 screen_evaluator = "experiments/580_qwen3vl_multiview_train_aug/evaluate_screen.py"
 
 [artifacts]

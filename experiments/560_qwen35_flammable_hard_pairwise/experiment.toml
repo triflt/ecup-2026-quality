@@ -2,7 +2,7 @@
 id = "560"
 slug = "qwen35_flammable_hard_pairwise"
 title = "Qwen3.5 flammable batch-local hard-pair margin"
-status = "pair_manifest_ready_not_run"
+status = "rejected_screen"
 entrypoint = "experiments/560_qwen35_flammable_hard_pairwise/trainer.py"
 result_file = "experiments/560_qwen35_flammable_hard_pairwise/results/metrics.json"
 

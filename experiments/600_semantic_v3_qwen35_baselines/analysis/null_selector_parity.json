@@ -1,0 +1,16 @@
+{
+  "audit_version": "semantic_v3_qwen35_selector_null_parity_v1",
+  "decision": "PASS",
+  "folds": [
+    {"fold": 0, "original_exact": true, "original_records": 5390, "original_records_sha256": "077b88b578e787e54bab97fa288ea9906b1f4d6145190a8c9c429be510a91484", "specialist_exact": true, "specialist_records": 5390, "specialist_records_sha256": "113fca1ef3f84c43ad5aa39bb157e8e94264160b5e0c4cffa99801a1d8f531f6"},
+    {"fold": 1, "original_exact": true, "original_records": 5390, "original_records_sha256": "2b4575416fd51fedea6bf359428ed0528ef419f988c368d2b55a5bc24e37c8b0", "specialist_exact": true, "specialist_records": 5390, "specialist_records_sha256": "7de39019386399038f1d46b87456e28bc891462b065e25a2f0addefe542f0f26"},
+    {"fold": 2, "original_exact": true, "original_records": 5395, "original_records_sha256": "9ba5914ceb3e080b5bcb182777bee23fb1c70d710be7b63e14622dedbfa9988d", "specialist_exact": true, "specialist_records": 5395, "specialist_records_sha256": "39c2dce3ee6ae918fcd058aeb02498aac470963187383c7fb0c8ef22164897a3"},
+    {"fold": 3, "original_exact": true, "original_records": 5390, "original_records_sha256": "35d97a903cc68dd5c10aa6807f2d4603d6b8e350da2d567768e87b6580c0801b", "specialist_exact": true, "specialist_records": 5390, "specialist_records_sha256": "967f60f8c80218229e4f9fda37dd78cd9a37bd5746e084211b1b52253c4eff9d"},
+    {"fold": 4, "original_exact": true, "original_records": 5395, "original_records_sha256": "af7c27cc6893c96b5e9028d354bfab00d548944728f6abad4387e7bc2247f836", "specialist_exact": true, "specialist_records": 5395, "specialist_records_sha256": "3aa1fe85a1c4a6e9c472e65ba5aed9e093e35f13469262bed24e0d13c9e4e5f4"}
+  ],
+  "mode": "old_protocol_identity_projection",
+  "original_all_exact": true,
+  "scope_note": "This proves that identity projection itself preserves both selectors. It does not authorize old selector scores for semantic-family-v3.",
+  "seed": 42,
+  "specialist_all_exact": true
+}

@@ -1,7 +1,7 @@
 {
   "experiment_id": "560",
-  "status": "pair_manifest_ready_not_run",
-  "launched": false,
+  "status": "rejected_screen",
+  "launched": true,
   "manifest_decision": {
     "fold_0": "GO",
     "fold_3": "GO"
@@ -11,6 +11,32 @@
     "fold_3": 88
   },
   "null_control_passed": true,
-  "folds": {},
-  "note": "CPU manifests and evaluator null-control only; no GPU training or candidate inference was launched."
+  "artifact_sha256": {
+    "fold_0": "e5eb6ed1f739d82735eff0588d3a13c6f21f228c4184340af6df8571108e02e5",
+    "fold_3": "b871cfe73812a4e53dab46f627d9d1753997df247432a91a5cb34eb6979bdf43"
+  },
+  "folds": {
+    "0": {
+      "delta_macro_f1": -0.044290123456790065,
+      "delta_flammable_f1": -0.08858024691358024,
+      "corrected": 4,
+      "regressed": 11,
+      "flammable_false_negative_delta": 4,
+      "safety_false_negative_delta": -1
+    },
+    "3": {
+      "delta_macro_f1": -0.024070450097847362,
+      "delta_flammable_f1": -0.048140900195694614,
+      "corrected": 0,
+      "regressed": 3,
+      "flammable_false_negative_delta": 3,
+      "safety_false_negative_delta": 3
+    }
+  },
+  "mean_delta_macro_f1": -0.034180286777318714,
+  "corrected": 4,
+  "regressed": 14,
+  "screen_passed": false,
+  "full_five_fold_cycle_allowed": false,
+  "decision": "Rejected: both screen folds lost Macro F1 and flammable recall; no remaining-fold or weight/seed tuning is allowed."
 }

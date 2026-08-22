@@ -1,0 +1,36 @@
+{
+  "experiment_id": "601",
+  "status": "prepared_not_launched",
+  "training_launched": false,
+  "input_audit_status": "ready",
+  "input_audit_file": "analysis/input_audit.json",
+  "input_id_order_verified": true,
+  "development_sealed_id_overlap": 0,
+  "robust_base_status": "pending_strict_nested_v2_cpu_rerun",
+  "robust_base_required_protocol": "semantic_v3_robust_base_strict_nested_v2",
+  "invalidated_local_protocols": [
+    {
+      "protocol": "semantic_v3_robust_base_nested_v1",
+      "accepted": false,
+      "reason": "inner-validation text leaked into TF-IDF vocabulary and IDF"
+    }
+  ],
+  "qwen3vl_fold_status": {
+    "0": "not_launched",
+    "1": "not_launched",
+    "2": "not_launched",
+    "3": "not_launched",
+    "4": "not_launched"
+  },
+  "sealed_holdout_used": false,
+  "development_rows": 11118,
+  "sealed_rows": 1853,
+  "runtime_estimate": {
+    "robust_base_cpu_minutes": "25-75",
+    "qwen_gpu_jobs": 5,
+    "gpu_per_job": 1,
+    "qwen_minutes_per_job": "20-40",
+    "parallel_wall_minutes": "25-50",
+    "serial_gpu_hours": "1.7-3.4"
+  }
+}

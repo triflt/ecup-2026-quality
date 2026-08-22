@@ -1,0 +1,23 @@
+{
+  "experiment_id": "600",
+  "status": "prepared_blocked",
+  "launched": false,
+  "protocol": "semantic_family_v3",
+  "components": ["original", "specialist"],
+  "development_folds": [0, 1, 2, 3, 4],
+  "planned_jobs": 10,
+  "completed_jobs": 0,
+  "development_rows": 11118,
+  "sealed_holdout_rows": 1853,
+  "sealed_holdout_used": false,
+  "null_selector_parity": {
+    "original": "PASS_5_OF_5",
+    "specialist": "PASS_5_OF_5"
+  },
+  "blockers": [
+    "Frozen development-only selector-score NPZ and provenance are not available."
+  ],
+  "expected_gpu_hours": [6.0, 8.5],
+  "fold_results": {},
+  "decision": "NOT_RUN"
+}

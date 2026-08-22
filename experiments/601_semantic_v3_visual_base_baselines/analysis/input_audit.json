@@ -1,0 +1,60 @@
+{
+  "audit_version": "semantic_v3_visual_base_inputs_v1",
+  "status": "ready",
+  "folds_sha256": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+  "data_sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+  "first_manifest_sha256": "d6193215ce2d6145440bd484ea225e77fe10784c4c2c06b7c6b0b85dc8efc7d9",
+  "rows": 12971,
+  "development_rows": 11118,
+  "sealed_rows": 1853,
+  "development_fold_rows": {
+    "0": 2224,
+    "1": 2223,
+    "2": 2224,
+    "3": 2224,
+    "4": 2223
+  },
+  "development_sealed_id_overlap": 0,
+  "data_fold_id_category_label_mapping_verified": true,
+  "sealed_used_for_train_selector_threshold_eval": false,
+  "embeddings_are_fixed_label_blind_features": true,
+  "embedding_contracts": {
+    "all_images": {
+      "rows": 12971,
+      "dimension": 2048,
+      "stored_dtype": "float16",
+      "finite": true,
+      "min": -0.12384033203125,
+      "max": 0.171875,
+      "norm_min": 0.9998463988304138,
+      "norm_median": 0.9999998211860657,
+      "norm_max": 1.0001519918441772,
+      "zero_norm_rows": 0,
+      "additional_normalization_required": false,
+      "sha256": "de350949c0f17e93b842686bb471d446a637718dbc163e6c5c48eb6b36e6d96f"
+    },
+    "first_image": {
+      "rows": 12971,
+      "dimension": 2048,
+      "stored_dtype": "float16",
+      "finite": true,
+      "min": -0.134033203125,
+      "max": 0.14501953125,
+      "norm_min": 0.9998072385787964,
+      "norm_median": 0.9999997019767761,
+      "norm_max": 1.0001559257507324,
+      "zero_norm_rows": 0,
+      "additional_normalization_required": false,
+      "sha256": "a893f93d12f6b9c48e3f11be9a78a75b15227d5965b32efc46483ab7e59c7557"
+    }
+  },
+  "robust_base_reproducibility": {
+    "status": "reproducible_from_fixed_embeddings_and_raw_text",
+    "artifact_only_blocker": false,
+    "historical_entrypoint_sha256": {
+      "research/build_oof_cache.py": "72007cccca7010c2c8f70a0364d02f6ce307871212b72082241e3a1cad198804",
+      "research/four_head_fusion_cv.py": "8b3fe606daccf202cb132f16a836fc812ba94691c89b135ac79badb5c01d89bb"
+    },
+    "new_protocol": "outer semantic-v3 development fold; four remaining folds select four-head weights and threshold; empirical-CDF projection to outer fold"
+  }
+}

@@ -240,5 +240,7 @@ def test_experiment_card_keeps_inference_and_parent_recipe_locked() -> None:
     assert config["inference"]["images_per_row"] == 1
     assert config["inference"]["passes"] == 1
     assert config["execution"]["gpu_count"] == 1
-    assert config["execution"]["launch_authorized"] is True
+    assert config["execution"]["launch_authorized"] is False
+    assert config["experiment"]["status"] == "rejected_screen"
+    assert metrics["screen_passed"] is False
     assert metrics["training_launched"] is True

@@ -129,6 +129,12 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def engine_output_names(null_control: bool) -> tuple[str, str]:
+    if null_control:
+        return "null_screen_control", "null_screen_control"
+    return "screen_audit", "screen_predictions"
+
+
 def main() -> int:
     args = parse_args()
     supplied = {fold: path for fold, path in ((0, args.fold_0), (3, args.fold_3)) if path}
@@ -163,7 +169,7 @@ def main() -> int:
             argv.extend(["--output-dir", temporary])
             sys.argv = argv
             result = engine.main()
-            source_name = "null_screen_control" if args.null_control else "screen_audit"
+            source_name, source_npz_name = engine_output_names(args.null_control)
             report_path = Path(temporary) / f"{source_name}.json"
             report = json.loads(report_path.read_text(encoding="utf-8"))
             report.update(
@@ -185,7 +191,7 @@ def main() -> int:
                 json.dumps(report, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
             )
-            shutil.copyfile(Path(temporary) / f"{source_name}.npz", output_npz)
+            shutil.copyfile(Path(temporary) / f"{source_npz_name}.npz", output_npz)
     finally:
         sys.argv = previous_argv
     return result

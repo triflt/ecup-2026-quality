@@ -1,0 +1,76 @@
+[experiment]
+id = "601"
+slug = "semantic_v3_visual_base_baselines"
+title = "Semantic-v3 reproducible robust-base and Qwen3-VL baselines"
+status = "prepared_not_launched"
+entrypoint = "experiments/601_semantic_v3_visual_base_baselines/train_robust_base.py"
+result_file = "experiments/601_semantic_v3_visual_base_baselines/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+folds = "validation/semantic_family_v3/folds.csv"
+folds_sha256 = "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae"
+development_rows = 11118
+sealed_rows = 1853
+
+[validation]
+primary_version = "semantic_family_v3"
+development_folds = [0, 1, 2, 3, 4]
+sealed_holdout_excluded = true
+sealed_holdout_fold = -1
+primary_metric = "macro_f1"
+
+[robust_base]
+historical_parent = "080_four_head_ensemble"
+status = "reproducible"
+protocol_version = "semantic_v3_robust_base_strict_nested_v2"
+heads = ["tfidf_linear_svc", "all_image_linear_svc", "first_image_linear_svc", "all_image_extra_trees"]
+outer_protocol = "fit on four development folds, evaluate fifth"
+selector_protocol = "four-head weights and threshold selected only from inner OOF on outer training folds"
+inner_text_protocol = "fit vocabulary and IDF on each inner-train only; transform inner-validation"
+projection_protocol = "empirical CDF of inner-OOF raw scores"
+uses_fixed_label_blind_embeddings = true
+embedding_normalization = "preserve stored unit-normalized vectors"
+runtime_and_convergence_warnings = "fatal"
+nonfinite_features_coefficients_scores = "fatal"
+
+[qwen3vl]
+training_parent = "110_qwen3vl_lora"
+parent_runner_sha256 = "c30e690ad260af72fcc625c8d3e6d9ab9c5a096d8443d6d9f5f7adbcaa52123c"
+model = "Qwen/Qwen3-VL-2B-Instruct"
+seed = 42
+training_mode = "hard"
+first_image_max_edge = 448
+first_image_max_pixels = 262144
+inference_images = 1
+inference_passes = 1
+development_jobs = 5
+gpu_per_job = 1
+prompt = "byte-identical parent"
+selector = "byte-identical parent, supplied only development robust-base OOF"
+
+[outputs]
+robust_base = "robust_base_semantic_v3.npz"
+qwen_fold_predictions = "lora_holdout_predictions.csv"
+component_bundle = "semantic_v3_visual_base_components.npz"
+sealed_rows_allowed = 0
+
+[runtime_estimate]
+robust_base_cpu_minutes_min = 25
+robust_base_cpu_minutes_max = 75
+qwen_gpu_jobs = 5
+qwen_gpu_minutes_per_job_min = 20
+qwen_gpu_minutes_per_job_max = 40
+qwen_parallel_wall_minutes_min = 25
+qwen_parallel_wall_minutes_max = 50
+qwen_serial_gpu_hours_min = 1.7
+qwen_serial_gpu_hours_max = 3.4
+
+[execution]
+launch_authorized = false
+commit_authorized = false
+private_runtime_presets = "experiments/601_semantic_v3_visual_base_baselines/.local/runtime"
+
+[artifacts]
+directory = "artifacts"
+publish = false

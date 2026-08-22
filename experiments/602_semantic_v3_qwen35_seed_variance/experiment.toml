@@ -1,0 +1,75 @@
+[experiment]
+id = "602"
+slug = "semantic_v3_qwen35_seed_variance"
+title = "Semantic-family-v3 independent Qwen3.5 seed variance"
+status = "prepared_blocked"
+entrypoint = "experiments/602_semantic_v3_qwen35_seed_variance/train_seed.py"
+result_file = "experiments/602_semantic_v3_qwen35_seed_variance/results/metrics.json"
+
+[dependency]
+experiment_id = "600"
+kind = "strict_development_only_input_wrapper"
+interface = "prepare_development_inputs + frozen semantic_family_v3"
+runtime_inputs = "experiments/600_semantic_v3_qwen35_baselines/.local/runtime_inputs_strict_v2"
+raw_inputs_duplicated = false
+
+[data]
+version = "competition_train_v1"
+development_rows = 11118
+sealed_holdout_rows = 1853
+
+[validation]
+protocol = "semantic_family_v3"
+folds = "validation/semantic_family_v3/folds.csv"
+folds_sha256 = "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae"
+development_folds = [0, 1, 2, 3, 4]
+sealed_holdout_used_for_training = false
+sealed_holdout_used_for_selection = false
+sealed_holdout_used_for_thresholds = false
+sealed_holdout_used_for_evaluation = false
+
+[training]
+parent_experiment = "190"
+model = "Qwen3.5-4B"
+parent_recipe = "exact_original_190_except_seed"
+seeds = [42, 31415, 271828, 161803]
+reference_seed = 42
+new_seeds = [31415, 271828, 161803]
+epochs = 1
+batch_size = 4
+gradient_accumulation = 4
+learning_rate = 0.0002
+training_mode = "hard"
+teacher = false
+pseudo_labels = false
+full_train = false
+
+[ensemble]
+type = "fixed_arithmetic_probability_mean"
+weights = [0.25, 0.25, 0.25, 0.25]
+weight_tuning = false
+threshold_tuning = "strictly_nested_per_category_per_outer_fold_only"
+
+[acceptance]
+macro_delta_at_least = 0.003
+fold_wins_at_least = 4
+maximum_category_drop = 0.005
+component_bootstrap_positive_at_least = 0.90
+corrected_to_regressed_at_least = 1.5
+
+[execution]
+reference_seed_source = "600 original seed42"
+new_seed_jobs = 15
+gpu_per_job = 1
+launch_authorized = false
+blocked_on = "experiment 600 seed42 OOF outputs and frozen development-only selector inputs"
+
+[budget]
+expected_gpu_hours_min = 9.0
+expected_gpu_hours_max = 12.5
+expected_parallel_wall_minutes_min = 45
+expected_parallel_wall_minutes_max = 80
+
+[artifacts]
+directory = "artifacts"
+publish = false

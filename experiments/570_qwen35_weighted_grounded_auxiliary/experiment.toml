@@ -2,7 +2,7 @@
 id = "570"
 slug = "qwen35_weighted_grounded_auxiliary"
 title = "Qwen3.5 weighted grounded auxiliary SFT"
-status = "running_two_fold_screen"
+status = "rejected_screen"
 entrypoint = "experiments/570_qwen35_weighted_grounded_auxiliary/trainer.py"
 result_file = "experiments/570_qwen35_weighted_grounded_auxiliary/results/metrics.json"
 

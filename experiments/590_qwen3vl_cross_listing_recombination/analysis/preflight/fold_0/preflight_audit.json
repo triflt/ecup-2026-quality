@@ -1,0 +1,64 @@
+{
+  "blind_audit": {
+    "cohen_kappa": null,
+    "decision": "NO_GO",
+    "forbidden_edge_count": 0,
+    "kappa_defined": false,
+    "raw_agreement": null,
+    "reason": "two blinded reviewer decisions are not available",
+    "required_cohen_kappa_if_defined": 0.8,
+    "required_pairs": 300,
+    "required_same_product_precision": 0.98,
+    "reviewed_pairs": 0,
+    "same_product_precision": null
+  },
+  "blind_sample_sha256": "2c59ff114cfe6aaf8b6566bf392507d915b34e181579f84d51a7852a97d4bf15",
+  "candidate_record_multiset_sha256": "78cb5ea0db5c1065aec32c67c06a0e5ae40f9a322c0ceda53fbe71c1e4e05b9d",
+  "cross_category_pairs": 0,
+  "cross_label_pairs": 0,
+  "data_sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+  "decision": "NO_GO",
+  "eligible_components": 986,
+  "eligible_pairs": 4773,
+  "eligible_repeated_occurrences": 140,
+  "experiment_id": "590",
+  "failures": [
+    "blind_audit_not_approved"
+  ],
+  "forbidden_stage_pairs": 0,
+  "generic_provenance_pairs": 0,
+  "high_degree_pairs": 0,
+  "holdout_fold": 0,
+  "manifest_sha256": "b4c387fe65eaf7300f15265f287af4db13859be103ca3cbdac43be92b7acd393",
+  "mixed_label_component_pairs": 0,
+  "oof_sha256": "d78bb7df897e244e030fa388e1b9c770d15434cc33aa1f56b238c7d057646116",
+  "outer_validation_pairs": 0,
+  "parent_record_multiset_sha256": "78cb5ea0db5c1065aec32c67c06a0e5ae40f9a322c0ceda53fbe71c1e4e05b9d",
+  "parent_training_records": 5390,
+  "provenance": {
+    "allowed_stages": [
+      "exact_first_image",
+      "exact_full_text",
+      "exact_name_corroborated"
+    ],
+    "draft_edges_sha256": "4b373931cc97d4a0d07c5c3c066ee9551e40f9c2081efd5eeb75fe7d97c74e6a",
+    "draft_manifest_sha256": "3f547396416365c46b952573365bb7011cdb819af3abb5d351b31793f8bdae24",
+    "forbidden_stages": [
+      "exact_auxiliary_images",
+      "masked_name_corroborated",
+      "perceptual_corroborated"
+    ],
+    "maximum_key_degree": 32,
+    "mixed_label_components_excluded": 47,
+    "sealed_folds_sha256": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+    "sealed_manifest_sha256": "cc19d83adcae0b8559c8ddb3c3529992d7d742a94bb42500c65054b80ce44333",
+    "strong_pairs": 5841
+  },
+  "recombined_fraction_of_repeats": 0.25,
+  "recombined_occurrences": 35,
+  "record_multiset_unchanged": true,
+  "record_order_unchanged": true,
+  "sealed_holdout_pairs": 0,
+  "steps_unchanged": true,
+  "text_prompt_labels_weights_unchanged": true
+}

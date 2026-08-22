@@ -1,8 +1,8 @@
 {
   "experiment_id": "580",
-  "status": "running_two_fold_screen",
+  "status": "rejected_screen",
   "training_launched": true,
-  "decision": "label_blind_audit_passed_screen_running",
+  "decision": "rejected_two_fold_screen",
   "label_blind_gallery_audit": {
     "status": "go_for_two_fold_screen",
     "rows": 12971,
@@ -21,7 +21,33 @@
     "mean_macro_f1_delta": 0.0,
     "artifact": "experiments/580_qwen3vl_multiview_train_aug/.local/null_control/null_screen_control.json"
   },
-  "folds": {},
-  "mean_screen_delta_macro_f1": null,
-  "screen_passed": null
+  "artifact_sha256": {
+    "fold_0": "82b8b1b6185db98d01c97460e4866ba61c47f7dac4765bec49cb546715b14600",
+    "fold_3": "485b9472a267e1dcdda3eec1eea7aceee4d2bbee287df2af315338a35c769397"
+  },
+  "folds": {
+    "0": {
+      "delta_macro_f1": -0.04341072615691299,
+      "delta_bad_f1": 0.00009212793308743805,
+      "delta_flammable_f1": -0.08691358024691354,
+      "corrected": 15,
+      "regressed": 21,
+      "flammable_false_negative_delta": 6,
+      "safety_false_negative_delta": 1
+    },
+    "3": {
+      "delta_macro_f1": -0.013065338780911318,
+      "delta_bad_f1": -0.002751682128032895,
+      "delta_flammable_f1": -0.02337899543378985,
+      "corrected": 5,
+      "regressed": 13,
+      "flammable_false_negative_delta": 0,
+      "safety_false_negative_delta": 0
+    }
+  },
+  "mean_screen_delta_macro_f1": -0.028238032468912155,
+  "corrected": 20,
+  "regressed": 34,
+  "screen_passed": false,
+  "full_five_fold_cycle_allowed": false
 }

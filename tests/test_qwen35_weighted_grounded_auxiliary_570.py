@@ -214,6 +214,16 @@ def test_exp570_screen_report_requires_weighted_and_frozen_parent_contracts(
         screen.validate_report(predictions, 0)
 
 
+def test_exp570_copies_the_actual_engine_npz_name() -> None:
+    screen = _load_module("_exp570_screen_output_names", EXPERIMENT / "evaluate_screen.py")
+
+    assert screen.engine_output_names(False) == ("screen_audit", "screen_predictions")
+    assert screen.engine_output_names(True) == (
+        "null_screen_control",
+        "null_screen_control",
+    )
+
+
 def test_exp570_private_presets_are_single_gpu_and_have_neutral_job_names() -> None:
     for fold in (0, 3):
         text = (EXPERIMENT / f".local/runtime/fold{fold}.yml").read_text()

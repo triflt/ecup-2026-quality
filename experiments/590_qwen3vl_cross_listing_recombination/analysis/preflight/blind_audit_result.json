@@ -1,0 +1,18 @@
+{
+  "experiment_id": "590",
+  "sample_pairs": 300,
+  "reviewers": 2,
+  "reviewed_pairs": 300,
+  "reviewer_a_accepts": 292,
+  "reviewer_b_accepts": 292,
+  "same_product_precision": 0.9733333333333334,
+  "raw_agreement": 1.0,
+  "cohen_kappa": 1.0,
+  "decision": "NO_GO",
+  "reason": "strict same-product precision is below 0.98",
+  "rejects": {
+    "quantity_or_variant": ["R090", "R103", "R158", "R176", "R289"],
+    "different_or_ambiguous_product": ["R096", "R113", "R259"]
+  },
+  "review_protocol": "Two separate strict passes over the frozen label-blind sample; no gold labels or downstream scores were consulted. Exact first-image duplicates were checked against names and descriptions for quantity, variant, and product contradictions."
+}
