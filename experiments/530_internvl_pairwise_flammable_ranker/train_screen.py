@@ -392,7 +392,7 @@ def main() -> None:
     if microbatch_index // GRADIENT_ACCUMULATION != OPTIMIZER_UPDATES:
         raise RuntimeError("locked optimizer update count was not reached")
 
-    scoring = selector.loc[score_ids].reset_index()
+    scoring = selector.loc[score_ids].reset_index(drop=True)
     raw_scores = score_frame(
         model=model,
         tokenizer=tokenizer,

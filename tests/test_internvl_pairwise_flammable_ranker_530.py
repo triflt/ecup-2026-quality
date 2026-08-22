@@ -363,6 +363,7 @@ def test_training_report_and_source_lock_exact_recipe(tmp_path: Path) -> None:
     assert "use_rslora=True" in source
     assert "row_field(row, 'name')" in source
     assert 'selector.set_index("id", drop=False)' in source
+    assert "selector.loc[score_ids].reset_index(drop=True)" in source
     assert "OPTIMIZER_UPDATES * GRADIENT_ACCUMULATION" in source
     assert 'choices=("manifest",)' in source
     assert "--images-zip" not in source

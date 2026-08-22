@@ -217,7 +217,7 @@ def test_context_report_proves_parent_recipe_and_pack_audit(tmp_path: Path) -> N
         evaluator.validate_context_report(report_path, fold=0)
 
 
-def test_null_control_and_experiment_card_are_frozen_not_run() -> None:
+def test_null_control_and_experiment_card_record_completed_screen() -> None:
     config = tomllib.loads((EXPERIMENT / "experiment.toml").read_text())
     metrics = json.loads((EXPERIMENT / "results/metrics.json").read_text())
     null = json.loads((EXPERIMENT / "analysis/null_screen_control_audit.json").read_text())
@@ -227,8 +227,10 @@ def test_null_control_and_experiment_card_are_frozen_not_run() -> None:
     assert config["packing"]["uses_gold_label"] is False
     assert config["packing"]["uses_model_prediction"] is False
     assert config["packing"]["allows_invented_chars"] is False
-    assert config["execution"]["launch_authorized"] is False
-    assert metrics["launched"] is False
+    assert config["execution"]["launch_authorized"] is True
+    assert metrics["launched"] is True
+    assert metrics["screen_passed"] is False
+    assert metrics["decision"] == "REJECT"
     assert null["null_control_passed"] is True
     assert null["mean_screen_delta_macro_f1"] == 0.0
     assert null["bad_changed_predictions"] == 0

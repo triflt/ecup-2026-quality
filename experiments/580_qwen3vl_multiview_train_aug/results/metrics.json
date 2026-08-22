@@ -1,0 +1,27 @@
+{
+  "experiment_id": "580",
+  "status": "running_two_fold_screen",
+  "training_launched": true,
+  "decision": "label_blind_audit_passed_screen_running",
+  "label_blind_gallery_audit": {
+    "status": "go_for_two_fold_screen",
+    "rows": 12971,
+    "images": 49456,
+    "multi_image_rows": 11171,
+    "multi_image_fraction": 0.8612288952278159,
+    "decode_failures": 0,
+    "deterministic_plan_failures": 0,
+    "gallery_cycle_coverage_failures": 0,
+    "first_image_null_byte_mismatches": 0,
+    "artifact": "experiments/580_qwen3vl_multiview_train_aug/analysis/label_blind_gallery_audit_v1.json"
+  },
+  "route400_null_control": {
+    "passed": true,
+    "changed_predictions": 0,
+    "mean_macro_f1_delta": 0.0,
+    "artifact": "experiments/580_qwen3vl_multiview_train_aug/.local/null_control/null_screen_control.json"
+  },
+  "folds": {},
+  "mean_screen_delta_macro_f1": null,
+  "screen_passed": null
+}

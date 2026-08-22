@@ -2,7 +2,7 @@
 id = "550"
 slug = "qwen35_evidence_preserving_context_pack"
 title = "Qwen3.5 evidence-preserving description packing"
-status = "audit_go_not_launched"
+status = "rejected_at_screen"
 entrypoint = "experiments/550_qwen35_evidence_preserving_context_pack/train_screen.py"
 result_file = "experiments/550_qwen35_evidence_preserving_context_pack/results/metrics.json"
 
@@ -81,7 +81,7 @@ require_each_fold_connected_safe_delta_positive = true
 bad_predictions_must_be_identical = true
 
 [execution]
-launch_authorized = false
+launch_authorized = true
 screen_evaluator = "experiments/550_qwen35_evidence_preserving_context_pack/evaluate_screen.py"
 
 [artifacts]

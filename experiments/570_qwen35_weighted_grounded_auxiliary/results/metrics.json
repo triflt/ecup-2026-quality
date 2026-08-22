@@ -1,0 +1,19 @@
+{
+  "experiment_id": "570",
+  "status": "running_two_fold_screen",
+  "launched": true,
+  "training_parent": "520_qwen35_grounded_auxiliary_sft",
+  "parent_screen_mean_delta_macro_f1": -0.03434412542799947,
+  "changed_factor": {
+    "first_atomic_verdict_weight": 1.0,
+    "subsequent_evidence_token_weight": 0.05
+  },
+  "screen_folds": [0, 3],
+  "implementation_null_control_passed": true,
+  "route400_null_control_launched": false,
+  "folds": {},
+  "mean_screen_delta_macro_f1": null,
+  "screen_passed": null,
+  "decision": "PENDING_SCREEN",
+  "note": "Folds 0 and 3 launched after tests, preset lint and implementation null-control."
+}

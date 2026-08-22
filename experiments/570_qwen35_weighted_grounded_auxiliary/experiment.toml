@@ -1,0 +1,94 @@
+[experiment]
+id = "570"
+slug = "qwen35_weighted_grounded_auxiliary"
+title = "Qwen3.5 weighted grounded auxiliary SFT"
+status = "running_two_fold_screen"
+entrypoint = "experiments/570_qwen35_weighted_grounded_auxiliary/trainer.py"
+result_file = "experiments/570_qwen35_weighted_grounded_auxiliary/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+training_parent = "520_qwen35_grounded_auxiliary_sft"
+prediction_parent = "400_qwen35_category_routed_adapters"
+screen_folds = [0, 3]
+primary_metric = "macro_f1"
+inference_passes = 1
+evaluator = "qwen35_weighted_grounded_route400_screen_v1"
+
+[hypothesis]
+changed_factor = "Reduce CE weight of every supervised token after the first atomic verdict from 1.0 to 0.05"
+mechanism = "Keep grounded evidence as a weak attention-shaping auxiliary signal while preventing the long structured suffix from dominating the verdict gradient"
+falsification = "Reject if either fold is non-positive, mean delta is below 0.001, flammable or safety-union false negatives increase, or any runtime/null-control contract fails"
+teacher_model = false
+hyperparameter_grid = false
+
+[target]
+format_version = "grounded_auxiliary_target_v1"
+lines = 6
+first_line = "atomic 0 or 1"
+fields = ["CONCEPT", "SOURCE", "START", "END", "EVIDENCE"]
+fallback_concept = "NO_SAFE_EVIDENCE"
+target_identical_to_experiment_520 = true
+prompt_identical_to_experiment_520 = true
+
+[loss]
+contract_version = "weighted_grounded_auxiliary_loss_v1"
+normalization = "sum_active_token_weights"
+first_atomic_verdict_weight = 1.0
+all_subsequent_supervised_token_weight = 0.05
+exact_unit_weight_null_control_required = true
+tuned = false
+
+[training]
+parent_entrypoint = "research/qwen35_bad_family_diverse_positives_lora.py"
+model = "Qwen3.5-4B"
+training_mode = "hard"
+model_class = "multimodal"
+family_balance_flammable = false
+family_diverse_bad_positives = true
+family_diverse_flammable_negatives = false
+epochs = 1
+batch_size = 4
+gradient_accumulation = 4
+learning_rate = 0.0002
+seed = 42
+changes_training_records = false
+changes_record_multiset = false
+changes_steps = false
+changes_images = false
+changes_inference = false
+
+[runtime_audit]
+expected_training_occurrences = 5390
+require_one_verdict_token_per_occurrence = true
+require_fixed_evidence_weight = true
+require_zero_weight_on_unsupervised_tokens = true
+require_exact_null_control = true
+require_frozen_target_plan_hash = true
+require_frozen_record_multiset_hash = true
+
+[acceptance.screen]
+folds = [0, 3]
+require_each_macro_delta_positive = true
+required_mean_macro_delta = 0.001
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+require_first_token_valid_rate = 1.0
+require_exact_evidence_rate_on_well_formed = 1.0
+
+[budget]
+planned_gpu_hours = 2.5
+planned_public_submissions = 0
+
+[execution]
+arguments = []
+full_train_allowed = false
+teacher_required = false
+screen_only_folds = [0, 3]
+
+[artifacts]
+directory = "artifacts"
+publish = false

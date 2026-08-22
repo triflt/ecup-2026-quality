@@ -1,0 +1,85 @@
+[experiment]
+id = "580"
+slug = "qwen3vl_multiview_train_aug"
+title = "Qwen3-VL deterministic single-gallery-view training augmentation"
+status = "running_two_fold_screen"
+entrypoint = "experiments/580_qwen3vl_multiview_train_aug/train_screen.py"
+result_file = "experiments/580_qwen3vl_multiview_train_aug/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+gallery_manifest = "research/multi_image_manifest.tsv.gz"
+images_archive_sha256 = "9ff051272e9ee1b08d6d05939470ebc7006403f4647c546b29647efb03837edc"
+
+[validation]
+primary_version = "qwen3vl_multiview_train_aug_two_fold_screen_v1"
+baseline = "400_qwen35_category_routed_adapters"
+training_parent = "110_qwen3vl_lora"
+selection_guard = "connected_family_guard_v2"
+folds = "validation/grouped_text_v1/folds.csv"
+screen_folds = [0, 3]
+reject_only = true
+primary_metric = "macro_f1"
+
+[hypothesis]
+changed_factor = "At training only, replace the first image by one deterministic real gallery image chosen from seed, epoch and occurrence"
+mechanism = "Repeated product presentations cycle through distinct real packaging views while the number of examples, optimizer updates and inference cost remain unchanged"
+falsification = "Reject if either fold is non-positive, mean delta is below 0.001, flammable or safety false negatives increase, corrected does not exceed regressed, or the label-blind gallery audit fails"
+uses_teacher = false
+uses_pseudo_labels = false
+
+[training]
+model = "Qwen/Qwen3-VL-2B-Instruct"
+seed = 42
+epochs = 1
+training_mode = "hard"
+training_view_policy = "deterministic_single_gallery_view_v1"
+images_per_occurrence = 1
+first_image_max_edge = 448
+first_image_max_pixels = 262144
+learning_rate = 0.0002
+weight_decay = 0.01
+batch_size = 4
+gradient_accumulation = 4
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+prompt = "byte-identical training parent"
+selector = "byte-identical training parent"
+steps = "byte-identical training parent"
+weights = "byte-identical training parent"
+
+[inference]
+view_policy = "first_image_only_v1"
+image_index = 0
+images_per_row = 1
+max_edge = 448
+max_pixels = 262144
+passes = 1
+tta = false
+
+[preflight.gallery_audit]
+required = true
+label_blind = true
+required_decode_failures = 0
+required_deterministic_plan_failures = 0
+required_cycle_coverage_failures = 0
+required_first_image_null_byte_mismatches = 0
+
+[acceptance.screen]
+folds = [0, 3]
+required_each_fold_delta_positive = true
+required_mean_macro_f1_delta = 0.001
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+required_corrected_exceeds_regressed = true
+
+[execution]
+gpu_count = 1
+launch_authorized = true
+screen_evaluator = "experiments/580_qwen3vl_multiview_train_aug/evaluate_screen.py"
+
+[artifacts]
+directory = "artifacts"
+publish = false
