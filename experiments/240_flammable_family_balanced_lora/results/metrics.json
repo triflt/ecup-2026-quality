@@ -1,0 +1,46 @@
+{
+  "experiment_id": "240",
+  "status": "inconclusive_output_not_retained",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "seed": 42,
+  "changed_factor": "coupled family-balanced positive flammable sampling and changed random negative half",
+  "primary_comparison": "family_balanced_seed42 + fixed_seed31415 mean probability",
+  "baseline_macro_f1": 0.9192367220630797,
+  "implementation_audit": {
+    "intended_single_factor": false,
+    "changed_negative_rows_range_per_fold": [587, 625],
+    "causal_followup": "241_flammable_family_balanced_isolated"
+  },
+  "validation": {
+    "bad_f1": null,
+    "flammable_f1": null,
+    "macro_f1": null,
+    "fold_scores": [
+      {"fold": 0, "standalone_bad_f1": 0.9444197421, "standalone_flammable_f1": 0.8941176471},
+      {"fold": 1, "standalone_bad_f1": 0.9420097388, "standalone_flammable_f1": 0.875},
+      {"fold": 2, "standalone_bad_f1": 0.9518668466, "standalone_flammable_f1": 0.9210526316},
+      {"fold": 3, "standalone_bad_f1": 0.9457858770, "standalone_flammable_f1": 0.8915662651},
+      {"fold": 4, "standalone_bad_f1": 0.9457504521, "standalone_flammable_f1": 0.9382716049}
+    ],
+    "warning": "standalone fold thresholds are diagnostic; nested primary metrics cannot be reconstructed without per-row predictions"
+  },
+  "runtime": {},
+  "reproducibility": {
+    "job": "redacted-job",
+    "hardware": "one H100",
+    "training_code_sha256": "f9f508757458c6e6efa38f5e1f12913bdbf1db3acedc3b5ffbbcda3cc5234cf3",
+    "cycle_code_sha256": "d35135e9bc95cd8ed48220c574a39598839494e602e5166736d426d3948ff008",
+    "oof_input_sha256": "5d7467c48fc8a5a73f947f5aa1300071c77ba699b29c12250caf1bcd3176d7ac",
+    "image_manifest_sha256": "d6193215ce2d6145440bd484ea225e77fe10784c4c2c06b7c6b0b85dc8efc7d9"
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/remote_job_redacted-job/qwen_family_balanced.zip",
+      "sha256": "8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85",
+      "bytes": 22,
+      "contents": "empty zip caused by non-recursive output mask"
+    }
+  ],
+  "decision": "inconclusive; do not repeat because the data change is coupled and experiment 241 is the isolated follow-up"
+}

@@ -8,8 +8,14 @@ import time
 from pathlib import Path
 
 import torch
+import torch.nn.functional as F
 from PIL import Image
-from transformers import AutoModelForImageTextToText, AutoModelForMultimodalLM, AutoProcessor
+import transformers
+
+
+AutoModelForImageTextToText = transformers.AutoModelForImageTextToText
+AutoModelForMultimodalLM = getattr(transformers, "AutoModelForMultimodalLM", None)
+AutoProcessor = transformers.AutoProcessor
 
 
 MODEL = Path(os.environ.get("MODEL_PATH", "/hf_models"))
@@ -34,6 +40,12 @@ def encode(processor, messages, add_generation_prompt):
         return_dict=True,
         return_tensors="pt",
     )
+    downsample_mode = os.environ.get("DOWNSAMPLE_MODE", "").strip()
+    if downsample_mode:
+        kwargs["downsample_mode"] = downsample_mode
+    max_slice_nums = int(os.environ.get("MAX_SLICE_NUMS", "0"))
+    if max_slice_nums:
+        kwargs["max_slice_nums"] = max_slice_nums
     try:
         return processor.apply_chat_template(messages, enable_thinking=False, **kwargs)
     except TypeError:
@@ -49,6 +61,11 @@ def main():
         processor_kwargs.update(min_pixels=4 * 28 * 28, max_pixels=262144)
     processor = AutoProcessor.from_pretrained(MODEL, **processor_kwargs)
     loader = AutoModelForMultimodalLM if MODEL_CLASS == "multimodal" else AutoModelForImageTextToText
+    if loader is None:
+        raise ValueError(
+            f"Transformers {transformers.__version__} does not expose the "
+            f"requested MODEL_CLASS={MODEL_CLASS} auto model"
+        )
     started = time.monotonic()
     model = loader.from_pretrained(
         MODEL,
@@ -116,19 +133,48 @@ def main():
             f"assistant suffix alignment failed: common={common} "
             f"prompt={len(prompt_ids)} full={len(full_ids)}"
         )
-    labels = torch.full_like(full["input_ids"], -100)
-    positions = torch.nonzero(full["attention_mask"][0]).flatten()
-    labels[0, positions[common:]] = full["input_ids"][0, positions[common:]]
-    full["labels"] = labels
-    full = {key: value.to("cuda") if hasattr(value, "to") else value for key, value in full.items()}
-    output = model(**full)
-    output.loss.backward()
+    soft_target_value = os.environ.get("SOFT_TARGET", "").strip()
+    if soft_target_value:
+        model_input = prompt
+    else:
+        labels = torch.full_like(full["input_ids"], -100)
+        positions = torch.nonzero(full["attention_mask"][0]).flatten()
+        labels[0, positions[common:]] = full["input_ids"][0, positions[common:]]
+        full["labels"] = labels
+        model_input = full
+    model_input = {
+        key: value.to("cuda") if hasattr(value, "to") else value
+        for key, value in model_input.items()
+    }
+    forward_kwargs = {}
+    if os.environ.get("DOWNSAMPLE_MODE", "").strip():
+        forward_kwargs["downsample_mode"] = os.environ["DOWNSAMPLE_MODE"].strip()
+    output = model(**model_input, **forward_kwargs)
+    if soft_target_value:
+        token_zero_ids = processor.tokenizer.encode("0", add_special_tokens=False)
+        token_one_ids = processor.tokenizer.encode("1", add_special_tokens=False)
+        if len(token_zero_ids) != 1 or len(token_one_ids) != 1:
+            raise ValueError(f"digit tokens are not atomic: {token_zero_ids}, {token_one_ids}")
+        sequence = torch.arange(
+            model_input["attention_mask"].shape[1], device="cuda"
+        )[None, :]
+        last = torch.where(
+            model_input["attention_mask"].bool(), sequence, -1
+        ).max(dim=1).values
+        logits = output.logits[torch.arange(1, device="cuda"), last]
+        binary_logit = logits[:, token_one_ids[0]].float() - logits[:, token_zero_ids[0]].float()
+        target = torch.tensor([float(soft_target_value)], device="cuda")
+        loss = F.binary_cross_entropy_with_logits(binary_logit, target)
+    else:
+        loss = output.loss
+    loss.backward()
     gradients = [p.grad for p in trainable if p.grad is not None]
     print(json.dumps({
         "prompt_tokens": len(prompt_ids),
         "full_tokens": len(full_ids),
         "answer_decoded": processor.tokenizer.decode(full_ids[common:].tolist()),
-        "loss": float(output.loss.detach().cpu()),
+        "loss": float(loss.detach().cpu()),
+        "soft_target": float(soft_target_value) if soft_target_value else None,
         "grad_tensors": len(gradients),
         "grad_norm": float(torch.sqrt(sum((g.float() ** 2).sum() for g in gradients)).cpu()),
         "max_cuda_gib": torch.cuda.max_memory_allocated() / 1024**3,

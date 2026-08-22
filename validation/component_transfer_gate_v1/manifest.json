@@ -1,0 +1,39 @@
+{
+  "version": "component_transfer_gate_v1",
+  "dataset_version": "competition_train_v1",
+  "created_after_public_experiment": "280_bad_family_diverse_public190",
+  "parent_evaluation": "locked_190_nested_v1",
+  "purpose": "Reduce repeated-selection and hidden-shift risk before promoting a learned component to Public",
+  "scope": "Applied only after a candidate completes all five frozen grouped outer folds",
+  "primary_evidence": {
+    "minimum_macro_f1_delta": 0.003,
+    "required_fold_wins": 4,
+    "maximum_category_f1_drop": 0.005,
+    "minimum_group_bootstrap_probability_positive": 0.9
+  },
+  "downstream_replay": {
+    "required": true,
+    "stack": ["exact", "normalized-name", "numeric-family", "rare-shingle"],
+    "minimum_change_survival_rate": 0.8,
+    "require_positive_macro_delta_after_priors": true
+  },
+  "stochastic_repeat": {
+    "required_before_production_promotion": true,
+    "folds": ["best primary-seed fold", "worst primary-seed fold"],
+    "seed": 31415,
+    "acceptance": "Positive mean delta across the two repeated folds and no category drop over 0.005"
+  },
+  "runtime": {
+    "public_limit_minutes": 20,
+    "target_public_minutes_with_reserve": 16,
+    "private_limit_minutes": 40,
+    "target_private_minutes_with_reserve": 32
+  },
+  "rationale": [
+    "Experiment 230 improved five-fold nested validation but degraded on Public.",
+    "Experiment 280 changed one adapter, improved locked validation on four of five folds, but tied Public.",
+    "A new model family must therefore survive both downstream decision rules and a predeclared stochastic repeat before production promotion."
+  ],
+  "limitations": "This gate reduces known risks but cannot reproduce the hidden product distribution or guarantee a Public improvement.",
+  "immutable": true
+}

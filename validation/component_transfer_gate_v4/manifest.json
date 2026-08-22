@@ -1,0 +1,45 @@
+{
+  "version": "component_transfer_gate_v4",
+  "dataset_version": "competition_train_v1",
+  "created_before_experiment_320_training": true,
+  "parent": "component_transfer_gate_v3",
+  "purpose": "Preserve every v3 transfer requirement while making stability-protocol applicability and decision integrity fail-closed",
+  "inherits_without_change": {
+    "historical_comparability_gate": "component_transfer_gate_v3.inherits_without_change.historical_comparability_gate",
+    "connected_safe_gate": "component_transfer_gate_v3.inherits_without_change.connected_safe_gate",
+    "topology_repeat_gate": "component_transfer_gate_v3.inherits_without_change.topology_repeat_gate",
+    "downstream_replay": "component_transfer_gate_v3.inherits_without_change.downstream_replay",
+    "runtime": "component_transfer_gate_v3.inherits_without_change.runtime",
+    "production_promotion": "component_transfer_gate_v3.production_promotion"
+  },
+  "model_stability": {
+    "applicability_discriminator": "estimator_randomness",
+    "exactly_one_protocol_required": true,
+    "protocols": {
+      "stochastic": {
+        "required_when": "estimator has a stochastic training path",
+        "protocol": "Use the component_transfer_gate_v2 stochastic seed-31415 repeat on the best and worst primary-seed folds"
+      },
+      "deterministic": {
+        "required_when": "estimator is deterministic for fixed data and hyperparameters",
+        "protocol": "Refit the best and worst historical folds after a seed-31415 donor-row permutation; selected hyperparameters stay fixed",
+        "acceptance": {
+          "reference_prediction_mismatches": 0,
+          "positive_mean_full_delta": true,
+          "positive_mean_connected_safe_delta": true,
+          "maximum_category_f1_drop": 0.005
+        }
+      }
+    },
+    "experiment_320_assignment": {
+      "estimator": "Ridge with lsqr solver",
+      "estimator_randomness": "deterministic",
+      "required_protocol": "deterministic"
+    }
+  },
+  "decision_integrity": {
+    "post310_branch": "Recompute the complete decision from the four canonical SHA-bound audit files and require exact JSON equality before experiment 320 starts",
+    "experiment_320_offline_gate": "Require the exact frozen boolean gate allowlist and semantic equality between residual historical scores and downstream-prior input scores"
+  },
+  "immutable": true
+}

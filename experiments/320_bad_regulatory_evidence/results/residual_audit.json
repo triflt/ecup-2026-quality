@@ -1,0 +1,2584 @@
+{
+  "experiment_id": "320",
+  "evaluation_version": "component_transfer_gate_v4",
+  "recipe_frozen_before_310_result": true,
+  "model": "family-weighted linear ridge residual",
+  "ridge_alphas": [
+    10.0,
+    100.0,
+    1000.0
+  ],
+  "residual_weights": [
+    0.1,
+    0.2,
+    0.35
+  ],
+  "residual_clip": 0.25,
+  "production_threshold": 0.27193570137023926,
+  "historical_locked_thresholds": [
+    0.27193570137023926,
+    0.2720194160938263
+  ],
+  "candidate_specific_threshold_tuning": false,
+  "production_refit_rule": "Use the modal (ridge_alpha, residual_weight) selected independently by the five nested inner-fold searches; ties prefer larger ridge_alpha then smaller residual_weight. Do not use outer scores.",
+  "feature_count": 35,
+  "feature_names": [
+    "locked_score",
+    "locked_uncertainty",
+    "name_sports_nutrition",
+    "description_sports_nutrition",
+    "count_sports_nutrition",
+    "sports_nutrition",
+    "name_explicit_bad",
+    "description_explicit_bad",
+    "count_explicit_bad",
+    "explicit_bad",
+    "name_medicine_language",
+    "description_medicine_language",
+    "count_medicine_language",
+    "medicine_language",
+    "name_dosage_form",
+    "description_dosage_form",
+    "count_dosage_form",
+    "dosage_form",
+    "name_food_beverage",
+    "description_food_beverage",
+    "count_food_beverage",
+    "food_beverage",
+    "name_pet_veterinary",
+    "description_pet_veterinary",
+    "count_pet_veterinary",
+    "pet_veterinary",
+    "name_not_a_drug",
+    "description_not_a_drug",
+    "count_not_a_drug",
+    "not_a_drug",
+    "sports_x_explicit_bad",
+    "sports_x_not_a_drug",
+    "sports_x_dosage_form",
+    "sports_x_medicine",
+    "sports_x_food"
+  ],
+  "topologies": {
+    "historical": {
+      "rows": 12971,
+      "baseline_category_f1": {
+        "БАД": 0.9546604046242775,
+        "Легковоспламеняющиеся": 0.8921568627450981
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9542378917378918,
+        "Легковоспламеняющиеся": 0.8921568627450981
+      },
+      "baseline_macro_f1": 0.9234086336846878,
+      "candidate_macro_f1": 0.923197377241495,
+      "delta_macro_f1": -0.0002112564431928643,
+      "category_delta": {
+        "БАД": -0.0004225128863857286,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 2,
+      "changed": 162,
+      "corrected": 75,
+      "regressed": 87,
+      "corrected_to_regressed": 0.8620689655172413,
+      "cohorts": {
+        "sports_nutrition": {
+          "rows": 2255,
+          "baseline_f1": 0.902102973168963,
+          "candidate_f1": 0.9041477866852562,
+          "delta_f1": 0.0020448135162931536,
+          "corrected": 53,
+          "regressed": 58
+        },
+        "medicine_language": {
+          "rows": 4954,
+          "baseline_f1": 0.9565807327001357,
+          "candidate_f1": 0.9558372248165443,
+          "delta_f1": -0.0007435078835913433,
+          "corrected": 58,
+          "regressed": 69
+        },
+        "food_beverage": {
+          "rows": 2276,
+          "baseline_f1": 0.9491094147582697,
+          "candidate_f1": 0.9520826808643909,
+          "delta_f1": 0.002973266106121142,
+          "corrected": 29,
+          "regressed": 22
+        },
+        "pet_veterinary": {
+          "rows": 25,
+          "baseline_f1": 0.7142857142857143,
+          "candidate_f1": 0.875,
+          "delta_f1": 0.1607142857142857,
+          "corrected": 2,
+          "regressed": 0
+        }
+      },
+      "non_sports_regulatory_context": {
+        "rows": 3955,
+        "baseline_f1": 0.9745995793560912,
+        "candidate_f1": 0.9736757624398074,
+        "delta_f1": -0.0009238169162838483,
+        "corrected": 22,
+        "regressed": 29
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_category_f1": {
+            "БАД": 0.9489380930863082,
+            "Легковоспламеняющиеся": 0.8571428571428571
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9488536155202821,
+            "Легковоспламеняющиеся": 0.8571428571428571
+          },
+          "macro_delta": -4.2238783013015535e-05
+        },
+        {
+          "fold": 1,
+          "baseline_category_f1": {
+            "БАД": 0.9531953195319532,
+            "Легковоспламеняющиеся": 0.8333333333333334
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9537777777777777,
+            "Легковоспламеняющиеся": 0.8333333333333334
+          },
+          "macro_delta": 0.0002912291229122399
+        },
+        {
+          "fold": 2,
+          "baseline_category_f1": {
+            "БАД": 0.9556962025316456,
+            "Легковоспламеняющиеся": 0.925
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9523385300668151,
+            "Легковоспламеняющиеся": 0.925
+          },
+          "macro_delta": -0.0016788362324151596
+        },
+        {
+          "fold": 3,
+          "baseline_category_f1": {
+            "БАД": 0.9566395663956639,
+            "Легковоспламеняющиеся": 0.9230769230769231
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9563279857397504,
+            "Легковоспламеняющиеся": 0.9230769230769231
+          },
+          "macro_delta": -0.00015579032795676184
+        },
+        {
+          "fold": 4,
+          "baseline_category_f1": {
+            "БАД": 0.9588421528720036,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "candidate_category_f1": {
+            "БАД": 0.96,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "macro_delta": 0.0005789235639981349
+        }
+      ],
+      "selection_details": [
+        {
+          "fold": 0,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9489380930863082,
+            "Легковоспламеняющиеся": 0.8571428571428571
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9488536155202821,
+            "Легковоспламеняющиеся": 0.8571428571428571
+          },
+          "macro_delta": -4.2238783013015535e-05,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -5.387279813909296e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 1.2331933435888454e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0011223701281526666,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 0.0001936391164464868,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0003992753218213796,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.001018239028431872,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 0.0004984434907628899,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0001086912373255422,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0006585585154155471,
+              "inner_folds_won": 3
+            }
+          ]
+        },
+        {
+          "fold": 1,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9531953195319532,
+            "Легковоспламеняющиеся": 0.8333333333333334
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9537777777777777,
+            "Легковоспламеняющиеся": 0.8333333333333334
+          },
+          "macro_delta": 0.0002912291229122399,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0007999169156408803,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0001773172233245357,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.00033771428175394247,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0009615981833250853,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -7.705383339115524e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.00014705269560746914,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0002735402454460967,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -3.262751907920358e-05,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0011073484119776544,
+              "inner_folds_won": 3
+            }
+          ]
+        },
+        {
+          "fold": 2,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9556962025316456,
+            "Легковоспламеняющиеся": 0.925
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9523385300668151,
+            "Легковоспламеняющиеся": 0.925
+          },
+          "macro_delta": -0.0016788362324151596,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.00024884936280972214,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0006194963228869643,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.00022556767572398662,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0003880713365282118,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0008682734925949676,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.00020521398017389614,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 1.4654770640998294e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0008098140739143667,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0020533453536136503,
+              "inner_folds_won": 4
+            }
+          ]
+        },
+        {
+          "fold": 3,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9566395663956639,
+            "Легковоспламеняющиеся": 0.9230769230769231
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9563279857397504,
+            "Легковоспламеняющиеся": 0.9230769230769231
+          },
+          "macro_delta": -0.00015579032795676184,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 0.00024941326389024687,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 6.773951002581047e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0008089246522134941,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 0.00023248698321490235,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0003950333890327118,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.00023106603504322032,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 0.00037920097951113507,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.00035927340637284533,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0013797970052725483,
+              "inner_folds_won": 3
+            }
+          ]
+        },
+        {
+          "fold": 4,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.1,
+          "baseline_category_f1": {
+            "БАД": 0.9588421528720036,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "candidate_category_f1": {
+            "БАД": 0.96,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "macro_delta": 0.0005789235639981349,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0007921873503587695,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.001403870051682382,
+              "inner_folds_won": 0
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0020357866079351306,
+              "inner_folds_won": 0
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.000669579326236458,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0010483645801035169,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0024765490048724026,
+              "inner_folds_won": 0
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0001422456681978712,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0007468835563390619,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.00046884187178516945,
+              "inner_folds_won": 2
+            }
+          ]
+        }
+      ],
+      "structural_invariants": {
+        "changed_outside_selector": 0,
+        "changed_unsafe": 0,
+        "changed_flammable": 0
+      },
+      "group_bootstrap": {
+        "iterations": 5000,
+        "seed": 32042,
+        "probability_delta_positive": 0.3716,
+        "delta_mean": -0.00020770805037819012,
+        "delta_ci95": [
+          -0.0014449087988452625,
+          0.0010894783904654478
+        ]
+      }
+    },
+    "repeat_0": {
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.950960831670692,
+        "Легковоспламеняющиеся": 0.8877551020408163
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9502487562189055,
+        "Легковоспламеняющиеся": 0.8877551020408163
+      },
+      "baseline_macro_f1": 0.9193579668557541,
+      "candidate_macro_f1": 0.9190019291298609,
+      "delta_macro_f1": -0.00035603772589321014,
+      "category_delta": {
+        "БАД": -0.0007120754517865313,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 2,
+      "changed": 125,
+      "corrected": 56,
+      "regressed": 69,
+      "corrected_to_regressed": 0.8115942028985508,
+      "cohorts": {
+        "sports_nutrition": {
+          "rows": 1876,
+          "baseline_f1": 0.8856492027334852,
+          "candidate_f1": 0.886652078774617,
+          "delta_f1": 0.001002876041131806,
+          "corrected": 41,
+          "regressed": 49
+        },
+        "medicine_language": {
+          "rows": 4314,
+          "baseline_f1": 0.9546245059288537,
+          "candidate_f1": 0.9534630350194553,
+          "delta_f1": -0.0011614709093984432,
+          "corrected": 44,
+          "regressed": 56
+        },
+        "food_beverage": {
+          "rows": 2032,
+          "baseline_f1": 0.9470630891950689,
+          "candidate_f1": 0.9473307058402006,
+          "delta_f1": 0.0002676166451317519,
+          "corrected": 16,
+          "regressed": 17
+        },
+        "pet_veterinary": {
+          "rows": 25,
+          "baseline_f1": 0.7142857142857143,
+          "candidate_f1": 0.875,
+          "delta_f1": 0.1607142857142857,
+          "corrected": 2,
+          "regressed": 0
+        }
+      },
+      "non_sports_regulatory_context": {
+        "rows": 3563,
+        "baseline_f1": 0.9738621824163772,
+        "candidate_f1": 0.9731202324736651,
+        "delta_f1": -0.0007419499427121501,
+        "corrected": 15,
+        "regressed": 20
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_category_f1": {
+            "БАД": 0.9608329201784829,
+            "Легковоспламеняющиеся": 0.907563025210084
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9536811311555339,
+            "Легковоспламеняющиеся": 0.907563025210084
+          },
+          "macro_delta": -0.0035758945114745533
+        },
+        {
+          "fold": 1,
+          "baseline_category_f1": {
+            "БАД": 0.946178686759957,
+            "Легковоспламеняющиеся": 0.8928571428571429
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9481005885500268,
+            "Легковоспламеняющиеся": 0.8928571428571429
+          },
+          "macro_delta": 0.0009609508950348955
+        },
+        {
+          "fold": 2,
+          "baseline_category_f1": {
+            "БАД": 0.9459007250418293,
+            "Легковоспламеняющиеся": 0.875
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9433131535498074,
+            "Легковоспламеняющиеся": 0.875
+          },
+          "macro_delta": -0.0012937857460109115
+        },
+        {
+          "fold": 3,
+          "baseline_category_f1": {
+            "БАД": 0.9468196037539103,
+            "Легковоспламеняющиеся": 0.9176470588235294
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9457523029682702,
+            "Легковоспламеняющиеся": 0.9176470588235294
+          },
+          "macro_delta": -0.0005336503928201619
+        },
+        {
+          "fold": 4,
+          "baseline_category_f1": {
+            "БАД": 0.9540526587506454,
+            "Легковоспламеняющиеся": 0.8235294117647058
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9596320899335717,
+            "Легковоспламеняющиеся": 0.8235294117647058
+          },
+          "macro_delta": 0.0027897155914632377
+        }
+      ],
+      "selection_details": [
+        {
+          "fold": 0,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9608329201784829,
+            "Легковоспламеняющиеся": 0.907563025210084
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9536811311555339,
+            "Легковоспламеняющиеся": 0.907563025210084
+          },
+          "macro_delta": -0.0035758945114745533,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -2.1876829661204855e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0016704243610237424,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0008455768619664017,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0003085395375773403,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.00171263788454748,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0012208091969177493,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 0.0006325724682209599,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0014221695164893522,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.002564311548881676,
+              "inner_folds_won": 2
+            }
+          ]
+        },
+        {
+          "fold": 1,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.1,
+          "baseline_category_f1": {
+            "БАД": 0.946178686759957,
+            "Легковоспламеняющиеся": 0.8928571428571429
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9481005885500268,
+            "Легковоспламеняющиеся": 0.8928571428571429
+          },
+          "macro_delta": 0.0009609508950348955,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0012074750928426359,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.002339712997928206,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0021867543245091825,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0012130213501557185,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.002147772526014835,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0017758766754849553,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.00042894703613319263,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.001767499473139894,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0012260176400850364,
+              "inner_folds_won": 2
+            }
+          ]
+        },
+        {
+          "fold": 2,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9459007250418293,
+            "Легковоспламеняющиеся": 0.875
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9433131535498074,
+            "Легковоспламеняющиеся": 0.875
+          },
+          "macro_delta": -0.0012937857460109115,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 7.635670601707778e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0008467375600746119,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.00043945494447134026,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0003319032576681591,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0010654777405017801,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.000276455843220641,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 0.0008089316525216605,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0004803609036661549,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0011055203099285538,
+              "inner_folds_won": 2
+            }
+          ]
+        },
+        {
+          "fold": 3,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9468196037539103,
+            "Легковоспламеняющиеся": 0.9176470588235294
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9457523029682702,
+            "Легковоспламеняющиеся": 0.9176470588235294
+          },
+          "macro_delta": -0.0005336503928201619,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.00025541173809082163,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0005641917978659872,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0008981314430580034,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -1.6628199025620072e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0005581891982100462,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0002863912055167672,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 0.0001286548934714138,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0005017579357158852,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0012383498594415732,
+              "inner_folds_won": 2
+            }
+          ]
+        },
+        {
+          "fold": 4,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9540526587506454,
+            "Легковоспламеняющиеся": 0.8235294117647058
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9596320899335717,
+            "Легковоспламеняющиеся": 0.8235294117647058
+          },
+          "macro_delta": 0.0027897155914632377,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0010384086782632973,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0015615307188671934,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0026551408811484323,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.000934532190939974,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.001327806910419782,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0023222628880309737,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0004324699045727409,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0014189441274096715,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0007836633476003274,
+              "inner_folds_won": 2
+            }
+          ]
+        }
+      ],
+      "structural_invariants": {
+        "changed_outside_selector": 0,
+        "changed_unsafe": 0,
+        "changed_flammable": 0
+      }
+    },
+    "repeat_1": {
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.950960831670692,
+        "Легковоспламеняющиеся": 0.8877551020408163
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9516528925619835,
+        "Легковоспламеняющиеся": 0.8877551020408163
+      },
+      "baseline_macro_f1": 0.9193579668557541,
+      "candidate_macro_f1": 0.9197039973013998,
+      "delta_macro_f1": 0.0003460304456457397,
+      "category_delta": {
+        "БАД": 0.0006920608912914794,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 4,
+      "changed": 159,
+      "corrected": 79,
+      "regressed": 80,
+      "corrected_to_regressed": 0.9875,
+      "cohorts": {
+        "sports_nutrition": {
+          "rows": 1876,
+          "baseline_f1": 0.8856492027334852,
+          "candidate_f1": 0.8922675933970461,
+          "delta_f1": 0.006618390663560847,
+          "corrected": 56,
+          "regressed": 53
+        },
+        "medicine_language": {
+          "rows": 4314,
+          "baseline_f1": 0.9546245059288537,
+          "candidate_f1": 0.9551729486582907,
+          "delta_f1": 0.0005484427294369931,
+          "corrected": 60,
+          "regressed": 62
+        },
+        "food_beverage": {
+          "rows": 2032,
+          "baseline_f1": 0.9470630891950689,
+          "candidate_f1": 0.9497326203208556,
+          "delta_f1": 0.002669531125786717,
+          "corrected": 27,
+          "regressed": 22
+        },
+        "pet_veterinary": {
+          "rows": 25,
+          "baseline_f1": 0.7142857142857143,
+          "candidate_f1": 0.875,
+          "delta_f1": 0.1607142857142857,
+          "corrected": 2,
+          "regressed": 0
+        }
+      },
+      "non_sports_regulatory_context": {
+        "rows": 3563,
+        "baseline_f1": 0.9738621824163772,
+        "candidate_f1": 0.9733743886976997,
+        "delta_f1": -0.00048779371867757604,
+        "corrected": 23,
+        "regressed": 27
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_category_f1": {
+            "БАД": 0.9649122807017544,
+            "Легковоспламеняющиеся": 0.8157894736842105
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9649207111965401,
+            "Легковоспламеняющиеся": 0.8157894736842105
+          },
+          "macro_delta": 4.215247392913568e-06
+        },
+        {
+          "fold": 1,
+          "baseline_category_f1": {
+            "БАД": 0.9572649572649573,
+            "Легковоспламеняющиеся": 0.8723404255319149
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9523809523809523,
+            "Легковоспламеняющиеся": 0.8723404255319149
+          },
+          "macro_delta": -0.0024420024420025443
+        },
+        {
+          "fold": 2,
+          "baseline_category_f1": {
+            "БАД": 0.935740839086564,
+            "Легковоспламеняющиеся": 0.9090909090909091
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9371428571428572,
+            "Легковоспламеняющиеся": 0.9090909090909091
+          },
+          "macro_delta": 0.0007010090281466264
+        },
+        {
+          "fold": 3,
+          "baseline_category_f1": {
+            "БАД": 0.9510783798001052,
+            "Легковоспламеняющиеся": 0.8918918918918919
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9513852587558809,
+            "Легковоспламеняющиеся": 0.8918918918918919
+          },
+          "macro_delta": 0.00015343947788781787
+        },
+        {
+          "fold": 4,
+          "baseline_category_f1": {
+            "БАД": 0.9451345755693582,
+            "Легковоспламеняющиеся": 0.9512195121951219
+          },
+          "candidate_category_f1": {
+            "БАД": 0.951417004048583,
+            "Легковоспламеняющиеся": 0.9512195121951219
+          },
+          "macro_delta": 0.0031412142396123333
+        }
+      ],
+      "selection_details": [
+        {
+          "fold": 0,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9649122807017544,
+            "Легковоспламеняющиеся": 0.8157894736842105
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9649207111965401,
+            "Легковоспламеняющиеся": 0.8157894736842105
+          },
+          "macro_delta": 4.215247392913568e-06,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0005542883401486176,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.000736890922834188,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.002023906964982808,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0005861907986545456,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.00025072090298255967,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0014833469431943247,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -3.697508918723558e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -1.6667169563583384e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0010340466698314232,
+              "inner_folds_won": 3
+            }
+          ]
+        },
+        {
+          "fold": 1,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9572649572649573,
+            "Легковоспламеняющиеся": 0.8723404255319149
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9523809523809523,
+            "Легковоспламеняющиеся": 0.8723404255319149
+          },
+          "macro_delta": -0.0024420024420025443,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -2.0580798369612685e-05,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.00047802391501633457,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0007987142174769868,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.00014783557144495973,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.000588674566204761,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0003440166932763,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 0.0003797398816612896,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0005093757242795593,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.00182809251841895,
+              "inner_folds_won": 3
+            }
+          ]
+        },
+        {
+          "fold": 2,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.935740839086564,
+            "Легковоспламеняющиеся": 0.9090909090909091
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9371428571428572,
+            "Легковоспламеняющиеся": 0.9090909090909091
+          },
+          "macro_delta": 0.0007010090281466264,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 8.24132874704675e-05,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0006821485149297313,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0014464086544287436,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.00020270585718748513,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0007670455155887601,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0009584570153558791,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0001750796893892903,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.00012383957697825743,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0012049220552723394,
+              "inner_folds_won": 3
+            }
+          ]
+        },
+        {
+          "fold": 3,
+          "ridge_alpha": 100.0,
+          "residual_weight": 0.2,
+          "baseline_category_f1": {
+            "БАД": 0.9510783798001052,
+            "Легковоспламеняющиеся": 0.8918918918918919
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9513852587558809,
+            "Легковоспламеняющиеся": 0.8918918918918919
+          },
+          "macro_delta": 0.00015343947788781787,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0007486212144241222,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.00013323943166124175,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0012280069820673478,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0006528985717030034,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0005962241337163221,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0006570910058266433,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.00036492560795067797,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0003516148526183649,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0005600677185035041,
+              "inner_folds_won": 3
+            }
+          ]
+        },
+        {
+          "fold": 4,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9451345755693582,
+            "Легковоспламеняющиеся": 0.9512195121951219
+          },
+          "candidate_category_f1": {
+            "БАД": 0.951417004048583,
+            "Легковоспламеняющиеся": 0.9512195121951219
+          },
+          "macro_delta": 0.0031412142396123333,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0011183531911064803,
+              "inner_folds_won": 0
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0009717380828781763,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.002269435170739381,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0012610112720038702,
+              "inner_folds_won": 0
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0010174697054119997,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0018787063958324857,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0006111290355911847,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0007823527501590599,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 9.383803156137738e-05,
+              "inner_folds_won": 3
+            }
+          ]
+        }
+      ],
+      "structural_invariants": {
+        "changed_outside_selector": 0,
+        "changed_unsafe": 0,
+        "changed_flammable": 0
+      }
+    },
+    "repeat_2": {
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.950960831670692,
+        "Легковоспламеняющиеся": 0.8877551020408163
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9517611816961058,
+        "Легковоспламеняющиеся": 0.8877551020408163
+      },
+      "baseline_macro_f1": 0.9193579668557541,
+      "candidate_macro_f1": 0.919758141868461,
+      "delta_macro_f1": 0.0004001750127069492,
+      "category_delta": {
+        "БАД": 0.0008003500254137874,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 3,
+      "changed": 162,
+      "corrected": 81,
+      "regressed": 81,
+      "corrected_to_regressed": 1.0,
+      "cohorts": {
+        "sports_nutrition": {
+          "rows": 1876,
+          "baseline_f1": 0.8856492027334852,
+          "candidate_f1": 0.8923611111111112,
+          "delta_f1": 0.006711908377625919,
+          "corrected": 57,
+          "regressed": 54
+        },
+        "medicine_language": {
+          "rows": 4314,
+          "baseline_f1": 0.9546245059288537,
+          "candidate_f1": 0.9552007440706867,
+          "delta_f1": 0.000576238141832941,
+          "corrected": 63,
+          "regressed": 65
+        },
+        "food_beverage": {
+          "rows": 2032,
+          "baseline_f1": 0.9470630891950689,
+          "candidate_f1": 0.9501069137562367,
+          "delta_f1": 0.003043824561167807,
+          "corrected": 29,
+          "regressed": 23
+        },
+        "pet_veterinary": {
+          "rows": 25,
+          "baseline_f1": 0.7142857142857143,
+          "candidate_f1": 0.875,
+          "delta_f1": 0.1607142857142857,
+          "corrected": 2,
+          "regressed": 0
+        }
+      },
+      "non_sports_regulatory_context": {
+        "rows": 3563,
+        "baseline_f1": 0.9738621824163772,
+        "candidate_f1": 0.9735507246376811,
+        "delta_f1": -0.00031145777869612257,
+        "corrected": 24,
+        "regressed": 27
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_category_f1": {
+            "БАД": 0.9561542525092446,
+            "Легковоспламеняющиеся": 0.7951807228915663
+          },
+          "candidate_category_f1": {
+            "БАД": 0.954118873826903,
+            "Легковоспламеняющиеся": 0.7951807228915663
+          },
+          "macro_delta": -0.0010176893411707466
+        },
+        {
+          "fold": 1,
+          "baseline_category_f1": {
+            "БАД": 0.9524296675191816,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9549098196392786,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "macro_delta": 0.0012400760600485006
+        },
+        {
+          "fold": 2,
+          "baseline_category_f1": {
+            "БАД": 0.9511568123393316,
+            "Легковоспламеняющиеся": 0.9552238805970149
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9525252525252526,
+            "Легковоспламеняющиеся": 0.9552238805970149
+          },
+          "macro_delta": 0.0006842200929604303
+        },
+        {
+          "fold": 3,
+          "baseline_category_f1": {
+            "БАД": 0.9396044895777659,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9417933927635029,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "macro_delta": 0.0010944515928685838
+        },
+        {
+          "fold": 4,
+          "baseline_category_f1": {
+            "БАД": 0.9553523399677246,
+            "Легковоспламеняющиеся": 0.8461538461538461
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9553191489361702,
+            "Легковоспламеняющиеся": 0.8461538461538461
+          },
+          "macro_delta": -1.659551577726237e-05
+        }
+      ],
+      "selection_details": [
+        {
+          "fold": 0,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9561542525092446,
+            "Легковоспламеняющиеся": 0.7951807228915663
+          },
+          "candidate_category_f1": {
+            "БАД": 0.954118873826903,
+            "Легковоспламеняющиеся": 0.7951807228915663
+          },
+          "macro_delta": -0.0010176893411707466,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.00091537366031752,
+              "inner_folds_won": 0
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0006344622301412695,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0006650273716575505,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0009350280642486108,
+              "inner_folds_won": 0
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 7.231458669845758e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0003720347589292461,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.00039612104007494264,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.00045201326804683584,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0015502544626876114,
+              "inner_folds_won": 3
+            }
+          ]
+        },
+        {
+          "fold": 1,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9524296675191816,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9549098196392786,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "macro_delta": 0.0012400760600485006,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0007567396781778535,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.00035986463291795556,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0016420509329234112,
+              "inner_folds_won": 0
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0006315404976633965,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 4.691811073889718e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.001338811695260539,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 5.540547151733355e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 4.576472754674876e-06,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0007658178998450615,
+              "inner_folds_won": 2
+            }
+          ]
+        },
+        {
+          "fold": 2,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9511568123393316,
+            "Легковоспламеняющиеся": 0.9552238805970149
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9525252525252526,
+            "Легковоспламеняющиеся": 0.9552238805970149
+          },
+          "macro_delta": 0.0006842200929604303,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -2.7261001334599744e-05,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.00030081421494485006,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0015058345293558761,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0004493814399772478,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.00014168875979184148,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0016309165661239355,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -1.7059508184952277e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -3.478205422427494e-05,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.001510432856287186,
+              "inner_folds_won": 2
+            }
+          ]
+        },
+        {
+          "fold": 3,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9396044895777659,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9417933927635029,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "macro_delta": 0.0010944515928685838,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0006857024283841995,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0001638675535198808,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0014635835892664872,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0008424593914162226,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.00046464641987478683,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0009240225029020221,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 9.987230796754121e-05,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": -0.0007497952586465739,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.00038932323136126046,
+              "inner_folds_won": 2
+            }
+          ]
+        },
+        {
+          "fold": 4,
+          "ridge_alpha": 1000.0,
+          "residual_weight": 0.35,
+          "baseline_category_f1": {
+            "БАД": 0.9553523399677246,
+            "Легковоспламеняющиеся": 0.8461538461538461
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9553191489361702,
+            "Легковоспламеняющиеся": 0.8461538461538461
+          },
+          "macro_delta": -1.659551577726237e-05,
+          "inner_grid": [
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.00022374694714746846,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.00012573285178338334,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 10.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0013651850008576938,
+              "inner_folds_won": 1
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": -0.0005053635632199238,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0006060247565671528,
+              "inner_folds_won": 3
+            },
+            {
+              "ridge_alpha": 100.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": -0.0005333647100997929,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.1,
+              "mean_inner_fold_bad_delta": 1.3652343788500554e-05,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.2,
+              "mean_inner_fold_bad_delta": 0.0005477767205709638,
+              "inner_folds_won": 2
+            },
+            {
+              "ridge_alpha": 1000.0,
+              "residual_weight": 0.35,
+              "mean_inner_fold_bad_delta": 0.0013866649307047452,
+              "inner_folds_won": 3
+            }
+          ]
+        }
+      ],
+      "structural_invariants": {
+        "changed_outside_selector": 0,
+        "changed_unsafe": 0,
+        "changed_flammable": 0
+      }
+    }
+  },
+  "input_sha256": {
+    "selector": "d254eba1c8d14114b982beee3877c3c8e361be8c83e4de2690e44b140ca195c1",
+    "locked": "176b76b0b0fd3527e9e15c8f2edd6a43f90fd3a24db1567a32a4b05e215139e8",
+    "qwen3vl": "ba432e13624e6c3b1c7304ced8cacf580f4ffcc0a0cde1af8b6afb098bf6dc01",
+    "qwen35": "147f2b2b87d8220566526b38ab0e085c0bc44cd82b0442baca6b019516c3f1d8",
+    "connected": "4dea3dbb832edc7134120963e031b86562d1948845eb8669ac6e46d800b7a7dc"
+  },
+  "historical_connected_safe": {
+    "rows": 11207,
+    "baseline_category_f1": {
+      "БАД": 0.9509505304064699,
+      "Легковоспламеняющиеся": 0.8877551020408163
+    },
+    "candidate_category_f1": {
+      "БАД": 0.9505216403264125,
+      "Легковоспламеняющиеся": 0.8877551020408163
+    },
+    "baseline_macro_f1": 0.9193528162236431,
+    "candidate_macro_f1": 0.9191383711836144,
+    "delta_macro_f1": -0.0002144450400286546,
+    "category_delta": {
+      "БАД": -0.00042889008005742024,
+      "Легковоспламеняющиеся": 0.0
+    },
+    "folds_won": 3,
+    "changed": 162,
+    "corrected": 75,
+    "regressed": 87,
+    "corrected_to_regressed": 0.8620689655172413,
+    "cohorts": {
+      "sports_nutrition": {
+        "rows": 1876,
+        "baseline_f1": 0.8856492027334852,
+        "candidate_f1": 0.8889852558542931,
+        "delta_f1": 0.003336053120807869,
+        "corrected": 53,
+        "regressed": 58
+      },
+      "medicine_language": {
+        "rows": 4314,
+        "baseline_f1": 0.9544592030360531,
+        "candidate_f1": 0.9536362226701814,
+        "delta_f1": -0.000822980365871695,
+        "corrected": 58,
+        "regressed": 69
+      },
+      "food_beverage": {
+        "rows": 2032,
+        "baseline_f1": 0.9466811751904244,
+        "candidate_f1": 0.9501069137562367,
+        "delta_f1": 0.0034257385658122974,
+        "corrected": 29,
+        "regressed": 22
+      },
+      "pet_veterinary": {
+        "rows": 25,
+        "baseline_f1": 0.7142857142857143,
+        "candidate_f1": 0.875,
+        "delta_f1": 0.1607142857142857,
+        "corrected": 2,
+        "regressed": 0
+      }
+    },
+    "non_sports_regulatory_context": {
+      "rows": 3563,
+      "baseline_f1": 0.9736745886654479,
+      "candidate_f1": 0.9726399710092408,
+      "delta_f1": -0.0010346176562070486,
+      "corrected": 22,
+      "regressed": 29
+    },
+    "folds": [
+      {
+        "fold": 0,
+        "baseline_category_f1": {
+          "БАД": 0.9430548163916977,
+          "Легковоспламеняющиеся": 0.8536585365853658
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9431230610134437,
+          "Легковоспламеняющиеся": 0.8536585365853658
+        },
+        "macro_delta": 3.41223108729638e-05
+      },
+      {
+        "fold": 1,
+        "baseline_category_f1": {
+          "БАД": 0.9503171247357294,
+          "Легковоспламеняющиеся": 0.8292682926829268
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9510416666666667,
+          "Легковоспламеняющиеся": 0.8292682926829268
+        },
+        "macro_delta": 0.00036227096546870285
+      },
+      {
+        "fold": 2,
+        "baseline_category_f1": {
+          "БАД": 0.9555785123966942,
+          "Легковоспламеняющиеся": 0.918918918918919
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9517521584560691,
+          "Легковоспламеняющиеся": 0.918918918918919
+        },
+        "macro_delta": -0.00191317697031268
+      },
+      {
+        "fold": 3,
+        "baseline_category_f1": {
+          "БАД": 0.9502939604489578,
+          "Легковоспламеняющиеся": 0.9166666666666666
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9500263019463441,
+          "Легковоспламеняющиеся": 0.9166666666666666
+        },
+        "macro_delta": -0.00013382925130689394
+      },
+      {
+        "fold": 4,
+        "baseline_category_f1": {
+          "БАД": 0.9552238805970149,
+          "Легковоспламеняющиеся": 0.926829268292683
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9565661727133368,
+          "Легковоспламеняющиеся": 0.926829268292683
+        },
+        "macro_delta": 0.0006711460581609874
+      }
+    ],
+    "selection_details": [
+      {
+        "fold": 0,
+        "ridge_alpha": 1000.0,
+        "residual_weight": 0.35,
+        "baseline_category_f1": {
+          "БАД": 0.9489380930863082,
+          "Легковоспламеняющиеся": 0.8571428571428571
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9488536155202821,
+          "Легковоспламеняющиеся": 0.8571428571428571
+        },
+        "macro_delta": -4.2238783013015535e-05,
+        "inner_grid": [
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": -5.387279813909296e-05,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": 1.2331933435888454e-05,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": -0.0011223701281526666,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": 0.0001936391164464868,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": -0.0003992753218213796,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": -0.001018239028431872,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": 0.0004984434907628899,
+            "inner_folds_won": 3
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": -0.0001086912373255422,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": 0.0006585585154155471,
+            "inner_folds_won": 3
+          }
+        ]
+      },
+      {
+        "fold": 1,
+        "ridge_alpha": 1000.0,
+        "residual_weight": 0.35,
+        "baseline_category_f1": {
+          "БАД": 0.9531953195319532,
+          "Легковоспламеняющиеся": 0.8333333333333334
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9537777777777777,
+          "Легковоспламеняющиеся": 0.8333333333333334
+        },
+        "macro_delta": 0.0002912291229122399,
+        "inner_grid": [
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": -0.0007999169156408803,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": -0.0001773172233245357,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": -0.00033771428175394247,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": -0.0009615981833250853,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": -7.705383339115524e-05,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": -0.00014705269560746914,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": -0.0002735402454460967,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": -3.262751907920358e-05,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": 0.0011073484119776544,
+            "inner_folds_won": 3
+          }
+        ]
+      },
+      {
+        "fold": 2,
+        "ridge_alpha": 1000.0,
+        "residual_weight": 0.35,
+        "baseline_category_f1": {
+          "БАД": 0.9556962025316456,
+          "Легковоспламеняющиеся": 0.925
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9523385300668151,
+          "Легковоспламеняющиеся": 0.925
+        },
+        "macro_delta": -0.0016788362324151596,
+        "inner_grid": [
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": -0.00024884936280972214,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": 0.0006194963228869643,
+            "inner_folds_won": 3
+          },
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": 0.00022556767572398662,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": -0.0003880713365282118,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": 0.0008682734925949676,
+            "inner_folds_won": 3
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": 0.00020521398017389614,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": 1.4654770640998294e-05,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": 0.0008098140739143667,
+            "inner_folds_won": 3
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": 0.0020533453536136503,
+            "inner_folds_won": 4
+          }
+        ]
+      },
+      {
+        "fold": 3,
+        "ridge_alpha": 1000.0,
+        "residual_weight": 0.35,
+        "baseline_category_f1": {
+          "БАД": 0.9566395663956639,
+          "Легковоспламеняющиеся": 0.9230769230769231
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9563279857397504,
+          "Легковоспламеняющиеся": 0.9230769230769231
+        },
+        "macro_delta": -0.00015579032795676184,
+        "inner_grid": [
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": 0.00024941326389024687,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": 6.773951002581047e-05,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": -0.0008089246522134941,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": 0.00023248698321490235,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": -0.0003950333890327118,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": -0.00023106603504322032,
+            "inner_folds_won": 3
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": 0.00037920097951113507,
+            "inner_folds_won": 3
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": 0.00035927340637284533,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": 0.0013797970052725483,
+            "inner_folds_won": 3
+          }
+        ]
+      },
+      {
+        "fold": 4,
+        "ridge_alpha": 1000.0,
+        "residual_weight": 0.1,
+        "baseline_category_f1": {
+          "БАД": 0.9588421528720036,
+          "Легковоспламеняющиеся": 0.926829268292683
+        },
+        "candidate_category_f1": {
+          "БАД": 0.96,
+          "Легковоспламеняющиеся": 0.926829268292683
+        },
+        "macro_delta": 0.0005789235639981349,
+        "inner_grid": [
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": -0.0007921873503587695,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": -0.001403870051682382,
+            "inner_folds_won": 0
+          },
+          {
+            "ridge_alpha": 10.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": -0.0020357866079351306,
+            "inner_folds_won": 0
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": -0.000669579326236458,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": -0.0010483645801035169,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 100.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": -0.0024765490048724026,
+            "inner_folds_won": 0
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.1,
+            "mean_inner_fold_bad_delta": -0.0001422456681978712,
+            "inner_folds_won": 2
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.2,
+            "mean_inner_fold_bad_delta": -0.0007468835563390619,
+            "inner_folds_won": 1
+          },
+          {
+            "ridge_alpha": 1000.0,
+            "residual_weight": 0.35,
+            "mean_inner_fold_bad_delta": -0.00046884187178516945,
+            "inner_folds_won": 2
+          }
+        ]
+      }
+    ],
+    "structural_invariants": {
+      "changed_outside_selector": 0,
+      "changed_unsafe": 0,
+      "changed_flammable": 0
+    },
+    "component_bootstrap": {
+      "iterations": 5000,
+      "seed": 32142,
+      "probability_delta_positive": 0.3826,
+      "delta_mean": -0.00021638217516203921,
+      "delta_ci95": [
+        -0.0016762787323430562,
+        0.0013202991697846575
+      ]
+    }
+  },
+  "deterministic_order_stability": {
+    "kind": "deterministic_order_permutation_stability",
+    "seed": 31415,
+    "folds": [
+      {
+        "fold": 2,
+        "reference_prediction_mismatches": 0,
+        "full_macro_delta": -0.0016788362324151596,
+        "safe_macro_delta": -0.00191317697031268,
+        "full_category_delta": {
+          "БАД": -0.00335767246483043,
+          "Легковоспламеняющиеся": 0.0
+        },
+        "safe_category_delta": {
+          "БАД": -0.003826353940625138,
+          "Легковоспламеняющиеся": 0.0
+        }
+      },
+      {
+        "fold": 4,
+        "reference_prediction_mismatches": 0,
+        "full_macro_delta": 0.0005789235639981349,
+        "safe_macro_delta": 0.0006711460581609874,
+        "full_category_delta": {
+          "БАД": 0.001157847127996381,
+          "Легковоспламеняющиеся": 0.0
+        },
+        "safe_category_delta": {
+          "БАД": 0.0013422921163218637,
+          "Легковоспламеняющиеся": 0.0
+        }
+      }
+    ],
+    "positive_mean_full_delta": false,
+    "positive_mean_safe_delta": false,
+    "no_category_drop_over_0_005": true,
+    "reference_prediction_mismatches_zero": true
+  },
+  "predeclared_production_config": {
+    "ridge_alpha": 1000.0,
+    "residual_weight": 0.35,
+    "outer_inner_selection_votes": {
+      "alpha=1000.0,weight=0.1": 1,
+      "alpha=1000.0,weight=0.35": 4
+    },
+    "outer_scores_used_for_choice": false
+  },
+  "acceptance": {
+    "historical_delta_at_least_0_003": false,
+    "historical_wins_at_least_4_of_5": false,
+    "historical_no_category_drop_over_0_005": true,
+    "historical_bootstrap_probability_at_least_0_90": false,
+    "connected_delta_at_least_0_003": false,
+    "connected_wins_at_least_4_of_5": false,
+    "connected_no_category_drop_over_0_005": true,
+    "connected_bootstrap_probability_at_least_0_90": false,
+    "all_repeat_deltas_positive": false,
+    "repeat_mean_delta_at_least_0_003": false,
+    "repeat_wins_at_least_11_of_15": false,
+    "bad_delta_at_least_0_006": false,
+    "sports_delta_at_least_0_01": false,
+    "non_sports_context_drop_at_most_0_005": true,
+    "no_context_cohort_net_regression": false,
+    "corrected_to_regressed_at_least_2": false,
+    "structural_invariants": true,
+    "order_stability_positive_full_and_safe": false,
+    "order_stability_no_category_drop_over_0_005": true,
+    "order_stability_reference_predictions_identical": true,
+    "repeat_mean_delta": 0.00013005591081982626,
+    "repeat_fold_wins": 9
+  },
+  "accepted_before_downstream_priors_runtime_schema_and_final_refit": false,
+  "runtime_seconds": 10.624542707999353
+}

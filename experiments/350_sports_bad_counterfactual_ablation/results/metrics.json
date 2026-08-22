@@ -1,0 +1,39 @@
+{
+  "experiment_id": "350",
+  "status": "rejected_offline",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "component_transfer_gate_v4_counterfactual_extension",
+  "parent_experiment": "190_shingle_neighbor_prior",
+  "frozen_recipe": {
+    "selector": "connected-safe BAD intersect sports_nutrition",
+    "counterfactuals": ["remove regulatory spans", "remove sports spans"],
+    "controls": ["remove neutral marketing spans"],
+    "foundation_model_passes_added": 0,
+    "source_sha256": "178314d279f1c81ffa7dbbc68c5206bb91c1ee68fc8b6ce85607f8ced627dce9"
+  },
+  "validation": {
+    "connected_safe": {
+      "baseline_macro_f1": 0.9193528162236431,
+      "candidate_macro_f1": 0.9191468179868413,
+      "delta_macro_f1": -0.00020599823680178542,
+      "bad_delta": -0.00041199647360368186,
+      "sports_delta": -0.0005716484362117136,
+      "singleton_sports_delta": -0.003706098321287543,
+      "folds_won": 2,
+      "changed": 44,
+      "corrected": 19,
+      "regressed": 25,
+      "bootstrap_probability_delta_positive": 0.271
+    },
+    "repeat_deltas": [-0.00009676247069989596, 0.00005241663421007292, -0.000047046501051584144],
+    "downstream_prior_delta": -0.00014545400851195822,
+    "placebo_median_effect_less_than_sports": true,
+    "accepted_for_full_refit": false
+  },
+  "artifacts": {
+    "counterfactual_audit_sha256": "d38decb5744b47a41f053b8bfbd7a2f00d04224881db0c43f571c5d605541798",
+    "counterfactual_scores_sha256": "d9bb4ab6df36671400f1b1b83b08a612060a8c5b80a069eed5c5f7b14fecedab",
+    "prior_replay_sha256": "6314bafb3530138a86eefdf51166d7ec610624f04351a7d51ea9b0e5288c47a8"
+  },
+  "decision": "Rejected offline. Counterfactual sports/regulatory sensitivity is distinguishable from neutral placebo but does not separate corrections: 19 corrected versus 25 regressed, connected Macro -0.000206, singleton sports -0.003706, two of three repeats negative, and post-prior delta -0.000145."
+}

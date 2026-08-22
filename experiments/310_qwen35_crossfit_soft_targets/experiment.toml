@@ -1,0 +1,47 @@
+[experiment]
+id = "310"
+slug = "qwen35_crossfit_soft_targets"
+title = "Qwen3.5 cross-fitted soft-target training"
+status = "five_fold_validation_running"
+entrypoint = "research/qwen3vl_lora_holdout.py"
+result_file = "experiments/310_qwen35_crossfit_soft_targets/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "component_transfer_gate_v1"
+secondary_version = "component_transfer_gate_v2"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "190_shingle_neighbor_prior"
+changed_factor = "Replace hard 0/1 training targets of the Qwen3.5 component with outer-fold cross-fitted soft probabilities while keeping the model, images, split and downstream fusion fixed"
+mechanism = "Soft probabilities preserve uncertainty on ambiguous and possibly mislabeled products, reducing overconfident memorization without adding another inference pass"
+expected_macro_f1_delta = 0.003
+falsification = "Reject if fewer than four of five locked folds improve, any category loses more than 0.005, grouped bootstrap P(delta>0) is below 0.90, the connected-safe gate fails, or the second-seed repeat is unstable"
+precedents = [
+  "https://arxiv.org/abs/1503.02531",
+  "https://arxiv.org/abs/1706.02690",
+]
+
+[acceptance]
+baseline_macro_f1 = 0.9234086336846878
+required_fold_wins = 4
+max_category_f1_drop = 0.005
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 4.0
+planned_public_submissions = 0
+runtime_limit_minutes = 16
+
+[execution]
+arguments = ["--soft-targets", "research/qwen35_crossfit_soft_targets.csv", "--first-image-only"]
+
+[artifacts]
+directory = "artifacts"
+publish = false

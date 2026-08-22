@@ -1,0 +1,67 @@
+{
+  "experiment_id": "430",
+  "status": "rejected_offline_promising_signal",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "locked_190_category_routing_soup_v1",
+  "parent_experiment": "400_qwen35_category_routed_adapters",
+  "alpha_260_grid": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "validation": {
+    "baseline_macro_f1": 0.9316449231243215,
+    "macro_f1": 0.9348302023121388,
+    "delta_vs_400": 0.0031852791878173026,
+    "bad_f1": 0.9546604046242775,
+    "flammable_f1": 0.915,
+    "flammable_delta": 0.006370558375634605,
+    "folds_won": 2,
+    "fold_deltas": [0.0010412018444146964, 0.0, 0.0, 0.016189290161892855, 0.0],
+    "selected_alpha_by_fold": [0.5, 0.5, 0.5, 0.5, 0.5],
+    "changed_predictions": 12,
+    "corrected": 7,
+    "regressed": 5,
+    "corrected_to_regressed_ratio": 1.4,
+    "flammable_false_negative_delta": -4,
+    "safety_union_false_negative_delta": -4,
+    "connected_safe_delta": 0.0033482142857143016,
+    "connected_bootstrap_probability_positive": 0.7334,
+    "connected_bootstrap_ci95": [-0.007001163240266178, 0.014404487548369841],
+    "accepted_before_prior_replay": false
+  },
+  "runtime": {
+    "jobs": ["redacted-job", "redacted-job", "redacted-job"],
+    "hardware": "three independent one-H100 jobs on private-gpu-pool and private-gpu-pool",
+    "training": false
+  },
+  "reproducibility": {
+    "selection_manifest_sha256": "f45dfb0864c1ae61a87c6e542eb4966e2847d10daf6e75babfe8a11c2a94c7cd",
+    "merger_sha256": "e63fda095cb150e93c30f7804a18f53c93e85087230251813465d227bcc96b28",
+    "scorer_sha256": "c9b566da08d367707471dde5e707547df0c1dc52339d9c5d44254a916f68d7cf",
+    "runner_sha256": "5230ca1668fe9a4866c8fe84345a7616cd1eab8bf1de29c375ebf1e96bb6ef5d",
+    "source_190": {
+      "s3": "s3://private-artifact-store/private-prefix/experiments/430/source190-folds.zip",
+      "sha256": "6620effa11fede9c4ead4e91a0f0e753519176b547ef30f684c018cf5ff17f46",
+      "size_bytes": 58311570
+    },
+    "source_260": {
+      "s3": "s3://private-artifact-store/private-prefix/experiments/430/source260-folds.zip",
+      "sha256": "fccf4952fba67886e2ca2b6a6eb4ac2ae4892eea614f5515025cdfc271cea782",
+      "size_bytes": 58313413
+    },
+    "local_merge_smoke": {
+      "alpha_260": 0.5,
+      "old_rank": 16,
+      "new_rank": 32,
+      "tensor_count": 64,
+      "max_factor_reconstruction_error": 0.0
+    },
+    "ingest_audits_sha256": {
+      "alpha_25": "c679458cd2eab937046f9457a54d68695e50d8d23e3245e2b2f2d0ede1c71790",
+      "alpha_50": "2a6ba2ce4fcd1e618799d3d00b61caf6879fdc84cf0724a5ae983483b2509f7c",
+      "alpha_75": "609bda3d0bbd26d8d70e43141307dee0b6ee81c07dab77fbe294c7782c1978a4"
+    },
+    "acceptance_audit_sha256": "ca7086f2a971bed708c9f6a3cc6672589a73dee05812dd7368e98c2193afb74f",
+    "nested_predictions_sha256": "a761b42253748942266179a17bec88257784e4454fd946729e7e194336b5839e",
+    "ingest_script_sha256": "b075596120520a2a36f6698b459f61c781feb6501e612de27036d1c0b7336e00",
+    "evaluation_script_sha256": "6a2abd2416252cf9b85da66054cd96def806283d5ca7704fe7a43bd636026e71"
+  },
+  "decision": "Rejected as a production candidate by the frozen 4/5 fold-win, 1.5 correction-ratio, and 0.90 connected-bootstrap gates. The consistent alpha 0.50 and positive recall effect are retained only as a promising signal for a separately versioned independent confirmation; no full adapter, prior replay, or submission package is built."
+}

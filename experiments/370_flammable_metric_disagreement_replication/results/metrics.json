@@ -1,0 +1,32 @@
+{
+  "experiment_id": "370",
+  "status": "rejected_offline_promising_signal",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "flammable_metric_connected_replication_v1",
+  "parent_experiment": "360_hard_negative_diagonal_metric",
+  "historical_motivation_not_acceptance": {"corrected": 7, "regressed": 2},
+  "frozen_recipe": {
+    "changed_category": "Легковоспламеняющиеся",
+    "metric_disagreement_quantile": 0.9,
+    "replication_topologies": ["repeat_0", "repeat_1", "repeat_2"],
+    "bad_changes_allowed": 0,
+    "source_sha256": "427acfefeffe0e856633f1ecbaa246c6d675aab9a0c2af93745994b9eb78dbcf"
+  },
+  "validation": {
+    "repeat_macro_deltas": [-0.0002253117917588865, 0.00238565426568238, 0.005247544333838783],
+    "mean_macro_delta": 0.0024692956025874255,
+    "total_fold_wins": 6,
+    "total_folds": 15,
+    "total_corrected": 22,
+    "total_regressed": 13,
+    "bootstrap_probability_delta_positive": [0.4818, 0.7046, 0.9054],
+    "changed_bad": 0,
+    "changed_unsafe": 0,
+    "acceptance_passed": false
+  },
+  "artifacts": {
+    "replication_audit_sha256": "3c32f3897272c969513eb07785f4e1ca2bc6c3839e291d88f3161f84e42d4f60",
+    "replication_predictions_sha256": "77b63d3a1e98a3662a33ce1b5e4a20a4fa90781e7f6df71f5c7fa3a98701719f"
+  },
+  "decision": "Reject the frozen rule: one repeat is negative, only 6/15 folds win, corrected-to-regressed is 1.69 and two bootstrap probabilities are below 0.80. Preserve the positive mean as an exploratory signal and test production-parity all-image embeddings in a separately versioned experiment."
+}

@@ -1,0 +1,21 @@
+{
+  "experiment_id": "440",
+  "bundle": "experiments/440_qwen3vl_rdrop/.local/downloads/redacted-job/qwen_rdrop_fold0.zip",
+  "bundle_bytes": 95002337,
+  "bundle_sha256": "75c3be479afdf977d45b87f00556e976d9eb9a59d963afecca30b2d2b6c524d1",
+  "payload_location": "outer",
+  "stage": {
+    "stage": "fold_0",
+    "adapter_bytes": 25723480,
+    "adapter_sha256": "bbb4fb9fdb6ae4255f30167bfe45b06069af051bfc97809d53139ef0d9e1835e",
+    "adapter_config_sha256": "198b1bc8325461763e8857826d28e74908188385262d93c0287d18664c28facb",
+    "prediction_rows": 2594,
+    "predictions_sha256": "6ecdbbb32648be8248fcb9b751e8daa44bce0fd13bb112658c07d7c8e7e3e33c",
+    "report_sha256": "48577bb991e9a1b6f97ca93e5eccb7e6d5e2591f4e950743bae7c593136d94a9",
+    "macro_lora_diagnostic": 0.8375233902036323,
+    "macro_fused_diagnostic": 0.9076129378475949,
+    "runtime_minutes": 19.468113474175333,
+    "selector_bundle_sha256": "79b5738b72cccf84e7906e1c235ea63b3c9d1643649c76353eb5c9c5f18b69a0"
+  },
+  "passed": true
+}

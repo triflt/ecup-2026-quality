@@ -1,0 +1,91 @@
+{
+  "experiment_id": "270",
+  "status": "rejected_offline",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "seed": 42,
+  "changed_factor": "family-balanced negative BAD sampling with control RNG consumption",
+  "primary_comparison": "bad_negative_family_seed42 + fixed_seed31415 mean probability",
+  "baseline_macro_f1": 0.9192367220630797,
+  "selection_audit": {
+    "old_selected_rows": 1500,
+    "old_selected_families_range": [1275, 1286],
+    "old_max_family_exposures": 27,
+    "new_selected_rows": 1500,
+    "new_selected_families_range": [1296, 1306],
+    "new_max_family_exposures": 2,
+    "all_eligible_families_covered": true,
+    "non_target_training_multiset_exact_on_all_folds": true,
+    "audit_path": "analysis/isolation_audit.json"
+  },
+  "validation": {
+    "bad_f1": 0.9515664386028088,
+    "flammable_f1": 0.8651399491094147,
+    "macro_f1": 0.9083531938561118,
+    "delta_macro_f1": -0.010883528206967918,
+    "category_delta": {
+      "БАД": -0.00030906737902092196,
+      "Легковоспламеняющиеся": -0.021457989034915137
+    },
+    "folds_won": 1,
+    "fold_scores": [
+      0.8818447771467905,
+      0.8833191588707122,
+      0.945164641052576,
+      0.9073685496047605,
+      0.9259237257930379
+    ],
+    "fold_deltas": [
+      -0.013926863924760946,
+      -0.005200563227001798,
+      0.0010767181549146132,
+      -0.00687765533761131,
+      -0.02763157894736834
+    ],
+    "group_bootstrap": {
+      "iterations": 10000,
+      "probability_delta_positive": 0.0507,
+      "delta_ci95": [-0.02544635657801841, 0.0018708430502026847]
+    }
+  },
+  "runtime": {
+    "fold_minutes": [
+      33.66487090227505,
+      33.0181984230876,
+      33.143337264160316,
+      33.26038283035159,
+      33.35177801487347
+    ],
+    "full_minutes": 38.127784211933616,
+    "total_training_minutes": 204.56635164668165
+  },
+  "reproducibility": {
+    "job": "redacted-job",
+    "hardware": "one H100",
+    "training_code_sha256": "9560924f6e48162f881f92fedcebd249b1f5ba72b002a2fd83b5f5d77772b108",
+    "cycle_code_sha256": "4a34b4fef9682d74f8eabcc9662a09cf761af91ed5388f364db20d00e56f5250",
+    "output_bundle_at_root": true,
+    "recursive_output_mask": true,
+    "oof_input_sha256": "5d7467c48fc8a5a73f947f5aa1300071c77ba699b29c12250caf1bcd3176d7ac",
+    "image_manifest_sha256": "d6193215ce2d6145440bd484ea225e77fe10784c4c2c06b7c6b0b85dc8efc7d9"
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/qwen_badneg_private_compute.zip",
+      "size_bytes": 279976581,
+      "sha256": "221db0208fe0f44af3f9426176f928be0ecb589a3ff99796b3dba24bc1060c36"
+    },
+    {
+      "path": "artifacts/seed_42_balanced_negatives/full/adapter/adapter_model.safetensors",
+      "size_bytes": 12592424,
+      "sha256": "84ccd4cc7f71e4e3d7e10881d76167362bbab6f21de1f9c6a8afdd723f1987ae"
+    },
+    {
+      "path": "results/ensemble_report.json"
+    },
+    {
+      "path": "results/acceptance_audit.json"
+    }
+  ],
+  "decision": "rejected: Macro F1 fell by 0.010884, only 1 of 5 outer folds improved, and flammable F1 fell by 0.021458; the parent 230 recipe also failed Public transfer"
+}

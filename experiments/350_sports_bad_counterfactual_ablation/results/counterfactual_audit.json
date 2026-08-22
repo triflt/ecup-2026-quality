@@ -1,0 +1,605 @@
+{
+  "experiment_id": "350",
+  "evaluation_version": "component_transfer_gate_v4_counterfactual_extension",
+  "recipe_frozen_before_scoring": true,
+  "topologies": {
+    "historical_connected_safe": {
+      "topology": "historical_connected_safe",
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.9509505304064699,
+        "Легковоспламеняющиеся": 0.8877551020408163
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9505385339328662,
+        "Легковоспламеняющиеся": 0.8877551020408163
+      },
+      "baseline_macro_f1": 0.9193528162236431,
+      "candidate_macro_f1": 0.9191468179868413,
+      "delta_macro_f1": -0.00020599823680178542,
+      "category_delta": {
+        "БАД": -0.00041199647360368186,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 2,
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_macro_f1": 0.8983566764885318,
+          "candidate_macro_f1": 0.8987572343943778,
+          "delta": 0.0004005579058460329
+        },
+        {
+          "fold": 1,
+          "baseline_macro_f1": 0.889792708709328,
+          "candidate_macro_f1": 0.8885952194608742,
+          "delta": -0.0011974892484538646
+        },
+        {
+          "fold": 2,
+          "baseline_macro_f1": 0.9372487156578067,
+          "candidate_macro_f1": 0.9370713997579669,
+          "delta": -0.00017731589983971396
+        },
+        {
+          "fold": 3,
+          "baseline_macro_f1": 0.9334803135578122,
+          "candidate_macro_f1": 0.933107629668968,
+          "delta": -0.00037268388884426074
+        },
+        {
+          "fold": 4,
+          "baseline_macro_f1": 0.9410265744448489,
+          "candidate_macro_f1": 0.941340712175089,
+          "delta": 0.0003141377302400272
+        }
+      ],
+      "changed": 44,
+      "corrected": 19,
+      "regressed": 25,
+      "direction": {
+        "FN": {
+          "changed": 43,
+          "corrected": 19,
+          "regressed": 24
+        },
+        "FP": {
+          "changed": 1,
+          "corrected": 0,
+          "regressed": 1
+        }
+      },
+      "sports": {
+        "rows": 2014,
+        "baseline_f1": 0.8900126422250316,
+        "candidate_f1": 0.8894409937888199,
+        "delta_f1": -0.0005716484362117136
+      },
+      "singleton_sports": {
+        "rows": 1231,
+        "baseline_f1": 0.8841642228739003,
+        "candidate_f1": 0.8804581245526127,
+        "delta_f1": -0.003706098321287543
+      },
+      "placebo_diagnostic": {
+        "median_absolute_delta_on_changed": 0.03302985429763794,
+        "median_sports_delta_on_changed": 0.06531784683465958
+      },
+      "component_bootstrap": {
+        "iterations": 5000,
+        "seed": 35042,
+        "probability_delta_positive": 0.271,
+        "delta_mean": -0.000204352415747612,
+        "delta_ci95": [
+          -0.0008630799910785303,
+          0.0004521053525949693
+        ]
+      },
+      "structural_invariants": {
+        "changed_unsafe": 0,
+        "changed_non_sports": 0,
+        "changed_flammable": 0
+      },
+      "training_folds": [
+        {
+          "fold": 0,
+          "selector_rows": 413,
+          "fn_changes": 9,
+          "fp_changes": 0
+        },
+        {
+          "fold": 1,
+          "selector_rows": 396,
+          "fn_changes": 9,
+          "fp_changes": 0
+        },
+        {
+          "fold": 2,
+          "selector_rows": 376,
+          "fn_changes": 7,
+          "fp_changes": 0
+        },
+        {
+          "fold": 3,
+          "selector_rows": 414,
+          "fn_changes": 12,
+          "fp_changes": 0
+        },
+        {
+          "fold": 4,
+          "selector_rows": 415,
+          "fn_changes": 6,
+          "fp_changes": 1
+        }
+      ]
+    },
+    "repeat_0": {
+      "topology": "repeat_0",
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.9511605923747506,
+        "Легковоспламеняющиеся": 0.8934010152284264
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9509670674333508,
+        "Легковоспламеняющиеся": 0.8934010152284264
+      },
+      "baseline_macro_f1": 0.9222808038015885,
+      "candidate_macro_f1": 0.9221840413308886,
+      "delta_macro_f1": -9.676247069989596e-05,
+      "category_delta": {
+        "БАД": -0.00019352494139979193,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 3,
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_macro_f1": 0.9387497934225748,
+          "candidate_macro_f1": 0.9368518518518518,
+          "delta": -0.001897941570722983
+        },
+        {
+          "fold": 1,
+          "baseline_macro_f1": 0.9195179148085499,
+          "candidate_macro_f1": 0.9210681870185341,
+          "delta": 0.0015502722099841604
+        },
+        {
+          "fold": 2,
+          "baseline_macro_f1": 0.9104503625209146,
+          "candidate_macro_f1": 0.9099540901502504,
+          "delta": -0.0004962723706641858
+        },
+        {
+          "fold": 3,
+          "baseline_macro_f1": 0.9327274960088419,
+          "candidate_macro_f1": 0.9328360034242387,
+          "delta": 0.00010850741539680797
+        },
+        {
+          "fold": 4,
+          "baseline_macro_f1": 0.8973161844477864,
+          "candidate_macro_f1": 0.897679372030326,
+          "delta": 0.0003631875825396147
+        }
+      ],
+      "changed": 46,
+      "corrected": 21,
+      "regressed": 25,
+      "direction": {
+        "FN": {
+          "changed": 45,
+          "corrected": 21,
+          "regressed": 24
+        },
+        "FP": {
+          "changed": 1,
+          "corrected": 0,
+          "regressed": 1
+        }
+      },
+      "sports": {
+        "rows": 2014,
+        "baseline_f1": 0.8900126422250316,
+        "candidate_f1": 0.8903599503516756,
+        "delta_f1": 0.0003473081266439637
+      },
+      "singleton_sports": {
+        "rows": 1231,
+        "baseline_f1": 0.8841642228739003,
+        "candidate_f1": 0.8807994289793005,
+        "delta_f1": -0.00336479389459976
+      },
+      "placebo_diagnostic": {
+        "median_absolute_delta_on_changed": 0.025113075971603394,
+        "median_sports_delta_on_changed": 0.06537911295890808
+      },
+      "component_bootstrap": {
+        "iterations": 5000,
+        "seed": 35043,
+        "probability_delta_positive": 0.4004,
+        "delta_mean": -9.560261064132509e-05,
+        "delta_ci95": [
+          -0.0008072002441225163,
+          0.0006412403636160955
+        ]
+      },
+      "structural_invariants": {
+        "changed_unsafe": 0,
+        "changed_non_sports": 0,
+        "changed_flammable": 0
+      },
+      "training_folds": [
+        {
+          "fold": 0,
+          "selector_rows": 440,
+          "fn_changes": 8,
+          "fp_changes": 0
+        },
+        {
+          "fold": 1,
+          "selector_rows": 397,
+          "fn_changes": 15,
+          "fp_changes": 0
+        },
+        {
+          "fold": 2,
+          "selector_rows": 394,
+          "fn_changes": 5,
+          "fp_changes": 1
+        },
+        {
+          "fold": 3,
+          "selector_rows": 367,
+          "fn_changes": 8,
+          "fp_changes": 0
+        },
+        {
+          "fold": 4,
+          "selector_rows": 416,
+          "fn_changes": 9,
+          "fp_changes": 0
+        }
+      ]
+    },
+    "repeat_1": {
+      "topology": "repeat_1",
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.9511605923747506,
+        "Легковоспламеняющиеся": 0.8934010152284264
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9512654256431708,
+        "Легковоспламеняющиеся": 0.8934010152284264
+      },
+      "baseline_macro_f1": 0.9222808038015885,
+      "candidate_macro_f1": 0.9223332204357986,
+      "delta_macro_f1": 5.241663421007292e-05,
+      "category_delta": {
+        "БАД": 0.00010483326842025686,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 1,
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_macro_f1": 0.8980405559352929,
+          "candidate_macro_f1": 0.8988287089307002,
+          "delta": 0.0007881529954073541
+        },
+        {
+          "fold": 1,
+          "baseline_macro_f1": 0.9207377417903734,
+          "candidate_macro_f1": 0.9205143540669856,
+          "delta": -0.00022338772338781343
+        },
+        {
+          "fold": 2,
+          "baseline_macro_f1": 0.9226644768621389,
+          "candidate_macro_f1": 0.9225179267529717,
+          "delta": -0.00014655010916719835
+        },
+        {
+          "fold": 3,
+          "baseline_macro_f1": 0.9214851358459986,
+          "candidate_macro_f1": 0.9212869742775305,
+          "delta": -0.00019816156846808042
+        },
+        {
+          "fold": 4,
+          "baseline_macro_f1": 0.94842177059782,
+          "candidate_macro_f1": 0.9484023639004358,
+          "delta": -1.940669738420553e-05
+        }
+      ],
+      "changed": 41,
+      "corrected": 20,
+      "regressed": 21,
+      "direction": {
+        "FN": {
+          "changed": 41,
+          "corrected": 20,
+          "regressed": 21
+        },
+        "FP": {
+          "changed": 0,
+          "corrected": 0,
+          "regressed": 0
+        }
+      },
+      "sports": {
+        "rows": 2014,
+        "baseline_f1": 0.8900126422250316,
+        "candidate_f1": 0.8914664457332229,
+        "delta_f1": 0.0014538035081912426
+      },
+      "singleton_sports": {
+        "rows": 1231,
+        "baseline_f1": 0.8841642228739003,
+        "candidate_f1": 0.882689556509299,
+        "delta_f1": -0.0014746663646012514
+      },
+      "placebo_diagnostic": {
+        "median_absolute_delta_on_changed": 0.021698474884033203,
+        "median_sports_delta_on_changed": 0.06406903266906738
+      },
+      "component_bootstrap": {
+        "iterations": 5000,
+        "seed": 35044,
+        "probability_delta_positive": 0.5486,
+        "delta_mean": 4.841893689255754e-05,
+        "delta_ci95": [
+          -0.0006230406811258027,
+          0.0007295924663573703
+        ]
+      },
+      "structural_invariants": {
+        "changed_unsafe": 0,
+        "changed_non_sports": 0,
+        "changed_flammable": 0
+      },
+      "training_folds": [
+        {
+          "fold": 0,
+          "selector_rows": 405,
+          "fn_changes": 7,
+          "fp_changes": 0
+        },
+        {
+          "fold": 1,
+          "selector_rows": 363,
+          "fn_changes": 5,
+          "fp_changes": 0
+        },
+        {
+          "fold": 2,
+          "selector_rows": 413,
+          "fn_changes": 7,
+          "fp_changes": 0
+        },
+        {
+          "fold": 3,
+          "selector_rows": 420,
+          "fn_changes": 5,
+          "fp_changes": 0
+        },
+        {
+          "fold": 4,
+          "selector_rows": 413,
+          "fn_changes": 17,
+          "fp_changes": 0
+        }
+      ]
+    },
+    "repeat_2": {
+      "topology": "repeat_2",
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.9511605923747506,
+        "Легковоспламеняющиеся": 0.8934010152284264
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9510664993726474,
+        "Легковоспламеняющиеся": 0.8934010152284264
+      },
+      "baseline_macro_f1": 0.9222808038015885,
+      "candidate_macro_f1": 0.9222337573005369,
+      "delta_macro_f1": -4.7046501051584144e-05,
+      "category_delta": {
+        "БАД": -9.409300210316829e-05,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 3,
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_macro_f1": 0.8756674877004054,
+          "candidate_macro_f1": 0.876011414077362,
+          "delta": 0.0003439263769566825
+        },
+        {
+          "fold": 1,
+          "baseline_macro_f1": 0.9396294679059323,
+          "candidate_macro_f1": 0.9396780338400628,
+          "delta": 4.856593413049559e-05
+        },
+        {
+          "fold": 2,
+          "baseline_macro_f1": 0.9611171629145485,
+          "candidate_macro_f1": 0.961265487790208,
+          "delta": 0.00014832487565952235
+        },
+        {
+          "fold": 3,
+          "baseline_macro_f1": 0.9334681100821703,
+          "candidate_macro_f1": 0.9331598570762778,
+          "delta": -0.0003082530058925448
+        },
+        {
+          "fold": 4,
+          "baseline_macro_f1": 0.9080559168193054,
+          "candidate_macro_f1": 0.9075915430820918,
+          "delta": -0.0004643737372136414
+        }
+      ],
+      "changed": 43,
+      "corrected": 20,
+      "regressed": 23,
+      "direction": {
+        "FN": {
+          "changed": 43,
+          "corrected": 20,
+          "regressed": 23
+        },
+        "FP": {
+          "changed": 0,
+          "corrected": 0,
+          "regressed": 0
+        }
+      },
+      "sports": {
+        "rows": 2014,
+        "baseline_f1": 0.8900126422250316,
+        "candidate_f1": 0.890728476821192,
+        "delta_f1": 0.0007158345961604251
+      },
+      "singleton_sports": {
+        "rows": 1231,
+        "baseline_f1": 0.8841642228739003,
+        "candidate_f1": 0.8828571428571429,
+        "delta_f1": -0.0013070800167573893
+      },
+      "placebo_diagnostic": {
+        "median_absolute_delta_on_changed": 0.031492143869400024,
+        "median_sports_delta_on_changed": 0.07034331560134888
+      },
+      "component_bootstrap": {
+        "iterations": 5000,
+        "seed": 35045,
+        "probability_delta_positive": 0.4434,
+        "delta_mean": -4.5907553168989245e-05,
+        "delta_ci95": [
+          -0.000681522397035328,
+          0.0006122629161997262
+        ]
+      },
+      "structural_invariants": {
+        "changed_unsafe": 0,
+        "changed_non_sports": 0,
+        "changed_flammable": 0
+      },
+      "training_folds": [
+        {
+          "fold": 0,
+          "selector_rows": 415,
+          "fn_changes": 7,
+          "fp_changes": 0
+        },
+        {
+          "fold": 1,
+          "selector_rows": 392,
+          "fn_changes": 4,
+          "fp_changes": 0
+        },
+        {
+          "fold": 2,
+          "selector_rows": 404,
+          "fn_changes": 12,
+          "fp_changes": 0
+        },
+        {
+          "fold": 3,
+          "selector_rows": 414,
+          "fn_changes": 14,
+          "fp_changes": 0
+        },
+        {
+          "fold": 4,
+          "selector_rows": 389,
+          "fn_changes": 6,
+          "fp_changes": 0
+        }
+      ]
+    }
+  },
+  "downstream_priors": {
+    "category": {
+      "БАД": {
+        "baseline_f1": 0.9571402845308842,
+        "candidate_f1": 0.9568493765138603
+      },
+      "Легковоспламеняющиеся": {
+        "baseline_f1": 0.8921568627450981,
+        "candidate_f1": 0.8921568627450981
+      }
+    },
+    "baseline_macro_f1": 0.9246485736379911,
+    "candidate_macro_f1": 0.9245031196294792,
+    "delta_macro_f1": -0.00014545400851195822,
+    "changed_before": 44,
+    "changed_after": 41,
+    "baseline_prior_hits": {
+      "БАД": {
+        "rows": 7469,
+        "exact_hits": 7,
+        "name_hits": 291,
+        "canonical_hits": 603,
+        "shingle_hits": 280,
+        "shingle_changes": 13
+      },
+      "Легковоспламеняющиеся": {
+        "rows": 5502,
+        "exact_hits": 0,
+        "name_hits": 0,
+        "canonical_hits": 0,
+        "shingle_hits": 0,
+        "shingle_changes": 0
+      }
+    },
+    "candidate_prior_hits": {
+      "БАД": {
+        "rows": 7469,
+        "exact_hits": 7,
+        "name_hits": 291,
+        "canonical_hits": 603,
+        "shingle_hits": 280,
+        "shingle_changes": 14
+      },
+      "Легковоспламеняющиеся": {
+        "rows": 5502,
+        "exact_hits": 0,
+        "name_hits": 0,
+        "canonical_hits": 0,
+        "shingle_hits": 0,
+        "shingle_changes": 0
+      }
+    }
+  },
+  "acceptance": {
+    "connected_delta_at_least_0_003": false,
+    "connected_wins_at_least_4_of_5": false,
+    "bad_delta_at_least_0_006": false,
+    "sports_delta_at_least_0_01": false,
+    "corrected_to_regressed_at_least_2": false,
+    "direction_corrected_to_regressed_at_least_2": false,
+    "singleton_sports_delta_positive": false,
+    "bootstrap_probability_at_least_0_90": false,
+    "placebo_median_effect_less_than_sports": true,
+    "all_repeat_deltas_positive": false,
+    "repeat_mean_delta_at_least_0_003": false,
+    "positive_after_priors": false,
+    "structural_invariants": true
+  },
+  "accepted_for_full_refit": false,
+  "runtime_seconds": 304.38086129199655,
+  "input_sha256": {
+    "research/data.csv": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "research/qwen35-hard-5fold-robust-fusion-report.npz": "147f2b2b87d8220566526b38ab0e085c0bc44cd82b0442baca6b019516c3f1d8",
+    "research/lora-hard-5fold-robust-fusion-report.npz": "ba432e13624e6c3b1c7304ced8cacf580f4ffcc0a0cde1af8b6afb098bf6dc01",
+    "validation/locked_190_nested_v1/adapter_replacement_report.npz": "176b76b0b0fd3527e9e15c8f2edd6a43f90fd3a24db1567a32a4b05e215139e8",
+    "validation/connected_family_guard_v2/rows.csv": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "validation/connected_family_repeated_v1/rows.csv": "4dea3dbb832edc7134120963e031b86562d1948845eb8669ac6e46d800b7a7dc"
+  }
+}

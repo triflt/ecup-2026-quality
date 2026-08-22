@@ -1,0 +1,20 @@
+id = "380"
+slug = "all_image_hard_negative_metric_parity"
+status = "rejected_offline_promising_signal"
+data_version = "competition_train_v1"
+evaluation_version = "all_image_flammable_metric_connected_replication_v1"
+parent_experiment = "370_flammable_metric_disagreement_replication"
+
+[hypothesis]
+statement = "The flammable hard-negative disagreement signal survives on the all-image representation used by production experiment 190."
+changed_factor = "First-image embedding cache replaced by production-parity all-image embedding cache."
+
+[entrypoints]
+run = "python experiments/380_all_image_hard_negative_metric_parity/run.py"
+
+[acceptance]
+minimum_repeat_mean_macro_delta = 0.001
+minimum_total_fold_wins = 11
+minimum_corrected_to_regressed = 2.0
+minimum_each_bootstrap_probability = 0.80
+all_repeat_deltas_positive = true

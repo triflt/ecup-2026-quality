@@ -20,6 +20,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn.functional as F
 from PIL import Image
 from sklearn.metrics import f1_score
 from transformers import AutoModelForImageTextToText, AutoModelForMultimodalLM, AutoProcessor
@@ -44,6 +45,10 @@ MODEL_CLASS = os.environ.get("MODEL_CLASS", "image_text").strip().lower()
 USE_CHAT_BATCH = MODEL_CLASS == "multimodal" or os.environ.get("USE_CHAT_BATCH") == "1"
 FULL_TRAIN = os.environ.get("FULL_TRAIN") == "1"
 DESCRIPTION_LIMIT = int(os.environ.get("DESCRIPTION_LIMIT", "1800"))
+DOWNSAMPLE_MODE = os.environ.get("DOWNSAMPLE_MODE", "").strip()
+MAX_SLICE_NUMS = int(os.environ.get("MAX_SLICE_NUMS", "0"))
+SOFT_TARGETS = Path(os.environ["SOFT_TARGETS"]) if os.environ.get("SOFT_TARGETS") else None
+LAST_LOGIT_ONLY = os.environ.get("LAST_LOGIT_ONLY") == "1"
 
 
 RULES = {
@@ -274,6 +279,10 @@ def chat_batch(processor, conversations, add_generation_prompt):
         truncation=True,
         max_length=MAX_LENGTH,
     )
+    if DOWNSAMPLE_MODE:
+        kwargs["downsample_mode"] = DOWNSAMPLE_MODE
+    if MAX_SLICE_NUMS:
+        kwargs["max_slice_nums"] = MAX_SLICE_NUMS
     try:
         return processor.apply_chat_template(
             conversations, enable_thinking=False, **kwargs
@@ -283,6 +292,38 @@ def chat_batch(processor, conversations, add_generation_prompt):
 
 
 def training_batch(processor, rows):
+    if SOFT_TARGETS is not None:
+        if USE_CHAT_BATCH:
+            images = open_images(rows)
+            batch = chat_batch(
+                processor,
+                [messages(row, False, image) for row, image in zip(rows, images)],
+                True,
+            )
+            for image in images:
+                image.close()
+        else:
+            prompts = [
+                processor.apply_chat_template(
+                    messages(row, False), tokenize=False, add_generation_prompt=True
+                )
+                for row in rows
+            ]
+            images = open_images(rows)
+            batch = processor(
+                text=prompts,
+                images=images,
+                padding=True,
+                truncation=True,
+                max_length=MAX_LENGTH,
+                return_tensors="pt",
+            )
+            for image in images:
+                image.close()
+        targets = torch.tensor(
+            [float(row.soft_target) for row in rows], dtype=torch.float32
+        )
+        return batch, targets
     if USE_CHAT_BATCH:
         images = open_images(rows)
         batch = chat_batch(
@@ -378,10 +419,16 @@ def validation_scores(model, processor, frame, positions, token_zero, token_one)
             for image in images:
                 image.close()
         batch = {key: value.to("cuda") for key, value in batch.items()}
-        outputs = model(**batch)
-        sequence = torch.arange(batch["attention_mask"].shape[1], device="cuda")[None, :]
-        last = torch.where(batch["attention_mask"].bool(), sequence, -1).max(dim=1).values
-        logits = outputs.logits[torch.arange(len(rows), device="cuda"), last]
+        forward_kwargs = {"downsample_mode": DOWNSAMPLE_MODE} if DOWNSAMPLE_MODE else {}
+        if LAST_LOGIT_ONLY:
+            forward_kwargs["logits_to_keep"] = 1
+        outputs = model(**batch, **forward_kwargs)
+        if LAST_LOGIT_ONLY:
+            logits = outputs.logits[:, -1]
+        else:
+            sequence = torch.arange(batch["attention_mask"].shape[1], device="cuda")[None, :]
+            last = torch.where(batch["attention_mask"].bool(), sequence, -1).max(dim=1).values
+            logits = outputs.logits[torch.arange(len(rows), device="cuda"), last]
         values = logits[:, token_one] - logits[:, token_zero]
         scores.extend(values.float().cpu().numpy().tolist())
         if len(scores) % 400 < len(rows) or len(scores) == len(positions):
@@ -409,6 +456,16 @@ def main():
     ids = frame["id"].astype(str).to_numpy()
     if not np.array_equal(ids, oof["ids"].astype(str)):
         raise ValueError("OOF id mismatch")
+    if SOFT_TARGETS is not None:
+        soft = pd.read_csv(SOFT_TARGETS, dtype={"id": str}).set_index("id")
+        missing = sorted(set(ids) - set(soft.index))
+        if missing:
+            raise ValueError(f"missing soft targets for {len(missing)} ids")
+        aligned = soft.loc[ids]
+        targets = aligned["soft_target"].to_numpy(np.float32)
+        if not np.isfinite(targets).all() or np.any((targets < 0) | (targets > 1)):
+            raise ValueError("soft targets must be finite probabilities in [0, 1]")
+        frame["soft_target"] = targets
     urls = load_urls()
     train_records = select_training(frame, oof)
     val_positions = (
@@ -425,6 +482,9 @@ def main():
         "validation": len(val_positions),
         "images": len(needed),
         "download_failures": len(failures),
+        "soft_targets": SOFT_TARGETS is not None,
+        "soft_target_mean": float(frame.loc[train_records, "soft_target"].mean())
+        if SOFT_TARGETS is not None else None,
     }), flush=True)
 
     processor_kwargs = {"local_files_only": True, "trust_remote_code": True}
@@ -491,9 +551,34 @@ def main():
         for start in range(0, len(train_records), BATCH_SIZE):
             positions = train_records[start:start + BATCH_SIZE]
             rows = [frame.iloc[index] for index in positions]
-            batch = training_batch(processor, rows)
+            training_data = training_batch(processor, rows)
+            if SOFT_TARGETS is not None:
+                batch, soft_targets = training_data
+                soft_targets = soft_targets.to("cuda")
+            else:
+                batch = training_data
             batch = {key: value.to("cuda") for key, value in batch.items()}
-            loss = model(**batch).loss / GRAD_ACCUM
+            forward_kwargs = {"downsample_mode": DOWNSAMPLE_MODE} if DOWNSAMPLE_MODE else {}
+            if SOFT_TARGETS is not None and LAST_LOGIT_ONLY:
+                forward_kwargs["logits_to_keep"] = 1
+            if SOFT_TARGETS is not None:
+                outputs = model(**batch, **forward_kwargs)
+                if LAST_LOGIT_ONLY:
+                    logits = outputs.logits[:, -1]
+                else:
+                    sequence = torch.arange(
+                        batch["attention_mask"].shape[1], device="cuda"
+                    )[None, :]
+                    last = torch.where(
+                        batch["attention_mask"].bool(), sequence, -1
+                    ).max(dim=1).values
+                    logits = outputs.logits[torch.arange(len(rows), device="cuda"), last]
+                binary_logits = logits[:, token_one].float() - logits[:, token_zero].float()
+                loss = F.binary_cross_entropy_with_logits(
+                    binary_logits, soft_targets
+                ) / GRAD_ACCUM
+            else:
+                loss = model(**batch, **forward_kwargs).loss / GRAD_ACCUM
             loss.backward()
             running_loss += float(loss.detach().cpu()) * GRAD_ACCUM
             step += 1
@@ -524,6 +609,8 @@ def main():
             "download_failures": len(failures),
             "optimizer_updates": optimizer_steps,
             "runtime_minutes": (time.monotonic() - started) / 60,
+            "soft_targets": SOFT_TARGETS is not None,
+            "last_logit_only": LAST_LOGIT_ONLY,
         }
         (OUTPUT / "full_train_report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -540,6 +627,8 @@ def main():
         "holdout_fold": HOLDOUT_FOLD,
         "train_records": len(train_records),
         "download_failures": len(failures),
+        "soft_targets": SOFT_TARGETS is not None,
+        "last_logit_only": LAST_LOGIT_ONLY,
         "categories": {},
     }
     macro_lora, macro_fused = [], []

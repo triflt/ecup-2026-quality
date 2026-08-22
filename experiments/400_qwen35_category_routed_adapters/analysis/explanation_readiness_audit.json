@@ -1,0 +1,20 @@
+{
+  "experiment_id": "400",
+  "audit_version": "explanation_readiness_v1",
+  "created_at": "2026-08-22",
+  "source": "experiments/400_qwen35_category_routed_adapters/submission/run.py",
+  "generator_signature": "explain(category, prediction)",
+  "possible_comments": 4,
+  "input_fields_used": ["category", "prediction"],
+  "product_specific_fields_used": [],
+  "uses_name": false,
+  "uses_description": false,
+  "uses_images": false,
+  "uses_component_evidence": false,
+  "format_consistent": true,
+  "verdict_consistent": true,
+  "organizer_concrete_evidence_requirement_met": false,
+  "decision": "not_ready_for_final_explanation_review",
+  "classification_candidate_status": "unchanged_ready_for_manual_public_metric_check",
+  "next_action": "add a verdict-locked evidence-first explanation layer and audit 200 frozen rows before final selection"
+}

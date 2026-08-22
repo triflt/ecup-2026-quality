@@ -1,0 +1,27 @@
+{
+  "experiment_id": "470",
+  "status": "rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "qwen35_adapter_soup_seed_repeat_screen_v1",
+  "seed": 31415,
+  "folds": [0, 3],
+  "alpha_specialist": 0.5,
+  "metrics": {
+    "baseline_macro_f1": 0.8967770153905033,
+    "candidate_macro_f1": 0.8977784975841498,
+    "delta_macro_f1": 0.0010014821936465967,
+    "fold_deltas": [-0.00015837820715858264, 0.0040584415584415945],
+    "folds_won": 1,
+    "corrected": 4,
+    "regressed": 4,
+    "flammable_false_negative_delta": -1,
+    "safety_union_false_negative_delta": -1,
+    "connected_safe_delta": 0.0011111604960220012,
+    "connected_bootstrap_probability_positive": 0.5444
+  },
+  "jobs": [
+    "redacted-job",
+    "redacted-job"
+  ],
+  "decision": "Rejected: fixed-alpha soup did not improve both folds and corrections did not exceed regressions"
+}

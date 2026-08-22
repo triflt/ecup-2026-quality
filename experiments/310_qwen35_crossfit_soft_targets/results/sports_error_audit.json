@@ -1,0 +1,17 @@
+{
+  "frozen_common_sports_errors": 243,
+  "fixed_from_frozen_243": 6,
+  "remaining_from_frozen_243": 237,
+  "cue_defined_sports_rows": 2255,
+  "cue_defined_baseline_errors": 254,
+  "cue_defined_candidate_errors": 258,
+  "new_sports_errors_created": 13,
+  "sports_errors_corrected": 9,
+  "guardrail_breach": true,
+  "input_sha256": {
+    "predictions": "08dbc30e582293c3f7e660767827d39dd3b08c1aae659c36ffacbfed441c8ef1",
+    "targets": "6e58a21f1830a24f6659347ea2110780fb29b8c75f81b1d14c9f99c26c0782d0",
+    "selector": "d254eba1c8d14114b982beee3877c3c8e361be8c83e4de2690e44b140ca195c1",
+    "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+  }
+}

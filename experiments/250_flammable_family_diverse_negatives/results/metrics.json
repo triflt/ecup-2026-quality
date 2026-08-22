@@ -1,0 +1,39 @@
+{
+  "experiment_id": "250",
+  "status": "superseded_before_training",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "seed": 42,
+  "changed_factor": "family-diverse negative flammable sampling",
+  "primary_comparison": "family_diverse_negative_seed42 + fixed_seed31415 mean probability",
+  "baseline_macro_f1": null,
+  "selection_audit": {
+    "old_selected_rows": 1600,
+    "old_selected_families_range": [1272, 1301],
+    "old_duplicate_exposures_range": [299, 328],
+    "old_hard_duplicate_exposures_range": [206, 237],
+    "old_max_family_exposures": 20,
+    "new_selected_rows": 1600,
+    "new_selected_families": 1600,
+    "new_max_family_exposures": 1,
+    "mean_uncertainty_change": 0.03266003727912903
+  },
+  "validation": {
+    "bad_f1": null,
+    "flammable_f1": null,
+    "macro_f1": null,
+    "fold_scores": []
+  },
+  "runtime": {},
+  "reproducibility": {
+    "hardware": "one H100",
+    "training_code_sha256": "e501ac3f2592bda54ed7719692db8d610dc93bb149868c70e539cf9450866452",
+    "cycle_code_sha256": "65b8f7ca98e15d0c51ffab4c4bfea2173caacec78e0938d7e817554ee3896623",
+    "output_bundle_at_root": true,
+    "recursive_output_mask": true,
+    "oof_input_sha256": "5d7467c48fc8a5a73f947f5aa1300071c77ba699b29c12250caf1bcd3176d7ac",
+    "image_manifest_sha256": "d6193215ce2d6145440bd484ea225e77fe10784c4c2c06b7c6b0b85dc8efc7d9"
+  },
+  "artifacts": [],
+  "decision": "superseded before training by experiment 410, which applies the same isolated negative-family factor to the exact 260 recipe used by category routing 400"
+}

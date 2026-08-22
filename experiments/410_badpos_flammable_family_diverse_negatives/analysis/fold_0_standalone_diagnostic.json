@@ -1,0 +1,30 @@
+{
+  "experiment_id": "410",
+  "fold": 0,
+  "diagnostic_only": true,
+  "not_an_acceptance_metric": "LoRA thresholds and best-fusion weights in these reports are selected on the same holdout fold. The frozen locked category-routed audit is still required.",
+  "parent_260": {
+    "bad_lora_f1": 0.9468037550290568,
+    "flammable_lora_f1": 0.891566265060241,
+    "macro_lora": 0.9191850100446488,
+    "macro_best_fusion": 0.9388619990995047,
+    "runtime_minutes": 36.0535923746104
+  },
+  "candidate_410": {
+    "bad_lora_f1": 0.9454870420017873,
+    "flammable_lora_f1": 0.8181818181818182,
+    "macro_lora": 0.8818344300918028,
+    "macro_best_fusion": 0.8975789941047334,
+    "runtime_minutes": 37.18664868737881,
+    "download_failures": 0,
+    "selected_flammable_negative_rows": 1600,
+    "selected_flammable_negative_families": 1600
+  },
+  "delta": {
+    "bad_lora_f1": -0.0013167130272694338,
+    "flammable_lora_f1": -0.07338444687842272,
+    "macro_lora": -0.037350579952845964,
+    "macro_best_fusion": -0.04128300499477133
+  },
+  "interim_decision": "negative warning; do not stop other folds because the frozen rule permits one fold loss and the locked routed metric is not available yet"
+}

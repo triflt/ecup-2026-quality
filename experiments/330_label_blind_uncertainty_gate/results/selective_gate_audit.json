@@ -1,0 +1,893 @@
+{
+  "experiment_id": "330",
+  "evaluation_version": "component_transfer_gate_v4_selective_extension",
+  "recipe_frozen_before_scoring": true,
+  "production_inputs_only": [
+    "robust_base_rank",
+    "qwen3vl_rank",
+    "qwen35_rank"
+  ],
+  "topologies": {
+    "historical": {
+      "topology": "historical",
+      "rows": 12971,
+      "baseline_category_f1": {
+        "БАД": 0.9546604046242775,
+        "Легковоспламеняющиеся": 0.8921568627450981
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9539212143115288,
+        "Легковоспламеняющиеся": 0.8921568627450981
+      },
+      "baseline_macro_f1": 0.9234086336846878,
+      "candidate_macro_f1": 0.9230390385283134,
+      "delta_macro_f1": -0.00036959515637446927,
+      "category_delta": {
+        "БАД": -0.0007391903127487165,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_macro_f1": 0.9030404751145826,
+          "candidate_macro_f1": 0.9030404751145826,
+          "delta": 0.0
+        },
+        {
+          "fold": 1,
+          "baseline_macro_f1": 0.8932643264326433,
+          "candidate_macro_f1": 0.8932643264326433,
+          "delta": 0.0
+        },
+        {
+          "fold": 2,
+          "baseline_macro_f1": 0.9403481012658228,
+          "candidate_macro_f1": 0.9403481012658228,
+          "delta": 0.0
+        },
+        {
+          "fold": 3,
+          "baseline_macro_f1": 0.9398582447362935,
+          "candidate_macro_f1": 0.9380090497737557,
+          "delta": -0.0018491949625378812
+        },
+        {
+          "fold": 4,
+          "baseline_macro_f1": 0.9428357105823433,
+          "candidate_macro_f1": 0.9428357105823433,
+          "delta": 0.0
+        }
+      ],
+      "changed": 10,
+      "corrected": 1,
+      "regressed": 9,
+      "selection": [
+        {
+          "category": "БАД",
+          "fold": 0,
+          "config": null,
+          "inner_baseline_f1": 0.9551599819738621,
+          "inner_candidate_f1": 0.9551599819738621,
+          "inner_changes": 0
+        },
+        {
+          "category": "БАД",
+          "fold": 1,
+          "config": null,
+          "inner_baseline_f1": 0.9551361735789354,
+          "inner_candidate_f1": 0.9551361735789354,
+          "inner_changes": 0
+        },
+        {
+          "category": "БАД",
+          "fold": 2,
+          "config": null,
+          "inner_baseline_f1": 0.9544018058690745,
+          "inner_candidate_f1": 0.9544018058690745,
+          "inner_changes": 0
+        },
+        {
+          "category": "БАД",
+          "fold": 3,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.15,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9533573681838666,
+          "inner_candidate_f1": 0.9542174109156518,
+          "inner_changes": 48
+        },
+        {
+          "category": "БАД",
+          "fold": 4,
+          "config": null,
+          "inner_baseline_f1": 0.9536169732535831,
+          "inner_candidate_f1": 0.9536169732535831,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 0,
+          "config": null,
+          "inner_baseline_f1": 0.9012345679012346,
+          "inner_candidate_f1": 0.9012345679012346,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 1,
+          "config": null,
+          "inner_baseline_f1": 0.9074074074074074,
+          "inner_candidate_f1": 0.9074074074074074,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 2,
+          "config": null,
+          "inner_baseline_f1": 0.8841463414634146,
+          "inner_candidate_f1": 0.8841463414634146,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 3,
+          "config": null,
+          "inner_baseline_f1": 0.8795180722891566,
+          "inner_candidate_f1": 0.8795180722891566,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 4,
+          "config": null,
+          "inner_baseline_f1": 0.874251497005988,
+          "inner_candidate_f1": 0.874251497005988,
+          "inner_changes": 0
+        }
+      ],
+      "structural_invariants": {
+        "changes_outside_eligible": 0,
+        "changes_without_two_opponents": 0
+      },
+      "component_bootstrap": {
+        "iterations": 5000,
+        "seed": 33042,
+        "probability_delta_positive": 0.0052,
+        "delta_mean": -0.0003677346831532331,
+        "delta_ci95": [
+          -0.0007778892297940904,
+          -4.925679669368079e-05
+        ]
+      }
+    },
+    "historical_connected_safe": {
+      "topology": "historical_connected_safe",
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.9509505304064699,
+        "Легковоспламеняющиеся": 0.8877551020408163
+      },
+      "candidate_category_f1": {
+        "БАД": 0.949679588192037,
+        "Легковоспламеняющиеся": 0.8877551020408163
+      },
+      "baseline_macro_f1": 0.9193528162236431,
+      "candidate_macro_f1": 0.9187173451164267,
+      "delta_macro_f1": -0.000635471107216401,
+      "category_delta": {
+        "БАД": -0.001270942214432913,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_macro_f1": 0.8983566764885318,
+          "candidate_macro_f1": 0.8983566764885318,
+          "delta": 0.0
+        },
+        {
+          "fold": 1,
+          "baseline_macro_f1": 0.889792708709328,
+          "candidate_macro_f1": 0.889792708709328,
+          "delta": 0.0
+        },
+        {
+          "fold": 2,
+          "baseline_macro_f1": 0.9372487156578067,
+          "candidate_macro_f1": 0.9372487156578067,
+          "delta": 0.0
+        },
+        {
+          "fold": 3,
+          "baseline_macro_f1": 0.9334803135578122,
+          "candidate_macro_f1": 0.9302434456928839,
+          "delta": -0.0032368678649283833
+        },
+        {
+          "fold": 4,
+          "baseline_macro_f1": 0.9410265744448489,
+          "candidate_macro_f1": 0.9410265744448489,
+          "delta": 0.0
+        }
+      ],
+      "changed": 18,
+      "corrected": 3,
+      "regressed": 15,
+      "selection": [
+        {
+          "category": "БАД",
+          "fold": 0,
+          "config": null,
+          "inner_baseline_f1": 0.951958224543081,
+          "inner_candidate_f1": 0.951958224543081,
+          "inner_changes": 0
+        },
+        {
+          "category": "БАД",
+          "fold": 1,
+          "config": null,
+          "inner_baseline_f1": 0.9510947948079193,
+          "inner_candidate_f1": 0.9510947948079193,
+          "inner_changes": 0
+        },
+        {
+          "category": "БАД",
+          "fold": 2,
+          "config": null,
+          "inner_baseline_f1": 0.9496175151675019,
+          "inner_candidate_f1": 0.9496175151675019,
+          "inner_changes": 0
+        },
+        {
+          "category": "БАД",
+          "fold": 3,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.05,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9496871741397289,
+          "inner_candidate_f1": 0.9510890830833442,
+          "inner_changes": 71
+        },
+        {
+          "category": "БАД",
+          "fold": 4,
+          "config": null,
+          "inner_baseline_f1": 0.9498548429664819,
+          "inner_candidate_f1": 0.9498548429664819,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 0,
+          "config": null,
+          "inner_baseline_f1": 0.896774193548387,
+          "inner_candidate_f1": 0.896774193548387,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 1,
+          "config": null,
+          "inner_baseline_f1": 0.9032258064516129,
+          "inner_candidate_f1": 0.9032258064516129,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 2,
+          "config": null,
+          "inner_baseline_f1": 0.8805031446540881,
+          "inner_candidate_f1": 0.8805031446540881,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 3,
+          "config": null,
+          "inner_baseline_f1": 0.8757763975155279,
+          "inner_candidate_f1": 0.8757763975155279,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 4,
+          "config": null,
+          "inner_baseline_f1": 0.8679245283018868,
+          "inner_candidate_f1": 0.8679245283018868,
+          "inner_changes": 0
+        }
+      ],
+      "structural_invariants": {
+        "changes_outside_eligible": 0,
+        "changes_without_two_opponents": 0
+      },
+      "component_bootstrap": {
+        "iterations": 5000,
+        "seed": 33043,
+        "probability_delta_positive": 0.0068,
+        "delta_mean": -0.0006355489460199305,
+        "delta_ci95": [
+          -0.0011927620039269339,
+          -0.00013924450880677423
+        ]
+      }
+    },
+    "repeat_0": {
+      "topology": "repeat_0",
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.9506302521008403,
+        "Легковоспламеняющиеся": 0.8905852417302799
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9501102825333473,
+        "Легковоспламеняющиеся": 0.8905852417302799
+      },
+      "baseline_macro_f1": 0.92060774691556,
+      "candidate_macro_f1": 0.9203477621318136,
+      "delta_macro_f1": -0.0002599847837464475,
+      "category_delta": {
+        "БАД": -0.000519969567493006,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 2,
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_macro_f1": 0.9334240150876636,
+          "candidate_macro_f1": 0.9319993343872202,
+          "delta": -0.001424680700443437
+        },
+        {
+          "fold": 1,
+          "baseline_macro_f1": 0.9195179148085499,
+          "candidate_macro_f1": 0.9209046595532356,
+          "delta": 0.0013867447446856973
+        },
+        {
+          "fold": 2,
+          "baseline_macro_f1": 0.9104503625209146,
+          "candidate_macro_f1": 0.9075280112044818,
+          "delta": -0.002922351316432814
+        },
+        {
+          "fold": 3,
+          "baseline_macro_f1": 0.9322333312887199,
+          "candidate_macro_f1": 0.9337974605900754,
+          "delta": 0.0015641293013555213
+        },
+        {
+          "fold": 4,
+          "baseline_macro_f1": 0.8973161844477864,
+          "candidate_macro_f1": 0.8973161844477864,
+          "delta": 0.0
+        }
+      ],
+      "changed": 81,
+      "corrected": 38,
+      "regressed": 43,
+      "selection": [
+        {
+          "category": "БАД",
+          "fold": 0,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.05,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9431089743589743,
+          "inner_candidate_f1": 0.9480830670926518,
+          "inner_changes": 102
+        },
+        {
+          "category": "БАД",
+          "fold": 1,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.05,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9498625474538552,
+          "inner_candidate_f1": 0.9504434011476265,
+          "inner_changes": 87
+        },
+        {
+          "category": "БАД",
+          "fold": 2,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.05,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9485847831732017,
+          "inner_candidate_f1": 0.9520733755328769,
+          "inner_changes": 103
+        },
+        {
+          "category": "БАД",
+          "fold": 3,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.05,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9494315954527637,
+          "inner_candidate_f1": 0.949986907567426,
+          "inner_changes": 75
+        },
+        {
+          "category": "БАД",
+          "fold": 4,
+          "config": null,
+          "inner_baseline_f1": 0.9493269992082344,
+          "inner_candidate_f1": 0.9493269992082344,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 0,
+          "config": null,
+          "inner_baseline_f1": 0.8689138576779026,
+          "inner_candidate_f1": 0.8689138576779026,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 1,
+          "config": null,
+          "inner_baseline_f1": 0.8823529411764706,
+          "inner_candidate_f1": 0.8823529411764706,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 2,
+          "config": null,
+          "inner_baseline_f1": 0.8640483383685801,
+          "inner_candidate_f1": 0.8640483383685801,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 3,
+          "config": null,
+          "inner_baseline_f1": 0.8831168831168831,
+          "inner_candidate_f1": 0.8831168831168831,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 4,
+          "config": null,
+          "inner_baseline_f1": 0.8703703703703703,
+          "inner_candidate_f1": 0.8703703703703703,
+          "inner_changes": 0
+        }
+      ],
+      "structural_invariants": {
+        "changes_outside_eligible": 0,
+        "changes_without_two_opponents": 0
+      },
+      "component_bootstrap": {
+        "iterations": 5000,
+        "seed": 33044,
+        "probability_delta_positive": 0.3168,
+        "delta_mean": -0.0002726958363750264,
+        "delta_ci95": [
+          -0.001405402669946068,
+          0.0009153188561687783
+        ]
+      }
+    },
+    "repeat_1": {
+      "topology": "repeat_1",
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.9509505304064699,
+        "Легковоспламеняющиеся": 0.8905852417302799
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9500578277783619,
+        "Легковоспламеняющиеся": 0.8905852417302799
+      },
+      "baseline_macro_f1": 0.9207678860683749,
+      "candidate_macro_f1": 0.9203215347543209,
+      "delta_macro_f1": -0.0004463513140540165,
+      "category_delta": {
+        "БАД": -0.000892702628108033,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 1,
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_macro_f1": 0.8903508771929824,
+          "candidate_macro_f1": 0.8903508771929824,
+          "delta": 0.0
+        },
+        {
+          "fold": 1,
+          "baseline_macro_f1": 0.9207377417903734,
+          "candidate_macro_f1": 0.9177778447262976,
+          "delta": -0.002959897064075734
+        },
+        {
+          "fold": 2,
+          "baseline_macro_f1": 0.9224158740887365,
+          "candidate_macro_f1": 0.9224158740887365,
+          "delta": 0.0
+        },
+        {
+          "fold": 3,
+          "baseline_macro_f1": 0.9214851358459986,
+          "candidate_macro_f1": 0.9219859670096637,
+          "delta": 0.0005008311636651719
+        },
+        {
+          "fold": 4,
+          "baseline_macro_f1": 0.9481486162011878,
+          "candidate_macro_f1": 0.9481486162011878,
+          "delta": 0.0
+        }
+      ],
+      "changed": 20,
+      "corrected": 6,
+      "regressed": 14,
+      "selection": [
+        {
+          "category": "БАД",
+          "fold": 0,
+          "config": null,
+          "inner_baseline_f1": 0.9471147409291739,
+          "inner_candidate_f1": 0.9471147409291739,
+          "inner_changes": 0
+        },
+        {
+          "category": "БАД",
+          "fold": 1,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.15,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9486552567237164,
+          "inner_candidate_f1": 0.949794026776519,
+          "inner_changes": 41
+        },
+        {
+          "category": "БАД",
+          "fold": 2,
+          "config": null,
+          "inner_baseline_f1": 0.9540756247546774,
+          "inner_candidate_f1": 0.9540756247546774,
+          "inner_changes": 0
+        },
+        {
+          "category": "БАД",
+          "fold": 3,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.15,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9506432134418482,
+          "inner_candidate_f1": 0.9506561679790027,
+          "inner_changes": 44
+        },
+        {
+          "category": "БАД",
+          "fold": 4,
+          "config": null,
+          "inner_baseline_f1": 0.952293094359515,
+          "inner_candidate_f1": 0.952293094359515,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 0,
+          "config": null,
+          "inner_baseline_f1": 0.9079365079365079,
+          "inner_candidate_f1": 0.9079365079365079,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 1,
+          "config": null,
+          "inner_baseline_f1": 0.8926174496644296,
+          "inner_candidate_f1": 0.8926174496644296,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 2,
+          "config": null,
+          "inner_baseline_f1": 0.8868501529051988,
+          "inner_candidate_f1": 0.8868501529051988,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 3,
+          "config": null,
+          "inner_baseline_f1": 0.89375,
+          "inner_candidate_f1": 0.89375,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 4,
+          "config": null,
+          "inner_baseline_f1": 0.8745980707395499,
+          "inner_candidate_f1": 0.8745980707395499,
+          "inner_changes": 0
+        }
+      ],
+      "structural_invariants": {
+        "changes_outside_eligible": 0,
+        "changes_without_two_opponents": 0
+      },
+      "component_bootstrap": {
+        "iterations": 5000,
+        "seed": 33045,
+        "probability_delta_positive": 0.0422,
+        "delta_mean": -0.0004465670807107246,
+        "delta_ci95": [
+          -0.0010605351508208515,
+          5.0100416617734883e-05
+        ]
+      }
+    },
+    "repeat_2": {
+      "topology": "repeat_2",
+      "rows": 11207,
+      "baseline_category_f1": {
+        "БАД": 0.9506302521008403,
+        "Легковоспламеняющиеся": 0.8905852417302799
+      },
+      "candidate_category_f1": {
+        "БАД": 0.949679588192037,
+        "Легковоспламеняющиеся": 0.8905852417302799
+      },
+      "baseline_macro_f1": 0.92060774691556,
+      "candidate_macro_f1": 0.9201324149611585,
+      "delta_macro_f1": -0.00047533195440152554,
+      "category_delta": {
+        "БАД": -0.0009506639088032731,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "folds_won": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "baseline_macro_f1": 0.8748390386944604,
+          "candidate_macro_f1": 0.8748390386944604,
+          "delta": 0.0
+        },
+        {
+          "fold": 1,
+          "baseline_macro_f1": 0.9396294679059323,
+          "candidate_macro_f1": 0.9391427894861473,
+          "delta": -0.0004866784197850027
+        },
+        {
+          "fold": 2,
+          "baseline_macro_f1": 0.9608725238167246,
+          "candidate_macro_f1": 0.9596793635486982,
+          "delta": -0.0011931602680264053
+        },
+        {
+          "fold": 3,
+          "baseline_macro_f1": 0.9332168789352244,
+          "candidate_macro_f1": 0.932517267139356,
+          "delta": -0.0006996117958684156
+        },
+        {
+          "fold": 4,
+          "baseline_macro_f1": 0.9007530930607854,
+          "candidate_macro_f1": 0.9007530930607854,
+          "delta": 0.0
+        }
+      ],
+      "changed": 75,
+      "corrected": 33,
+      "regressed": 42,
+      "selection": [
+        {
+          "category": "БАД",
+          "fold": 0,
+          "config": null,
+          "inner_baseline_f1": 0.9497836633014292,
+          "inner_candidate_f1": 0.9497836633014292,
+          "inner_changes": 0
+        },
+        {
+          "category": "БАД",
+          "fold": 1,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.05,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.949165900433469,
+          "inner_candidate_f1": 0.9495986313988682,
+          "inner_changes": 86
+        },
+        {
+          "category": "БАД",
+          "fold": 2,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.0,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9474374098833399,
+          "inner_candidate_f1": 0.9490051390169982,
+          "inner_changes": 112
+        },
+        {
+          "category": "БАД",
+          "fold": 3,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.05,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9531025473546701,
+          "inner_candidate_f1": 0.9534610872115761,
+          "inner_changes": 64
+        },
+        {
+          "category": "БАД",
+          "fold": 4,
+          "config": {
+            "minimum_opposing": 2,
+            "advantage": 0.15,
+            "baseline_cap": 0.6
+          },
+          "inner_baseline_f1": 0.9494844015141627,
+          "inner_candidate_f1": 0.9495292887029289,
+          "inner_changes": 45
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 0,
+          "config": null,
+          "inner_baseline_f1": 0.9161290322580645,
+          "inner_candidate_f1": 0.9161290322580645,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 1,
+          "config": null,
+          "inner_baseline_f1": 0.8810289389067524,
+          "inner_candidate_f1": 0.8810289389067524,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 2,
+          "config": null,
+          "inner_baseline_f1": 0.8658536585365854,
+          "inner_candidate_f1": 0.8658536585365854,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 3,
+          "config": null,
+          "inner_baseline_f1": 0.8461538461538461,
+          "inner_candidate_f1": 0.8461538461538461,
+          "inner_changes": 0
+        },
+        {
+          "category": "Легковоспламеняющиеся",
+          "fold": 4,
+          "config": null,
+          "inner_baseline_f1": 0.8932038834951457,
+          "inner_candidate_f1": 0.8932038834951457,
+          "inner_changes": 0
+        }
+      ],
+      "structural_invariants": {
+        "changes_outside_eligible": 0,
+        "changes_without_two_opponents": 0
+      },
+      "component_bootstrap": {
+        "iterations": 5000,
+        "seed": 33046,
+        "probability_delta_positive": 0.1942,
+        "delta_mean": -0.0004719481661972528,
+        "delta_ci95": [
+          -0.0015519075234562308,
+          0.0006846381927201212
+        ]
+      }
+    }
+  },
+  "downstream_priors": {
+    "protocol": "donor-only Public-190 prior replay",
+    "category": {
+      "БАД": {
+        "baseline_f1": 0.9571402845308842,
+        "candidate_f1": 0.9566861773975687
+      },
+      "Легковоспламеняющиеся": {
+        "baseline_f1": 0.8921568627450981,
+        "candidate_f1": 0.8921568627450981
+      }
+    },
+    "baseline_macro_f1": 0.9246485736379911,
+    "candidate_macro_f1": 0.9244215200713334,
+    "delta_macro_f1": -0.00022705356665775334,
+    "changed_before": 10,
+    "changed_after": 7,
+    "baseline_prior_hits": {
+      "БАД": {
+        "rows": 7469,
+        "exact_hits": 7,
+        "name_hits": 291,
+        "canonical_hits": 603,
+        "shingle_hits": 280,
+        "shingle_changes": 13
+      },
+      "Легковоспламеняющиеся": {
+        "rows": 5502,
+        "exact_hits": 0,
+        "name_hits": 0,
+        "canonical_hits": 0,
+        "shingle_hits": 0,
+        "shingle_changes": 0
+      }
+    },
+    "candidate_prior_hits": {
+      "БАД": {
+        "rows": 7469,
+        "exact_hits": 7,
+        "name_hits": 291,
+        "canonical_hits": 603,
+        "shingle_hits": 280,
+        "shingle_changes": 13
+      },
+      "Легковоспламеняющиеся": {
+        "rows": 5502,
+        "exact_hits": 0,
+        "name_hits": 0,
+        "canonical_hits": 0,
+        "shingle_hits": 0,
+        "shingle_changes": 0
+      }
+    }
+  },
+  "acceptance": {
+    "historical_delta_at_least_0_002": false,
+    "historical_wins_at_least_4_of_5": false,
+    "historical_bootstrap_probability_at_least_0_90": false,
+    "connected_delta_at_least_0_002": false,
+    "connected_wins_at_least_4_of_5": false,
+    "connected_bootstrap_probability_at_least_0_90": false,
+    "no_category_drop_over_0_005": true,
+    "all_repeat_deltas_positive": false,
+    "repeat_mean_delta_at_least_0_002": false,
+    "positive_macro_delta_after_priors": false,
+    "structural_invariants": true
+  },
+  "accepted_for_full_refit": false,
+  "runtime_seconds": 28.54831362499681,
+  "input_sha256": {
+    "research/qwen35-hard-5fold-robust-fusion-report.npz": "147f2b2b87d8220566526b38ab0e085c0bc44cd82b0442baca6b019516c3f1d8",
+    "research/lora-hard-5fold-robust-fusion-report.npz": "ba432e13624e6c3b1c7304ced8cacf580f4ffcc0a0cde1af8b6afb098bf6dc01",
+    "validation/locked_190_nested_v1/adapter_replacement_report.npz": "176b76b0b0fd3527e9e15c8f2edd6a43f90fd3a24db1567a32a4b05e215139e8",
+    "validation/grouped_text_v1/folds.csv": "03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d",
+    "validation/connected_family_guard_v2/rows.csv": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "validation/connected_family_repeated_v1/rows.csv": "4dea3dbb832edc7134120963e031b86562d1948845eb8669ac6e46d800b7a7dc",
+    "research/data.csv": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "experiment_id": "280",
+  "status": "public_tie_rejected",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "locked_190_nested_v1",
+  "parent_experiment": "190_shingle_neighbor_prior",
+  "source_adapter_experiment": "260_bad_family_diverse_positives",
+  "changed_factor": "Qwen3.5 seed42 full-data adapter only",
+  "validation": {
+    "baseline_bad_f1": 0.9546604046242775,
+    "baseline_flammable_f1": 0.8921568627450981,
+    "baseline_macro_f1": 0.9234086336846878,
+    "bad_f1": 0.9525967551889786,
+    "flammable_f1": 0.9086294416243654,
+    "macro_f1": 0.9306130984066721,
+    "delta_macro_f1": 0.007204464721984216,
+    "category_delta": {
+      "БАД": -0.0020636494352989088,
+      "Легковоспламеняющиеся": 0.01647257887926734
+    },
+    "folds_won": 4,
+    "fold_deltas": [
+      0.025249876340383448,
+      0.003453529634806274,
+      0.01754578996293188,
+      -0.024126514741872107,
+      0.010897321091864809
+    ],
+    "changed_predictions": 97,
+    "corrected": 42,
+    "regressed": 55,
+    "group_bootstrap": {
+      "iterations": 10000,
+      "probability_delta_positive": 0.8275,
+      "delta_ci95": [-0.00807448462938323, 0.023215952705384575]
+    },
+    "report": "validation/locked_190_nested_v1/adapter_replacement_report.json"
+  },
+  "runtime": {
+    "architecture_unchanged_from_190": true,
+    "qwen35_passes": 1,
+    "measured_rows": 600,
+    "measured_seconds": 228.76,
+    "projected_public_minutes": 10.17,
+    "projected_private_minutes": 24.15,
+    "public_limit_minutes": 20,
+    "private_limit_minutes": 40
+  },
+  "leaderboard": {
+    "public_macro_f1": 0.8919244237,
+    "baseline_experiment": "190_shingle_neighbor_prior",
+    "baseline_public_macro_f1": 0.8919244237,
+    "displayed_delta": 0.0,
+    "source": "manual leaderboard screenshot, 2026-08-22",
+    "interpretation": "Tie to leaderboard display precision; prediction identity cannot be inferred from an equal aggregate score"
+  },
+  "reproducibility": {
+    "submission_tree_sha256": "ee18bc1eb7f50670e5cfe8d31a5014e2724bd67cd3050121736ce5756e469e78",
+    "qwen3vl_adapter_sha256": "ee51108823f5ef2288e0b60233611d99a6c4a34d5a4ec987c8dbadafb1b4b5b7",
+    "qwen35_adapter_sha256": "6a6ad2fe4eebafbb9658dc268e96bd872e9f76852b33b0fb31a6a3928b918bfa",
+    "shingle_index_sha256": "a2b207365436863c18781b6e5a9a4716a6991a451598b18e69af80d4ad5724ff",
+    "annotator_prior_sha256": "1589a984e1946ad1f1406d5de02217c226ffce9ee6330755ac66442670b6f43d"
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/quality-public190-badfam-v280.zip",
+      "size_bytes": 47761207,
+      "sha256": "cd8d60d5446823aac766e1e0f6db28d4654129a411c8cbdefd466e5d27e89fcb"
+    },
+    {
+      "path": "composition.json"
+    }
+  ],
+  "decision": "Rejected as an improvement: Public Macro F1 tied experiment 190 at 0.8919244237 to displayed precision. Keep experiment 190 as champion and do not tune thresholds from this result."
+}

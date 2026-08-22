@@ -1,0 +1,13 @@
+{
+  "control_script": "research/qwen3vl_lora_holdout.py",
+  "candidate_script": "research/qwen35_family_balanced_isolated_lora.py",
+  "seed": 42,
+  "folds": [
+    {"fold": 0, "all_records": 5390, "non_target_multiset_exact": true, "positive_families": 113, "min_family_exposure": 6, "max_family_exposure": 7},
+    {"fold": 1, "all_records": 5390, "non_target_multiset_exact": true, "positive_families": 113, "min_family_exposure": 6, "max_family_exposure": 7},
+    {"fold": 2, "all_records": 5395, "non_target_multiset_exact": true, "positive_families": 113, "min_family_exposure": 7, "max_family_exposure": 8},
+    {"fold": 3, "all_records": 5390, "non_target_multiset_exact": true, "positive_families": 116, "min_family_exposure": 6, "max_family_exposure": 7},
+    {"fold": 4, "all_records": 5395, "non_target_multiset_exact": true, "positive_families": 113, "min_family_exposure": 7, "max_family_exposure": 8}
+  ],
+  "passed": true
+}

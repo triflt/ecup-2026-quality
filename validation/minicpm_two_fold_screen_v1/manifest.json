@@ -1,0 +1,35 @@
+{
+  "version": "minicpm_two_fold_screen_v1",
+  "dataset_version": "competition_train_v1",
+  "parent_evaluation": "locked_190_nested_v1",
+  "purpose": "Low-cost causal screen of a new first-image VLM before five-fold training",
+  "screen_folds": [0, 3],
+  "selection_time_rationale": {
+    "fold_0": "largest positive fold delta for experiment 260 inside locked Public-190",
+    "fold_3": "only negative and largest adverse fold delta for experiment 260 inside locked Public-190"
+  },
+  "calibration": "For fold 0 the category threshold is fitted only on fold 3; for fold 3 it is fitted only on fold 0",
+  "fixed_fusion_weights": {
+    "БАД": [0.5, 0.25, 0.25],
+    "Легковоспламеняющиеся": [0.15, 0.1, 0.75]
+  },
+  "acceptance": {
+    "positive_mean_delta": true,
+    "required_fold_wins": 2,
+    "max_category_f1_drop": 0.005
+  },
+  "limitations": "A two-fold screen is only a compute gate. Passing it authorizes, but does not replace, full locked_190_nested_v1 evaluation.",
+  "integrity": {
+    "dataset_sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "fold_registry_sha256": "03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d",
+    "evaluator_sha256": "8a7294b680467bc46f1e5d09c4e1f22fafce67e0f8e01d84d9a47500529f61d0",
+    "null_control_report_sha256": "87fcabd85a9f8e5a94e4b9be56f70f59ed4de6650ffafbeef21d77d8018ff5c6"
+  },
+  "null_control": {
+    "candidate": "original Qwen3.5 seed42 scores",
+    "delta_macro_f1": 0.0,
+    "changed_predictions": 0,
+    "status": "passed"
+  },
+  "immutable": true
+}

@@ -1,0 +1,53 @@
+{
+  "version": "qwen35_adapter_soup_seed_repeat_screen_v1",
+  "dataset_version": "competition_train_v1",
+  "parent_experiment": "430_qwen35_flammable_adapter_soup",
+  "baseline_experiment": "400_qwen35_category_routed_adapters",
+  "purpose": "Independent-seed reject-only confirmation of the fixed alpha-0.50 Qwen3.5 LoRA interpolation",
+  "screen_folds": [
+    0,
+    3
+  ],
+  "seed": 31415,
+  "selection_time_rationale": {
+    "fold_0": "Experiment 430 changed decisions and produced a small positive effect on this fold",
+    "fold_3": "Experiment 430 produced its largest positive effect and recall recovery on this fold"
+  },
+  "changed_factor": "Training seed only: repeat the exact experiment-260 specialist recipe and interpolate it with the original adapter from the same seed",
+  "alpha_specialist": 0.5,
+  "alpha_selection": "fixed from experiment 430; no grid or tuning on seed-31415 predictions",
+  "fixed_fusion_weights": {
+    "base": 0.15,
+    "qwen3vl": 0.1,
+    "qwen35": 0.75
+  },
+  "fixed_thresholds": {
+    "0": 0.9558810591697693,
+    "3": 0.9558810591697693
+  },
+  "threshold_rule": "The same fold-specific threshold transferred from experiment 430 is applied to the pure specialist and the soup; no seed-31415 labels select a threshold",
+  "acceptance": {
+    "required_each_fold_delta_positive": true,
+    "minimum_mean_macro_delta": 0.0,
+    "maximum_flammable_false_negative_increase": 0,
+    "maximum_safety_union_false_negative_increase": 0,
+    "corrected_must_exceed_regressed": true
+  },
+  "limitations": "Passing authorizes a separately versioned full cycle only. The two-fold result cannot itself accept, package, or submit a model.",
+  "input_sha256": {
+    "validation/grouped_text_v1/folds.csv": "03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d",
+    "validation/connected_family_guard_v2/rows.csv": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "experiments/430_qwen35_flammable_adapter_soup/results/acceptance_audit.json": "ca7086f2a971bed708c9f6a3cc6672589a73dee05812dd7368e98c2193afb74f"
+  },
+  "code_sha256": {
+    "research/run_qwen35_adapter_soup_seed_repeat.py": "3f2a175765fce41ec07019c114ebecfa19a4f24e6220ce8596ad1db0d5b34545",
+    "research/qwen35_adapter_soup_seed_repeat_oof.py": "2d04a1279518ce7729fea694b9cdaa8004203fb6508918ec8f0049215954be55",
+    "experiments/470_qwen35_adapter_soup_seed_repeat/evaluate.py": "b2c0633ef42a14bd3bc32f8744ba01b7f09c72da6d367e4d4d3f93f0d785d2a6"
+  },
+  "jobs": [
+    "redacted-job",
+    "redacted-job"
+  ],
+  "frozen_before_predictions": true,
+  "immutable": true
+}

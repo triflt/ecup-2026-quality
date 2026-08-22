@@ -1,0 +1,26 @@
+{
+  "experiment_id": "410",
+  "fold": 3,
+  "diagnostic_only": true,
+  "reason_not_acceptance_metric": "The fixed production threshold does not replace the frozen nested threshold fitted on the other four folds.",
+  "threshold": 0.953912615776062,
+  "baseline_macro_f1": 0.9125303095136215,
+  "candidate_macro_f1": 0.918319783197832,
+  "delta_macro_f1": 0.0057894736842105665,
+  "baseline_category_f1": {
+    "БАД": 0.9566395663956639,
+    "Легковоспламеняющиеся": 0.868421052631579
+  },
+  "candidate_category_f1": {
+    "БАД": 0.9566395663956639,
+    "Легковоспламеняющиеся": 0.88
+  },
+  "changed": 1,
+  "corrected": 1,
+  "regressed": 0,
+  "flammable_false_negatives": {
+    "baseline": 7,
+    "candidate": 7,
+    "delta": 0
+  }
+}

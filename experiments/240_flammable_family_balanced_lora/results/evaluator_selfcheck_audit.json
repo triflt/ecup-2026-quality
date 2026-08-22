@@ -1,0 +1,120 @@
+{
+  "evaluation_version": "nested_grouped_v1",
+  "candidate": "evaluator-selfcheck",
+  "baseline_macro_f1": 0.9192367220630797,
+  "candidate_macro_f1": 0.9192367220630797,
+  "delta_macro_f1": 0.0,
+  "baseline_category_f1": {
+    "БАД": 0.9518755059818297,
+    "Легковоспламеняющиеся": 0.8865979381443299
+  },
+  "candidate_category_f1": {
+    "БАД": 0.9518755059818297,
+    "Легковоспламеняющиеся": 0.8865979381443299
+  },
+  "category_delta": {
+    "БАД": 0.0,
+    "Легковоспламеняющиеся": 0.0
+  },
+  "folds_won": 0,
+  "folds": [
+    {
+      "fold": 0,
+      "baseline_macro_f1": 0.8957716410715515,
+      "candidate_macro_f1": 0.8957716410715515,
+      "delta": 0.0,
+      "baseline_category_f1": {
+        "БАД": 0.945389435989257,
+        "Легковоспламеняющиеся": 0.8461538461538461
+      },
+      "candidate_category_f1": {
+        "БАД": 0.945389435989257,
+        "Легковоспламеняющиеся": 0.8461538461538461
+      }
+    },
+    {
+      "fold": 1,
+      "baseline_macro_f1": 0.888519722097714,
+      "candidate_macro_f1": 0.888519722097714,
+      "delta": 0.0,
+      "baseline_category_f1": {
+        "БАД": 0.9520394441954281,
+        "Легковоспламеняющиеся": 0.825
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9520394441954281,
+        "Легковоспламеняющиеся": 0.825
+      }
+    },
+    {
+      "fold": 2,
+      "baseline_macro_f1": 0.9440879228976614,
+      "candidate_macro_f1": 0.9440879228976614,
+      "delta": 0.0,
+      "baseline_category_f1": {
+        "БАД": 0.9531109107303878,
+        "Легковоспламеняющиеся": 0.935064935064935
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9531109107303878,
+        "Легковоспламеняющиеся": 0.935064935064935
+      }
+    },
+    {
+      "fold": 3,
+      "baseline_macro_f1": 0.9142462049423719,
+      "candidate_macro_f1": 0.9142462049423719,
+      "delta": 0.0,
+      "baseline_category_f1": {
+        "БАД": 0.9517800811176206,
+        "Легковоспламеняющиеся": 0.8767123287671232
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9517800811176206,
+        "Легковоспламеняющиеся": 0.8767123287671232
+      }
+    },
+    {
+      "fold": 4,
+      "baseline_macro_f1": 0.9535553047404063,
+      "candidate_macro_f1": 0.9535553047404063,
+      "delta": 0.0,
+      "baseline_category_f1": {
+        "БАД": 0.9571106094808126,
+        "Легковоспламеняющиеся": 0.95
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9571106094808126,
+        "Легковоспламеняющиеся": 0.95
+      }
+    }
+  ],
+  "disagreements": {
+    "БАД": {
+      "changed": 0,
+      "corrected": 0,
+      "regressed": 0
+    },
+    "Легковоспламеняющиеся": {
+      "changed": 0,
+      "corrected": 0,
+      "regressed": 0
+    }
+  },
+  "group_bootstrap": {
+    "iterations": 1000,
+    "seed": 23031415,
+    "delta_mean": 0.0,
+    "delta_ci95": [
+      0.0,
+      0.0
+    ],
+    "probability_delta_positive": 0.0
+  },
+  "acceptance": {
+    "delta_at_least_0_001": false,
+    "wins_at_least_4_of_5_folds": false,
+    "no_category_drop_over_0_005": true
+  },
+  "accepted": false
+}

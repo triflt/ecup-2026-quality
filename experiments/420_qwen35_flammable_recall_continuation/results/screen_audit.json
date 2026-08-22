@@ -1,0 +1,183 @@
+{
+  "experiment_id": "420",
+  "evaluation_version": "flammable_recall_two_fold_reject_screen_v1",
+  "purpose": "Reject-only screen; cannot accept or package the candidate",
+  "screen_folds": [
+    0,
+    3
+  ],
+  "threshold_protocol": "Hybrid nested threshold: continuation OOF ranks on folds 0 and 3, unchanged parent-260 OOF ranks on folds 1, 2 and 4; each tested fold threshold excludes that fold",
+  "weights": {
+    "robust_base": 0.15,
+    "qwen3vl": 0.1,
+    "qwen35": 0.75
+  },
+  "selection_uses_screen_labels": false,
+  "folds": [
+    {
+      "fold": 0,
+      "baseline_category_f1": {
+        "БАД": 0.9489380930863082,
+        "Легковоспламеняющиеся": 0.9135802469135802
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9489380930863082,
+        "Легковоспламеняющиеся": 0.8607594936708861
+      },
+      "baseline_macro_f1": 0.9312591699999442,
+      "candidate_macro_f1": 0.9048487933785971,
+      "delta_macro_f1": -0.026410376621347043,
+      "changed": 4,
+      "corrected": 0,
+      "regressed": 4,
+      "flammable_false_negatives": {
+        "baseline": 3,
+        "candidate": 6,
+        "delta": 3
+      },
+      "safety_union_false_negatives": {
+        "positive_rows": 32,
+        "baseline": 3,
+        "candidate": 3,
+        "delta": 0
+      },
+      "connected_safe_delta_macro_f1": -0.027124773960217063,
+      "gates": {
+        "routed_macro_delta_positive": false,
+        "flammable_false_negatives_not_increased": false,
+        "corrected_exceeds_regressed": false,
+        "safety_union_false_negatives_not_increased": true
+      },
+      "passed": false
+    },
+    {
+      "fold": 3,
+      "baseline_category_f1": {
+        "БАД": 0.9566395663956639,
+        "Легковоспламеняющиеся": 0.8767123287671232
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9566395663956639,
+        "Легковоспламеняющиеся": 0.8611111111111112
+      },
+      "baseline_macro_f1": 0.9166759475813936,
+      "candidate_macro_f1": 0.9088753387533876,
+      "delta_macro_f1": -0.007800608828006039,
+      "changed": 1,
+      "corrected": 0,
+      "regressed": 1,
+      "flammable_false_negatives": {
+        "baseline": 8,
+        "candidate": 9,
+        "delta": 1
+      },
+      "safety_union_false_negatives": {
+        "positive_rows": 38,
+        "baseline": 8,
+        "candidate": 9,
+        "delta": 1
+      },
+      "connected_safe_delta_macro_f1": -0.008593396653098218,
+      "gates": {
+        "routed_macro_delta_positive": false,
+        "flammable_false_negatives_not_increased": false,
+        "corrected_exceeds_regressed": false,
+        "safety_union_false_negatives_not_increased": false
+      },
+      "passed": false
+    }
+  ],
+  "screen_passed": false,
+  "full_five_fold_cycle_allowed": false,
+  "parent_locked_detail": {
+    "weights": {
+      "robust_base": 0.15000000596046448,
+      "qwen3vl": 0.10000000149011612,
+      "qwen35": 0.75
+    },
+    "nested_f1": 0.9086294416243654,
+    "nested_folds": [
+      {
+        "fold": 0,
+        "threshold": 0.9564604759216309,
+        "train_f1": 0.910828025477707,
+        "validation_f1": 0.9135802469135802
+      },
+      {
+        "fold": 1,
+        "threshold": 0.9569836854934692,
+        "train_f1": 0.9329073482428115,
+        "validation_f1": 0.8395061728395061
+      },
+      {
+        "fold": 2,
+        "threshold": 0.9569836854934692,
+        "train_f1": 0.9015873015873016,
+        "validation_f1": 0.9620253164556962
+      },
+      {
+        "fold": 3,
+        "threshold": 0.9570291638374329,
+        "train_f1": 0.91875,
+        "validation_f1": 0.8767123287671232
+      },
+      {
+        "fold": 4,
+        "threshold": 0.9569836854934692,
+        "train_f1": 0.9044585987261147,
+        "validation_f1": 0.95
+      }
+    ],
+    "production_threshold": 0.953912615776062,
+    "production_threshold_oof_f1": 0.9022556390977443
+  },
+  "hybrid_locked_detail": {
+    "weights": {
+      "robust_base": 0.15000000596046448,
+      "qwen3vl": 0.10000000149011612,
+      "qwen35": 0.75
+    },
+    "nested_f1": 0.8838383838383839,
+    "nested_folds": [
+      {
+        "fold": 0,
+        "threshold": 0.956210196018219,
+        "train_f1": 0.910828025477707,
+        "validation_f1": 0.8607594936708861
+      },
+      {
+        "fold": 1,
+        "threshold": 0.9559599757194519,
+        "train_f1": 0.9171974522292994,
+        "validation_f1": 0.8395061728395061
+      },
+      {
+        "fold": 2,
+        "threshold": 0.9502502083778381,
+        "train_f1": 0.8936170212765957,
+        "validation_f1": 0.9156626506024096
+      },
+      {
+        "fold": 3,
+        "threshold": 0.9584850072860718,
+        "train_f1": 0.9085173501577287,
+        "validation_f1": 0.8611111111111112
+      },
+      {
+        "fold": 4,
+        "threshold": 0.9558007121086121,
+        "train_f1": 0.8888888888888888,
+        "validation_f1": 0.9382716049382716
+      }
+    ],
+    "production_threshold": 0.953912615776062,
+    "production_threshold_oof_f1": 0.89
+  },
+  "input_sha256": {
+    "experiments/420_qwen35_flammable_recall_continuation/artifacts/screen_seed42/fold_0/lora_holdout_predictions.csv": "afba4c51a7ab07519e5862e244a678abc801a35764018621ec3c4e77d0ecadea",
+    "experiments/420_qwen35_flammable_recall_continuation/artifacts/screen_seed42/fold_3/lora_holdout_predictions.csv": "80f2b63d7ec36ff39508fec32ba72550863b4b8984424b975b044adf26d5990f",
+    "experiments/400_qwen35_category_routed_adapters/results/routed_predictions.npz": "58aa9feb3e6a276fda27666b11e479e052549523999bf2fb3c9af660904ab174",
+    "validation/connected_family_guard_v2/rows.csv": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "research/data.csv": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+  }
+}

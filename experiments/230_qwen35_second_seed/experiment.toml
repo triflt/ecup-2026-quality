@@ -2,9 +2,10 @@
 id = "230"
 slug = "qwen35_second_seed"
 title = "Second-seed Qwen3.5 ensemble"
-status = "ready_for_aggregation"
+status = "rejected_online"
 entrypoint = "research/qwen35_seed_ensemble_cv.py"
 result_file = "experiments/230_qwen35_second_seed/results/metrics.json"
+submission_source = "experiments/230_qwen35_second_seed/submission_two_pass"
 
 [data]
 version = "competition_train_v1"

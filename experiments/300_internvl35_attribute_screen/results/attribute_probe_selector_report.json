@@ -1,0 +1,40 @@
+{
+  "selector_version": "internvl_attribute_probe_selector_v1",
+  "selection_uses_labels": false,
+  "category": "Легковоспламеняющиеся",
+  "uncertainty_fraction": 0.2,
+  "uncertainty_cutoff": 0.19171971082687378,
+  "required_text_cue_union": [
+    "fuel_or_gas",
+    "empty_equipment",
+    "ignition_source",
+    "fuel_included",
+    "combustible_material",
+    "absence_or_negation"
+  ],
+  "category_rows": 5502,
+  "uncertainty_rows_before_cues": 1102,
+  "selected_rows": 909,
+  "selected_fraction_of_category": 0.16521264994547438,
+  "selected_by_fold": {
+    "0": 167,
+    "1": 187,
+    "2": 191,
+    "3": 163,
+    "4": 201
+  },
+  "post_selection_diagnostic_not_used_by_selector": {
+    "baseline_flammable_errors": 44,
+    "selected_baseline_errors": 37,
+    "error_coverage": 0.8409090909090909,
+    "selected_positives": 116
+  },
+  "input_sha256": {
+    "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "folds": "03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d",
+    "qwen35": "147f2b2b87d8220566526b38ab0e085c0bc44cd82b0442baca6b019516c3f1d8",
+    "qwen3vl": "ba432e13624e6c3b1c7304ced8cacf580f4ffcc0a0cde1af8b6afb098bf6dc01",
+    "locked": "176b76b0b0fd3527e9e15c8f2edd6a43f90fd3a24db1567a32a4b05e215139e8",
+    "image_manifest": "d6193215ce2d6145440bd484ea225e77fe10784c4c2c06b7c6b0b85dc8efc7d9"
+  }
+}

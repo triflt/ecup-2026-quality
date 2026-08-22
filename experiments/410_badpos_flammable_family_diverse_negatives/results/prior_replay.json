@@ -1,0 +1,94 @@
+{
+  "baseline_before_priors": {
+    "bad_f1": 0.9546604046242775,
+    "flammable_f1": 0.9086294416243654,
+    "macro_f1": 0.9316449231243215
+  },
+  "candidate_before_priors": {
+    "bad_f1": 0.9546604046242775,
+    "flammable_f1": 0.8636363636363636,
+    "macro_f1": 0.9091483841303205
+  },
+  "baseline_after_priors": {
+    "bad_f1": 0.9571402845308842,
+    "flammable_f1": 0.9086294416243654,
+    "macro_f1": 0.9328848630776247
+  },
+  "candidate_after_priors": {
+    "bad_f1": 0.9571402845308842,
+    "flammable_f1": 0.8636363636363636,
+    "macro_f1": 0.9103883240836239
+  },
+  "change_survival": {
+    "changed_before_priors": {
+      "rows": 32,
+      "bad_rows": 0,
+      "flammable_rows": 32
+    },
+    "overridden_by_priors": {
+      "rows": 0,
+      "bad_rows": 0,
+      "flammable_rows": 0
+    },
+    "survived_after_priors": {
+      "rows": 32,
+      "bad_rows": 0,
+      "flammable_rows": 32
+    },
+    "introduced_by_different_prior_resolution": {
+      "rows": 0,
+      "bad_rows": 0,
+      "flammable_rows": 0
+    },
+    "survival_rate": 1.0,
+    "before_priors": {
+      "corrected": 7,
+      "regressed": 25
+    },
+    "after_priors": {
+      "corrected": 7,
+      "regressed": 25
+    }
+  },
+  "baseline_prior_hits": {
+    "БАД": {
+      "rows": 7469,
+      "exact_hits": 7,
+      "name_hits": 291,
+      "canonical_hits": 603,
+      "shingle_hits": 280,
+      "shingle_changes": 13
+    },
+    "Легковоспламеняющиеся": {
+      "rows": 5502,
+      "exact_hits": 0,
+      "name_hits": 0,
+      "canonical_hits": 0,
+      "shingle_hits": 0,
+      "shingle_changes": 0
+    }
+  },
+  "candidate_prior_hits": {
+    "БАД": {
+      "rows": 7469,
+      "exact_hits": 7,
+      "name_hits": 291,
+      "canonical_hits": 603,
+      "shingle_hits": 280,
+      "shingle_changes": 13
+    },
+    "Легковоспламеняющиеся": {
+      "rows": 5502,
+      "exact_hits": 0,
+      "name_hits": 0,
+      "canonical_hits": 0,
+      "shingle_hits": 0,
+      "shingle_changes": 0
+    }
+  },
+  "delta_after_priors": {
+    "bad_f1": 0.0,
+    "flammable_f1": -0.044993077988001784,
+    "macro_f1": -0.022496538994000836
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "experiment_id": "450",
+  "evaluation_version": "flammable_transaction_scope_nested_v1",
+  "created_before_candidate_scores": true,
+  "parent_experiment": "400_qwen35_category_routed_adapters",
+  "single_changed_factor": "Add one label-blind transaction-scope text view for the flammable category",
+  "scope_terms": [
+    "комплект", "набор", "входит", "содерж", "постав", "включ", "состав",
+    "комплектац", "отдельно", "без", "предназнач", "подход", "совместим",
+    "заправ", "сменн", "пуст", "газ", "топлив", "угол", "уголь", "дров",
+    "брикет", "парафин", "спирт", "бензин", "керосин", "жидкост", "аэрозол",
+    "баллон", "свеч", "спич", "зажиг", "горел", "пиротех", "фейерверк",
+    "салют", "петард", "дым"
+  ],
+  "scope_view": "Normalized title twice plus every sentence containing a frozen scope term; title only when no sentence matches; maximum 4000 characters",
+  "model": {
+    "type": "LinearSVC",
+    "C": 1.0,
+    "class_weight": "balanced",
+    "word_ngrams": [1, 2],
+    "char_wb_ngrams": [3, 5],
+    "word_max_features": 80000,
+    "char_max_features": 120000,
+    "min_df": 2,
+    "seed": 45042
+  },
+  "cross_fit": "For each frozen outer fold, fit vectorizer and classifier on flammable rows from the other four folds only",
+  "integration": {
+    "parent_weights": [0.15, 0.10, 0.75],
+    "scope_weight_grid": [0.05, 0.10, 0.15, 0.20],
+    "rule": "Scale all parent weights by 1-scope_weight and add scope rank; choose weight and threshold on the other four outer folds; ties prefer the smaller scope weight",
+    "bad_route": "Copy experiment-400 BAD decisions exactly"
+  },
+  "acceptance": {
+    "minimum_macro_delta": 0.003,
+    "minimum_flammable_delta": 0.006,
+    "minimum_fold_wins": 4,
+    "minimum_corrected_to_regressed_ratio": 1.5,
+    "maximum_flammable_false_negative_increase": 0,
+    "maximum_safety_union_false_negative_increase": 0,
+    "minimum_connected_bootstrap_probability": 0.90
+  },
+  "forbidden_after_results": [
+    "Change scope terms or context window",
+    "Add rules for observed errors",
+    "Expand the weight grid",
+    "Relax acceptance gates"
+  ]
+}

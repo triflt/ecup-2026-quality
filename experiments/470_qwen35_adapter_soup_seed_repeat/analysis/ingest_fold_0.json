@@ -1,0 +1,17 @@
+{
+  "experiment_id": "470",
+  "fold": 0,
+  "bundle": "experiments/470_qwen35_adapter_soup_seed_repeat/.local/downloads/redacted-job/qwen_soup_rpt_f0.zip",
+  "bundle_bytes": 46681626,
+  "bundle_sha256": "a32fa2275b1516b8b1491a328a0b8ee2d575dd66f1e58117e483e715e9850c28",
+  "pure_rows": 2594,
+  "soup_rows": 1100,
+  "accepted_files": {
+    "adapter.zip": "ba7619d49466f2137ff1439934515159f57339aaae135cefa12488f1f552dc74",
+    "lora_holdout_predictions.csv": "1b6cd2e175068d7c117075cb94c66aebde784bcc8062f3dc90c18ad9264925d6",
+    "lora_holdout_report.json": "affbedb6cba5a8fd95060760b5daf31396b87e2f8026e546280981e814b0d2ad",
+    "soup_holdout_predictions.csv": "0d053daecba848d2376aac12e0bc0fb7ad15292a5fcc379fd8c80408a923d358",
+    "soup_holdout_report.json": "25795d11b6034a5d55ebe21f951ea68ffffb25774188a83db23b04e77b34a05b"
+  },
+  "passed": true
+}

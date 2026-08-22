@@ -1,0 +1,44 @@
+[experiment]
+id = "241"
+slug = "flammable_family_balanced_isolated"
+title = "Isolated family-balanced Qwen3.5 for flammable positives"
+status = "rejected"
+entrypoint = "research/qwen35_family_balanced_isolated_lora.py"
+result_file = "experiments/241_flammable_family_balanced_isolated/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "nested_grouped_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "230_qwen35_second_seed"
+changed_factor = "Equalize positive flammable exposure across families using an isolated RNG stream"
+mechanism = "Repeated positive rows overweight large product families; isolation keeps every non-target training row identical to the control"
+primary_comparison = "Replace seed42 with isolated-family seed42 in the fixed probability pair with seed31415"
+expected_macro_f1_delta = 0.002
+falsification = "Reject if nested Macro F1 gains less than 0.001, fewer than four folds improve, or either category drops by more than 0.005"
+precedents = ["Class-Balanced Loss, CVPR 2019", "Rakuten SIGIR 2020 winning solution"]
+
+[acceptance]
+baseline_macro_f1 = 0.9192367220630797
+required_fold_wins = 4
+max_category_f1_drop = 0.005
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 4.8
+planned_public_submissions = 0
+runtime_limit_minutes = 40
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false
