@@ -2,13 +2,15 @@
 
 ## Статус
 
-`strict_cpu_rerun`. Первый строгий CPU-запуск остановлен до сохранения artifact
+`qwen_training_running`. Первый строгий CPU-запуск остановлен до сохранения artifact
 из-за подтверждённой ошибки NumPy 2.2.6 на ARM macOS: Accelerate/SME выставляет
 ложные floating-point flags при корректном `matmul`. Минимальное воспроизведение
 на матрицах из единиц дало три предупреждения при конечном точном результате;
-NumPy 2.3.1 на том же входе предупреждений не даёт. Повтор выполняется с NumPy
-2.3.1, все RuntimeWarning, ConvergenceWarning и non-finite проверки остаются
-фатальными, а версии численных библиотек записываются в итоговый report.
+NumPy 2.3.1 на том же входе предупреждений не даёт. Повтор на NumPy 2.3.1
+успешно завершён, при этом все RuntimeWarning, ConvergenceWarning и non-finite
+проверки остались фатальными. Итог: Macro F1 `0,8935380094`, BAD
+`0,9452849741`, «легковоспламеняющиеся» `0,8417910448`. Пять Qwen3-VL folds
+запущены 22 августа 2026 года и ожидают результатов.
 
 Эксперимент готовит
 два воспроизводимых development-компонента: robust base и точный повтор
@@ -86,9 +88,9 @@ python experiments/601_semantic_v3_visual_base_baselines/prepare_runtime_inputs.
   --output-dir experiments/601_semantic_v3_visual_base_baselines/.local/runtime_inputs
 ```
 
-Presets передают в задачу только два публичных Python-файла, parent runner и
-отдельный development-only runtime-каталог; весь `.local` целиком не
-упаковывается.
+Задача получает только два публичных Python-файла, parent runner и отдельный
+development-only runtime-архив с обязательной проверкой SHA-256; весь `.local`
+целиком не упаковывается.
 
 ## Qwen3-VL
 

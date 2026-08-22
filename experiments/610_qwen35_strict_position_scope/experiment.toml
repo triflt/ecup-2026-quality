@@ -1,0 +1,94 @@
+[experiment]
+id = "610"
+slug = "qwen35_strict_position_scope"
+title = "Strict position-only transaction-scope augmentation on semantic-v3"
+status = "rejected_before_gpu"
+entrypoint = "experiments/610_qwen35_strict_position_scope/train_screen.py"
+result_file = "experiments/610_qwen35_strict_position_scope/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+source = "experiment-600 physical development-only scoped runtime"
+development_rows = 11118
+sealed_holdout_rows = 1853
+sealed_rows_available_to_job = 0
+
+[validation]
+protocol = "semantic_family_v3"
+selector_source_protocol = "semantic_v3_robust_base_strict_nested_v2"
+screen_folds = [0, 3]
+independent_blind_audit_folds = [1, 2, 4]
+legacy_audit_ids_excluded = 73
+sealed_holdout_used = false
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+training_parent_component = "260_bad_family_diverse_positives"
+changed_factor = "Move exactly one complete unambiguous transaction-scope sentence to the beginning of description for a deterministic row subset nearest to 50 percent of eligible training occurrences"
+mechanism = "Training invariance to sentence position may recover late bundle and compatibility evidence without adding deleting or paraphrasing tokens and without changing inference"
+expected_macro_f1_delta = "0.001-0.004"
+falsification = "Fewer than 100 independent blind-audit pairs; semantic preservation below 98 percent; kappa below 0.80; insufficient intervention coverage; or either reject-screen fold is non-positive"
+precedents = [
+  "Consistent Text Categorization using Data Augmentation in e-Commerce, ACL Industry 2023",
+  "Learning the Difference that Makes a Difference with Counterfactually-Augmented Data, ICLR 2020",
+  "Unsupervised Data Augmentation for Consistency Training, NeurIPS 2020",
+]
+
+[augmentation]
+parser_version = "transaction_scope_position_strict_v2"
+target_occurrence_rate = 0.50
+selection = "deterministic hash order and subset sum nearest to half of eligible occurrences"
+adds_tokens = false
+deletes_tokens = false
+rephrases_tokens = false
+changes_labels = false
+changes_ids = false
+changes_record_order = false
+changes_steps = false
+changes_inference = false
+
+[preflight]
+target_blind_pairs = 200
+minimum_independent_pairs = 100
+required_semantic_pass_rate = 0.98
+required_cohen_kappa = 0.80
+observed_independent_pairs = 91
+manual_reviews_completed = 0
+decision = "NO_GO_INSUFFICIENT_INDEPENDENT_PAIRS"
+
+[training]
+model = "Qwen3.5-4B"
+component = "route-400 flammable specialist"
+seed = 42
+epochs = 1
+batch_size = 4
+gradient_accumulation = 4
+learning_rate = 0.0002
+teacher = false
+full_train = false
+
+[acceptance.screen]
+reject_only = true
+folds = [0, 3]
+required_each_fold_delta_positive = true
+required_mean_macro_delta = 0.001
+max_flammable_false_negative_increase = 0
+max_safety_false_negative_increase = 0
+require_corrected_greater_than_regressed = true
+require_bad_predictions_identical = true
+minimum_changed_decisions = 5
+maximum_gain_component_rows = 10
+
+[budget]
+planned_gpu_hours = 2.5
+actual_gpu_hours = 0.0
+planned_public_submissions = 0
+
+[execution]
+jobs = 0
+launch_authorized = false
+blocker = "Only 91 new independent eligible IDs; frozen minimum is 100 and target is 200"
+
+[artifacts]
+directory = "artifacts"
+publish = false

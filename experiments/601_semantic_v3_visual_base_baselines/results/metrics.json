@@ -1,12 +1,18 @@
 {
   "experiment_id": "601",
-  "status": "strict_cpu_rerun",
-  "training_launched": false,
+  "status": "qwen_training_running",
+  "training_launched": true,
   "input_audit_status": "ready",
   "input_audit_file": "analysis/input_audit.json",
   "input_id_order_verified": true,
   "development_sealed_id_overlap": 0,
-  "robust_base_status": "running_strict_nested_v2_numpy_2_3_1",
+  "robust_base_status": "completed_strict_nested_v2_numpy_2_3_1",
+  "robust_base": {
+    "macro_f1": 0.8935380094,
+    "bad_f1": 0.9452849741,
+    "flammable_f1": 0.8417910448,
+    "artifact_sha256": "e84ae3549aa80aab40ae125c95c74cd975d9a08ba65ccbcebe3c1d8aa05c2f71"
+  },
   "strict_v2_first_attempt": {
     "accepted": false,
     "artifact_created": false,
@@ -24,11 +30,11 @@
     }
   ],
   "qwen3vl_fold_status": {
-    "0": "not_launched",
-    "1": "not_launched",
-    "2": "not_launched",
-    "3": "not_launched",
-    "4": "not_launched"
+    "0": "running",
+    "1": "running",
+    "2": "running",
+    "3": "running",
+    "4": "running"
   },
   "sealed_holdout_used": false,
   "development_rows": 11118,

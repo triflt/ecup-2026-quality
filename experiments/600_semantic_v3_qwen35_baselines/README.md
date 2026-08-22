@@ -1,7 +1,7 @@
 # 600: Qwen3.5 baseline-компоненты на semantic-family-v3
 
-Статус: **подготовлен, обучение не запускалось; запуск заблокирован до появления
-development-only selector scores**.
+Статус: **10 из 10 development-only задач запущены 22 августа 2026 года;
+результаты ожидаются**.
 
 ## Цель
 
@@ -33,8 +33,9 @@ python experiments/600_semantic_v3_qwen35_baselines/prepare_runtime_inputs.py \
 ```
 
 Эта команда записывает только 11 118 development-строк: CSV, folds, first-image
-manifest, selector OOF, provenance и mapping. Presets передают в GPU-задачу
-только этот scoped-каталог. Перед импортом parent runner wrapper:
+manifest, selector OOF, provenance и mapping. Задача получает только этот
+scoped-каталог через архив с обязательной проверкой SHA-256. Перед импортом
+parent runner wrapper:
 
 1. проверяет SHA256 и инварианты `validation/semantic_family_v3/folds.csv`;
 2. проверяет frozen SHA256 исходного CSV, image manifest и точного parent runner;
@@ -74,14 +75,10 @@ family-diverse BAD-positive factor. Teacher, pseudo-labels, public feedback,
   совпали по порядку records. Этот audit проверяет wrapper, но не разрешает
   применять старые scores в semantic-v3.
 
-## Блокер
+## Запуск
 
-В репозитории пока нет selector-score OOF, построенного исключительно на
-development split. Старый OOF мог быть обучен с использованием sealed labels и
-поэтому запрещён даже как источник hardness для selector.
-
-До запуска robust-base `601` должен завершиться, после чего указанная CPU-команда
-должна создать два замороженных selector-файла:
+Строгий robust base `601` завершён, а development-only runtime создан. Он
+содержит два замороженных selector-файла:
 
 - `development_selector_oof.npz` с ровно 11 118 development ID, folds `0..4` и
   полем `fused_scores` или `fused`;
@@ -89,8 +86,11 @@ development split. Старый OOF мог быть обучен с исполь
   labels не использовались при fit, selection и thresholding, а scores были
   заморожены до Qwen-обучения.
 
-Без них каждая задача завершится до загрузки модели. Это намеренный fail-closed
-барьер, а не недостающий optional input.
+Все десять задач прошли этот fail-closed барьер и начали выполнение. Первые два
+технических запуска завершились до обучения из-за контракта передачи аргументов;
+после подтверждённого исправления рабочий запуск состоит из пяти `original` и
+пяти `specialist` folds. Эти технические ошибки не создавали модельных
+результатов и не меняли гипотезу.
 
 ## Ожидаемый бюджет
 
@@ -100,6 +100,5 @@ GPU-часов суммарно. При параллельном исполне�
 около 45–70 минут; последовательный запуск займёт около 6–9 часов. Возможное
 повторное скачивание изображений может добавить 10–25 минут на задачу.
 
-Кроме selector-score blocker, перед фактическим запуском необходимо подтвердить
-доступность Qwen3.5-4B, исходного CSV, image manifest и достаточной квоты на десять
-одно-GPU задач. Ни одна задача этим пакетом не запускалась.
+В рабочем запуске используется 10 одно-GPU задач. Sealed holdout физически
+отсутствует в runtime-входах и остаётся закрытым до фиксации итогового рецепта.

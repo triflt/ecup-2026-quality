@@ -259,17 +259,18 @@ def test_component_assembly_rejects_sealed_and_emits_route_order(tmp_path: Path)
     assert "sealed" not in bundle["ids"].astype(str)
 
 
-def test_card_records_jobs_runtime_and_authorized_strict_rerun() -> None:
+def test_card_records_completed_robust_base_and_running_qwen_jobs() -> None:
     config = tomllib.loads((EXPERIMENT / "experiment.toml").read_text())
     metrics = json.loads((EXPERIMENT / "results/metrics.json").read_text())
     assert config["validation"]["development_folds"] == [0, 1, 2, 3, 4]
     assert config["validation"]["sealed_holdout_excluded"] is True
-    assert config["robust_base"]["status"] == "strict_nested_v2_running_numpy_2_3_1"
+    assert config["robust_base"]["status"] == "strict_nested_v2_completed_numpy_2_3_1"
+    assert config["robust_base"]["macro_f1"] == pytest.approx(0.8935380094)
     assert config["qwen3vl"]["seed"] == 42
     assert config["qwen3vl"]["first_image_max_edge"] == 448
     assert config["qwen3vl"]["development_jobs"] == 5
     assert config["qwen3vl"]["gpu_per_job"] == 1
     assert config["execution"]["launch_authorized"] is True
     assert config["execution"]["commit_authorized"] is True
-    assert metrics["training_launched"] is False
+    assert metrics["training_launched"] is True
     assert metrics["sealed_holdout_used"] is False

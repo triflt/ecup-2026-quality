@@ -2,7 +2,7 @@
 id = "602"
 slug = "semantic_v3_qwen35_seed_variance"
 title = "Semantic-family-v3 independent Qwen3.5 seed variance"
-status = "prepared_blocked"
+status = "training_running"
 entrypoint = "experiments/602_semantic_v3_qwen35_seed_variance/train_seed.py"
 result_file = "experiments/602_semantic_v3_qwen35_seed_variance/results/metrics.json"
 
@@ -61,8 +61,9 @@ corrected_to_regressed_at_least = 1.5
 reference_seed_source = "600 original seed42"
 new_seed_jobs = 15
 gpu_per_job = 1
-launch_authorized = false
-blocked_on = "experiment 600 seed42 OOF outputs and frozen development-only selector inputs"
+launch_authorized = true
+launched = true
+blocked_on = ""
 
 [budget]
 expected_gpu_hours_min = 9.0

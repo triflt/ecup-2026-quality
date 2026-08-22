@@ -1,7 +1,7 @@
 {
   "experiment_id": "602",
-  "status": "prepared_blocked",
-  "launched": false,
+  "status": "training_running",
+  "launched": true,
   "protocol": "semantic_family_v3_seed_variance_v1",
   "reference_seed": 42,
   "new_seeds": [31415, 271828, 161803],
@@ -13,9 +13,9 @@
     "weights": {"42": 0.25, "31415": 0.25, "271828": 0.25, "161803": 0.25},
     "weights_tuned": false
   },
-  "blockers": [
-    "Experiment 600 must first produce all five seed-42 development-only OOF outputs.",
-    "The frozen development-only selector-score inputs required by experiment 600 are absent."
-  ],
-  "decision": "NOT_RUN"
+  "blockers": [],
+  "runtime_archive_sha256": "1490e7349433b30d7773202327851e376d09f183af1abe6d771e2bf17c2d758e",
+  "working_jobs": 15,
+  "technical_pretraining_failures": 30,
+  "decision": "PENDING_RESULTS"
 }

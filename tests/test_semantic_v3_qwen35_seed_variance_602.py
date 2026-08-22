@@ -122,23 +122,21 @@ def test_runtime_presets_cover_fifteen_neutral_one_gpu_jobs() -> None:
         assert "ecup" not in config["generate_name"].lower()
         assert args[args.index("--runtime-dir") + 1] == "/work/input/runtime"
         sources = [entry["src"] for entry in config["input"] if "src" in entry]
-        assert (
-            "experiments/600_semantic_v3_qwen35_baselines/.local/runtime_inputs_strict_v2"
-            in sources
-        )
+        assert "research/scoped_runtime_bootstrap.py" in sources
+        assert not any(".local/runtime_inputs" in source for source in sources)
         assert "research/data.csv" not in sources
         assert "validation/semantic_family_v3/folds.csv" not in sources
         assert "research/lora_image_manifest_complete.tsv.gz" not in sources
     assert observed == {(seed, fold) for seed in protocol.NEW_SEEDS for fold in protocol.FOLDS}
 
 
-def test_card_and_metrics_are_prepared_not_launched() -> None:
+def test_card_and_metrics_record_running_grid() -> None:
     card = tomllib.loads((EXP / "experiment.toml").read_text(encoding="utf-8"))
     metrics = json.loads((EXP / "results/metrics.json").read_text(encoding="utf-8"))
     assert card["execution"]["new_seed_jobs"] == 15
     assert card["ensemble"]["weights"] == [0.25, 0.25, 0.25, 0.25]
     assert card["ensemble"]["weight_tuning"] is False
-    assert metrics["launched"] is False
+    assert metrics["launched"] is True
     assert metrics["sealed_holdout_used"] is False
 
 

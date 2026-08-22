@@ -2,7 +2,7 @@
 id = "600"
 slug = "semantic_v3_qwen35_baselines"
 title = "Semantic-family-v3 Qwen3.5 route baselines"
-status = "prepared_blocked"
+status = "training_running"
 entrypoint = "experiments/600_semantic_v3_qwen35_baselines/train_component.py"
 result_file = "experiments/600_semantic_v3_qwen35_baselines/results/metrics.json"
 
@@ -65,8 +65,9 @@ components = ["original", "specialist"]
 folds = [0, 1, 2, 3, 4]
 jobs = 10
 gpu_per_job = 1
-launch_authorized = false
-blocked_on = "development-only selector-score NPZ and provenance"
+launch_authorized = true
+launched = true
+blocked_on = ""
 
 [budget]
 expected_gpu_hours_min = 6.0
