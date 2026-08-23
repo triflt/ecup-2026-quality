@@ -100,8 +100,9 @@
   пересечения с прежними audit ID. Все поля ручной оценки пусты; GPU запрещён до
   настоящих `282/300` строгих проходов и нуля критических ошибок.
 - `623` — multitask Qwen3.5 с отдельными start/end, `NO_EVIDENCE` и закрытой
-  concept-head. Folds `0/3` выполняются; validation runtime физически не содержит
-  labels или rationale targets. Свободный chain-of-thought не используется.
+  concept-head — прошёл frozen screen: delta folds `+0,082078/+0,015772`, средняя
+  `+0,048925`, исправлено/ухудшено `92/42`, flammable FN `−4`. Folds `1/2/4`
+  запущены без изменений. Structural coverage `58,4%` не является human-score.
 - Новый агрегированный разбор `603` находится в
   `reports/exp603-four-seed-error-mining-2026-08-22.md`: 29 исправлений против
   25 ухудшений, полезный сигнал в flammable `11/7`, но БАД `18/18`, длинные

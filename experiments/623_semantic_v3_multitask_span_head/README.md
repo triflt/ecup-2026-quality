@@ -1,6 +1,6 @@
 # Experiment 623 — semantic-v3 multitask span head
 
-Status: `screen_running`.
+Status: `full_grid_running`.
 
 ## Hypothesis
 
@@ -48,10 +48,12 @@ operation.
 
 ## Run order
 
-The CPU preflight passed and folds 0 and 3 are running independently with the exact
-experiment-600 parent recipe. Folds 1, 2, and 4 are forbidden unless the frozen screen
-gates in `frozen_spec.json` pass. This directory intentionally contains no task preset,
-data, weights, predictions, or sealed-holdout output.
+The CPU preflight and both frozen screen folds passed. Fold 0 improved Macro F1 by
+`+0.082078`, fold 3 by `+0.015772`; the mean delta is `+0.048925`. The candidate
+corrected 92 decisions and regressed 42, reduced flammable false negatives by 4,
+and passed every predeclared classification and safety gate. Folds 1, 2, and 4
+are now running without recipe changes. This directory intentionally contains no
+task preset, data, weights, predictions, or sealed-holdout output.
 
 ## Runnable fold contract
 
@@ -65,5 +67,6 @@ Each successful fold writes a PEFT adapter ZIP, a separate safetensors auxiliary
 label-free validation scores and grounded explanations, a selection audit, and a
 hash-complete output contract. The runner rejects a changed parent, model revision,
 runtime hash, nonempty output/image directory, failed image download, selector leakage,
-non-finite score, or non-exact rendered evidence. The two screen folds are running; no
-validation metric has been released.
+non-finite score, or non-exact rendered evidence. Downloaded screen artifacts passed
+these checks before labels were opened. Structural exact-substring coverage is `58.4%`
+overall (`68.1%` BAD, `45.2%` flammable); this is not a human-quality score.

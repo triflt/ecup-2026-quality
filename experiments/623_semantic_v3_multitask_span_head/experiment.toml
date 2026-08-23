@@ -1,6 +1,6 @@
 id = 623
 slug = "semantic-v3-multitask-span-head"
-status = "screen_running"
+status = "full_grid_running"
 parent = 600
 validation_protocol = "semantic_family_v3"
 uses_sealed_holdout = false
@@ -25,6 +25,21 @@ target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
 verdict_ce_weight = 1.0
 span_ce_weight = 0.10
 concept_ce_weight = 0.05
+
+[screen_result]
+passed = true
+mean_macro_delta = 0.04892460163522139
+corrected = 92
+regressed = 42
+flammable_false_negative_delta = -4
+all_positive_false_negative_delta = -26
+structural_grounded_coverage = 0.5840827338129496
+human_quality_evaluated = false
+
+[compute]
+screen_jobs_completed = 2
+remaining_fold_jobs_launched = 3
+one_gpu_per_job = true
 
 [commands]
 build_runtime = "python3 experiments/623_semantic_v3_multitask_span_head/build_fold_runtime.py --help"

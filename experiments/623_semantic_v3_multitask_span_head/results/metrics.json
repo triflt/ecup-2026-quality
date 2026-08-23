@@ -1,10 +1,11 @@
 {
   "experiment_id": "623",
-  "status": "screen_running",
+  "status": "full_grid_running",
   "validation_version": "semantic_family_v3",
   "validation_complete": false,
   "screen_folds": [0, 3],
   "screen_jobs_launched": 2,
+  "remaining_folds_launched": [1, 2, 4],
   "sealed_holdout_used": false,
   "large_teacher_used": false,
   "loss": {
@@ -12,6 +13,25 @@
     "span_ce_weight": 0.1,
     "concept_ce_weight": 0.05
   },
-  "metrics": {},
-  "decision": "SCREEN_RUNNING_NO_METRIC_RELEASED"
+  "metrics": {
+    "fold_macro_deltas": [0.08207769088943984, 0.01577151238100294],
+    "mean_macro_delta": 0.04892460163522139,
+    "bad_delta": 0.00999798862839174,
+    "flammable_delta": 0.08306294613887077,
+    "corrected": 92,
+    "regressed": 42,
+    "corrected_to_regressed": 2.1904761904761907,
+    "flammable_false_negative_delta": -4,
+    "all_positive_false_negative_delta": -26,
+    "all_frozen_gates_passed": true
+  },
+  "grounding": {
+    "metric": "structural_exact_substring_coverage",
+    "overall": 0.5840827338129496,
+    "bad": 0.6811085089773614,
+    "flammable": 0.45227995758218453,
+    "human_quality_evaluated": false,
+    "human_quality": null
+  },
+  "decision": "GO_FULL_FOLDS_1_2_4"
 }
