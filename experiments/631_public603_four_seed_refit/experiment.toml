@@ -2,7 +2,7 @@
 id = "631"
 slug = "public603_four_seed_refit"
 title = "Production refit of the frozen experiment-603 four-seed ablation"
-status = "training"
+status = "ready_for_public_ablation"
 entrypoint = "experiments/631_public603_four_seed_refit/train_full_seed.py"
 result_file = "experiments/631_public603_four_seed_refit/results/metrics.json"
 submission_source = "experiments/631_public603_four_seed_refit/submission"
@@ -14,9 +14,16 @@ second_full_seed_source = "230"
 
 [data]
 version = "competition_train_v1"
+registry = "datasets/registry.toml"
 rows = 12971
 full_data_refit = true
 public_tuning = false
+
+[validation]
+primary_version = "semantic_family_v3_fixed_four_seed"
+registry = "validation/registry.toml"
+folds = "validation/semantic_family_v3/folds.csv"
+primary_metric = "macro_f1"
 
 [training]
 model = "Qwen3.5-4B"
@@ -29,6 +36,13 @@ learning_rate = 0.0002
 training_mode = "hard"
 gpu_per_job = 1
 jobs = 2
+
+[inference]
+batch_size = 16
+prediction_preserving_shared_preprocessing = true
+
+[execution]
+arguments = []
 
 [ensemble]
 type = "fixed_arithmetic_probability_mean"

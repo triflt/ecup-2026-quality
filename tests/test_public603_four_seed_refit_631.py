@@ -36,7 +36,7 @@ def test_submission_runtime_keeps_original_route_and_four_seeds() -> None:
     source = (EXPERIMENT / "submission/run.py").read_text(encoding="utf-8")
     for seed in ("seed31415", "seed271828", "seed161803"):
         assert seed in source
-    assert "qwen35_probabilities / 4.0" in source
+    assert "probability_sum / len(adapter_names)" in source
     assert '"weight_base": 0.50' in source
     assert '"weight_qwen3vl": 0.25' in source
     assert '"weight_qwen35": 0.25' in source
@@ -47,14 +47,11 @@ def test_submission_runtime_keeps_original_route_and_four_seeds() -> None:
     assert '"threshold": 0.953912615776062' in source
 
 
-def test_builder_is_fail_closed_until_manifest_and_runtime_pass(tmp_path: Path) -> None:
+def test_builder_accepts_only_verified_manifest_and_runtime() -> None:
     builder = load_module("exp631_builder_test", EXPERIMENT / "build_submission.py")
     metrics = json.loads((EXPERIMENT / "results/metrics.json").read_text(encoding="utf-8"))
-    assert metrics["submission_ready"] is False
-    assert not (EXPERIMENT / "results/production_manifest.json").exists()
-    try:
-        builder.verify_production_manifest()
-    except SystemExit as error:
-        assert "manifest is absent" in str(error)
-    else:
-        raise AssertionError("builder must reject an unverified production package")
+    assert metrics["submission_ready"] is True
+    assert metrics["schema_valid"] is True
+    assert metrics["projected_public_minutes"] <= 20.0
+    assert metrics["projected_private_minutes"] <= 40.0
+    builder.verify_production_manifest()

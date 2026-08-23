@@ -1,0 +1,21 @@
+{
+  "experiment_id": 631,
+  "parent_experiment": 603,
+  "recipe": "fixed_equal_probability_mean_no_public_tuning",
+  "adapters": {
+    "42": {"sha256": "75d4cb53fb05636d715f33ad88d2b420f5af4393977da113286133843a6db2a1"},
+    "31415": {"sha256": "8a5408fe262af1aea98c297c55541af1123130d346cbc72fa332668098134384"},
+    "271828": {"sha256": "c7fbdc2b2d4c1339aa364855bbbae542b18ce273ec237266487af711314be720"},
+    "161803": {"sha256": "a450f3abbaffb62221ee8f574af07300b9d5b49adb8e9a8e87318fb6b6a23358"}
+  },
+  "runtime": {
+    "accepted": true,
+    "rows": 600,
+    "images": 2274,
+    "seconds": 331.949325338006,
+    "projected_public_minutes": 14.753303348355821,
+    "projected_private_minutes": 35.03909545234508,
+    "schema_valid": true,
+    "predictions_identical_to_unoptimized": true
+  }
+}

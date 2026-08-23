@@ -1,10 +1,17 @@
 {
   "experiment_id": 631,
-  "status": "training",
+  "status": "ready_for_public_ablation",
   "parent_experiment": 603,
   "new_full_seed_jobs": 2,
-  "completed_full_seed_jobs": 0,
-  "submission_ready": false,
+  "completed_full_seed_jobs": 2,
+  "submission_ready": true,
+  "runtime_smoke_rows": 600,
+  "runtime_smoke_images": 2274,
+  "runtime_seconds": 331.949325338006,
+  "projected_public_minutes": 14.753303348355821,
+  "projected_private_minutes": 35.03909545234508,
+  "schema_valid": true,
+  "predictions_identical_to_unoptimized": true,
   "public_f1": null,
-  "decision": "PENDING_FULL_DATA_REFITS"
+  "decision": "READY_NOT_SUBMITTED_PUBLIC_ABLATION"
 }

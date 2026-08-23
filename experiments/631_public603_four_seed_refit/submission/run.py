@@ -463,6 +463,66 @@ def compute_lora_scores(
     return np.asarray(scores, dtype=np.float32)
 
 
+@torch.inference_mode()
+def compute_lora_probability_mean(
+    model,
+    processor,
+    frame: pd.DataFrame,
+    adapter_names: tuple[str, ...],
+) -> np.ndarray:
+    """Score all adapters on one prepared batch without changing predictions."""
+    zero_ids = processor.tokenizer.encode("0", add_special_tokens=False)
+    one_ids = processor.tokenizer.encode("1", add_special_tokens=False)
+    if len(zero_ids) != 1 or len(one_ids) != 1:
+        raise ValueError(f"digit tokens are not atomic: {zero_ids}, {one_ids}")
+    token_zero, token_one = zero_ids[0], one_ids[0]
+    means: list[np.ndarray] = []
+    started = time.monotonic()
+    for start in range(0, len(frame), LORA_BATCH_SIZE):
+        rows = list(frame.iloc[start : start + LORA_BATCH_SIZE].itertuples(index=False))
+        paths = [row.image_paths[0] if row.image_paths else None for row in rows]
+        images = [open_lora_image(path) for path in paths]
+        try:
+            conversations = [lora_messages(row, image) for row, image in zip(rows, images)]
+            kwargs = {
+                "add_generation_prompt": True,
+                "tokenize": True,
+                "return_dict": True,
+                "return_tensors": "pt",
+                "padding": True,
+                "truncation": True,
+                "max_length": 1536,
+            }
+            try:
+                batch = processor.apply_chat_template(
+                    conversations, enable_thinking=False, **kwargs
+                )
+            except TypeError:
+                batch = processor.apply_chat_template(conversations, **kwargs)
+        finally:
+            for image in images:
+                image.close()
+        batch = {key: value.to("cuda") for key, value in batch.items()}
+        positions = torch.arange(batch["attention_mask"].shape[1], device="cuda")[None, :]
+        last = torch.where(batch["attention_mask"].bool(), positions, -1).max(dim=1).values
+        probability_sum = np.zeros(len(rows), dtype=np.float32)
+        for adapter_name in adapter_names:
+            model.set_adapter(adapter_name)
+            outputs = model(**batch)
+            logits = outputs.logits[torch.arange(len(rows), device="cuda"), last]
+            scores = (logits[:, token_one] - logits[:, token_zero]).float().cpu()
+            probability_sum += torch.sigmoid(scores).numpy()
+        means.append(probability_sum / len(adapter_names))
+        done = min(start + LORA_BATCH_SIZE, len(frame))
+        if done % 400 < len(rows) or done == len(frame):
+            print(
+                f"lora_ensemble_scored={done}/{len(frame)} "
+                f"elapsed_min={(time.monotonic() - started) / 60:.1f}",
+                flush=True,
+            )
+    return np.concatenate(means)
+
+
 def explain(category: str, prediction: int) -> str:
     if category == "БАД":
         return (
@@ -559,22 +619,16 @@ def main() -> None:
     qwen35_model, qwen35_processor = load_lora_model(
         QWEN35_MODEL_PATH, QWEN35_ADAPTER_PATH, "multimodal"
     )
-    qwen35_scores = compute_lora_scores(
-        qwen35_model, qwen35_processor, frame, use_chat_batch=True
-    )
-    qwen35_probabilities = torch.sigmoid(torch.from_numpy(qwen35_scores)).numpy()
     for adapter_name, adapter_path in QWEN35_ADDITIONAL_ADAPTERS:
         qwen35_model.load_adapter(
             adapter_path, adapter_name=adapter_name, is_trainable=False
         )
-        qwen35_model.set_adapter(adapter_name)
-        seed_scores = compute_lora_scores(
-            qwen35_model, qwen35_processor, frame, use_chat_batch=True
-        )
-        qwen35_probabilities += torch.sigmoid(
-            torch.from_numpy(seed_scores)
-        ).numpy()
-    qwen35_scores = qwen35_probabilities / 4.0
+    qwen35_scores = compute_lora_probability_mean(
+        qwen35_model,
+        qwen35_processor,
+        frame,
+        ("default", *(name for name, _ in QWEN35_ADDITIONAL_ADAPTERS)),
+    )
     predictions = np.zeros(len(frame), dtype=np.int8)
     for category, config in LORA_FUSION.items():
         mask = frame["category"].to_numpy() == category
