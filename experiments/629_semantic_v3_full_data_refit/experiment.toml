@@ -1,0 +1,15 @@
+id = 629
+slug = "semantic-v3-full-data-refit"
+status = "blocked_by_dependency"
+parent_experiment = 628
+uses_large_teacher = false
+
+[training]
+requires_accepted_parent = true
+fits_per_component = 1
+seed_search_allowed = false
+hyperparameter_search_allowed = false
+checkpoint_integrity_required = true
+
+[gate]
+rule = "Train only when experiment 628 accepts the frozen recipe; otherwise mark skipped_by_gate."

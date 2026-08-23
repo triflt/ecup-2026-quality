@@ -1,0 +1,24 @@
+id = 627
+slug = "semantic-v3-final-recipe-freeze"
+status = "blocked_by_dependency"
+depends_on = [624, 625, 626]
+uses_sealed_holdout = false
+uses_large_teacher = false
+
+[freeze]
+exact_recipe_count = 1
+fail_closed_manifest_required = true
+bound_fields = [
+  "code",
+  "component_weights",
+  "route_weights",
+  "thresholds",
+  "explanation_renderer",
+  "seed",
+  "data_selection",
+  "checksums"
+]
+post_freeze_recipe_changes_allowed = false
+
+[gate]
+rule = "Freeze only after development gates, independent-seed reproduction, safety gates, and required explanation audit are resolved."

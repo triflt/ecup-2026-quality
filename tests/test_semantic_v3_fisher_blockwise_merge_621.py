@@ -105,9 +105,11 @@ def test_label_blind_audit_and_public_metadata_checks(tmp_path: Path) -> None:
         preflight.validate_public_metadata({"path": "private://bucket/file"})
 
 
-def test_public_scaffold_has_no_completed_metrics_claim() -> None:
+def test_public_result_records_pre_validation_rejection_without_metrics() -> None:
     metrics = json.loads((EXP / "results" / "metrics.json").read_text(encoding="utf-8"))
-    assert metrics["status"] == "screen_running"
+    assert metrics["status"] == "rejected_before_validation_reconstruction_gate"
     assert metrics["validation_complete"] is False
+    assert metrics["reconstruction_gate"]["passed"] is False
+    assert metrics["reconstruction_gate"]["maximum_relative_error"] == 0.05
     assert metrics["folds"] == []
     assert metrics["metrics"] == {}

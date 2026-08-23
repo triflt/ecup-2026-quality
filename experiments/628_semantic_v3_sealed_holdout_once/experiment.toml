@@ -1,0 +1,25 @@
+id = 628
+slug = "semantic-v3-sealed-holdout-once"
+status = "blocked_by_dependency"
+parent_experiment = 627
+uses_sealed_holdout = false
+uses_large_teacher = false
+
+[sealed_protocol]
+maximum_evaluations = 1
+requires_frozen_recipe = true
+requires_development_gate = true
+requires_independent_seed_gate = true
+post_evaluation_tuning_allowed = false
+required_reports = [
+  "macro_f1",
+  "category_f1",
+  "family_component_bootstrap",
+  "singleton_repeated",
+  "false_negatives",
+  "corrected_regressed",
+  "explanation_quality"
+]
+
+[gate]
+rule = "Open once only after experiment 627 is fail-closed and all prerequisite gates passed; otherwise skip without opening."

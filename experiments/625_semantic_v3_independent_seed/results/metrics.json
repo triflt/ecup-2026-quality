@@ -1,0 +1,8 @@
+{
+  "experiment_id": "625",
+  "status": "blocked_by_dependency",
+  "validation_complete": false,
+  "sealed_holdout_used": false,
+  "metrics": {},
+  "decision": "AWAITING_ACCEPTED_624_RECIPE"
+}

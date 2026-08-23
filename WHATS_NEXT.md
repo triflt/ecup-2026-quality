@@ -92,10 +92,10 @@
   Полный аудит остальных folds не раскрывался, потому что frozen screen не
   пройден. Exact-span evidence сохраняется для объяснений, но не используется
   как самостоятельный verdict-router.
-- `621` — консервативная train-only Fisher-смесь original и specialist
-  semantic-v3 адаптеров на уровне эффективных LoRA-дельт. Fail-closed runtime,
-  физическое отделение outer-validation labels и загрузка merged PEFT adapter
-  проверены; folds `0/3` выполняются с замороженными donor-only thresholds.
+- `621` отклонён до validation scoring: на обоих screen-fold одна и та же
+  `k_proj`-дельта слоя 11 дала относительную ошибку rank-32 SVD `0,094416` и
+  `0,095641` при замороженном максимуме `0,05`. Gate не ослаблялся, validation
+  predictions и метрики не открывались, folds `1/2/4` запрещены.
 - `622` — свежий слепой пакет из 300 уникальных semantic components готов без
   пересечения с прежними audit ID. Все поля ручной оценки пусты; GPU запрещён до
   настоящих `282/300` строгих проходов и нуля критических ошибок.

@@ -1,0 +1,8 @@
+{
+  "experiment_id": "629",
+  "status": "blocked_by_dependency",
+  "training_complete": false,
+  "metrics": {},
+  "artifacts": [],
+  "decision": "AWAITING_ACCEPTED_628"
+}

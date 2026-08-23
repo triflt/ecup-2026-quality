@@ -1,0 +1,9 @@
+{
+  "experiment_id": "626",
+  "status": "blocked_by_dependency",
+  "validation_complete": false,
+  "sealed_holdout_used": false,
+  "human_ratings_present": false,
+  "metrics": {},
+  "decision": "AWAITING_REPRODUCED_RECIPE_AND_REAL_HUMAN_AUDIT"
+}

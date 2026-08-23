@@ -1,0 +1,18 @@
+id = 625
+slug = "semantic-v3-independent-seed"
+status = "blocked_by_dependency"
+parent_experiment = 624
+validation_protocol = "semantic_family_v3"
+uses_sealed_holdout = false
+uses_large_teacher = false
+
+[reproduction]
+outer_folds = [0, 1, 2, 3, 4]
+independent_seed_count = 1
+recipe_changes_allowed = false
+
+[gate]
+effect_sign_must_match = true
+minimum_winning_folds = 4
+all_component_category_and_safety_gates_required = true
+failure_fallback_experiment = 603

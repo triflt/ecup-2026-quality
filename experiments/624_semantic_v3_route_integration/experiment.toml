@@ -1,0 +1,20 @@
+id = 624
+slug = "semantic-v3-route-integration"
+status = "blocked_by_dependency"
+validation_protocol = "semantic_family_v3"
+uses_sealed_holdout = false
+uses_large_teacher = false
+
+[dependency]
+requires_any_accepted = [621, 622, 623]
+fallback_experiment = 603
+fallback_behavior = "Select original route 603 without adding a weak fusion when no upstream component passes."
+
+[integration]
+maximum_new_components = 1
+reference_route_weights_unchanged = true
+threshold_calibration = "donor_only"
+trained_second_level_router_allowed = false
+
+[gate]
+rule = "Integrate only a component that passed its complete frozen development gate; otherwise use experiment 603 unchanged."

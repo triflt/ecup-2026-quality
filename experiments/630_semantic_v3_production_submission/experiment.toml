@@ -1,0 +1,20 @@
+id = 630
+slug = "semantic-v3-production-submission"
+status = "blocked_by_dependency"
+parent_experiment = 629
+uses_large_teacher = false
+
+[assembly]
+requires_successful_parent = true
+zip_integrity_required = true
+sha256_required = true
+schema_validation_required = true
+unique_ids_required = true
+both_categories_required = true
+nan_allowed = false
+runtime_margin_required = true
+concrete_product_evidence_required = true
+exact_component_provenance_required = true
+
+[gate]
+rule = "Assemble only after experiment 629 succeeds; otherwise create no ZIP and retain the documented champion fallback."

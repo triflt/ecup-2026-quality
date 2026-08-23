@@ -1,6 +1,6 @@
 # Experiment 621: semantic-v3 Fisher blockwise merge
 
-Status: **screen folds 0/3 running; not validated**.
+Status: **rejected before validation at the frozen reconstruction gate**.
 
 This package defines a public-safe, deterministic way to merge two adapters
 trained from the same base model and semantic-v3 outer fold. The original
@@ -14,10 +14,12 @@ on A and B independently. The merged update is compressed back to the declared
 rank with deterministic SVD signs. Reconstruction error and metadata identity
 must pass before a run can proceed.
 
-The intended grid is exactly five one-GPU jobs, one per frozen outer fold. The
-two predeclared screen folds are running. No validation result is claimed, and
-folds 1/2/4 remain forbidden unless the screen gates pass. A full-data refit is
-forbidden until the five-fold acceptance gates in `experiment.toml` pass.
+The intended grid was exactly five one-GPU jobs, one per frozen outer fold. Both
+predeclared screen folds stopped before validation scoring because the same
+layer-11 `k_proj` update exceeded the frozen `0.05` relative SVD reconstruction
+limit: `0.0944161222` on fold 0 and `0.0956405199` on fold 3. The limit was not
+relaxed after observation. No validation result is claimed; folds 1/2/4 and a
+full-data refit are forbidden.
 
 The label-blind preflight accepts only the safe membership columns:
 `id`, `category`, `semantic_component`, `component_size`, `split`, and
@@ -86,6 +88,7 @@ labels, rejects sealed input rows, and never tunes thresholds on validation.
 
 Expected resources are one GPU with approximately 24–40 GB of memory, the
 local base model and PEFT runtime, and roughly 4 GB of temporary adapter/model
-working space. A fold is expected to take approximately 50–90 minutes, mainly
-for two gradient passes and label-free validation scoring; this remains an
-estimate until the running screen completes.
+working space. The two screen jobs reached the deterministic merge gate after
+their train-only Fisher passes, then failed closed before label-free validation
+scoring. This is a scientific rejection of the fixed-rank merge, not a transport
+failure and not grounds for changing the rank or error limit under experiment 621.

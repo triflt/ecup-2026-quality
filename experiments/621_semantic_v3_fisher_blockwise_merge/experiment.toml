@@ -1,6 +1,6 @@
 id = "621"
 name = "semantic_v3_fisher_blockwise_merge"
-status = "screen_running"
+status = "rejected_before_validation_reconstruction_gate"
 description = "Deterministic train-only Fisher-weighted merge of two same-base adapters."
 fold_worker = "experiments/621_semantic_v3_fisher_blockwise_merge/fold_worker.py"
 fold_evaluator = "experiments/621_semantic_v3_fisher_blockwise_merge/evaluate_fold.py"
@@ -34,6 +34,8 @@ temporary_working_space_gb = 4
 launch_authorized = true
 screen_jobs_launched = 2
 technical_pre_gpu_failures = 2
+screen_jobs_completed = 2
+validation_predictions_released = 0
 
 [acceptance]
 minimum_winning_folds = 4

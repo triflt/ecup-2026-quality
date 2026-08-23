@@ -1,0 +1,23 @@
+id = 626
+slug = "semantic-v3-explanation-human-audit"
+status = "blocked_by_dependency"
+depends_on = [624, 625]
+uses_sealed_holdout = false
+uses_large_teacher = false
+
+[audit]
+minimum_sample_size = 300
+exclude_experiment_490_rows = true
+human_review_required = true
+synthetic_human_ratings_allowed = false
+dimensions = [
+  "exact_evidence_relevance",
+  "object_of_sale",
+  "negation",
+  "composition_or_completeness",
+  "verdict_consistency",
+  "unsupported_facts"
+]
+
+[gate]
+rule = "Remain blocked until a real independent reviewer completes the frozen audit packet."

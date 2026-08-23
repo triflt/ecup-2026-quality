@@ -1,0 +1,9 @@
+{
+  "experiment_id": "630",
+  "status": "blocked_by_dependency",
+  "assembly_complete": false,
+  "metrics": {},
+  "artifacts": [],
+  "sha256": null,
+  "decision": "AWAITING_SUCCESSFUL_629_NO_SUBMISSION_CREATED"
+}
