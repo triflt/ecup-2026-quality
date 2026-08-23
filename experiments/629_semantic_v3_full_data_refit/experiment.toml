@@ -2,6 +2,7 @@ id = 629
 slug = "semantic-v3-full-data-refit"
 status = "blocked_by_dependency"
 parent_experiment = 628
+uses_sealed_holdout = false
 uses_large_teacher = false
 
 [training]
@@ -10,6 +11,10 @@ fits_per_component = 1
 seed_search_allowed = false
 hyperparameter_search_allowed = false
 checkpoint_integrity_required = true
+requires_experiment_627_recipe_manifest_sha256 = true
+requires_exact_permitted_full_data_manifest_sha256 = true
+checkpoint_manifest_required_fields = ["component", "source_experiment", "sha256", "size_bytes", "integrity_passed", "fit_count"]
+private_storage_policy_id = "approved_local_or_goal_s3_prefix_v1"
 
 [gate]
 rule = "Train only when experiment 628 accepts the frozen recipe; otherwise mark skipped_by_gate."

@@ -9,10 +9,18 @@ uses_large_teacher = false
 [reproduction]
 outer_folds = [0, 1, 2, 3, 4]
 independent_seed_count = 1
+independent_seed_must_differ_from_parent = true
 recipe_changes_allowed = false
+requires_experiment_624_recipe_manifest_sha256 = true
+comparator_experiment = 603
 
 [gate]
 effect_sign_must_match = true
 minimum_winning_folds = 4
-all_component_category_and_safety_gates_required = true
+minimum_macro_delta = 0.003
+minimum_category_delta = 0.0
+minimum_corrected_to_regressed_ratio = 1.5
+minimum_component_bootstrap_probability_positive = 0.90
+maximum_flammable_false_negative_increase = 0
+maximum_safety_false_negative_increase = 0
 failure_fallback_experiment = 603

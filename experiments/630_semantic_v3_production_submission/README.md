@@ -11,3 +11,9 @@ violation statement.
 No ZIP, checksum, metric, or component provenance is claimed while experiment
 629 is incomplete. If upstream acceptance fails, this stage records the Public
 champion fallback instead of creating a fictitious submission.
+
+Acceptance additionally requires exact equality with the expected ID set and
+row count, an allowlisted archive, finite outputs, measured Public and Private
+runtime margins, and the closed reasoning chain: card → exact substring or
+safe `NO_EVIDENCE` → concept → verdict → short explanation containing the
+quote. Generic violation text and unsupported visual or absence claims fail.

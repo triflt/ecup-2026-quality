@@ -9,16 +9,38 @@ uses_large_teacher = false
 exact_recipe_count = 1
 fail_closed_manifest_required = true
 bound_fields = [
-  "code",
+  "code_commit_sha",
+  "model_base_revision_sha256",
+  "component_artifact_sha256",
+  "auxiliary_head_sha256",
+  "training_config_sha256",
+  "data_registry_sha256",
+  "fold_registry_sha256",
   "component_weights",
   "route_weights",
-  "thresholds",
-  "explanation_renderer",
+  "threshold_manifest_sha256",
+  "fusion_route_config_sha256",
+  "explanation_renderer_sha256",
+  "closed_concept_vocabulary_sha256",
+  "reasoning_schema_sha256",
   "seed",
-  "data_selection",
-  "checksums"
+  "data_selection_sha256",
+  "dependency_decisions_sha256",
+  "sealed_acceptance_policy_sha256"
 ]
 post_freeze_recipe_changes_allowed = false
+manifest_schema = "final_recipe_manifest_v1"
+manifest_verifier_required = true
+
+[sealed_acceptance]
+comparator_experiment = 603
+minimum_macro_delta = 0.0
+minimum_category_delta = 0.0
+maximum_flammable_false_negative_increase = 0
+maximum_safety_false_negative_increase = 0
+minimum_explanation_strict_pass_rate = 0.94
+maximum_critical_explanation_failures = 0
+policy_frozen_before_reveal = true
 
 [gate]
-rule = "Freeze only after development gates, independent-seed reproduction, safety gates, and required explanation audit are resolved."
+rule = "Freeze only after development gates, independent-seed reproduction, safety gates, and the required explanation audit are accepted, not merely completed."

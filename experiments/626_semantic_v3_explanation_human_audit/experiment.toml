@@ -8,6 +8,11 @@ uses_large_teacher = false
 [audit]
 minimum_sample_size = 300
 exclude_experiment_490_rows = true
+exclude_experiment_622_rows = true
+exclude_all_prior_audit_and_review_ids = true
+unique_semantic_components_required = true
+sample_manifest_sha256_frozen_before_ratings = true
+blind_order_frozen_before_ratings = true
 human_review_required = true
 synthetic_human_ratings_allowed = false
 dimensions = [
@@ -20,4 +25,8 @@ dimensions = [
 ]
 
 [gate]
-rule = "Remain blocked until a real independent reviewer completes the frozen audit packet."
+minimum_strict_pass = 282
+maximum_critical_unsupported = 0
+maximum_scope_or_negation_failure = 0
+completed_is_not_accepted = true
+rule = "Accept only after a real independent reviewer completes the frozen packet and all numerical gates pass; a completed failing audit is rejected."

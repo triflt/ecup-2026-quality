@@ -11,6 +11,14 @@ requires_frozen_recipe = true
 requires_development_gate = true
 requires_independent_seed_gate = true
 post_evaluation_tuning_allowed = false
+requires_experiment_627_recipe_manifest_sha256 = true
+requires_experiment_627_sealed_acceptance_policy_sha256 = true
+comparator_experiment = 603
+persistent_reveal_ledger_required = true
+atomic_reveal_count_transition = "0_to_1"
+second_evaluation_must_fail_closed = true
+public_champion_fallback_experiment = 400
+local_safe_fallback_experiment = 603
 required_reports = [
   "macro_f1",
   "category_f1",
@@ -22,4 +30,4 @@ required_reports = [
 ]
 
 [gate]
-rule = "Open once only after experiment 627 is fail-closed and all prerequisite gates passed; otherwise skip without opening."
+rule = "Open once only after experiment 627 is fail-closed and all prerequisite gates passed; accept only by the sealed policy hash frozen in 627; otherwise skip without opening."

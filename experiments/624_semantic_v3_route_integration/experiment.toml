@@ -7,6 +7,8 @@ uses_large_teacher = false
 
 [dependency]
 requires_any_accepted = [621, 622, 623]
+terminal_statuses = ["accepted", "rejected", "rejected_by_gate", "rejected_before_validation", "confirmed_external_blocker"]
+all_upstreams_must_be_terminal_before_fallback = true
 fallback_experiment = 603
 fallback_behavior = "Select original route 603 without adding a weak fusion when no upstream component passes."
 
@@ -15,6 +17,7 @@ maximum_new_components = 1
 reference_route_weights_unchanged = true
 threshold_calibration = "donor_only"
 trained_second_level_router_allowed = false
+fallback_must_match_experiment_603_manifest = true
 
 [gate]
 rule = "Integrate only a component that passed its complete frozen development gate; otherwise use experiment 603 unchanged."
