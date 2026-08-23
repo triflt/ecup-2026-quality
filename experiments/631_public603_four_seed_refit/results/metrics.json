@@ -1,0 +1,10 @@
+{
+  "experiment_id": 631,
+  "status": "training",
+  "parent_experiment": 603,
+  "new_full_seed_jobs": 2,
+  "completed_full_seed_jobs": 0,
+  "submission_ready": false,
+  "public_f1": null,
+  "decision": "PENDING_FULL_DATA_REFITS"
+}

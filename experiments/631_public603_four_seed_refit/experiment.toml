@@ -1,0 +1,51 @@
+[experiment]
+id = "631"
+slug = "public603_four_seed_refit"
+title = "Production refit of the frozen experiment-603 four-seed ablation"
+status = "training"
+entrypoint = "experiments/631_public603_four_seed_refit/train_full_seed.py"
+result_file = "experiments/631_public603_four_seed_refit/results/metrics.json"
+submission_source = "experiments/631_public603_four_seed_refit/submission"
+
+[dependency]
+development_experiment = "603"
+production_parent = "190"
+second_full_seed_source = "230"
+
+[data]
+version = "competition_train_v1"
+rows = 12971
+full_data_refit = true
+public_tuning = false
+
+[training]
+model = "Qwen3.5-4B"
+seeds = [42, 31415, 271828, 161803]
+new_full_data_seeds = [271828, 161803]
+epochs = 1
+batch_size = 4
+gradient_accumulation = 4
+learning_rate = 0.0002
+training_mode = "hard"
+gpu_per_job = 1
+jobs = 2
+
+[ensemble]
+type = "fixed_arithmetic_probability_mean"
+weights = [0.25, 0.25, 0.25, 0.25]
+weight_tuning = false
+route_weights_bad = [0.50, 0.25, 0.25]
+route_weights_flammable = [0.15, 0.10, 0.75]
+thresholds = "unchanged production-190 thresholds"
+
+[acceptance]
+purpose = "public ablation only"
+requires_archive_integrity = true
+requires_schema_smoke = true
+requires_public_runtime_minutes_at_most = 20.0
+requires_private_runtime_minutes_at_most = 40.0
+does_not_promote_champion_without_public_result = true
+
+[artifacts]
+publish = false
+directory = "artifacts"
