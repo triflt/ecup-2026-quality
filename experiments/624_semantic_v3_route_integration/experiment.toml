@@ -18,6 +18,24 @@ reference_route_weights_unchanged = true
 threshold_calibration = "donor_only"
 trained_second_level_router_allowed = false
 fallback_must_match_experiment_603_manifest = true
+accepted_manifest_schema = "exp624_route_recipe_v1"
+accepted_manifest_self_hash_required = true
+
+[evaluation]
+outer_folds = [0, 1, 2, 3, 4]
+bootstrap_unit = "semantic_component"
+bootstrap_iterations = 10000
+bootstrap_seed = 623042
+candidate_variants = 1
+requires_strict_recomputation_of_accepted_623 = true
+sealed_rows_allowed = 0
 
 [gate]
 rule = "Integrate only a component that passed its complete frozen development gate; otherwise use experiment 603 unchanged."
+minimum_macro_delta = 0.003
+minimum_winning_folds = 4
+minimum_category_delta = 0.0
+minimum_corrected_to_regressed_ratio = 1.5
+minimum_component_bootstrap_probability_positive = 0.90
+maximum_flammable_false_negative_increase = 0
+maximum_all_positive_false_negative_increase = 0
