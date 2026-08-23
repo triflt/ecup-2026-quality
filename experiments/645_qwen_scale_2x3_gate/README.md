@@ -42,7 +42,16 @@ python experiments/645_qwen_scale_2x3_gate/adapt_prompt640.py --help
 python experiments/645_qwen_scale_2x3_gate/freeze_audit.py --help
 python experiments/645_qwen_scale_2x3_gate/evaluate.py --help
 python experiments/645_qwen_scale_2x3_gate/verify_training_artifact.py --help
+python experiments/645_qwen_scale_2x3_gate/fast_path_smoke.py --help
 ```
+
+Перед дорогим обучением `fast_path_smoke.py` без данных и модельных весов
+выполняет CUDA forward и backward для `causal-conv1d` и FLA gated-delta-rule,
+а также проверяет реальные bindings Qwen. Импортов недостаточно: smoke должен
+доказать конечные выходы и градиенты обоих быстрых ядер.
+`run_fast_path_smoke.sh` проверяет SHA-256 всех локальных wheel, устанавливает
+их без разрешения зависимостей и запускает этот тест с зафиксированным
+самодостаточным C-компилятором.
 
 Каждый скачанный training-артефакт до оценки проверяется
 `verify_training_artifact.py`: самохешированный output contract, точные версии

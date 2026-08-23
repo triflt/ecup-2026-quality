@@ -1,11 +1,25 @@
 {
   "experiment_id": "645",
-  "status": "prepared_waiting_for_640_644",
+  "status": "functional_fast_path_smoke_running_before_641_644",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
   "full_folds": [0, 1, 2, 3, 4],
   "distillation_allowed": false,
+  "training_preflight": {
+    "experiment_id": "641",
+    "launched_at_utc": "2026-08-23T16:49:43Z",
+    "gpus": 1,
+    "model_weights_loaded": false,
+    "training_data_read": false,
+    "required_checks": [
+      "causal_conv1d_cuda_forward_backward",
+      "fla_gated_delta_cuda_forward_backward",
+      "qwen35_compiled_bindings",
+      "exact_dependency_versions"
+    ],
+    "status": "running"
+  },
   "metrics": null,
   "decision": "PENDING_GRID"
 }

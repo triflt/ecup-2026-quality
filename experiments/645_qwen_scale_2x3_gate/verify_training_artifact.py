@@ -16,6 +16,8 @@ EXPECTED_FAST_PATH_PACKAGES = {
     "fla_core": "0.5.2",
     "flash_linear_attention": "0.5.2",
     "causal_conv1d": "1.6.2.post1",
+    "kernels": "0.16.0",
+    "ziglang": "0.16.0",
 }
 EXPECTED_BINDING_PREFIXES = {
     "chunk_gated_delta_rule": "fla.",

@@ -40,6 +40,19 @@ EPOCHS = 1
 LEARNING_RATE = 2e-4
 
 
+def verify_frozen_c_compiler() -> str:
+    configured_cc = os.environ.get("CC")
+    compiler_path = shutil.which(configured_cc) if configured_cc else None
+    if compiler_path is None or Path(compiler_path).name != "python-zig":
+        raise RuntimeError(
+            "the frozen self-contained C compiler is unavailable; set CC to python-zig"
+        )
+    version = importlib.metadata.version("ziglang")
+    if version != "0.16.0":
+        raise RuntimeError(f"unexpected ziglang version: {version}")
+    return version
+
+
 def verify_fast_linear_attention_dependencies() -> dict[str, str]:
     """Fail before model loading if Qwen's memory-safe training path is unavailable."""
     # `flash-linear-attention` is only the high-level distribution as of 0.5.x;
@@ -69,6 +82,7 @@ def verify_fast_linear_attention_dependencies() -> dict[str, str]:
 
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA is unavailable for the required Qwen fast path")
+    ziglang_version = verify_frozen_c_compiler()
     try:
         triton_backend = triton.runtime.driver.active.get_current_target().backend
     except Exception as error:
@@ -82,6 +96,8 @@ def verify_fast_linear_attention_dependencies() -> dict[str, str]:
         "fla_core": importlib.metadata.version("fla-core"),
         "flash_linear_attention": importlib.metadata.version("flash-linear-attention"),
         "causal_conv1d": importlib.metadata.version("causal-conv1d"),
+        "kernels": importlib.metadata.version("kernels"),
+        "ziglang": ziglang_version,
     }
     if versions != {
         "transformers": "5.15.1",
@@ -90,6 +106,8 @@ def verify_fast_linear_attention_dependencies() -> dict[str, str]:
         "fla_core": "0.5.2",
         "flash_linear_attention": "0.5.2",
         "causal_conv1d": "1.6.2.post1",
+        "kernels": "0.16.0",
+        "ziglang": "0.16.0",
     }:
         raise RuntimeError(f"unexpected fast-path package versions: {versions}")
 

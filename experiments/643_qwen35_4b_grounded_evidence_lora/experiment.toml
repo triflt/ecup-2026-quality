@@ -56,6 +56,10 @@ flash_linear_attention_package = "flash-linear-attention==0.5.2"
 flash_linear_attention_wheel_sha256 = "dcf405d81f5426393b59037097aa700d0f4a841465d5028d5aa543f4502f2400"
 causal_conv1d_package = "causal-conv1d==1.6.2.post1"
 causal_conv1d_wheel_sha256 = "c16c1c48d4fa63415cc797e02d69f97248c57c04627d99e394d5bb0ef266e288"
+ziglang_package = "ziglang==0.16.0"
+ziglang_wheel_sha256 = "9fcda73f62b851dd72a54b710ad40a209896db14cfb13649e62191243556342b"
+kernels_package = "kernels==0.16.0"
+kernels_wheel_sha256 = "794af6a10fd888bb4f46ad1b9b2f4f61b5b0b104475a6415c5322b58a7bf02ed"
 
 [hypothesis]
 changed_factor = "Add a decoupled low-weight exact-evidence auxiliary objective to experiment 641"

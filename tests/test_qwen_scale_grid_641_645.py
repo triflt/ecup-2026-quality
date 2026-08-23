@@ -83,10 +83,14 @@ def test_trained_grid_cells_lock_identical_fast_path_artifacts() -> None:
         'flash_linear_attention_core_package = "fla-core==0.5.2"',
         'flash_linear_attention_package = "flash-linear-attention==0.5.2"',
         'causal_conv1d_package = "causal-conv1d==1.6.2.post1"',
+        'ziglang_package = "ziglang==0.16.0"',
+        'kernels_package = "kernels==0.16.0"',
         'einops_wheel_sha256 = "54058201ac7087911181bfec4af6091bb59380360f069276601256a76af08193"',
         'flash_linear_attention_core_wheel_sha256 = "5e830c85bad3d0d34677f98ac7074d08687a3756f0f0499d95ceb96eb6920761"',
         'flash_linear_attention_wheel_sha256 = "dcf405d81f5426393b59037097aa700d0f4a841465d5028d5aa543f4502f2400"',
         'causal_conv1d_wheel_sha256 = "c16c1c48d4fa63415cc797e02d69f97248c57c04627d99e394d5bb0ef266e288"',
+        'ziglang_wheel_sha256 = "9fcda73f62b851dd72a54b710ad40a209896db14cfb13649e62191243556342b"',
+        'kernels_wheel_sha256 = "794af6a10fd888bb4f46ad1b9b2f4f61b5b0b104475a6415c5322b58a7bf02ed"',
     }
     for prefix in ("641", "642", "643", "644"):
         directory = next((ROOT / "experiments").glob(f"{prefix}_*"))
@@ -105,6 +109,26 @@ def test_fast_path_dependency_check_fails_closed(monkeypatch: pytest.MonkeyPatch
     monkeypatch.setattr(train_lora.importlib, "import_module", fail_fla)
     with pytest.raises(RuntimeError, match="required fast-path module is unavailable"):
         train_lora.verify_fast_linear_attention_dependencies()
+
+
+def test_fast_path_requires_frozen_self_contained_compiler(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CC", "unexpected-compiler")
+    monkeypatch.setattr(train_lora.shutil, "which", lambda _name: "/usr/bin/gcc")
+    with pytest.raises(RuntimeError, match="self-contained C compiler"):
+        train_lora.verify_frozen_c_compiler()
+
+
+def test_fast_path_accepts_exact_ziglang_compiler(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CC", "python-zig")
+    monkeypatch.setattr(
+        train_lora.shutil, "which", lambda _name: "/usr/local/bin/python-zig"
+    )
+    monkeypatch.setattr(train_lora.importlib.metadata, "version", lambda _name: "0.16.0")
+    assert train_lora.verify_frozen_c_compiler() == "0.16.0"
 
 
 def test_fast_path_binding_check_rejects_torch_fallback(

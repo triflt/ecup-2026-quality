@@ -38,7 +38,7 @@
     "gpus": 32,
     "launched_at_utc": "2026-08-23T13:14:50Z",
     "status": "running",
-    "last_polled_at_utc": "2026-08-23T15:53:35Z",
+    "last_polled_at_utc": "2026-08-23T16:51:16Z",
     "running_shards": 32,
     "terminal_shards": 0,
     "labels_read": 0

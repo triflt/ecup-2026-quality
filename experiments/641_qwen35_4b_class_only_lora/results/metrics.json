@@ -1,6 +1,6 @@
 {
   "experiment_id": "641",
-  "status": "complete_dependency_fast_path_preflight_running",
+  "status": "functional_fast_path_smoke_running",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
@@ -53,7 +53,16 @@
     "einops_wheel_sha256": "54058201ac7087911181bfec4af6091bb59380360f069276601256a76af08193",
     "fold": 0,
     "gpus": 1,
-    "status": "running"
+    "status": "failed_before_training_triton_loader_requires_c_compiler"
+  },
+  "functional_fast_path_smoke": {
+    "launched_at_utc": "2026-08-23T16:49:43Z",
+    "changed_factor": "provide a frozen self-contained C compiler and execute real CUDA forward/backward for both fast kernels before loading model weights",
+    "gpus": 1,
+    "status": "running",
+    "kernels_wheel_sha256": "794af6a10fd888bb4f46ad1b9b2f4f61b5b0b104475a6415c5322b58a7bf02ed",
+    "ziglang_wheel_sha256": "9fcda73f62b851dd72a54b710ad40a209896db14cfb13649e62191243556342b",
+    "runtime_bundle_sha256": "7a86b7e4c434c9464d3205dec34e6418d3b9edd94a1013032068ff47cb5a2a7a"
   },
   "metrics": null,
   "decision": "PENDING_SCREEN"
