@@ -1,6 +1,6 @@
 {
   "experiment_id": "641",
-  "status": "fast_path_preflight_running",
+  "status": "complete_dependency_fast_path_preflight_running",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
@@ -25,6 +25,32 @@
   "fla_core_preflight": {
     "launched_at_utc": "2026-08-23T15:07:04Z",
     "changed_factor": "pin fla-core 0.5.2 with flash-linear-attention 0.5.2 and verify actual Qwen kernel bindings",
+    "fold": 0,
+    "gpus": 1,
+    "status": "failed_before_training_transformers_wheel_unavailable_from_runtime_index"
+  },
+  "vendored_transformers_preflight": {
+    "launched_at_utc": "2026-08-23T15:38:33Z",
+    "changed_factor": "deliver the same frozen Transformers 5.15.1 wheel by verified runtime artifact instead of an unstable package index",
+    "transformers_wheel_sha256": "b7cdf238ff583e3a58dbc7fa34da1aaf091ce063141f65a30538160bd5afe93f",
+    "fold": 0,
+    "gpus": 1,
+    "status": "failed_before_training_causal_conv1d_source_build_without_nvcc"
+  },
+  "vendored_causal_conv1d_preflight": {
+    "launched_at_utc": "2026-08-23T15:52:56Z",
+    "changed_factor": "deliver the exact official CPython 3.12 PyTorch 2.10 CUDA 12 CXX11 ABI causal-conv1d wheel instead of compiling the same version from source",
+    "causal_conv1d_wheel_sha256": "c16c1c48d4fa63415cc797e02d69f97248c57c04627d99e394d5bb0ef266e288",
+    "fold": 0,
+    "gpus": 1,
+    "status": "failed_before_training_missing_einops_dependency"
+  },
+  "complete_dependency_fast_path_preflight": {
+    "launched_at_utc": "2026-08-23T16:10:36Z",
+    "changed_factor": "vendor the exact pure-Python FLA and einops wheels and fail closed unless the frozen Triton 3.6.0 backend is CUDA",
+    "fla_core_wheel_sha256": "5e830c85bad3d0d34677f98ac7074d08687a3756f0f0499d95ceb96eb6920761",
+    "flash_linear_attention_wheel_sha256": "dcf405d81f5426393b59037097aa700d0f4a841465d5028d5aa543f4502f2400",
+    "einops_wheel_sha256": "54058201ac7087911181bfec4af6091bb59380360f069276601256a76af08193",
     "fold": 0,
     "gpus": 1,
     "status": "running"

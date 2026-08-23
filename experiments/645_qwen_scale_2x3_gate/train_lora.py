@@ -64,12 +64,29 @@ def verify_fast_linear_attention_dependencies() -> dict[str, str]:
             raise RuntimeError(
                 f"required fast-path symbols are unavailable in {module_name}: {missing}"
             )
+    import torch
+    import triton
+
+    if not torch.cuda.is_available():
+        raise RuntimeError("CUDA is unavailable for the required Qwen fast path")
+    try:
+        triton_backend = triton.runtime.driver.active.get_current_target().backend
+    except Exception as error:
+        raise RuntimeError("Triton cannot initialize its active CUDA target") from error
+    if triton_backend != "cuda":
+        raise RuntimeError(f"unexpected Triton backend for Qwen fast path: {triton_backend}")
     versions = {
+        "transformers": importlib.metadata.version("transformers"),
+        "triton": importlib.metadata.version("triton"),
+        "einops": importlib.metadata.version("einops"),
         "fla_core": importlib.metadata.version("fla-core"),
         "flash_linear_attention": importlib.metadata.version("flash-linear-attention"),
         "causal_conv1d": importlib.metadata.version("causal-conv1d"),
     }
     if versions != {
+        "transformers": "5.15.1",
+        "triton": "3.6.0",
+        "einops": "0.8.2",
         "fla_core": "0.5.2",
         "flash_linear_attention": "0.5.2",
         "causal_conv1d": "1.6.2.post1",

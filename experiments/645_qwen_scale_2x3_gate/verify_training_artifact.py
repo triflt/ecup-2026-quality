@@ -10,6 +10,9 @@ from typing import Any
 from grid_contract import CELL_SPECS, GRID_CONTRACT_SHA256, canonical_sha256, sha256_file
 
 EXPECTED_FAST_PATH_PACKAGES = {
+    "transformers": "5.15.1",
+    "triton": "3.6.0",
+    "einops": "0.8.2",
     "fla_core": "0.5.2",
     "flash_linear_attention": "0.5.2",
     "causal_conv1d": "1.6.2.post1",

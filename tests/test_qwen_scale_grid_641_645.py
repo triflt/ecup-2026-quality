@@ -66,10 +66,32 @@ def test_grid_reuses_exact_prompt_and_frozen_effective_batch() -> None:
     assert 'os.environ["USE_HUB_KERNELS"] = "NO"' in source
     assert "use_kernels=False" in source
     assert "required fast-path module is unavailable" in source
+    assert '"triton": importlib.metadata.version' in source
+    assert '"einops": importlib.metadata.version' in source
+    assert 'triton_backend != "cuda"' in source
     assert '"fla_core": importlib.metadata.version' in source
     assert '"flash_linear_attention": importlib.metadata.version' in source
     assert '"causal_conv1d": importlib.metadata.version' in source
     assert "verify_qwen35_fast_path_binding" in source
+
+
+def test_trained_grid_cells_lock_identical_fast_path_artifacts() -> None:
+    required = {
+        'transformers_package = "transformers==5.15.1"',
+        'triton_package = "triton==3.6.0"',
+        'einops_package = "einops==0.8.2"',
+        'flash_linear_attention_core_package = "fla-core==0.5.2"',
+        'flash_linear_attention_package = "flash-linear-attention==0.5.2"',
+        'causal_conv1d_package = "causal-conv1d==1.6.2.post1"',
+        'einops_wheel_sha256 = "54058201ac7087911181bfec4af6091bb59380360f069276601256a76af08193"',
+        'flash_linear_attention_core_wheel_sha256 = "5e830c85bad3d0d34677f98ac7074d08687a3756f0f0499d95ceb96eb6920761"',
+        'flash_linear_attention_wheel_sha256 = "dcf405d81f5426393b59037097aa700d0f4a841465d5028d5aa543f4502f2400"',
+        'causal_conv1d_wheel_sha256 = "c16c1c48d4fa63415cc797e02d69f97248c57c04627d99e394d5bb0ef266e288"',
+    }
+    for prefix in ("641", "642", "643", "644"):
+        directory = next((ROOT / "experiments").glob(f"{prefix}_*"))
+        config = (directory / "experiment.toml").read_text(encoding="utf-8")
+        assert required.issubset(config.splitlines())
 
 
 def test_fast_path_dependency_check_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
