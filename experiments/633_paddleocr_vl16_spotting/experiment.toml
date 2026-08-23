@@ -1,0 +1,47 @@
+[experiment]
+id = "633"
+slug = "paddleocr_vl16_spotting"
+title = "Grounded OCR regions for every competition image"
+status = "technical_smoke_running"
+entrypoint = "experiments/633_paddleocr_vl16_spotting/run_spotting.py"
+result_file = "experiments/633_paddleocr_vl16_spotting/results/metrics.json"
+
+[data]
+input_version = "competition_train_v1"
+planned_output_version = "competition_train_paddleocr_vl16_spotting_v1"
+source_manifest = "research/multi_image_manifest.tsv.gz"
+expected_rows = 12971
+expected_images = 49456
+
+[model]
+id = "PaddlePaddle/PaddleOCR-VL-1.6"
+revision = "c5630abae1d940eafe0697512a0325494b02ab42"
+parameters_billions = 0.9
+task = "spotting"
+prompt = "Spotting:"
+max_new_tokens = 512
+
+[hypothesis]
+parent_experiment = "623_semantic_v3_multitask_span_head"
+changed_factor = "Add label-blind OCR text regions with real quadrilateral coordinates"
+mechanism = "Packaging text can expose policy evidence missing from listing text while region selection keeps explanations grounded"
+expected_macro_f1_delta = 0.003
+falsification = "Stop before full extraction if fewer than 95 percent of readable smoke images produce parseable bounded output or runtime exceeds the frozen budget"
+precedents = ["PaddleOCR-VL-1.6", "PaddleOCR-VL-1.5 grounded text spotting"]
+
+[validation]
+classification_version = "semantic_family_v3"
+technical_smoke_images = 100
+minimum_parseable_fraction = 0.95
+maximum_out_of_bounds_regions = 0
+sealed_labels_used = false
+
+[budget]
+technical_smoke_gpus = 1
+full_extraction_max_gpus = 8
+planned_gpu_hours = 24.0
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

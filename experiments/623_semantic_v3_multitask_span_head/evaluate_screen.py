@@ -30,6 +30,9 @@ PROTOCOL_PATH = HERE / "protocol.py"
 RUNNER_PATH = HERE / "run_fold.py"
 EXPECTED_PARENT_RUNNER_SHA256 = "c30e690ad260af72fcc625c8d3e6d9ab9c5a096d8443d6d9f5f7adbcaa52123c"
 EXPECTED_MODEL_REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+CANDIDATE_EXPERIMENT_ID = "623"
+CANDIDATE_SEED = 42
+RUNTIME_EXPERIMENT_ID = "623"
 ARTIFACT_NAMES = (
     "adapter.zip",
     "auxiliary_head.safetensors",
@@ -167,7 +170,7 @@ def _expected_selected_ids(runtime_dir: Path, *, fold: int) -> list[str]:
     thresholds = np.asarray([threshold_map[category] for category in categories], dtype=np.float32)
     uncertainty = np.abs(scores - thresholds)
     train_mask = folds != fold
-    rng = np.random.default_rng(42)
+    rng = np.random.default_rng(CANDIDATE_SEED)
     records: list[int] = []
     bad = np.flatnonzero(train_mask & (categories == "БАД"))
     bad_pos, bad_neg = bad[labels[bad] == 1], bad[labels[bad] == 0]
@@ -178,7 +181,7 @@ def _expected_selected_ids(runtime_dir: Path, *, fold: int) -> list[str]:
     flam_pos, flam_neg = flammable[labels[flammable] == 1], flammable[labels[flammable] == 0]
     records.extend(np.repeat(flam_pos, 5).tolist())
     records.extend(_hard_random(flam_neg, uncertainty, min(1600, len(flam_neg)), rng))
-    random.Random(42).shuffle(records)
+    random.Random(CANDIDATE_SEED).shuffle(records)
     return [ids[index] for index in records]
 
 
@@ -215,7 +218,7 @@ def _expected_selected_multiset_hashes(runtime_dir: Path, *, fold: int) -> set[s
         (flam_neg, min(1600, len(flam_neg))),
     )
     states: list[tuple[list[int], np.random.Generator]] = [
-        ([], np.random.default_rng(42))
+        ([], np.random.default_rng(CANDIDATE_SEED))
     ]
     for stage_index, (indices, count) in enumerate(stages):
         expanded: list[tuple[list[int], np.random.Generator]] = []
@@ -241,7 +244,7 @@ def _verify_runtime(runtime_dir: Path, *, fold: int, expected: pd.DataFrame) -> 
     validation_path = runtime_dir / "validation.jsonl"
     audit = _load_json(audit_path)
     expected_fields = {
-        "experiment_id": "623",
+        "experiment_id": RUNTIME_EXPERIMENT_ID,
         "outer_fold": fold,
         "validation_rows": len(expected),
         "validation_label_columns": [],
@@ -287,9 +290,9 @@ def _load_candidate_fold(
     contract = _load_json(contract_path)
     _verify_self_contract(contract)
     expected_contract = {
-        "experiment_id": "623",
+        "experiment_id": CANDIDATE_EXPERIMENT_ID,
         "outer_fold": fold,
-        "seed": 42,
+        "seed": CANDIDATE_SEED,
         "validation_rows": len(expected),
         "download_failures": 0,
         "parent_sha256": EXPECTED_PARENT_RUNNER_SHA256,
@@ -481,7 +484,7 @@ def evaluate_screen(
         }
     grounded = all_candidates["evidence"].astype(str).ne("NO_EVIDENCE")
     result: dict[str, Any] = {
-        "protocol": "623_frozen_donor_screen_v1",
+        "protocol": f"{CANDIDATE_EXPERIMENT_ID}_frozen_donor_screen_v1",
         "screen_folds": list(SCREEN_FOLDS),
         "registry_sha256": sha256_file(registry_path),
         "threshold_contract_sha256": sha256_file(threshold_contract_path),
@@ -510,7 +513,11 @@ def evaluate_screen(
         },
         "gates": gates,
         "passed": passed,
-        "decision": "GO_LAUNCH_FOLDS_1_2_4" if passed else "NO_GO_REJECT_623",
+        "decision": (
+            "GO_LAUNCH_FOLDS_1_2_4"
+            if passed
+            else f"NO_GO_REJECT_{CANDIDATE_EXPERIMENT_ID}"
+        ),
         "candidate_provenance": candidate_provenance,
         "prediction_audits": prediction_audits,
     }

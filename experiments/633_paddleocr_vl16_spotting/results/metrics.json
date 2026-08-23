@@ -1,0 +1,20 @@
+{
+  "experiment_id": "633",
+  "status": "technical_smoke_running",
+  "data_version": "competition_train_v1",
+  "planned_output_data_version": "competition_train_paddleocr_vl16_spotting_v1",
+  "model_id": "PaddlePaddle/PaddleOCR-VL-1.6",
+  "model_revision": "c5630abae1d940eafe0697512a0325494b02ab42",
+  "technical_smoke": {
+    "images": 100,
+    "gpus": 1,
+    "launched_at_utc": "2026-08-23T11:27:01Z",
+    "attempts": 2,
+    "first_attempt": "failed_before_model_execution_pep668",
+    "confirmed_fix": "ephemeral_container_pip_break_system_packages",
+    "restarted_at_utc": "2026-08-23T11:55:20Z",
+    "status": "running_after_confirmed_environment_fix"
+  },
+  "full_extraction": null,
+  "decision": "PENDING_TECHNICAL_SMOKE"
+}

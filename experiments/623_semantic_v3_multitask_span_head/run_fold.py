@@ -36,6 +36,7 @@ from renderer import render_explanation
 PARENT_PATH = ROOT / "research/qwen3vl_lora_holdout.py"
 PARENT_SHA256 = "c30e690ad260af72fcc625c8d3e6d9ab9c5a096d8443d6d9f5f7adbcaa52123c"
 MODEL_REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+EXPERIMENT_ID = "623"
 SEED = 42
 BATCH_SIZE = 4
 GRAD_ACCUM = 4
@@ -383,7 +384,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     selection_path = output_dir / "selection_audit.json"
     selection_path.write_text(json.dumps(selection_audit, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     report = {
-        "experiment_id": "623", "outer_fold": args.fold, "seed": SEED,
+        "experiment_id": EXPERIMENT_ID, "outer_fold": args.fold, "seed": SEED,
         "training_records": len(selected_ids), "training_unique_rows": len(set(selected_ids)),
         "validation_rows": len(predictions), "download_failures": 0,
         "optimizer_updates": updates, "alignment_masked_safe_candidates": masked_alignment_rows,

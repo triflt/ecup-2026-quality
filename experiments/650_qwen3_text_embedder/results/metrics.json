@@ -1,0 +1,21 @@
+{
+  "experiment_id": "650",
+  "status": "embedding_extraction_running",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "embedding_extraction": {
+    "rows": 11118,
+    "gpus": 1,
+    "launched_at_utc": "2026-08-23T11:42:30Z",
+    "attempts": 2,
+    "first_attempt": "failed_during_external_model_cache_initialization",
+    "confirmed_cause": "transient_model_delivery_websocket_failure_before_user_code",
+    "restarted_at_utc": "2026-08-23T12:07:31Z",
+    "status": "running_after_safe_rerun"
+  },
+  "zero_shot": null,
+  "frozen_supervised": null,
+  "finetuned": null,
+  "integration_140": null,
+  "decision": "PENDING_EMBEDDING_EXTRACTION"
+}

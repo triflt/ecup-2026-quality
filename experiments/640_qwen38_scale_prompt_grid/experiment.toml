@@ -1,0 +1,52 @@
+[experiment]
+id = "640"
+slug = "qwen38_scale_prompt_grid"
+title = "Fair zero-shot prompting comparison of Qwen 4B and 27B"
+status = "large_model_technical_smoke_running"
+entrypoint = "experiments/640_qwen38_scale_prompt_grid/run_prompt_scores.py"
+result_file = "experiments/640_qwen38_scale_prompt_grid/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+scope = "semantic_family_v3 development only"
+expected_rows = 11118
+image_policy = "first image only"
+description_limit = 1800
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+decision_threshold = 0.0
+threshold_tuned = false
+sealed_holdout_used = false
+
+[models.small]
+id = "Qwen/Qwen3.5-4B"
+revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+
+[models.large]
+id = "Qwen/Qwen3.8-27B"
+revision = "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0"
+
+[prompt]
+version = "qwen_scale_binary_v1"
+thinking = false
+output = "single token 0 or 1"
+score = "next-token logit(1) minus logit(0)"
+
+[hypothesis]
+changed_factor = "Model scale and generation only: 4B versus 27B"
+mechanism = "The larger native multimodal model may better resolve visual text scope and product-versus-accessory relations before any task adaptation"
+expected_macro_f1_delta = 0.02
+falsification = "Reject 27B as teacher candidate if it does not improve both screen folds or fails runtime and evidence diagnostics"
+precedents = ["Qwen3.8-27B official model card", "Multimodal-CoT 2023"]
+
+[budget]
+technical_smoke_gpus = 1
+full_prompt_max_parallel_gpus = 8
+planned_gpu_hours = 24.0
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

@@ -2,7 +2,7 @@
 id = "631"
 slug = "public603_four_seed_refit"
 title = "Production refit of the frozen experiment-603 four-seed ablation"
-status = "ready_for_public_ablation"
+status = "rejected_public"
 entrypoint = "experiments/631_public603_four_seed_refit/train_full_seed.py"
 result_file = "experiments/631_public603_four_seed_refit/results/metrics.json"
 submission_source = "experiments/631_public603_four_seed_refit/submission"
@@ -59,6 +59,9 @@ requires_schema_smoke = true
 requires_public_runtime_minutes_at_most = 20.0
 requires_private_runtime_minutes_at_most = 40.0
 does_not_promote_champion_without_public_result = true
+public_result = 0.8636091486049575
+public_delta_vs_140 = -0.0287885335263154
+decision = "rejected_public_no_retuning"
 
 [artifacts]
 publish = false

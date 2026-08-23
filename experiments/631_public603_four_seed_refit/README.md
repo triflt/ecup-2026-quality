@@ -1,6 +1,6 @@
 # 631: production refit of experiment 603
 
-Status: **production archive is ready for one Public ablation**.
+Status: **Public ablation completed and rejected online**.
 
 Experiment 603 found a predeclared equal-probability mean of four Qwen3.5
 seeds. This package turns that development-only signal into a separately named
@@ -29,3 +29,10 @@ the relevant local evidence is experiment 602/603. The Public submission is
 useful as an architecture-level ablation because experiment 230 confounded a
 second seed with newly selected route weights, whereas 631 freezes the original
 production route.
+
+The frozen archive received Public Macro F1 **0.8636091486**, which is
+`-0.0287885335` below experiment 140. It is also slightly below the rejected
+two-seed experiment 230. This causally cleaner result shows that the
+development gain of fixed seed averaging does not transfer to the Public
+distribution. No weights, thresholds or follow-up recipe are tuned from this
+observation; the four-seed production route is rejected.

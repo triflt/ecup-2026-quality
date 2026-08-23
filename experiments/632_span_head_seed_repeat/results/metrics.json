@@ -1,0 +1,32 @@
+{
+  "experiment_id": "632",
+  "status": "full_validation_running",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "parent_experiment": "623",
+  "seed": 31415,
+  "screen_folds": [0, 3],
+  "jobs_launched": 5,
+  "jobs_completed": 2,
+  "launched_at_utc": "2026-08-23T11:16:02Z",
+  "validation": {
+    "screen_folds": [0, 3],
+    "baseline_macro_f1": [0.8099424385, 0.9114912713],
+    "candidate_macro_f1": [0.9090670860, 0.9280967403],
+    "fold_delta": [0.0991246474, 0.0166054690],
+    "mean_fold_delta": 0.0578650582,
+    "bad_f1_delta": 0.0086622401,
+    "flammable_f1_delta": 0.1017450458,
+    "corrected": 99,
+    "regressed": 52,
+    "corrected_to_regressed": 1.9038461538,
+    "flammable_false_negatives_before": 14,
+    "flammable_false_negatives_after": 3,
+    "structural_grounded_coverage": 0.5959982014,
+    "human_quality_evaluated": false,
+    "sealed_rows_used": 0,
+    "public_used": false,
+    "screen_passed": true
+  },
+  "decision": "GO_FULL_FOLDS_1_2_4_RUNNING"
+}

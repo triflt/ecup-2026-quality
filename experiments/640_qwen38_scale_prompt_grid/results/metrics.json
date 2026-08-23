@@ -1,0 +1,19 @@
+{
+  "experiment_id": "640",
+  "status": "large_model_technical_smoke_running",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "prompt_version": "qwen_scale_binary_v1",
+  "small_model": null,
+  "large_model": {
+    "technical_smoke_rows": 20,
+    "gpus": 1,
+    "launched_at_utc": "2026-08-23T11:35:15Z",
+    "attempts": 2,
+    "first_attempt": "failed_before_model_execution_pep668",
+    "confirmed_fix": "ephemeral_container_pip_break_system_packages",
+    "restarted_at_utc": "2026-08-23T12:04:12Z",
+    "status": "running_after_confirmed_environment_fix"
+  },
+  "decision": "PENDING_TECHNICAL_SMOKE"
+}

@@ -1,0 +1,53 @@
+[experiment]
+id = "632"
+slug = "span_head_seed_repeat"
+title = "Independent seed reproduction of the experiment-623 exact-span objective"
+status = "full_validation_running"
+entrypoint = "experiments/632_span_head_seed_repeat/run_fold.py"
+result_file = "experiments/632_span_head_seed_repeat/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+folds = "validation/semantic_family_v3/folds.csv"
+primary_metric = "macro_f1"
+screen_folds = [0, 3]
+
+[hypothesis]
+parent_experiment = "623_semantic_v3_multitask_span_head"
+changed_factor = "Training seed 42 to 31415 only"
+mechanism = "A genuine verdict regularization effect should reproduce independently of initialization"
+expected_macro_f1_delta = 0.003
+falsification = "Reject if either screen fold is non-positive, a category drops over 0.002, safety false negatives increase, or corrected/regressed is below 1.5"
+precedents = ["Deep Ensembles, NeurIPS 2017", "experiment 623"]
+
+[training]
+model = "Qwen3.5-4B"
+seed = 31415
+parent_seed = 42
+gpu_per_job = 1
+recipe_changes = 0
+
+[acceptance]
+required_screen_fold_wins = 2
+required_full_fold_wins = 4
+minimum_macro_delta = 0.003
+minimum_corrected_to_regressed = 1.5
+max_category_f1_drop = 0.002
+maximum_flammable_false_negative_increase = 0
+
+[budget]
+planned_gpu_hours = 6.0
+planned_public_submissions = 0
+runtime_limit_minutes = 40
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false

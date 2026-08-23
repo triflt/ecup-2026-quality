@@ -142,3 +142,15 @@ base_folds = "validation/grouped_text_v1/folds.csv"
 connected_guard = "validation/connected_family_guard_v2/rows.csv"
 manifest = "validation/qwen35_fisher_blockwise_soup_screen_v1/manifest.json"
 immutable = true
+
+[[evaluations]]
+version = "semantic_family_v3"
+dataset_version = "competition_train_v1"
+purpose = "Leakage-resistant model selection over audited semantic product families"
+protocol = "Five immutable development folds plus a sealed holdout; semantic components cross neither folds nor the development/holdout boundary"
+folds = "validation/semantic_family_v3/folds.csv"
+manifest = "validation/semantic_family_v3/manifest.json"
+development_rows = 11118
+sealed_holdout_rows = 1853
+sealed = true
+immutable = true
