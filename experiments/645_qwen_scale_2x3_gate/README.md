@@ -41,6 +41,12 @@ Screen требует положительную разницу `644−643` на
 python experiments/645_qwen_scale_2x3_gate/adapt_prompt640.py --help
 python experiments/645_qwen_scale_2x3_gate/freeze_audit.py --help
 python experiments/645_qwen_scale_2x3_gate/evaluate.py --help
+python experiments/645_qwen_scale_2x3_gate/verify_training_artifact.py --help
 ```
+
+Каждый скачанный training-артефакт до оценки проверяется
+`verify_training_artifact.py`: самохешированный output contract, точные версии
+FLA, фактические compiled bindings, SHA-256 прогнозов и адаптера, CRC и состав
+ZIP, отсутствие supervision в prediction JSONL и неизменный нулевой порог.
 
 Пакет не содержит platform presets, приватные адреса, данные, веса или ZIP.
