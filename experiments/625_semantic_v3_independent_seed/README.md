@@ -1,6 +1,10 @@
 # Experiment 625 — independent-seed reproduction
 
-Status: `blocked_by_dependency`.
+Status: `skipped_by_gate`.
+
+Experiment 624 selected the unchanged 603 fallback rather than an accepted new
+component, so an independent seed would not reproduce an eligible hypothesis.
+The five prepared runs were not launched.
 
 After experiment 624 freezes its winning development recipe, this stage trains
 one independent seed on all five semantic-v3 folds. The recipe, data selection,

@@ -88,11 +88,12 @@ def test_route_manifest_rejects_tampering(tmp_path: Path):
         runner.verify_route_manifest(path, spec)
 
 
-def test_no_acceptance_claim_exists():
+def test_terminal_skip_claims_no_acceptance():
     metrics = json.loads((EXP / "results/metrics.json").read_text())
     assert metrics["validation_complete"] is False
     assert metrics["metrics"] == {}
-    assert metrics["decision"] == "AWAITING_ACCEPTED_624_RECIPE"
+    assert metrics["status"] == "skipped_by_gate"
+    assert metrics["decision"] == "SKIPPED_NO_ACCEPTED_624_RECIPE"
 
 
 def test_wrapper_enforces_single_gpu_and_overrides_only_seed():

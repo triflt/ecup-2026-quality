@@ -1,6 +1,10 @@
 # Experiment 627 — freeze one final recipe
 
-Status: `blocked_by_dependency`.
+Status: `skipped_by_gate`.
+
+No new recipe passed route integration, independent reproduction, and the real
+human explanation audit. Consequently no final recipe manifest was frozen and
+the sealed holdout remains closed.
 
 Exactly one recipe may be frozen after development validation, independent-seed
 reproduction, safety checks, and the required explanation audit are resolved.

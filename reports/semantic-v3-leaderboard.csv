@@ -10,3 +10,5 @@ group_rank,experiment_id,variant,system_level,bad_f1,flammable_f1,macro_f1,statu
 6,600,original_seed_42,qwen35_component,0.9418774828,0.8333333333,0.8876054080,reference,"Original Qwen3.5 component"
 7,600,specialist_seed_42,qwen35_component,0.9450433312,0.8292682927,0.8871558120,rejected,"Delta -0.000450 versus original"
 8,602,seed_271828,qwen35_component,0.9365988126,0.8323353293,0.8844670709,rejected,"Delta -0.003138 versus seed 42"
+1,623,multitask_exact_span_seed42,qwen35_component,0.9530102790,0.8537313433,0.9033708111,rejected,"Delta +0.015765 versus experiment 600 original but only 3/5 fold wins; 229/114 corrected/regressed; bootstrap P=0.9261"
+4,624,original_route_603_fallback,full_route,0.9548589342,0.8724035608,0.9136312475,cycle_winner,"No 621-623 component passed every frozen gate; exact unchanged route 603 retained"

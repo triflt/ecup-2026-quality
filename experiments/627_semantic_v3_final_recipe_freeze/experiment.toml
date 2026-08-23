@@ -1,6 +1,6 @@
 id = 627
 slug = "semantic-v3-final-recipe-freeze"
-status = "blocked_by_dependency"
+status = "skipped_by_gate"
 depends_on = [624, 625, 626]
 uses_sealed_holdout = false
 uses_large_teacher = false

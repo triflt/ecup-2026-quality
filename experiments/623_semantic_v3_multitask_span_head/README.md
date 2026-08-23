@@ -1,6 +1,13 @@
 # Experiment 623 — semantic-v3 multitask span head
 
-Status: `full_grid_running`.
+Status: `rejected_by_full_gate`.
+
+The five-fold result improved Macro F1 from `0.8876054080` to `0.9033708111`
+(`+0.0157654031`) and passed every category, safety, paired-change, and grouped
+bootstrap gate. It nevertheless won only folds `0/1/3`, or `3/5`, below the
+frozen requirement of `4/5`; folds `2/4` lost `0.0151667231/0.0125968118`.
+The component is therefore retained for research and explanations but is not
+integrated into the route, independently reproduced, or submitted.
 
 ## Hypothesis
 

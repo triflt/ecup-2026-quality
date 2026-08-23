@@ -1,6 +1,12 @@
 # Experiment 624 — semantic-v3 route integration
 
-Status: `blocked_by_dependency`.
+Status: `completed_fallback`.
+
+No upstream component passed its complete frozen gate: 621 failed before
+validation, 622 has a confirmed external human-review blocker, and 623 won only
+`3/5` full folds. Per the predeclared fallback, the cycle winner is therefore
+the original route 603 unchanged (`0.9136312475` on semantic-v3). No integration
+manifest, weak fusion, new threshold, or second-level router was created.
 
 This stage integrates **one** component only after experiment 621, 622, or 623
 passes its frozen development gates. The reference-route weights remain those

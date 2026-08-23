@@ -1,6 +1,9 @@
 # Experiment 629 — accepted-recipe full-data refit
 
-Status: `blocked_by_dependency`.
+Status: `skipped_by_gate`.
+
+There is no recipe accepted by experiment 628, so no full-data fit or checkpoint
+was created.
 
 Full-data training is allowed only if the one-time experiment-628 evaluation
 accepts the frozen recipe. Each component receives one fit on all permitted

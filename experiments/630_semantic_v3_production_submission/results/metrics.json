@@ -1,9 +1,12 @@
 {
   "experiment_id": "630",
-  "status": "blocked_by_dependency",
+  "status": "skipped_by_gate",
   "assembly_complete": false,
+  "sealed_holdout_used": false,
   "metrics": {},
   "artifacts": [],
   "sha256": null,
-  "decision": "AWAITING_SUCCESSFUL_629_NO_SUBMISSION_CREATED"
+  "public_fallback_experiment": 400,
+  "local_safe_fallback_experiment": 603,
+  "decision": "NO_SUBMISSION_CREATED_KEEP_400_AND_603"
 }

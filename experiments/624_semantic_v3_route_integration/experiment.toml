@@ -1,6 +1,6 @@
 id = 624
 slug = "semantic-v3-route-integration"
-status = "blocked_by_dependency"
+status = "completed_fallback"
 validation_protocol = "semantic_family_v3"
 uses_sealed_holdout = false
 uses_large_teacher = false

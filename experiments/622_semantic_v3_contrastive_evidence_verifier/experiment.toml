@@ -1,6 +1,6 @@
 id = "622"
 name = "semantic_v3_contrastive_evidence_verifier"
-status = "blocked_pre_gpu_human_audit"
+status = "confirmed_external_blocker"
 description = "Donor-only contrastive verifier for exact text evidence and closed policy claims."
 entrypoint = "experiments/622_semantic_v3_contrastive_evidence_verifier/build_preflight.py"
 result_file = "experiments/622_semantic_v3_contrastive_evidence_verifier/results/metrics.json"

@@ -1,6 +1,10 @@
 # Experiment 630 — production submission assembly
 
-Status: `blocked_by_dependency`.
+Status: `skipped_by_gate`.
+
+Experiment 629 produced no accepted full-data refit. No ZIP was manufactured;
+the verified Public fallback remains experiment 400 and the local safe recipe
+remains original route 603.
 
 A production ZIP may be assembled only from a successful experiment-629
 full-data refit. The archive must pass SHA-256 and ZIP integrity checks, output

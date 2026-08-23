@@ -1,7 +1,8 @@
 # 622: contrastive evidence verifier on semantic-v3
 
-Status: **blocked before GPU**. The CPU builder and frozen contracts are ready;
-the mandatory fresh human audit has not been performed. No score is claimed.
+Status: **confirmed external blocker**. The CPU builder and frozen contracts are
+ready, but the mandatory fresh human audit was not supplied. No score is claimed,
+no rating was invented, and no GPU task was launched.
 
 ## Hypothesis
 

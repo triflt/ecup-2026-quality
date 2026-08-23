@@ -1,6 +1,12 @@
 # Experiment 626 — independent explanation audit
 
-Status: `blocked_by_dependency`.
+Status: `confirmed_external_blocker`.
+
+A private blind packet was frozen with 300 unique semantic components, excluding
+all 200 experiment-490 and 300 experiment-622 IDs. It contains no sealed rows,
+has zero exclusion overlap, and every human field remains empty. Because 623 was
+rejected and no real reviewer supplied ratings, the required `282/300` plus zero
+critical/scope-failure gate cannot be claimed.
 
 This stage prepares a new blind audit of at least 300 rows for the explanation
 renderer selected by experiment 624 and reproduced by experiment 625. It must

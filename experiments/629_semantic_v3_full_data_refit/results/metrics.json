@@ -1,8 +1,10 @@
 {
   "experiment_id": "629",
-  "status": "blocked_by_dependency",
+  "status": "skipped_by_gate",
   "training_complete": false,
+  "gpu_jobs_launched": 0,
+  "sealed_holdout_used": false,
   "metrics": {},
   "artifacts": [],
-  "decision": "AWAITING_ACCEPTED_628"
+  "decision": "SKIPPED_NO_ACCEPTED_628"
 }

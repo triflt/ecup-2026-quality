@@ -1,9 +1,9 @@
 {
   "experiment_id": "627",
-  "status": "blocked_by_dependency",
+  "status": "skipped_by_gate",
   "validation_complete": false,
   "sealed_holdout_used": false,
   "recipe_frozen": false,
   "metrics": {},
-  "decision": "AWAITING_624_625_626"
+  "decision": "SKIPPED_NO_ACCEPTED_REPRODUCED_AUDITED_RECIPE"
 }

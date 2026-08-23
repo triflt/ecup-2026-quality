@@ -10,7 +10,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.util
+import itertools
 import json
+import math
 import random
 import sys
 from collections import Counter
@@ -95,6 +97,42 @@ def _hard_random(
     return np.concatenate([hard, random_part]).tolist()
 
 
+def _clone_rng(rng: np.random.Generator) -> np.random.Generator:
+    clone = np.random.default_rng()
+    clone.bit_generator.state = rng.bit_generator.state
+    return clone
+
+
+def _hard_random_tie_options(
+    indices: np.ndarray,
+    scores: np.ndarray,
+    count: int,
+    rng: np.random.Generator,
+) -> list[tuple[list[int], np.random.Generator]]:
+    """Enumerate selections allowed only by the parent's unstable argsort ties."""
+
+    indices = np.asarray(indices, dtype=np.int64)
+    if len(indices) <= count:
+        return [(indices.tolist(), _clone_rng(rng))]
+    hard_count = count // 2
+    values = scores[indices]
+    boundary = np.partition(values, hard_count - 1)[hard_count - 1]
+    fixed = indices[values < boundary]
+    tied = indices[values == boundary]
+    needed = hard_count - len(fixed)
+    combinations = math.comb(len(tied), needed)
+    if combinations > 256:
+        raise ValueError("selector boundary has too many tie-equivalent branches")
+    options: list[tuple[list[int], np.random.Generator]] = []
+    for chosen in itertools.combinations(tied.tolist(), needed):
+        branch = _clone_rng(rng)
+        hard = np.concatenate([fixed, np.asarray(chosen, dtype=np.int64)])
+        remaining = np.setdiff1d(indices, hard, assume_unique=False)
+        random_part = branch.choice(remaining, size=count - hard_count, replace=False)
+        options.append((np.concatenate([hard, random_part]).tolist(), branch))
+    return options
+
+
 def _expected_selected_ids(runtime_dir: Path, *, fold: int) -> list[str]:
     """Repeat the exact frozen experiment-600 hard selector without model imports."""
 
@@ -142,6 +180,60 @@ def _expected_selected_ids(runtime_dir: Path, *, fold: int) -> list[str]:
     records.extend(_hard_random(flam_neg, uncertainty, min(1600, len(flam_neg)), rng))
     random.Random(42).shuffle(records)
     return [ids[index] for index in records]
+
+
+def _expected_selected_multiset_hashes(runtime_dir: Path, *, fold: int) -> set[str]:
+    """Return every exact-parent multiset allowed solely by boundary ties."""
+
+    train = protocol.read_jsonl(runtime_dir / "train.jsonl")
+    validation = protocol.read_jsonl(runtime_dir / "validation.jsonl")
+    ordered = sorted(train + validation, key=lambda row: int(row["row_index"]))
+    train_by_id = {str(row["id"]): row for row in train}
+    selector = np.load(runtime_dir / "development_selector_oof.npz", allow_pickle=False)
+    ids = [str(value) for value in selector["ids"].tolist()]
+    folds = selector["fold_ids"].astype(np.int8)
+    categories = np.asarray([str(row["category"]) for row in ordered])
+    labels = np.asarray(
+        [int(train_by_id[row_id]["label"]) if row_id in train_by_id else 0 for row_id in ids],
+        dtype=np.int8,
+    )
+    scores = selector["fused_scores"].astype(np.float32)
+    threshold_map = {"БАД": 0.24864045896205267, FLAMMABLE: 0.9591804083988902}
+    thresholds = np.asarray(
+        [threshold_map[category] for category in categories], dtype=np.float32
+    )
+    uncertainty = np.abs(scores - thresholds)
+    train_mask = folds != fold
+    bad = np.flatnonzero(train_mask & (categories == "БАД"))
+    bad_pos, bad_neg = bad[labels[bad] == 1], bad[labels[bad] == 0]
+    bad_count = min(1500, len(bad_neg), len(bad_pos))
+    flammable = np.flatnonzero(train_mask & (categories == FLAMMABLE))
+    flam_pos, flam_neg = flammable[labels[flammable] == 1], flammable[labels[flammable] == 0]
+    stages = (
+        (bad_pos, bad_count),
+        (bad_neg, bad_count),
+        (flam_neg, min(1600, len(flam_neg))),
+    )
+    states: list[tuple[list[int], np.random.Generator]] = [
+        ([], np.random.default_rng(42))
+    ]
+    for stage_index, (indices, count) in enumerate(stages):
+        expanded: list[tuple[list[int], np.random.Generator]] = []
+        for records, rng in states:
+            for selected, next_rng in _hard_random_tie_options(
+                indices, uncertainty, count, rng
+            ):
+                current = records + selected
+                if stage_index == 1:
+                    current += np.repeat(flam_pos, 5).tolist()
+                expanded.append((current, next_rng))
+        if len(expanded) > 4096:
+            raise ValueError("selector has too many combined tie-equivalent branches")
+        states = expanded
+    return {
+        canonical_sha256(sorted(Counter(ids[index] for index in records).items()))
+        for records, _ in states
+    }
 
 
 def _verify_runtime(runtime_dir: Path, *, fold: int, expected: pd.DataFrame) -> Path:
@@ -230,13 +322,17 @@ def _load_candidate_fold(
         "outer_fold": fold,
         "training_records": len(expected_ids),
         "training_unique_rows": len(set(expected_ids)),
-        "selected_id_multiset_sha256": canonical_sha256(sorted(Counter(expected_ids).items())),
         "outer_validation_occurrences": 0,
         "runtime_audit_sha256": sha256_file(runtime_dir / "runtime_audit.json"),
         "decision": "GO",
     }
-    if selection != expected_selection:
+    observed_multiset = selection.get("selected_id_multiset_sha256")
+    selection_without_multiset = dict(selection)
+    selection_without_multiset.pop("selected_id_multiset_sha256", None)
+    if selection_without_multiset != expected_selection:
         raise ValueError(f"candidate fold {fold} selection audit mismatch")
+    if observed_multiset not in _expected_selected_multiset_hashes(runtime_dir, fold=fold):
+        raise ValueError(f"candidate fold {fold} selection multiset is not tie-equivalent")
     frame = pd.read_csv(prediction_path, dtype={"id": str, "category": str})
     return frame, {
         "contract_sha256": sha256_file(contract_path),

@@ -314,3 +314,20 @@ def test_screen_rejects_runtime_claiming_sealed_rows(
             threshold_contract_path=thresholds,
             output_path=tmp_path / "screen.json",
         )
+
+
+def test_selector_enumerates_only_boundary_tie_equivalents() -> None:
+    indices = np.arange(8, dtype=np.int64)
+    scores = np.asarray([0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 3.0, 4.0])
+    options = screen._hard_random_tie_options(
+        indices, scores, count=4, rng=np.random.default_rng(42)
+    )
+    hard_subsets = {tuple(sorted(selected[:2])) for selected, _ in options}
+    assert hard_subsets == {
+        (0, 1),
+        (0, 2),
+        (0, 3),
+        (1, 2),
+        (1, 3),
+        (2, 3),
+    }

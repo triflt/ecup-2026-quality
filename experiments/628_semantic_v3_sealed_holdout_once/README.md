@@ -1,6 +1,9 @@
 # Experiment 628 — one-time sealed evaluation
 
-Status: `blocked_by_dependency`.
+Status: `skipped_by_gate`.
+
+Experiment 627 produced no accepted frozen recipe. The sealed holdout was not
+opened, the reveal ledger remains absent, and the evaluation count remains zero.
 
 The sealed semantic-v3 holdout may be opened exactly once, only after experiment
 627 freezes one recipe that has passed the complete development and independent-

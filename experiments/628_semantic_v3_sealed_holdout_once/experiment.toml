@@ -1,6 +1,6 @@
 id = 628
 slug = "semantic-v3-sealed-holdout-once"
-status = "blocked_by_dependency"
+status = "skipped_by_gate"
 parent_experiment = 627
 uses_sealed_holdout = false
 uses_large_teacher = false

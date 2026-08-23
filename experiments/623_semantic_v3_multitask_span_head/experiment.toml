@@ -1,6 +1,6 @@
 id = 623
 slug = "semantic-v3-multitask-span-head"
-status = "full_grid_running"
+status = "rejected_by_full_gate"
 parent = 600
 validation_protocol = "semantic_family_v3"
 uses_sealed_holdout = false
@@ -39,6 +39,7 @@ human_quality_evaluated = false
 [compute]
 screen_jobs_completed = 2
 remaining_fold_jobs_launched = 3
+remaining_fold_jobs_completed = 3
 one_gpu_per_job = true
 
 [full_evaluation]
@@ -49,6 +50,13 @@ sealed_rows_read_when_frozen = 0
 bootstrap_unit = "semantic_component"
 bootstrap_seed = 623
 bootstrap_iterations = 10000
+completed = true
+candidate_macro_f1 = 0.9033708111425253
+baseline_macro_f1 = 0.8876054080423723
+macro_delta = 0.015765403100152953
+winning_folds = 3
+required_winning_folds = 4
+decision = "NO_GO_REJECT_623"
 
 [commands]
 build_runtime = "python3 experiments/623_semantic_v3_multitask_span_head/build_fold_runtime.py --help"

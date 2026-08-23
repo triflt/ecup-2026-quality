@@ -1,6 +1,6 @@
 id = 625
 slug = "semantic-v3-independent-seed"
-status = "blocked_by_dependency"
+status = "skipped_by_gate"
 parent_experiment = 624
 validation_protocol = "semantic_family_v3"
 uses_sealed_holdout = false
