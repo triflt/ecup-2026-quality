@@ -1,34 +1,32 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-22",
-  "experiment": "400_qwen35_category_routed_adapters",
-  "submission_filename": "quality-public190-category-route-v400.zip",
-  "submission_sha256": "2a99472be1d2b753ae93036becdaee5595f44c4694d161e11fd9d59d2c52a373",
+  "updated_at": "2026-08-23",
+  "experiment": "140_qwen35_dual_lora_prior",
+  "submission_filename": "quality-qwen3vl-qwen35-dual-lora-prior-submit.zip",
+  "submission_sha256": "6cc2fda9d17d959880050889d964c3b971b92adbfa606505df7f04b46a819cd3",
   "data_version": "competition_train_v1",
   "evaluation_versions": [
-    "locked_190_category_routing_v1",
-    "connected_family_guard_v2",
-    "production_replay_post470_v1"
+    "nested_grouped_recurrence_v1",
+    "repeated_70_30_simulation_v1",
+    "official_runtime_smoke_v1"
   ],
   "validation": {
-    "locked_bad_f1": 0.9546604046,
-    "locked_flammable_f1": 0.9086294416,
-    "locked_macro_f1": 0.9316449231,
-    "locked_delta_vs_190": 0.0082359951,
-    "exact_production_replay_delta_vs_190": 0.0023473317439940966,
-    "connected_safe_production_delta_vs_190": 0.00238565426568238
+    "nested_recurrence_macro_f1": 0.942878,
+    "repeated_70_30_macro_f1": 0.94109,
+    "semantic_v3_replay_available": false,
+    "note": "Historical local protocols were optimistic; Public is authoritative only for the frozen submitted archive and is not used for retuning."
   },
   "leaderboard": {
-    "public_macro_f1": 0.8922900010951702,
+    "public_macro_f1": 0.8923976821312729,
     "public_baseline_190": 0.8919244236941932,
-    "public_delta_vs_190": 0.0003655774009770001,
+    "public_delta_vs_190": 0.0004732584370797,
     "private_macro_f1": null
   },
   "runtime": {
     "measured_rows": 600,
-    "measured_seconds": 320.24,
-    "projected_public_minutes": 14.23,
-    "projected_private_minutes": 33.8
+    "measured_seconds": null,
+    "projected_public_minutes": 10.2,
+    "projected_private_minutes": 24.1
   },
   "verification": {
     "official_container_smoke": true,
@@ -36,11 +34,11 @@
     "empty_category_safe": true,
     "adapter_checksums_recorded": true,
     "archive_sha256_recorded": true,
-    "connected_family_audit": true,
-    "exact_production_replay": true,
+    "connected_family_audit": false,
+    "exact_production_replay": false,
     "clean_rebuild_before_public": true
   },
-  "acceptance_reason": "Новый лучший Public: +0.0003655774 к 190. Архив, схема, обе категории, время и контрольная сумма проверены. Эффект мал и локально переоценён, поэтому 400 — текущий Public-чемпион, но новая semantic-family validation остаётся обязательной перед следующим challenger и Private-выводами.",
+  "acceptance_reason": "Эксперименты 140 и 180 получили одинаковый лучший Public 0.8923976821. Более простой 140 выбран отображаемым чемпионом: дополнительное правило числовых вариантов в 180 не дало измеримого эффекта. Преимущество над 400 равно только 0.0001076810 и не доказывает устойчивый Private-перенос.",
   "final_readiness": {
     "classification": true,
     "explanations": false,
