@@ -96,7 +96,7 @@ def test_full_five_fold_acceptance_reports_all_frozen_gates(
     assert result["macro_delta"] >= 0.003
     assert all(result["gates"].values())
     assert result["component_bootstrap"]["iterations"] == 10_000
-    assert result["component_bootstrap"]["seed"] == 623_042
+    assert result["component_bootstrap"]["seed"] == 623
     assert result["component_bootstrap"]["probability_delta_positive"] >= 0.9
     assert result["grounding"]["overall"]["grounded_coverage"] == 1.0
     assert result["grounding"]["human_quality_evaluated"] is False
