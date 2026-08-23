@@ -1,6 +1,6 @@
 {
   "experiment_id": "641",
-  "status": "legacy_eager_smoke_passed_screen_folds_running",
+  "status": "legacy_eager_micro2_screen_running",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
@@ -111,13 +111,58 @@
     "runner_sha256": "a6e2c4dbec3a35bb4304ef0173d1503303469ea7361ffd76f0c0e1f05284ab88"
   },
   "legacy_eager_screen": {
-    "status": "folds_0_and_3_running",
+    "status": "folds_0_and_3_failed_technical_oom",
     "folds": [0, 3],
     "gpus": 2,
+    "runtime_micro_batch_size": 4,
+    "runtime_gradient_accumulation": 4,
+    "effective_batch_size": 16,
+    "failure_stage": "training_forward_before_any_complete_scientific_run",
+    "confirmed_cause": "legacy eager Gated DeltaNet path used about 79.15 GiB and OOMed on an additional 20 MiB allocation",
+    "preset_audit_errors": 0,
+    "preset_audit_warnings": 0,
+    "dry_runs": "passed_2_of_2"
+  },
+  "legacy_eager_micro2_smoke": {
+    "status": "passed",
+    "changed_factor": "runtime micro batch 4 to 2 and gradient accumulation 4 to 8",
+    "selection_contract_changed": false,
+    "numerical_accumulation_order_changed": true,
+    "runtime_micro_batch_size": 2,
+    "runtime_gradient_accumulation": 8,
+    "effective_batch_size": 16,
+    "train_occurrences": 8,
+    "validation_rows": 2,
+    "finite_scores": 2,
+    "validation_labels_read": 0,
+    "sealed_rows_used": 0,
+    "runtime_minutes": 0.10553578799590468,
+    "artifact_sha256": "69e4fb6b0d306b9d2048b8a3fd3580c3ca47ac87d7e56019f873acf0b73e919d",
+    "adapter_zip_sha256": "b5452a269ee2d69b1622a7c1fa2ef4b645622b95925872d50378e47e3ec837be",
+    "preset_audit_errors": 0,
+    "preset_audit_warnings": 0,
+    "dry_run": "passed"
+  },
+  "legacy_eager_micro2_screen": {
+    "status": "running",
+    "folds": [0, 3],
+    "gpus": 2,
+    "train_occurrences_per_fold": 4892,
+    "frozen_micro_batch_size": 4,
+    "frozen_gradient_accumulation": 4,
+    "runtime_micro_batch_size": 2,
+    "runtime_gradient_accumulation": 8,
+    "effective_batch_size": 16,
+    "frozen_optimizer_updates": 306,
+    "runtime_optimizer_updates": 306,
+    "tail_rows": 12,
+    "objective_weighting_preserved": true,
+    "selection_contract_changed": false,
+    "numerical_accumulation_order_changed": true,
     "preset_audit_errors": 0,
     "preset_audit_warnings": 0,
     "dry_runs": "passed_2_of_2"
   },
   "metrics": null,
-  "decision": "PENDING_FROZEN_SCREEN_FOLDS_0_AND_3"
+  "decision": "PENDING_FROZEN_FOLD_0_AND_3_SCREEN"
 }

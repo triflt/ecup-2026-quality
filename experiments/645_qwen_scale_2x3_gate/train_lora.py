@@ -40,6 +40,68 @@ EPOCHS = 1
 LEARNING_RATE = 2e-4
 
 
+def resolve_runtime_batching(spec: Any, args: argparse.Namespace) -> tuple[int, int]:
+    """Apply the audited 641-only memory override with the same effective batch."""
+    frozen_micro = int(spec.micro_batch_size)
+    frozen_accumulation = int(spec.gradient_accumulation)
+    effective_batch = frozen_micro * frozen_accumulation
+    override = args.micro_batch_size_override
+    if override is None:
+        return frozen_micro, frozen_accumulation
+    override = int(override)
+    if args.runtime_backend != "legacy_eager":
+        raise ValueError("micro-batch override is allowed only for legacy_eager")
+    if spec.experiment_id != "641" or spec.objective != "class_only":
+        raise ValueError("micro-batch override is allowed only for 641 class-only")
+    if override != 2:
+        raise ValueError("only the audited 641 legacy-eager micro-batch size 2 is allowed")
+    return override, effective_batch // override
+
+
+def build_batching_plan(
+    spec: Any,
+    *,
+    train_occurrences: int,
+    runtime_micro_batch_size: int,
+    runtime_gradient_accumulation: int,
+) -> dict[str, int | bool]:
+    """Prove update-count and objective-weighting invariants before training."""
+    if train_occurrences <= 0:
+        raise ValueError("training runtime must contain at least one occurrence")
+    frozen_micro = int(spec.micro_batch_size)
+    frozen_accumulation = int(spec.gradient_accumulation)
+    frozen_effective = frozen_micro * frozen_accumulation
+    runtime_effective = runtime_micro_batch_size * runtime_gradient_accumulation
+    override = runtime_micro_batch_size != frozen_micro
+    if runtime_effective != frozen_effective:
+        raise ValueError("runtime effective batch differs from the frozen contract")
+    if override and train_occurrences % frozen_micro:
+        raise ValueError(
+            "641 micro-batch override requires a complete frozen micro-batch tail"
+        )
+    frozen_batches = math.ceil(train_occurrences / frozen_micro)
+    runtime_batches = math.ceil(train_occurrences / runtime_micro_batch_size)
+    frozen_updates = math.ceil(frozen_batches * EPOCHS / frozen_accumulation)
+    runtime_updates = math.ceil(
+        runtime_batches * EPOCHS / runtime_gradient_accumulation
+    )
+    if override and runtime_updates != frozen_updates:
+        raise ValueError("641 micro-batch override changes the optimizer update count")
+    return {
+        "frozen_micro_batch_size": frozen_micro,
+        "frozen_gradient_accumulation": frozen_accumulation,
+        "runtime_micro_batch_size": runtime_micro_batch_size,
+        "runtime_gradient_accumulation": runtime_gradient_accumulation,
+        "effective_batch_size": runtime_effective,
+        "batching_override": override,
+        "frozen_micro_batches": frozen_batches,
+        "runtime_micro_batches": runtime_batches,
+        "frozen_optimizer_updates": frozen_updates,
+        "runtime_optimizer_updates": runtime_updates,
+        "tail_rows": train_occurrences % frozen_effective,
+    }
+
+
 def verify_frozen_c_compiler() -> str:
     configured_cc = os.environ.get("CC")
     configured_cxx = os.environ.get("CXX")
@@ -565,9 +627,16 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
         raise FileExistsError("refusing to overwrite nonempty output directory")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     train_rows, validation_rows, runtime_audit = load_runtime(args.runtime_dir, spec_id, args.fold)
+    micro_batch_size, gradient_accumulation = resolve_runtime_batching(spec, args)
     if args.technical_smoke:
-        train_rows = train_rows[: max(spec.micro_batch_size, 8)]
+        train_rows = train_rows[: max(micro_batch_size, 8)]
         validation_rows = validation_rows[:2]
+    batching_plan = build_batching_plan(
+        spec,
+        train_occurrences=len(train_rows),
+        runtime_micro_batch_size=micro_batch_size,
+        runtime_gradient_accumulation=gradient_accumulation,
+    )
     if spec.objective == "grounded_evidence" and any(
         "evidence_target" not in row for row in train_rows
     ):
@@ -627,8 +696,8 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
     model.gradient_checkpointing_enable()
     trainable = [parameter for parameter in model.parameters() if parameter.requires_grad]
     optimizer = torch.optim.AdamW(trainable, lr=LEARNING_RATE, weight_decay=0.01)
-    batches = math.ceil(len(train_rows) / spec.micro_batch_size)
-    updates = math.ceil(batches * EPOCHS / spec.gradient_accumulation)
+    batches = int(batching_plan["runtime_micro_batches"])
+    updates = int(batching_plan["runtime_optimizer_updates"])
     warmup = max(1, int(updates * 0.05))
 
     def schedule(step: int) -> float:
@@ -640,13 +709,14 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, schedule)
     optimizer.zero_grad(set_to_none=True)
     step = 0
+    optimizer_steps = 0
     started = time.monotonic()
     indices = list(range(len(train_rows)))
     for epoch in range(EPOCHS):
         random.Random(SEED + epoch).shuffle(indices)
-        for offset in range(0, len(indices), spec.micro_batch_size):
+        for offset in range(0, len(indices), micro_batch_size):
             local = [
-                train_rows[index] for index in indices[offset : offset + spec.micro_batch_size]
+                train_rows[index] for index in indices[offset : offset + micro_batch_size]
             ]
             rows = [SimpleNamespace(**item) for item in local]
             images = [open_image(args.images, item) for item in local]
@@ -656,18 +726,24 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
                     loss = loss + spec.evidence_auxiliary_weight * auxiliary_loss(
                         model, processor, rows, images
                     )
-                (loss / spec.gradient_accumulation).backward()
+                (loss / gradient_accumulation).backward()
             finally:
                 for image in images:
                     image.close()
             step += 1
-            if step % spec.gradient_accumulation == 0 or offset + spec.micro_batch_size >= len(
+            if step % gradient_accumulation == 0 or offset + micro_batch_size >= len(
                 indices
             ):
                 torch.nn.utils.clip_grad_norm_(trainable, 1.0)
                 optimizer.step()
                 scheduler.step()
                 optimizer.zero_grad(set_to_none=True)
+                optimizer_steps += 1
+
+    if optimizer_steps != updates:
+        raise RuntimeError(
+            f"optimizer step count drifted: executed={optimizer_steps}, planned={updates}"
+        )
 
     model.eval()
     model.config.use_cache = True
@@ -711,7 +787,12 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
         "model_input_view_sha256": runtime_audit["model_input_view_sha256"],
         "seed": SEED,
         "epochs": EPOCHS,
-        "effective_batch_size": spec.micro_batch_size * spec.gradient_accumulation,
+        **batching_plan,
+        "optimizer_steps_executed": optimizer_steps,
+        "selection_contract_changed": False,
+        "numerical_accumulation_order_changed": bool(
+            batching_plan["batching_override"]
+        ),
         "evidence_auxiliary_weight": spec.evidence_auxiliary_weight,
         "runtime_backend": args.runtime_backend,
         "optimized_training_kernels": args.runtime_backend == "verified_fast_path",
@@ -764,6 +845,15 @@ def parser_for(spec_id: str) -> argparse.ArgumentParser:
             "Technical execution backend. legacy_eager preserves the frozen "
             "runtime used by successful experiments 623/632 and changes no "
             "scientific field of the grid contract."
+        ),
+    )
+    parser.add_argument(
+        "--micro-batch-size-override",
+        type=int,
+        default=None,
+        help=(
+            "Memory-only legacy-eager override. Gradient accumulation is derived "
+            "to preserve the frozen effective batch exactly."
         ),
     )
     return parser

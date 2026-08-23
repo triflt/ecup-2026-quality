@@ -1,6 +1,6 @@
 {
   "experiment_id": "651",
-  "status": "both_smokes_passed_full_prompt_grids_in_progress_or_prepared",
+  "status": "qwen36_rejected_qwen35_122b_final_shard_running",
   "launched_at_utc": {
     "Qwen/Qwen3.6-27B": "2026-08-23T17:42:28Z",
     "Qwen/Qwen3.5-122B-A10B": "2026-08-23T17:42:33Z"
@@ -38,20 +38,44 @@
   },
   "full_prompt_grid": {
     "Qwen/Qwen3.6-27B": {
-      "status": "three_shards_verified_fourth_running",
+      "status": "complete_rejected",
       "num_shards": 4,
-      "verified_shards": [0, 1, 2],
-      "verified_unique_rows": 8339,
-      "running_shards": [3],
+      "verified_shards": [0, 1, 2, 3],
+      "verified_unique_rows": 11118,
+      "exact_global_index_cover": true,
+      "finite_scores": 11118,
+      "artifact_sha256": [
+        "8ea9bf17bdb1a2d938751fcd5068eb5c209411ff9d60e484fd3ce130bc3fdc2d",
+        "0f6fd4b431d0d4cdcf1321c8653de5951c64b8663c6b0c516c5412fef33d82b1",
+        "ea32430206a7c81fcb786230437b60adde1fe2fe98b5f9b600b1433de3fb01eb",
+        "a8e70c1e2c8c31f468838bf14a024dd81353c2e5488503827778204917d79fe0"
+      ],
+      "macro_f1": 0.5341306952730538,
+      "baseline_qwen38_macro_f1": 0.5527541862050617,
+      "delta_macro_f1": -0.01862349093200788,
+      "fold_deltas": [-0.014307551712947952, -0.022073438806607504, -0.02199405525488285, -0.02085381753691351, -0.01401417233164981],
+      "bad_f1": 0.9005194550622366,
+      "bad_delta": -0.020961139570108922,
+      "flammable_f1": 0.16774193548387098,
+      "flammable_delta": -0.01628584229390681,
+      "corrected": 506,
+      "regressed": 872,
+      "corrected_to_regressed": 0.5802752293577982,
+      "screen_gate_passed": false,
+      "decision": "REJECT_NO_PROMPT_OR_THRESHOLD_RETUNING",
+      "running_shards": [],
       "not_launched_shards": [],
       "fourth_shard_launched_at_utc": "2026-08-23T19:12:03Z"
     },
     "Qwen/Qwen3.5-122B-A10B": {
-      "status": "three_shards_submitted_fourth_prepared",
+      "status": "three_shards_verified_fourth_running",
       "num_shards": 4,
       "gpus_per_shard": 4,
-      "submitted_shards": [0, 1, 2],
-      "not_launched_shards": [3],
+      "submitted_shards": [0, 1, 2, 3],
+      "verified_shards": [0, 1, 2],
+      "verified_unique_rows": 8339,
+      "running_shards": [3],
+      "not_launched_shards": [],
       "submitted_at_utc": "2026-08-23T19:12:06Z",
       "preset_audit_errors": 0,
       "preset_audit_warnings": 0,
@@ -65,5 +89,5 @@
     }
   },
   "metrics": null,
-  "decision": "BOTH_FULL_GRIDS_ALLOWED_FIRST_ADDITIONAL_CAPACITY_WAVE_SUBMITTED"
+  "decision": "QWEN36_REJECTED_WAIT_QWEN35_122B_COMPLETE_GRID"
 }

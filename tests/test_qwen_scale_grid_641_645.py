@@ -75,6 +75,74 @@ def test_grid_reuses_exact_prompt_and_frozen_effective_batch() -> None:
     assert "verify_qwen35_fast_path_binding" in source
 
 
+def test_legacy_eager_runtime_batch_override_preserves_effective_batch() -> None:
+    args = SimpleNamespace(runtime_backend="legacy_eager", micro_batch_size_override=2)
+    micro, accumulation = train_lora.resolve_runtime_batching(
+        grid_contract.CELL_SPECS["641"], args
+    )
+    assert (micro, accumulation) == (2, 8)
+    assert micro * accumulation == 16
+    plan = train_lora.build_batching_plan(
+        grid_contract.CELL_SPECS["641"],
+        train_occurrences=4892,
+        runtime_micro_batch_size=micro,
+        runtime_gradient_accumulation=accumulation,
+    )
+    assert plan["frozen_micro_batches"] == 1223
+    assert plan["runtime_micro_batches"] == 2446
+    assert plan["frozen_optimizer_updates"] == 306
+    assert plan["runtime_optimizer_updates"] == 306
+    assert plan["tail_rows"] == 12
+
+
+def test_legacy_eager_runtime_batch_override_preserves_smoke_plan() -> None:
+    plan = train_lora.build_batching_plan(
+        grid_contract.CELL_SPECS["641"],
+        train_occurrences=8,
+        runtime_micro_batch_size=2,
+        runtime_gradient_accumulation=8,
+    )
+    assert plan["frozen_micro_batches"] == 2
+    assert plan["runtime_micro_batches"] == 4
+    assert plan["frozen_optimizer_updates"] == 1
+    assert plan["runtime_optimizer_updates"] == 1
+
+
+@pytest.mark.parametrize("train_occurrences", [4890, 4891, 4893])
+def test_legacy_override_rejects_incomplete_frozen_micro_batch_tail(
+    train_occurrences: int,
+) -> None:
+    with pytest.raises(ValueError, match="complete frozen micro-batch tail"):
+        train_lora.build_batching_plan(
+            grid_contract.CELL_SPECS["641"],
+            train_occurrences=train_occurrences,
+            runtime_micro_batch_size=2,
+            runtime_gradient_accumulation=8,
+        )
+
+
+@pytest.mark.parametrize(
+    ("spec_id", "backend", "override"),
+    [
+        ("641", "verified_fast_path", 2),
+        ("642", "legacy_eager", 1),
+        ("643", "legacy_eager", 2),
+        ("641", "legacy_eager", 1),
+        ("641", "legacy_eager", 4),
+        ("641", "legacy_eager", 3),
+        ("641", "legacy_eager", 8),
+    ],
+)
+def test_runtime_batch_override_rejects_contract_drift(
+    spec_id: str, backend: str, override: int
+) -> None:
+    args = SimpleNamespace(
+        runtime_backend=backend, micro_batch_size_override=override
+    )
+    with pytest.raises(ValueError):
+        train_lora.resolve_runtime_batching(grid_contract.CELL_SPECS[spec_id], args)
+
+
 def test_trained_grid_cells_lock_identical_fast_path_artifacts() -> None:
     required = {
         'transformers_package = "transformers==5.15.1"',
