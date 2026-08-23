@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
+import importlib.metadata
 import io
 import json
 import math
@@ -34,6 +36,30 @@ MAX_LENGTH = 1536
 SEED = 42
 EPOCHS = 1
 LEARNING_RATE = 2e-4
+
+
+def verify_fast_linear_attention_dependencies() -> dict[str, str]:
+    """Fail before model loading if Qwen's memory-safe training path is unavailable."""
+    required = {
+        "fla.ops.gated_delta_rule": ("chunk_gated_delta_rule",),
+        "causal_conv1d": ("causal_conv1d_fn", "causal_conv1d_update"),
+    }
+    for module_name, attributes in required.items():
+        try:
+            module = importlib.import_module(module_name)
+        except Exception as error:
+            raise RuntimeError(
+                f"required fast-path module is unavailable: {module_name}"
+            ) from error
+        missing = [name for name in attributes if not callable(getattr(module, name, None))]
+        if missing:
+            raise RuntimeError(
+                f"required fast-path symbols are unavailable in {module_name}: {missing}"
+            )
+    return {
+        "flash_linear_attention": importlib.metadata.version("flash-linear-attention"),
+        "causal_conv1d": importlib.metadata.version("causal-conv1d"),
+    }
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -407,6 +433,7 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
     from transformers import AutoModelForMultimodalLM, AutoProcessor
 
     spec = CELL_SPECS[spec_id]
+    fast_path_packages = verify_fast_linear_attention_dependencies()
     if args.model_revision != spec.model_revision:
         raise ValueError("model revision differs from frozen cell contract")
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
@@ -555,6 +582,7 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
         "effective_batch_size": spec.micro_batch_size * spec.gradient_accumulation,
         "evidence_auxiliary_weight": spec.evidence_auxiliary_weight,
         "optimized_training_kernels": True,
+        "fast_path_packages": fast_path_packages,
         "target_orders": (
             ["class_first", "evidence_first"] if spec.objective == "grounded_evidence" else []
         ),

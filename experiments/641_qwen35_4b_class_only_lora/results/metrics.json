@@ -1,6 +1,6 @@
 {
   "experiment_id": "641",
-  "status": "screen_training_running",
+  "status": "fast_path_preflight_running",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
@@ -9,10 +9,17 @@
   "launched_at_utc": "2026-08-23T13:09:03Z",
   "first_attempt": "failed_confirmed_torch_linear_attention_oom",
   "second_attempt": "failed_before_training_incompatible_kernel_package_version",
-  "retry": {
+  "third_attempt": {
     "launched_at_utc": "2026-08-23T14:00:06Z",
-    "changed_factor": "activate official optimized training kernel backend at the exact framework-required version only",
+    "changed_factor": "activate the exact framework-compatible hub kernel package",
     "gpus": 2,
+    "status": "failed_confirmed_missing_fla_and_causal_conv1d_fallback_oom"
+  },
+  "fast_path_preflight": {
+    "launched_at_utc": "2026-08-23T14:37:00Z",
+    "changed_factor": "install and fail-closed verify the official FLA and causal-conv1d training dependencies",
+    "fold": 0,
+    "gpus": 1,
     "status": "running"
   },
   "metrics": null,

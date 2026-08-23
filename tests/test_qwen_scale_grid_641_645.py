@@ -63,8 +63,24 @@ def test_grid_reuses_exact_prompt_and_frozen_effective_batch() -> None:
     )
     assert args.technical_smoke is True
     source = (GRID / "train_lora.py").read_text(encoding="utf-8")
-    assert 'use_kernels=True' in source
-    assert 'optimized training kernels were requested but not activated' in source
+    assert "use_kernels=True" in source
+    assert "optimized training kernels were requested but not activated" in source
+    assert "required fast-path module is unavailable" in source
+    assert '"flash_linear_attention": importlib.metadata.version' in source
+    assert '"causal_conv1d": importlib.metadata.version' in source
+
+
+def test_fast_path_dependency_check_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    real_import = train_lora.importlib.import_module
+
+    def fail_fla(name: str):
+        if name == "fla.ops.gated_delta_rule":
+            raise ImportError("missing")
+        return real_import(name)
+
+    monkeypatch.setattr(train_lora.importlib, "import_module", fail_fla)
+    with pytest.raises(RuntimeError, match="required fast-path module is unavailable"):
+        train_lora.verify_fast_linear_attention_dependencies()
 
 
 def test_grounding_is_exact_and_never_generates_coordinates() -> None:

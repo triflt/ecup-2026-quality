@@ -2,7 +2,7 @@
 id = "641"
 slug = "qwen35_4b_class_only_lora"
 title = "Qwen3.5-4B class-only LoRA in the frozen scale grid"
-status = "screen_training_running"
+status = "fast_path_preflight_running"
 entrypoint = "experiments/641_qwen35_4b_class_only_lora/run_fold.py"
 result_file = "experiments/641_qwen35_4b_class_only_lora/results/metrics.json"
 
@@ -36,7 +36,9 @@ lora_rank = 16
 lora_alpha = 32
 lora_dropout = 0.05
 target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
-optimized_kernel_package = "kernels==0.15.2"
+optimized_kernel_package = "kernels==0.16.0"
+flash_linear_attention_package = "flash-linear-attention==0.5.2"
+causal_conv1d_package = "causal-conv1d==1.6.2.post1"
 
 [hypothesis]
 changed_factor = "Supervised class-only LoRA relative to fixed 4B prompting"
