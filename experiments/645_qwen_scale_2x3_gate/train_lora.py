@@ -4,9 +4,11 @@ import argparse
 import hashlib
 import importlib
 import importlib.metadata
+import inspect
 import io
 import json
 import math
+import os
 import random
 import shutil
 import sys
@@ -40,8 +42,14 @@ LEARNING_RATE = 2e-4
 
 def verify_fast_linear_attention_dependencies() -> dict[str, str]:
     """Fail before model loading if Qwen's memory-safe training path is unavailable."""
+    # `flash-linear-attention` is only the high-level distribution as of 0.5.x;
+    # the actual `fla.ops` implementation lives in `fla-core`.  Pin and verify
+    # both so an older preinstalled core cannot silently select the torch path.
     required = {
-        "fla.ops.gated_delta_rule": ("chunk_gated_delta_rule",),
+        "fla.ops.gated_delta_rule": (
+            "chunk_gated_delta_rule",
+            "fused_recurrent_gated_delta_rule",
+        ),
         "causal_conv1d": ("causal_conv1d_fn", "causal_conv1d_update"),
     }
     for module_name, attributes in required.items():
@@ -56,10 +64,67 @@ def verify_fast_linear_attention_dependencies() -> dict[str, str]:
             raise RuntimeError(
                 f"required fast-path symbols are unavailable in {module_name}: {missing}"
             )
-    return {
+    versions = {
+        "fla_core": importlib.metadata.version("fla-core"),
         "flash_linear_attention": importlib.metadata.version("flash-linear-attention"),
         "causal_conv1d": importlib.metadata.version("causal-conv1d"),
     }
+    if versions != {
+        "fla_core": "0.5.2",
+        "flash_linear_attention": "0.5.2",
+        "causal_conv1d": "1.6.2.post1",
+    }:
+        raise RuntimeError(f"unexpected fast-path package versions: {versions}")
+
+    # Transformers 5.15.1 asks the FLA namespace for
+    # `recurrent_gated_delta_rule`, while FLA 0.5.2 exports the same supported
+    # kernel as `fused_recurrent_gated_delta_rule`.  Install the compatibility
+    # alias before the lazy Qwen module is imported.
+    gated = importlib.import_module("fla.ops.gated_delta_rule")
+    if not hasattr(gated, "recurrent_gated_delta_rule"):
+        gated.recurrent_gated_delta_rule = gated.fused_recurrent_gated_delta_rule
+
+    from transformers.utils import (
+        is_causal_conv1d_available,
+        is_flash_linear_attention_available,
+    )
+
+    if not is_flash_linear_attention_available() or not is_causal_conv1d_available():
+        raise RuntimeError("Transformers does not recognize the installed fast-path packages")
+    return versions
+
+
+def verify_qwen35_fast_path_binding() -> dict[str, str]:
+    """Prove that Qwen wrappers captured compiled functions, not torch fallbacks."""
+    modeling_qwen3_5 = importlib.import_module(
+        "transformers.models.qwen3_5.modeling_qwen3_5"
+    )
+
+    targets = {
+        "chunk_gated_delta_rule": (
+            modeling_qwen3_5.torch_chunk_gated_delta_rule,
+            "fla.",
+        ),
+        "recurrent_gated_delta_rule": (
+            modeling_qwen3_5.torch_recurrent_gated_delta_rule,
+            "fla.",
+        ),
+        "causal_conv1d_fn": (modeling_qwen3_5.causal_conv1d_fn, "causal_conv1d"),
+        "causal_conv1d_update": (
+            modeling_qwen3_5.causal_conv1d_update,
+            "causal_conv1d",
+        ),
+    }
+    bound: dict[str, str] = {}
+    for name, (wrapper, expected_prefix) in targets.items():
+        implementation = inspect.getclosurevars(wrapper).nonlocals.get("implementation")
+        module_name = str(getattr(implementation, "__module__", ""))
+        if not callable(implementation) or not module_name.startswith(expected_prefix):
+            raise RuntimeError(
+                f"Qwen fast-path binding failed for {name}: {module_name or 'torch fallback'}"
+            )
+        bound[name] = module_name
+    return bound
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -430,10 +495,15 @@ def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
 def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
     import numpy as np
     import torch
-    from transformers import AutoModelForMultimodalLM, AutoProcessor
 
     spec = CELL_SPECS[spec_id]
+    # The Hub fused GDN kernel is hardware-gated and is not the H100 training
+    # path.  Disable Hub substitution and require the official FLA backend.
+    os.environ["USE_HUB_KERNELS"] = "NO"
     fast_path_packages = verify_fast_linear_attention_dependencies()
+    from transformers import AutoModelForMultimodalLM, AutoProcessor
+
+    fast_path_bindings = verify_qwen35_fast_path_binding()
     if args.model_revision != spec.model_revision:
         raise ValueError("model revision differs from frozen cell contract")
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
@@ -474,10 +544,8 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
         local_files_only=True,
         trust_remote_code=True,
         attn_implementation="eager",
-        use_kernels=True,
+        use_kernels=False,
     ).to("cuda")
-    if not getattr(model, "_use_kernels", False):
-        raise RuntimeError("optimized training kernels were requested but not activated")
     model = get_peft_model(
         model,
         LoraConfig(
@@ -583,6 +651,7 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
         "evidence_auxiliary_weight": spec.evidence_auxiliary_weight,
         "optimized_training_kernels": True,
         "fast_path_packages": fast_path_packages,
+        "fast_path_bindings": fast_path_bindings,
         "target_orders": (
             ["class_first", "evidence_first"] if spec.objective == "grounded_evidence" else []
         ),

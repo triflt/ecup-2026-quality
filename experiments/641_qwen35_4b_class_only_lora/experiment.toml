@@ -37,6 +37,7 @@ lora_alpha = 32
 lora_dropout = 0.05
 target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
 optimized_kernel_package = "kernels==0.16.0"
+flash_linear_attention_core_package = "fla-core==0.5.2"
 flash_linear_attention_package = "flash-linear-attention==0.5.2"
 causal_conv1d_package = "causal-conv1d==1.6.2.post1"
 

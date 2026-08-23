@@ -63,11 +63,13 @@ def test_grid_reuses_exact_prompt_and_frozen_effective_batch() -> None:
     )
     assert args.technical_smoke is True
     source = (GRID / "train_lora.py").read_text(encoding="utf-8")
-    assert "use_kernels=True" in source
-    assert "optimized training kernels were requested but not activated" in source
+    assert 'os.environ["USE_HUB_KERNELS"] = "NO"' in source
+    assert "use_kernels=False" in source
     assert "required fast-path module is unavailable" in source
+    assert '"fla_core": importlib.metadata.version' in source
     assert '"flash_linear_attention": importlib.metadata.version' in source
     assert '"causal_conv1d": importlib.metadata.version' in source
+    assert "verify_qwen35_fast_path_binding" in source
 
 
 def test_fast_path_dependency_check_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -81,6 +83,30 @@ def test_fast_path_dependency_check_fails_closed(monkeypatch: pytest.MonkeyPatch
     monkeypatch.setattr(train_lora.importlib, "import_module", fail_fla)
     with pytest.raises(RuntimeError, match="required fast-path module is unavailable"):
         train_lora.verify_fast_linear_attention_dependencies()
+
+
+def test_fast_path_binding_check_rejects_torch_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeModeling:
+        @staticmethod
+        def torch_chunk_gated_delta_rule() -> None:
+            return None
+
+        torch_recurrent_gated_delta_rule = torch_chunk_gated_delta_rule
+        causal_conv1d_fn = torch_chunk_gated_delta_rule
+        causal_conv1d_update = torch_chunk_gated_delta_rule
+
+    real_import = train_lora.importlib.import_module
+
+    def fake_import(name: str):
+        if name == "transformers.models.qwen3_5.modeling_qwen3_5":
+            return FakeModeling
+        return real_import(name)
+
+    monkeypatch.setattr(train_lora.importlib, "import_module", fake_import)
+    with pytest.raises(RuntimeError, match="Qwen fast-path binding failed"):
+        train_lora.verify_qwen35_fast_path_binding()
 
 
 def test_grounding_is_exact_and_never_generates_coordinates() -> None:

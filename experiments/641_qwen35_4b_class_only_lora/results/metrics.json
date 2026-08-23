@@ -20,6 +20,13 @@
     "changed_factor": "install and fail-closed verify the official FLA and causal-conv1d training dependencies",
     "fold": 0,
     "gpus": 1,
+    "status": "failed_confirmed_fla_core_version_not_pinned_torch_fallback_oom"
+  },
+  "fla_core_preflight": {
+    "launched_at_utc": "2026-08-23T15:07:04Z",
+    "changed_factor": "pin fla-core 0.5.2 with flash-linear-attention 0.5.2 and verify actual Qwen kernel bindings",
+    "fold": 0,
+    "gpus": 1,
     "status": "running"
   },
   "metrics": null,
