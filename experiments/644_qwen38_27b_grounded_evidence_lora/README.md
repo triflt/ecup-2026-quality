@@ -1,6 +1,7 @@
 # 644: Qwen3.8-27B, класс + проверяемое доказательство
 
-Статус: **подготовлен, не запущен**.
+Статус: **prompt-gate 640 пройден; запуск ждёт checksum-locked OCR-sidecar 634
+и отдельный доказанный training-runtime**.
 
 Большая evidence-ячейка строго повторяет `643`: одинаковые training IDs и их
 multiplicity, prompt, первый снимок, preprocessing, два порядка auxiliary

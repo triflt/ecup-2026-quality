@@ -2,6 +2,8 @@
   "schema_version": 1,
   "updated_at": "2026-08-23",
   "experiment": "140_qwen35_dual_lora_prior",
+  "canonical_experiment_id": "140_dual_lora_fusion",
+  "experiment_field_note": "Historical submission-recipe alias retained for compatibility",
   "submission_filename": "quality-qwen3vl-qwen35-dual-lora-prior-submit.zip",
   "submission_sha256": "6cc2fda9d17d959880050889d964c3b971b92adbfa606505df7f04b46a819cd3",
   "data_version": "competition_train_v1",

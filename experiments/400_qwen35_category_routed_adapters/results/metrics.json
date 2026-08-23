@@ -1,6 +1,6 @@
 {
   "experiment_id": "400",
-  "status": "public_champion",
+  "status": "former_public_champion",
   "data_version": "competition_train_v1",
   "evaluation_version": "locked_190_category_routing_v1",
   "parent_experiment": "280_bad_family_diverse_public190",
@@ -39,5 +39,5 @@
   },
   "public_macro_f1": 0.8922900010951702,
   "public_delta_vs_190": 0.0003655774009770001,
-  "decision": "Accepted as the current Public champion after a successful platform run. The positive direction transferred, but by much less than the locked local estimate."
+  "decision": "Accepted as Public champion on 2026-08-22; superseded on 2026-08-23 by the simpler experiment 140 at 0.8923976821."
 }

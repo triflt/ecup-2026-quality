@@ -2,7 +2,7 @@
 id = "140"
 slug = "dual_lora_fusion"
 title = "Dual-LoRA fusion"
-status = "accepted"
+status = "current_public_production_champion"
 entrypoint = "research/nested_multimodel_fusion.py"
 result_file = "experiments/140_dual_lora_fusion/results/metrics.json"
 submission_source = "experiments/140_dual_lora_fusion/submission"

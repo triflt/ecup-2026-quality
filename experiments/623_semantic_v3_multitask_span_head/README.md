@@ -7,7 +7,10 @@ The five-fold result improved Macro F1 from `0.8876054080` to `0.9033708111`
 bootstrap gate. It nevertheless won only folds `0/1/3`, or `3/5`, below the
 frozen requirement of `4/5`; folds `2/4` lost `0.0151667231/0.0125968118`.
 The component is therefore retained for research and explanations but is not
-integrated into the route, independently reproduced, or submitted.
+submitted. It was subsequently reproduced as experiment `632`: the independent
+seed improved `4/5` folds at component level. Experiment `635` then performed
+the required full-140 integration and rejected promotion because fold 4 fell by
+`0.023562` and grouped-bootstrap confidence was only `0.7785`.
 
 ## Hypothesis
 
@@ -57,10 +60,10 @@ operation.
 
 The CPU preflight and both frozen screen folds passed. Fold 0 improved Macro F1 by
 `+0.082078`, fold 3 by `+0.015772`; the mean delta is `+0.048925`. The candidate
-corrected 92 decisions and regressed 42, reduced flammable false negatives by 4,
-and passed every predeclared classification and safety gate. Folds 1, 2, and 4
-are now running without recipe changes. This directory intentionally contains no
-task preset, data, weights, predictions, or sealed-holdout output.
+corrected 92 decisions and regressed 42 and reduced flammable false negatives by
+4. All five folds later completed without recipe changes; the final `3/5` wins
+failed the promotion gate. This directory intentionally contains no task preset,
+data, weights, predictions, or sealed-holdout output.
 
 ## Runnable fold contract
 

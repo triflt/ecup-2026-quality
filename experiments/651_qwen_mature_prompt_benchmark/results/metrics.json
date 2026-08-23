@@ -38,16 +38,21 @@
   },
   "full_prompt_grid": {
     "Qwen/Qwen3.6-27B": {
-      "status": "three_of_four_shards_running",
+      "status": "three_shards_verified_fourth_running",
       "num_shards": 4,
-      "running_shards": [0, 1, 2],
-      "not_launched_shards": [3],
-      "reason": "capacity ceiling after the goal was updated to 32 active GPUs"
+      "verified_shards": [0, 1, 2],
+      "verified_unique_rows": 8339,
+      "running_shards": [3],
+      "not_launched_shards": [],
+      "fourth_shard_launched_at_utc": "2026-08-23T19:12:03Z"
     },
     "Qwen/Qwen3.5-122B-A10B": {
-      "status": "four_shards_prepared_not_launched_waiting_for_capacity",
+      "status": "three_shards_submitted_fourth_prepared",
       "num_shards": 4,
       "gpus_per_shard": 4,
+      "submitted_shards": [0, 1, 2],
+      "not_launched_shards": [3],
+      "submitted_at_utc": "2026-08-23T19:12:06Z",
       "preset_audit_errors": 0,
       "preset_audit_warnings": 0,
       "dry_runs": "passed_4_of_4",
@@ -60,5 +65,5 @@
     }
   },
   "metrics": null,
-  "decision": "BOTH_FULL_GRIDS_ALLOWED_CAPACITY_GATED"
+  "decision": "BOTH_FULL_GRIDS_ALLOWED_FIRST_ADDITIONAL_CAPACITY_WAVE_SUBMITTED"
 }

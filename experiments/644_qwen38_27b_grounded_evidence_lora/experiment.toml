@@ -2,7 +2,7 @@
 id = "644"
 slug = "qwen38_27b_grounded_evidence_lora"
 title = "Qwen3.8-27B verdict-primary grounded-evidence LoRA"
-status = "prepared_waiting_for_640_prompt_gate"
+status = "prepared_waiting_for_634_ocr_sidecar_and_training_runtime"
 entrypoint = "experiments/644_qwen38_27b_grounded_evidence_lora/run_fold.py"
 result_file = "experiments/644_qwen38_27b_grounded_evidence_lora/results/metrics.json"
 

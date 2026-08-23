@@ -29,4 +29,8 @@ Source directory: `experiments/180_fuzzy_family_prior/submission`. Локаль�
 
 Donor-only BAD +0.000761; 17/20 recurrence wins; flammable отключён.
 
+Public Macro F1: **0,8923976821**, точная ничья с `140`. Дополнительное правило
+не дало измеримой пользы, поэтому эксперимент не продвинут, а production-
+чемпионом остаётся более простой `140`.
+
 Подробные machine-readable результаты находятся в `results/metrics.json` и `reports/experiment-log.csv`.

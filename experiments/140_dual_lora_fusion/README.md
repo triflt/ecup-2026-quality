@@ -29,4 +29,8 @@ Source directory: `experiments/140_dual_lora_fusion/submission`. Локальн�
 
 Главная architecture: nested Macro F1 0.911843; scaled runtime укладывается в лимит.
 
+Public Macro F1: **0,8923976821**. Эксперимент `180` получил ровно тот же
+результат, поэтому более простой `140` выбран текущим production-чемпионом.
+Public не используется для перенастройки весов или порогов.
+
 Подробные machine-readable результаты находятся в `results/metrics.json` и `reports/experiment-log.csv`.

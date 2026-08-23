@@ -1,0 +1,16 @@
+{
+  "experiment_id": "652",
+  "status": "prepared_waiting_for_capacity_and_dataset_634",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "quality_reference_version": "competition_train_paddleocr_vl16_spotting_v1_pending_634",
+  "paddleocr_vl16_usage": "offline_teacher_only",
+  "classification_requires_online_ocr": false,
+  "candidate": "PP-OCRv5 mobile detector plus eslav recognizer",
+  "control_runtime_seconds_600_rows": 228.76,
+  "maximum_ocr_seconds_600_rows": 130.0,
+  "maximum_combined_public_minutes": 16.0,
+  "maximum_combined_private_minutes": 38.0,
+  "metrics": null,
+  "decision": "PENDING_DATASET_634_AND_ONE_GPU_RUNTIME_SMOKE"
+}

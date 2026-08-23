@@ -20,13 +20,15 @@ parameters_billions = 0.9
 task = "spotting"
 prompt = "Spotting:"
 max_new_tokens = 512
+intended_usage = "offline_teacher_only"
+production_runtime_allowed = false
 
 [hypothesis]
 parent_experiment = "623_semantic_v3_multitask_span_head"
 changed_factor = "Add label-blind OCR text regions with real quadrilateral coordinates"
 mechanism = "Packaging text can expose policy evidence missing from listing text while region selection keeps explanations grounded"
 expected_macro_f1_delta = 0.003
-falsification = "Stop before full extraction if fewer than 95 percent of readable smoke images produce parseable bounded output or runtime exceeds the frozen budget"
+falsification = "Stop before full extraction if fewer than 95 percent of readable smoke images produce parseable bounded output; measured runtime determines offline-only versus production eligibility"
 precedents = ["PaddleOCR-VL-1.6", "PaddleOCR-VL-1.5 grounded text spotting"]
 
 [validation]
