@@ -1,0 +1,68 @@
+{
+  "candidate_counts": {
+    "0": {
+      "all_roles": 7585,
+      "by_concept": {
+        "BAD_EXPLICIT_MARKING": 3220,
+        "BAD_EXPLICIT_NEGATION": 136,
+        "FL_COMBUSTIBLE_PRODUCT": 29,
+        "FL_COMPATIBILITY_ONLY": 216,
+        "FL_EMPTY_CONTAINER": 4,
+        "FL_FUEL_EXCLUDED": 256,
+        "FL_INCLUDED_QUALIFYING_ITEM": 6,
+        "FL_INTEGRATED_IGNITION_ONLY": 14,
+        "FL_PYROTECHNIC_PRODUCT": 34,
+        "FL_STANDALONE_IGNITION_SOURCE": 32
+      },
+      "donor_targets": 3947,
+      "outer_validation": 1526
+    },
+    "3": {
+      "all_roles": 7585,
+      "by_concept": {
+        "BAD_EXPLICIT_MARKING": 3247,
+        "BAD_EXPLICIT_NEGATION": 137,
+        "FL_COMBUSTIBLE_PRODUCT": 23,
+        "FL_COMPATIBILITY_ONLY": 216,
+        "FL_EMPTY_CONTAINER": 2,
+        "FL_FUEL_EXCLUDED": 253,
+        "FL_INCLUDED_QUALIFYING_ITEM": 5,
+        "FL_INTEGRATED_IGNITION_ONLY": 13,
+        "FL_PYROTECHNIC_PRODUCT": 36,
+        "FL_STANDALONE_IGNITION_SOURCE": 31
+      },
+      "donor_targets": 3963,
+      "outer_validation": 1496
+    }
+  },
+  "decision": "PRE_GPU_BLOCKER",
+  "experiment_id": "622",
+  "fresh_audit": {
+    "human_ratings_present": false,
+    "maximum_critical_unsupported": 0,
+    "maximum_scope_or_negation_failure": 0,
+    "minimum_strict_pass": 282,
+    "overlap_with_discovered_legacy_ids": 0,
+    "prepared_rows": 300,
+    "requested_rows": 300,
+    "unique_row_ids": 300,
+    "unique_semantic_components": 300
+  },
+  "label_isolation": {
+    "feature_label_columns": 0,
+    "feature_rows": 11118,
+    "membership_label_columns": 0,
+    "sealed_rows_written": 0,
+    "semantic_components_crossing_folds": 0,
+    "validation_labels_loaded": false,
+    "validation_labels_written": false
+  },
+  "ontology_claims": 12,
+  "private_manifest_sha256": "021e7639f11c6b57753d6a5b74ef55a25574312d57ccdee0dc9adedbf74fd97d",
+  "schema_version": "exp622_public_preflight_summary_v1",
+  "screen_folds": [
+    0,
+    3
+  ],
+  "status": "blocked_pre_gpu_human_audit"
+}

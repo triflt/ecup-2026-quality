@@ -92,11 +92,16 @@
   Полный аудит остальных folds не раскрывался, потому что frozen screen не
   пройден. Exact-span evidence сохраняется для объяснений, но не используется
   как самостоятельный verdict-router.
-- `621` — следующий независимый механизм: консервативная train-only
-  Fisher-смесь original и specialist semantic-v3 адаптеров на уровне
-  эффективных LoRA-дельт. Подготовлен fail-closed fold runtime; запуск разрешён
-  только после физического отделения outer-validation labels и проверки
-  загрузки merged PEFT adapter. Это один model pass и не использует учителя.
+- `621` — консервативная train-only Fisher-смесь original и specialist
+  semantic-v3 адаптеров на уровне эффективных LoRA-дельт. Fail-closed runtime,
+  физическое отделение outer-validation labels и загрузка merged PEFT adapter
+  проверены; folds `0/3` выполняются с замороженными donor-only thresholds.
+- `622` — свежий слепой пакет из 300 уникальных semantic components готов без
+  пересечения с прежними audit ID. Все поля ручной оценки пусты; GPU запрещён до
+  настоящих `282/300` строгих проходов и нуля критических ошибок.
+- `623` — multitask Qwen3.5 с отдельными start/end, `NO_EVIDENCE` и закрытой
+  concept-head. Folds `0/3` выполняются; validation runtime физически не содержит
+  labels или rationale targets. Свободный chain-of-thought не используется.
 - Новый агрегированный разбор `603` находится в
   `reports/exp603-four-seed-error-mining-2026-08-22.md`: 29 исправлений против
   25 ухудшений, полезный сигнал в flammable `11/7`, но БАД `18/18`, длинные

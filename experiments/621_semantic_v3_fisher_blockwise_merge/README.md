@@ -1,6 +1,6 @@
 # Experiment 621: semantic-v3 Fisher blockwise merge
 
-Status: **runnable_not_launched; not validated**.
+Status: **screen folds 0/3 running; not validated**.
 
 This package defines a public-safe, deterministic way to merge two adapters
 trained from the same base model and semantic-v3 outer fold. The original
@@ -14,10 +14,10 @@ on A and B independently. The merged update is compressed back to the declared
 rank with deterministic SVD signs. Reconstruction error and metadata identity
 must pass before a run can proceed.
 
-The intended grid is exactly five one-GPU jobs, one per frozen outer fold. This
-repository change does not launch jobs, access model storage, download data, or
-claim any validation result. A full-data refit is forbidden until the five-fold
-acceptance gates in `experiment.toml` pass.
+The intended grid is exactly five one-GPU jobs, one per frozen outer fold. The
+two predeclared screen folds are running. No validation result is claimed, and
+folds 1/2/4 remain forbidden unless the screen gates pass. A full-data refit is
+forbidden until the five-fold acceptance gates in `experiment.toml` pass.
 
 The label-blind preflight accepts only the safe membership columns:
 `id`, `category`, `semantic_component`, `component_size`, `split`, and
@@ -39,12 +39,18 @@ sealed rows were not written. The worker receives this runtime directory rather
 than the source table.
 
 `run_fold.py` safely unpacks a pair of PEFT adapter directories or archives,
-selects deterministic one-per-component-per-label Fisher samples, loads one
+selects deterministic one-per-component Fisher samples, loads one
 adapter at a time, and computes mean squared LoRA gradients for the broad and
 specialist tasks. It then calls the existing effective-delta merge, loads the
 merged adapter, and writes label-free validation scores plus a hash-bound fold
-contract. The first-image policy is strict: images must already be available
-under `--image-root`; the worker never downloads them.
+contract. Its prompt, text normalization, no-thinking chat encoding, 1536-token
+limit, multimodal model loader, and parent source hashes are frozen to the two
+experiment-600 parents. Both exact parent runner files are mandatory runtime
+inputs and are checksum-verified before any model or image work. The first-image
+policy is strict: every required image is downloaded from the development-only
+runtime manifest, decoded, resized, and materialized under a fresh
+`--image-root`; any failure aborts the fold and there is no synthetic image
+fallback.
 
 ## Local fold workflow
 
@@ -81,6 +87,5 @@ labels, rejects sealed input rows, and never tunes thresholds on validation.
 Expected resources are one GPU with approximately 24–40 GB of memory, the
 local base model and PEFT runtime, and roughly 4 GB of temporary adapter/model
 working space. A fold is expected to take approximately 50–90 minutes, mainly
-for two gradient passes and label-free validation scoring; this is an estimate,
-not an observed result. The current blockers are model/runtime availability,
-complete local first-image assets, and a valid train-only Fisher report path.
+for two gradient passes and label-free validation scoring; this remains an
+estimate until the running screen completes.

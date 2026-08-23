@@ -106,7 +106,8 @@ def evaluate_fold(
         threshold = float(thresholds[category])
         if not pd.notna(threshold):
             raise ValueError(f"invalid threshold for category {category}")
-        predicted = group["lora_score"].astype(float) > threshold
+        # Match the frozen parent/route threshold convention exactly.
+        predicted = group["lora_score"].astype(float) >= threshold
         category_metrics[str(category)] = {
             "rows": len(group),
             "positive": int(group["label"].sum()),

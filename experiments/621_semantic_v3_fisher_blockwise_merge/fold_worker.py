@@ -120,7 +120,9 @@ def load_fold_membership(
         if previous != fold:
             raise ValueError("semantic components cross development folds")
     train = [row["id"] for row in development_folds if int(row["development_fold"]) != outer_fold]
-    validation = [row["id"] for row in development_folds if int(row["development_fold"]) == outer_fold]
+    validation = [
+        row["id"] for row in development_folds if int(row["development_fold"]) == outer_fold
+    ]
     if not train or not validation:
         raise ValueError("both train and validation memberships must be non-empty")
     return train, validation
@@ -368,9 +370,12 @@ def merge_fold_adapters(
         reconstruction_errors[module] = error
         output_state[f"{module}.lora_A.weight"] = a.astype(np.float32)
         output_state[f"{module}.lora_B.weight"] = b.astype(np.float32)
-    if output_dir.exists() and any(output_dir.iterdir()):
-        raise FileExistsError("refusing to overwrite merged adapter output")
-    output_dir.mkdir(parents=True, exist_ok=False)
+    if output_dir.exists():
+        if not output_dir.is_dir():
+            raise NotADirectoryError(output_dir)
+        if any(output_dir.iterdir()):
+            raise FileExistsError("refusing to overwrite merged adapter output")
+    output_dir.mkdir(parents=True, exist_ok=True)
     # Preserve the complete PEFT config so defaults such as task_type,
     # dropout, modules_to_save, and future PEFT fields remain loadable.
     config = _load_config_payload(original_dir)

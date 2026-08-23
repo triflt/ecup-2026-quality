@@ -11,10 +11,17 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import html
+import io
 import json
+import re
 import tempfile
+import time
+import urllib.error
+import urllib.request
 import zipfile
 from collections.abc import Iterable, Mapping
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -31,9 +38,27 @@ from fold_worker import (
 FISHER_MAX_ROWS = 512
 FISHER_BATCH_SIZE = 4
 DESCRIPTION_LIMIT = 1800
-PROMPT_VERSION = "qwen35_hard_first_image_binary_v1"
+NAME_LIMIT = 320
+MAX_LENGTH = 1536
+FIRST_IMAGE_MAX_EDGE = 448
+IMAGE_DOWNLOAD_WORKERS = 32
+PROMPT_VERSION = "qwen35_parent_multimodal_binary_v1"
+ORIGINAL_PARENT_SHA256 = "c30e690ad260af72fcc625c8d3e6d9ab9c5a096d8443d6d9f5f7adbcaa52123c"
+SPECIALIST_PARENT_SHA256 = "404f6d07965f551dfe7c7ee0120ce0a16132e1103f1db7d13b3622993f4fd6c0"
 LABEL_FREE_PREDICTION_COLUMNS = ("id", "category", "fold", "lora_score")
 SPECIALIST_CATEGORY = "Легковоспламеняющиеся"
+RULES = {
+    "БАД": (
+        "Метка 1 только если в описании или на упаковке есть прямое указание БАД "
+        "или dietary supplement. Спортивное питание без такой маркировки, явное "
+        "отрицание или отсутствие маркировки — метка 0."
+    ),
+    SPECIALIST_CATEGORY: (
+        "Метка 1 для самостоятельного источника огня, горючего вещества или газа, "
+        "либо если такой товар входит в комплект. Пустое оборудование, встроенный "
+        "источник, горючий материал только как компонент или предмет не в комплекте — 0."
+    ),
+}
 
 
 def _load_rows(path: Path, *, require_label: bool) -> list[dict[str, str]]:
@@ -62,6 +87,43 @@ def _load_rows(path: Path, *, require_label: bool) -> list[dict[str, str]]:
     return rows
 
 
+def verify_parent_source(path: Path, expected_sha256: str, *, component: str) -> str:
+    """Fail closed unless the exact frozen parent runner is mounted."""
+
+    if not path.is_file():
+        raise FileNotFoundError(f"{component} parent runner is missing")
+    actual = sha256_file(path)
+    if actual != expected_sha256:
+        raise ValueError(f"exact {component} parent checksum mismatch")
+    return actual
+
+
+def verify_runtime_audit(runtime_dir: Path, audit: Mapping[str, Any]) -> None:
+    """Bind every scoped runtime input to the builder's signed-by-hash audit."""
+
+    claimed_audit_sha256 = audit.get("audit_sha256")
+    audit_payload = dict(audit)
+    audit_payload.pop("audit_sha256", None)
+    if claimed_audit_sha256 != canonical_sha256(audit_payload):
+        raise ValueError("runtime audit self-checksum mismatch")
+    files = audit.get("files_sha256")
+    if not isinstance(files, dict) or not files:
+        raise ValueError("runtime audit has no file checksums")
+    expected_names = {
+        "train_data.csv",
+        "validation_data.csv",
+        "development_data_label_free.csv",
+        "development_membership.csv",
+        "development_image_manifest.tsv",
+    }
+    if set(files) != expected_names:
+        raise ValueError("runtime audit file set mismatch")
+    for name in sorted(expected_names):
+        path = runtime_dir / name
+        if not path.is_file() or sha256_file(path) != files[name]:
+            raise ValueError(f"runtime input checksum mismatch: {name}")
+
+
 def stable_row_key(row: Mapping[str, str], *, seed: int = 42) -> str:
     payload = f"{seed}|{row['id']}|{row['semantic_component']}".encode()
     return hashlib.sha256(payload).hexdigest()
@@ -86,15 +148,18 @@ def select_fisher_rows(
     if not candidates:
         raise ValueError(f"no rows available for Fisher task {task}")
     candidates.sort(key=lambda row: stable_row_key(row, seed=seed))
-    by_component_stratum: dict[tuple[str, str], dict[str, str]] = {}
+    # A semantic component is the leakage unit.  Pick its deterministic
+    # representative first, then stratify, so a component can never contribute
+    # two near-duplicate rows merely because its labels disagree.
+    by_component: dict[str, dict[str, str]] = {}
     for row in candidates:
         if row.get("label") not in {"0", "1"}:
             raise ValueError("Fisher rows must carry binary train labels")
-        stratum = (row["semantic_component"], row["label"])
-        by_component_stratum.setdefault(stratum, row)
+        by_component.setdefault(row["semantic_component"], row)
     strata: dict[str, list[dict[str, str]]] = {"0": [], "1": []}
-    for (_, label), row in sorted(by_component_stratum.items()):
-        strata[label].append(row)
+    for component in sorted(by_component):
+        row = by_component[component]
+        strata[row["label"]].append(row)
     if not strata["0"] or not strata["1"]:
         raise ValueError(f"Fisher task {task} lacks both label strata")
     per_class = min(len(strata["0"]), len(strata["1"]), max_rows // 2)
@@ -144,9 +209,9 @@ def unpack_adapter(path: Path, temporary_root: Path) -> Path:
 def _load_image_manifest(path: Path) -> dict[str, str]:
     with path.open("r", encoding="utf-8", newline="") as stream:
         reader = csv.DictReader(stream, delimiter="\t")
-        if reader.fieldnames is None or "id" not in reader.fieldnames:
-            raise ValueError("runtime image manifest lacks id")
-        image_field = "image_url" if "image_url" in reader.fieldnames else reader.fieldnames[-1]
+        if reader.fieldnames is None or not {"id", "image_url"}.issubset(reader.fieldnames):
+            raise ValueError("runtime image manifest lacks id or image_url")
+        image_field = "image_url"
         result: dict[str, str] = {}
         for raw in reader:
             item_id = str(raw["id"])
@@ -167,6 +232,7 @@ def _resolve_image(image_ref: str, item_id: str, image_root: Path):
     candidates.extend(
         image_root / item_id / name for name in ("0.jpg", "0.jpeg", "0.png", "image.jpg")
     )
+    candidates.append(image_root / f"{item_id}.jpg")
     candidates.append(image_root / basename if basename else image_root / item_id)
     for path in candidates:
         if path.is_file():
@@ -175,15 +241,101 @@ def _resolve_image(image_ref: str, item_id: str, image_root: Path):
     raise FileNotFoundError(f"no local first image for development item {item_id}")
 
 
-def build_messages(row: Mapping[str, str], image: Any) -> list[dict[str, Any]]:
-    text = (
-        "Определи, относится ли товар к целевой категории. Ответь одним числом: 1 или 0.\n"
-        f"Название: {row['name']}\n"
-        f"Описание: {row['description'][:DESCRIPTION_LIMIT]}"
+def _download_image(item_id: str, url: str, image_root: Path) -> tuple[str, str | None]:
+    """Download and decode one first image without a synthetic fallback."""
+
+    from PIL import Image
+
+    destination = image_root / f"{item_id}.jpg"
+    last_error: Exception | None = None
+    for _ in range(3):
+        try:
+            with urllib.request.urlopen(url, timeout=60) as response:
+                payload = response.read()
+            with Image.open(io.BytesIO(payload)) as source:
+                image = source.convert("RGB")
+                image.thumbnail(
+                    (FIRST_IMAGE_MAX_EDGE, FIRST_IMAGE_MAX_EDGE), Image.Resampling.LANCZOS
+                )
+                image.save(destination, format="JPEG", quality=92)
+            return item_id, None
+        except (OSError, ValueError, urllib.error.URLError) as error:  # pragma: no cover
+            last_error = error
+    return item_id, f"{type(last_error).__name__}: {last_error}"
+
+
+def predownload_images(
+    item_ids: Iterable[str], image_manifest: Mapping[str, str], image_root: Path
+) -> dict[str, Any]:
+    """Strictly materialize every image needed by Fisher or validation scoring."""
+
+    ordered = sorted({str(item_id) for item_id in item_ids})
+    missing_refs = [item_id for item_id in ordered if not image_manifest.get(item_id)]
+    if missing_refs:
+        raise ValueError(f"image manifest misses {len(missing_refs)} required IDs")
+    if image_root.exists():
+        if not image_root.is_dir():
+            raise NotADirectoryError(image_root)
+        if any(image_root.iterdir()):
+            raise FileExistsError("refusing to reuse a nonempty image directory")
+    else:
+        image_root.mkdir(parents=True, exist_ok=False)
+    failures: list[tuple[str, str]] = []
+    started = time.monotonic()
+    with ThreadPoolExecutor(max_workers=IMAGE_DOWNLOAD_WORKERS) as pool:
+        futures = {
+            pool.submit(_download_image, item_id, image_manifest[item_id], image_root): item_id
+            for item_id in ordered
+        }
+        for index, future in enumerate(as_completed(futures), 1):
+            item_id, error = future.result()
+            if error is not None:
+                failures.append((item_id, error))
+            if index % 500 == 0 or index == len(futures):
+                print(
+                    f"images={index}/{len(futures)} failures={len(failures)} "
+                    f"elapsed_min={(time.monotonic() - started) / 60:.1f}",
+                    flush=True,
+                )
+    if failures:
+        raise RuntimeError(f"strict image download failed for {len(failures)} items")
+    return {
+        "required": len(ordered),
+        "downloaded": len(ordered),
+        "failures": 0,
+        "max_edge": FIRST_IMAGE_MAX_EDGE,
+    }
+
+
+def compact_text(value: Any, limit: int = DESCRIPTION_LIMIT) -> str:
+    """Exact text normalization used by both frozen experiment-600 parents."""
+
+    text = html.unescape(str(value or ""))
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) <= limit:
+        return text
+    head = int(limit * 0.7)
+    return text[:head].rstrip() + " … " + text[-(limit - head) :].lstrip()
+
+
+def parent_user_text(row: Mapping[str, str]) -> str:
+    category = row["category"]
+    if category not in RULES:
+        raise ValueError(f"unsupported parent category: {category}")
+    return (
+        f"Категория: {category}\n"
+        f"Название: {compact_text(row['name'], NAME_LIMIT)}\n"
+        f"Описание: {compact_text(row['description'], DESCRIPTION_LIMIT)}\n"
+        f"Правило: {RULES[category]}\n"
+        "Определи правильность категории. Ответь только одной цифрой: 1 или 0."
     )
+
+
+def build_messages(row: Mapping[str, str], image: Any) -> list[dict[str, Any]]:
     content: list[dict[str, Any]] = [
         {"type": "image", "image": image},
-        {"type": "text", "text": text},
+        {"type": "text", "text": parent_user_text(row)},
     ]
     return [{"role": "user", "content": content}]
 
@@ -192,33 +344,24 @@ def _import_model_stack():
     try:
         import torch
         from peft import PeftModel
-        from transformers import AutoProcessor
+        from transformers import AutoModelForMultimodalLM, AutoProcessor
     except ImportError as exc:
         raise RuntimeError("Qwen/PEFT runtime dependencies are not installed") from exc
-    return torch, PeftModel, AutoProcessor
+    return torch, PeftModel, AutoModelForMultimodalLM, AutoProcessor
 
 
 def _load_model(base_model_id: str, base_model_revision: str, adapter_dir: Path, device: str):
-    torch, PeftModel, AutoProcessor = _import_model_stack()
-    from transformers import AutoModelForCausalLM
+    torch, PeftModel, AutoModelForMultimodalLM, AutoProcessor = _import_model_stack()
 
     dtype = torch.bfloat16 if device.startswith("cuda") else torch.float32
-    try:
-        base = AutoModelForCausalLM.from_pretrained(
-            base_model_id,
-            revision=base_model_revision,
-            torch_dtype=dtype,
-            trust_remote_code=True,
-        )
-    except (ImportError, ValueError):
-        from transformers import AutoModelForMultimodalLM
-
-        base = AutoModelForMultimodalLM.from_pretrained(
-            base_model_id,
-            revision=base_model_revision,
-            torch_dtype=dtype,
-            trust_remote_code=True,
-        )
+    base = AutoModelForMultimodalLM.from_pretrained(
+        base_model_id,
+        revision=base_model_revision,
+        dtype=dtype,
+        local_files_only=True,
+        trust_remote_code=True,
+        attn_implementation="eager",
+    )
     model = PeftModel.from_pretrained(base, str(adapter_dir), is_trainable=True)
     model.to(device)
     processor = AutoProcessor.from_pretrained(
@@ -239,13 +382,21 @@ def _target_ids(processor: Any) -> tuple[int, int]:
 def _encode(
     processor: Any, messages: list[dict[str, Any]], torch: Any, device: str
 ) -> dict[str, Any]:
-    encoded = processor.apply_chat_template(
-        messages,
-        tokenize=True,
-        add_generation_prompt=True,
-        return_tensors="pt",
-        return_dict=True,
-    )
+    kwargs = {
+        "tokenize": True,
+        "add_generation_prompt": True,
+        "return_tensors": "pt",
+        "return_dict": True,
+        "padding": True,
+        "truncation": True,
+        "max_length": MAX_LENGTH,
+    }
+    try:
+        encoded = processor.apply_chat_template(messages, enable_thinking=False, **kwargs)
+    except TypeError:
+        # Older compatible transformer builds do not expose this keyword; this
+        # is the exact fallback in both parent runners.
+        encoded = processor.apply_chat_template(messages, **kwargs)
     return {
         key: value.to(device) if hasattr(value, "to") else value for key, value in encoded.items()
     }
@@ -284,9 +435,14 @@ def collect_fisher(
     image_root: Path,
     device: str,
     task: str,
+    outer_fold: int,
     batch_size: int,
     torch: Any,
 ) -> dict[str, Any]:
+    if task not in {"original", "specialist"}:
+        raise ValueError("task must be original or specialist")
+    if outer_fold not in DEVELOPMENT_FOLDS:
+        raise ValueError("invalid outer fold")
     zero_id, one_id = _target_ids(processor)
     gradients: list[dict[str, np.ndarray]] = []
     model.train()
@@ -301,22 +457,26 @@ def collect_fisher(
             loss, _ = _binary_loss(model, encoded, target, zero_id, one_id, torch)
             loss_total = loss if loss_total is None else loss_total + loss
         (loss_total / len(batch)).backward()
-        batch_gradients: dict[str, np.ndarray] = {}
+        gradient_parts: dict[str, list[np.ndarray]] = {}
         for name, parameter in model.named_parameters():
             module = _normalise_gradient_name(name)
             if module is None or parameter.grad is None:
                 continue
             values = parameter.grad.detach().float().cpu().numpy()
-            batch_gradients[module] = (
-                values if module not in batch_gradients else batch_gradients[module] + values
-            )
+            gradient_parts.setdefault(module, []).append(values.reshape(-1))
+        # LoRA A and B generally have incompatible matrix shapes.  Concatenate
+        # their flattened gradients; adding them can broadcast incorrectly or
+        # fail outright and does not estimate a module-level squared gradient.
+        batch_gradients = {
+            module: np.concatenate(parts) for module, parts in sorted(gradient_parts.items())
+        }
         if not batch_gradients:
             raise RuntimeError("no trainable LoRA gradients were observed")
         gradients.append(batch_gradients)
     return estimate_fisher_from_gradients(
         gradients,
         train_rows=len(rows),
-        outer_fold=int(rows[0]["development_fold"]),
+        outer_fold=outer_fold,
         train_ids_sha256=canonical_sha256([row["id"] for row in rows]),
     )
 
@@ -366,6 +526,8 @@ def run_fold(
     runtime_dir: Path,
     original_adapter: Path,
     specialist_adapter: Path,
+    original_parent: Path,
+    specialist_parent: Path,
     base_model_id: str,
     base_model_revision: str,
     image_root: Path,
@@ -377,10 +539,20 @@ def run_fold(
 ) -> dict[str, Any]:
     if outer_fold not in DEVELOPMENT_FOLDS:
         raise ValueError(f"outer_fold must be one of {DEVELOPMENT_FOLDS}")
-    if output_dir.exists() and any(output_dir.iterdir()):
-        raise FileExistsError("refusing to overwrite fold output")
+    original_parent_sha256 = verify_parent_source(
+        original_parent, ORIGINAL_PARENT_SHA256, component="original"
+    )
+    specialist_parent_sha256 = verify_parent_source(
+        specialist_parent, SPECIALIST_PARENT_SHA256, component="specialist"
+    )
+    if output_dir.exists():
+        if not output_dir.is_dir():
+            raise NotADirectoryError(output_dir)
+        if any(output_dir.iterdir()):
+            raise FileExistsError("refusing to overwrite fold output")
     audit_path = runtime_dir / "runtime_audit.json"
     audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    verify_runtime_audit(runtime_dir, audit)
     if audit.get("outer_fold") != outer_fold or audit.get("decision") != "GO":
         raise ValueError("runtime audit does not match requested fold")
     if audit.get("validation_labels_written") is not False or audit.get("sealed_rows_written") != 0:
@@ -398,7 +570,16 @@ def run_fold(
     image_manifest = _load_image_manifest(runtime_dir / "development_image_manifest.tsv")
     original_rows = select_fisher_rows(train_rows, task="original", max_rows=max_fisher_rows)
     specialist_rows = select_fisher_rows(train_rows, task="specialist", max_rows=max_fisher_rows)
-    output_dir.mkdir(parents=True, exist_ok=False)
+    image_audit = predownload_images(
+        [
+            *(row["id"] for row in original_rows),
+            *(row["id"] for row in specialist_rows),
+            *(row["id"] for row in validation_rows),
+        ],
+        image_manifest,
+        image_root,
+    )
+    output_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as temporary:
         temp_root = Path(temporary)
         original_dir = unpack_adapter(original_adapter, temp_root / "original_unpack")
@@ -414,6 +595,7 @@ def run_fold(
             image_root=image_root,
             device=device,
             task="original",
+            outer_fold=outer_fold,
             batch_size=batch_size,
             torch=torch,
         )
@@ -431,10 +613,16 @@ def run_fold(
             image_root=image_root,
             device=device,
             task="specialist",
+            outer_fold=outer_fold,
             batch_size=batch_size,
             torch=torch,
         )
         fisher_report = dict(original_fisher)
+        fisher_report["original_fisher_sample_rows"] = original_fisher["train_rows"]
+        fisher_report["original_fisher_sample_ids_sha256"] = original_fisher["train_ids_sha256"]
+        fisher_report["specialist_fisher_sample_rows"] = specialist_fisher["train_rows"]
+        fisher_report["specialist_fisher_sample_ids_sha256"] = specialist_fisher["train_ids_sha256"]
+        fisher_report["specialist_gradient_batches"] = specialist_fisher["gradient_batches"]
         fisher_report["outer_fold"] = outer_fold
         fisher_report["train_rows"] = len(train_rows)
         fisher_report["train_ids_sha256"] = canonical_sha256([row["id"] for row in train_rows])
@@ -478,12 +666,15 @@ def run_fold(
         "protocol": "621_semantic_v3_fold_runtime_v1",
         "outer_fold": outer_fold,
         "prompt_version": PROMPT_VERSION,
+        "original_parent_sha256": original_parent_sha256,
+        "specialist_parent_sha256": specialist_parent_sha256,
         "fisher_max_rows": max_fisher_rows,
         "fisher_batch_size": batch_size,
         "train_rows": len(train_rows),
         "validation_rows": len(validation_rows),
         "original_fisher_rows": len(original_rows),
         "specialist_fisher_rows": len(specialist_rows),
+        "image_audit": image_audit,
         "runtime_audit_sha256": sha256_file(audit_path),
         "fisher_report_sha256": sha256_file(fisher_path),
         "merge_manifest_sha256": sha256_file(output_dir / "merged_adapter" / "merge_manifest.json"),
@@ -504,6 +695,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--runtime-dir", required=True, type=Path)
     parser.add_argument("--original-adapter", required=True, type=Path)
     parser.add_argument("--specialist-adapter", required=True, type=Path)
+    parser.add_argument("--original-parent", required=True, type=Path)
+    parser.add_argument("--specialist-parent", required=True, type=Path)
     parser.add_argument("--base-model-id", required=True)
     parser.add_argument("--base-model-revision", required=True)
     parser.add_argument("--image-root", required=True, type=Path)
@@ -523,6 +716,8 @@ def main() -> None:
                 runtime_dir=args.runtime_dir,
                 original_adapter=args.original_adapter,
                 specialist_adapter=args.specialist_adapter,
+                original_parent=args.original_parent,
+                specialist_parent=args.specialist_parent,
                 base_model_id=args.base_model_id,
                 base_model_revision=args.base_model_revision,
                 image_root=args.image_root,

@@ -1,6 +1,6 @@
 id = "621"
 name = "semantic_v3_fisher_blockwise_merge"
-status = "runnable_not_launched"
+status = "screen_running"
 description = "Deterministic train-only Fisher-weighted merge of two same-base adapters."
 fold_worker = "experiments/621_semantic_v3_fisher_blockwise_merge/fold_worker.py"
 fold_evaluator = "experiments/621_semantic_v3_fisher_blockwise_merge/evaluate_fold.py"
@@ -27,16 +27,17 @@ max_relative_reconstruction_error = 0.05
 
 [compute]
 one_gpu_jobs = 5
-job_names = ["621-fold0", "621-fold1", "621-fold2", "621-fold3", "621-fold4"]
 runtime_multiplier_limit = 1.20
 expected_vram_gb = [24, 40]
 expected_fold_minutes = [50, 90]
 temporary_working_space_gb = 4
-launch_authorized = false
+launch_authorized = true
+screen_jobs_launched = 2
+technical_pre_gpu_failures = 2
 
 [acceptance]
 minimum_winning_folds = 4
-minimum_mean_macro_delta = 0.001
-maximum_category_drop = 0.005
+minimum_mean_macro_delta = 0.0015
+maximum_category_drop = 0.002
 maximum_rare_category_false_negative_delta = 0
 minimum_corrected_to_regressed_ratio = 1.5

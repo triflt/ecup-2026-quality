@@ -1,0 +1,17 @@
+{
+  "experiment_id": "623",
+  "status": "screen_running",
+  "validation_version": "semantic_family_v3",
+  "validation_complete": false,
+  "screen_folds": [0, 3],
+  "screen_jobs_launched": 2,
+  "sealed_holdout_used": false,
+  "large_teacher_used": false,
+  "loss": {
+    "verdict_ce_weight": 1.0,
+    "span_ce_weight": 0.1,
+    "concept_ce_weight": 0.05
+  },
+  "metrics": {},
+  "decision": "SCREEN_RUNNING_NO_METRIC_RELEASED"
+}

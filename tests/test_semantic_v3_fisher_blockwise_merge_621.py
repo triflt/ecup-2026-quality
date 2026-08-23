@@ -107,6 +107,7 @@ def test_label_blind_audit_and_public_metadata_checks(tmp_path: Path) -> None:
 
 def test_public_scaffold_has_no_completed_metrics_claim() -> None:
     metrics = json.loads((EXP / "results" / "metrics.json").read_text(encoding="utf-8"))
-    assert metrics["status"] == "runnable_not_launched"
+    assert metrics["status"] == "screen_running"
     assert metrics["validation_complete"] is False
     assert metrics["folds"] == []
+    assert metrics["metrics"] == {}

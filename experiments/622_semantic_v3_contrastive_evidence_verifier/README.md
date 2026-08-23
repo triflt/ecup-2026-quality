@@ -75,3 +75,13 @@ python experiments/622_semantic_v3_contrastive_evidence_verifier/build_preflight
 
 The command does not train a model. It writes private candidate banks, donor
 targets and an unreviewed audit sheet, then writes a sanitized aggregate summary.
+
+The reviewer follows `human_audit_protocol.md`. After all 300 rows are rated,
+validate the private sheet and calculate the aggregate gate without publishing
+raw rows:
+
+```bash
+python experiments/622_semantic_v3_contrastive_evidence_verifier/evaluate_human_audit.py \
+  --review experiments/622_semantic_v3_contrastive_evidence_verifier/.local/preflight/human_audit_300.csv \
+  --output experiments/622_semantic_v3_contrastive_evidence_verifier/.local/preflight/human_gate_summary.json
+```

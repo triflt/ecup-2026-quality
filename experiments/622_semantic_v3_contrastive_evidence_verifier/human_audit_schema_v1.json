@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "exp622_human_audit_schema_v1",
+  "title": "Private blind human-audit row",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "audit_id", "row_id", "semantic_component",
+    "category", "product_name", "source", "source_text", "raw_start", "raw_end",
+    "exact_surface_span", "claim_concept",
+    "counterclaim_concept", "hard_negative_mapping", "strict_pass",
+    "critical_unsupported", "scope_or_negation_failure", "review_notes"
+  ],
+  "properties": {
+    "schema_version": {"const": "exp622_human_audit_row_v1"},
+    "audit_id": {"type": "string", "pattern": "^A[0-9]{3}$"},
+    "row_id": {"type": "string", "minLength": 1},
+    "semantic_component": {"type": "string", "minLength": 1},
+    "category": {"enum": ["БАД", "Легковоспламеняющиеся"]},
+    "product_name": {"type": "string", "minLength": 1},
+    "source": {"enum": ["name", "description"]},
+    "source_text": {"type": "string", "minLength": 1},
+    "raw_start": {"type": "string", "pattern": "^[0-9]+$"},
+    "raw_end": {"type": "string", "pattern": "^[0-9]+$"},
+    "exact_surface_span": {"type": "string", "minLength": 8, "maxLength": 160},
+    "claim_concept": {"type": "string", "minLength": 1},
+    "counterclaim_concept": {"type": "string", "minLength": 1},
+    "hard_negative_mapping": {"type": "string", "minLength": 1},
+    "strict_pass": {"enum": ["", "0", "1"]},
+    "critical_unsupported": {"enum": ["", "0", "1"]},
+    "scope_or_negation_failure": {"enum": ["", "0", "1"]},
+    "review_notes": {"type": "string"}
+  }
+}

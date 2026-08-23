@@ -1,0 +1,48 @@
+id = 623
+slug = "semantic-v3-multitask-span-head"
+status = "screen_running"
+parent = 600
+validation_protocol = "semantic_family_v3"
+uses_sealed_holdout = false
+uses_large_teacher = false
+
+[hypothesis]
+statement = "Exact-span and closed-concept supervision can regularize the original Qwen3.5 verdict without free-form reasoning."
+frozen_before_gpu = true
+
+[training]
+screen_folds = [0, 3]
+remaining_folds_after_screen_only = [1, 2, 4]
+seed = 42
+epochs = 1
+batch_size = 4
+gradient_accumulation = 4
+learning_rate = 0.0002
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+verdict_ce_weight = 1.0
+span_ce_weight = 0.10
+concept_ce_weight = 0.05
+
+[commands]
+build_runtime = "python3 experiments/623_semantic_v3_multitask_span_head/build_fold_runtime.py --help"
+preflight = "python3 experiments/623_semantic_v3_multitask_span_head/preflight.py"
+run_fold = "python3 experiments/623_semantic_v3_multitask_span_head/run_fold.py --help"
+
+[artifacts]
+public = [
+  "README.md",
+  "experiment.toml",
+  "frozen_spec.json",
+  "protocol.py",
+  "build_fold_runtime.py",
+  "multitask_head.py",
+  "model.py",
+  "alignment.py",
+  "run_fold.py",
+  "renderer.py",
+  "preflight.py"
+]
+private = [".local/runtime_inputs", ".local/checkpoints", ".local/predictions"]
