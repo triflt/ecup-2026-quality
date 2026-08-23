@@ -2,7 +2,7 @@
 id = "633"
 slug = "paddleocr_vl16_spotting"
 title = "Grounded OCR regions for every competition image"
-status = "technical_smoke_running"
+status = "full_extraction_running"
 entrypoint = "experiments/633_paddleocr_vl16_spotting/run_spotting.py"
 result_file = "experiments/633_paddleocr_vl16_spotting/results/metrics.json"
 
@@ -38,8 +38,8 @@ sealed_labels_used = false
 
 [budget]
 technical_smoke_gpus = 1
-full_extraction_max_gpus = 8
-planned_gpu_hours = 24.0
+full_extraction_max_gpus = 32
+planned_gpu_hours = 256.0
 planned_public_submissions = 0
 
 [artifacts]
