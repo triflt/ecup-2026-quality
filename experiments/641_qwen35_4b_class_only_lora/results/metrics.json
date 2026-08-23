@@ -59,10 +59,18 @@
     "launched_at_utc": "2026-08-23T16:49:43Z",
     "changed_factor": "provide a frozen self-contained C compiler and execute real CUDA forward/backward for both fast kernels before loading model weights",
     "gpus": 1,
-    "status": "running",
+    "status": "failed_before_training_incomplete_kernels_no_deps_and_incorrect_zig_entrypoint",
     "kernels_wheel_sha256": "794af6a10fd888bb4f46ad1b9b2f4f61b5b0b104475a6415c5322b58a7bf02ed",
     "ziglang_wheel_sha256": "9fcda73f62b851dd72a54b710ad40a209896db14cfb13649e62191243556342b",
     "runtime_bundle_sha256": "7a86b7e4c434c9464d3205dec34e6418d3b9edd94a1013032068ff47cb5a2a7a"
+  },
+  "functional_fast_path_smoke_v2": {
+    "launched_at_utc": "2026-08-23T17:39:21Z",
+    "changed_factor": "add exact kernels-data 0.16.0 and explicit zig cc/c++ wrappers, then rerun the same no-model CUDA forward/backward smoke",
+    "gpus": 1,
+    "status": "running",
+    "kernels_data_wheel_sha256": "30efa0e6ee0261c6c5b581fed372321a79db923a3e1934d00b7675565baaffc3",
+    "runtime_bundle_sha256": "0f9d73e2a2acf1e16dd9bfa2a87ccfc1cd14ce3c92f5d3b77407b92ec59d02f5"
   },
   "metrics": null,
   "decision": "PENDING_SCREEN"

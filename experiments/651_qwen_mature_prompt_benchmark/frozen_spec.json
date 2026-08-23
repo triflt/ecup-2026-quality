@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "experiment_id": "651",
+  "parent_experiment": "640",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "runtime_rows": 11118,
+  "technical_smoke_rows": 20,
+  "screen_folds": [0, 3],
+  "full_folds": [0, 1, 2, 3, 4],
+  "prompt_source": "experiments/640_qwen38_scale_prompt_grid/run_prompt_scores.py",
+  "thinking": false,
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "image_policy": "first_image_only",
+  "public_used_for_selection": false,
+  "sealed_rows_used": 0,
+  "models": [
+    {
+      "id": "Qwen/Qwen3.6-27B",
+      "revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+      "gpus": 1
+    },
+    {
+      "id": "Qwen/Qwen3.5-122B-A10B",
+      "revision": "dc4d348443bc740c68e2d77492492c11606384d5",
+      "gpus": 4
+    }
+  ],
+  "technical_gate": {
+    "rows": 20,
+    "finite_scores": true,
+    "schema_exact": true,
+    "cpu_or_disk_offload_forbidden": true
+  },
+  "scientific_gate": {
+    "baseline": "Qwen/Qwen3.8-27B@1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+    "each_screen_fold_positive": true,
+    "minimum_category_delta": -0.002,
+    "minimum_corrected_to_regressed": 1.5
+  }
+}

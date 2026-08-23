@@ -87,6 +87,7 @@ def messages(row: SimpleNamespace, image: Image.Image) -> list[dict[str, Any]]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--runtime", type=Path, required=True)
+    parser.add_argument("--experiment-id", default="640")
     parser.add_argument("--model-root", type=Path, required=True)
     parser.add_argument("--model-id", required=True)
     parser.add_argument("--model-revision", required=True)
@@ -95,6 +96,7 @@ def main() -> None:
     parser.add_argument("--num-shards", type=int, default=1)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--batch-size", type=int, default=1)
+    parser.add_argument("--device-map-auto", action="store_true")
     args = parser.parse_args()
     if not 0 <= args.shard_index < args.num_shards:
         raise ValueError("invalid shard index")
@@ -107,11 +109,24 @@ def main() -> None:
 
     rows = load_rows(args.runtime, shard_index=args.shard_index, num_shards=args.num_shards, limit=args.limit)
     processor = AutoProcessor.from_pretrained(args.model_root, local_files_only=True)
+    model_kwargs: dict[str, Any] = {
+        "torch_dtype": torch.bfloat16,
+        "local_files_only": True,
+    }
+    if args.device_map_auto:
+        model_kwargs["device_map"] = "auto"
+        model_kwargs["low_cpu_mem_usage"] = True
     model = AutoModelForMultimodalLM.from_pretrained(
         args.model_root,
-        torch_dtype=torch.bfloat16,
-        local_files_only=True,
-    ).to("cuda").eval()
+        **model_kwargs,
+    )
+    if not args.device_map_auto:
+        model = model.to("cuda")
+    model = model.eval()
+    device_map = getattr(model, "hf_device_map", {})
+    if args.device_map_auto and any(str(device) in {"cpu", "disk"} for device in device_map.values()):
+        raise RuntimeError(f"model was offloaded outside CUDA: {device_map}")
+    input_device = model.device
     zero = processor.tokenizer.encode("0", add_special_tokens=False)
     one = processor.tokenizer.encode("1", add_special_tokens=False)
     if len(zero) != 1 or len(one) != 1 or zero == one:
@@ -135,7 +150,7 @@ def main() -> None:
                     truncation=True,
                     max_length=1536,
                     enable_thinking=False,
-                ).to(model.device)
+                ).to(input_device)
                 with torch.inference_mode():
                     logits = model(**batch).logits[:, -1, :].float().cpu()
                 scores = logits[:, one[0]] - logits[:, zero[0]]
@@ -162,7 +177,7 @@ def main() -> None:
     elapsed = time.monotonic() - started
     report = {
         "schema_version": 1,
-        "experiment_id": "640",
+        "experiment_id": args.experiment_id,
         "model_id": args.model_id,
         "model_revision": args.model_revision,
         "runtime_sha256": sha256_file(args.runtime),
@@ -171,6 +186,9 @@ def main() -> None:
         "num_shards": args.num_shards,
         "rows": len(rows),
         "batch_size": args.batch_size,
+        "device_map_auto": args.device_map_auto,
+        "cuda_device_count": torch.cuda.device_count(),
+        "hf_device_map": {str(key): str(value) for key, value in device_map.items()},
         "elapsed_seconds": elapsed,
         "rows_per_second": len(rows) / elapsed if elapsed else 0.0,
         "thinking": False,

@@ -42,11 +42,15 @@ LEARNING_RATE = 2e-4
 
 def verify_frozen_c_compiler() -> str:
     configured_cc = os.environ.get("CC")
+    configured_cxx = os.environ.get("CXX")
     compiler_path = shutil.which(configured_cc) if configured_cc else None
-    if compiler_path is None or Path(compiler_path).name != "python-zig":
+    compiler_cxx_path = shutil.which(configured_cxx) if configured_cxx else None
+    if compiler_path is None or Path(compiler_path).name != "zig_cc.sh":
         raise RuntimeError(
-            "the frozen self-contained C compiler is unavailable; set CC to python-zig"
+            "the frozen self-contained C compiler wrapper is unavailable"
         )
+    if compiler_cxx_path is None or Path(compiler_cxx_path).name != "zig_cxx.sh":
+        raise RuntimeError("the frozen self-contained C++ compiler wrapper is unavailable")
     version = importlib.metadata.version("ziglang")
     if version != "0.16.0":
         raise RuntimeError(f"unexpected ziglang version: {version}")
@@ -97,6 +101,7 @@ def verify_fast_linear_attention_dependencies() -> dict[str, str]:
         "flash_linear_attention": importlib.metadata.version("flash-linear-attention"),
         "causal_conv1d": importlib.metadata.version("causal-conv1d"),
         "kernels": importlib.metadata.version("kernels"),
+        "kernels_data": importlib.metadata.version("kernels-data"),
         "ziglang": ziglang_version,
     }
     if versions != {
@@ -107,6 +112,7 @@ def verify_fast_linear_attention_dependencies() -> dict[str, str]:
         "flash_linear_attention": "0.5.2",
         "causal_conv1d": "1.6.2.post1",
         "kernels": "0.16.0",
+        "kernels_data": "0.16.0",
         "ziglang": "0.16.0",
     }:
         raise RuntimeError(f"unexpected fast-path package versions: {versions}")

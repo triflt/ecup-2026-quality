@@ -1,6 +1,6 @@
 {
   "experiment_id": "645",
-  "status": "functional_fast_path_smoke_running_before_641_644",
+  "status": "functional_fast_path_smoke_v2_running_before_641_644",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
@@ -8,7 +8,7 @@
   "distillation_allowed": false,
   "training_preflight": {
     "experiment_id": "641",
-    "launched_at_utc": "2026-08-23T16:49:43Z",
+    "launched_at_utc": "2026-08-23T17:39:21Z",
     "gpus": 1,
     "model_weights_loaded": false,
     "training_data_read": false,
@@ -18,7 +18,7 @@
       "qwen35_compiled_bindings",
       "exact_dependency_versions"
     ],
-    "status": "running"
+    "status": "running_after_exact_kernels_data_and_zig_cc_wrappers"
   },
   "metrics": null,
   "decision": "PENDING_GRID"

@@ -17,6 +17,7 @@ expected = {
     "fla_core-0.5.2-py3-none-any.whl": "5e830c85bad3d0d34677f98ac7074d08687a3756f0f0499d95ceb96eb6920761",
     "flash_linear_attention-0.5.2-py3-none-any.whl": "dcf405d81f5426393b59037097aa700d0f4a841465d5028d5aa543f4502f2400",
     "kernels-0.16.0-py3-none-any.whl": "794af6a10fd888bb4f46ad1b9b2f4f61b5b0b104475a6415c5322b58a7bf02ed",
+    "kernels_data-0.16.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "30efa0e6ee0261c6c5b581fed372321a79db923a3e1934d00b7675565baaffc3",
     "ziglang-0.16.0-py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.musllinux_1_1_x86_64.whl": "9fcda73f62b851dd72a54b710ad40a209896db14cfb13649e62191243556342b",
 }
 for filename, expected_sha256 in expected.items():
@@ -34,6 +35,8 @@ python -m pip install -q --break-system-packages --no-deps \
   "${qwen_vendor_dir}/fla_core-0.5.2-py3-none-any.whl" \
   "${qwen_vendor_dir}/flash_linear_attention-0.5.2-py3-none-any.whl" \
   "${qwen_vendor_dir}/kernels-0.16.0-py3-none-any.whl" \
+  "${qwen_vendor_dir}/kernels_data-0.16.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl" \
   "${qwen_vendor_dir}/ziglang-0.16.0-py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.musllinux_1_1_x86_64.whl"
 
-export CC=python-zig
+export CC="${qwen_runtime_root}/experiments/645_qwen_scale_2x3_gate/zig_cc.sh"
+export CXX="${qwen_runtime_root}/experiments/645_qwen_scale_2x3_gate/zig_cxx.sh"

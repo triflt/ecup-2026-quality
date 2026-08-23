@@ -123,10 +123,9 @@ def test_fast_path_requires_frozen_self_contained_compiler(
 def test_fast_path_accepts_exact_ziglang_compiler(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("CC", "python-zig")
-    monkeypatch.setattr(
-        train_lora.shutil, "which", lambda _name: "/usr/local/bin/python-zig"
-    )
+    monkeypatch.setenv("CC", "/runtime/zig_cc.sh")
+    monkeypatch.setenv("CXX", "/runtime/zig_cxx.sh")
+    monkeypatch.setattr(train_lora.shutil, "which", lambda name: name)
     monkeypatch.setattr(train_lora.importlib.metadata, "version", lambda _name: "0.16.0")
     assert train_lora.verify_frozen_c_compiler() == "0.16.0"
 

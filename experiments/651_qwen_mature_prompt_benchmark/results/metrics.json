@@ -1,0 +1,14 @@
+{
+  "experiment_id": "651",
+  "status": "technical_smokes_running",
+  "launched_at_utc": {
+    "Qwen/Qwen3.6-27B": "2026-08-23T17:42:28Z",
+    "Qwen/Qwen3.5-122B-A10B": "2026-08-23T17:42:33Z"
+  },
+  "gpus": {
+    "Qwen/Qwen3.6-27B": 1,
+    "Qwen/Qwen3.5-122B-A10B": 4
+  },
+  "metrics": null,
+  "decision": "PENDING_TECHNICAL_SMOKES_THEN_FROZEN_FULL_GRID"
+}
