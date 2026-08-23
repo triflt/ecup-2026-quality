@@ -41,6 +41,15 @@ screen_jobs_completed = 2
 remaining_fold_jobs_launched = 3
 one_gpu_per_job = true
 
+[full_evaluation]
+threshold_contract_sha256 = "c89899069890b514331243fb71b27fec1890749d3dc40032e4e1ce96db03810a"
+threshold_contract_frozen_before_remaining_results = true
+candidate_inputs_read_when_frozen = 0
+sealed_rows_read_when_frozen = 0
+bootstrap_unit = "semantic_component"
+bootstrap_seed = 623
+bootstrap_iterations = 10000
+
 [commands]
 build_runtime = "python3 experiments/623_semantic_v3_multitask_span_head/build_fold_runtime.py --help"
 preflight = "python3 experiments/623_semantic_v3_multitask_span_head/preflight.py"
