@@ -1,0 +1,13 @@
+{
+  "experiment_id": "642",
+  "grid_contract_sha256": "aad63f99ee9ddd5ecfa133575ea5cf1a803c11ab3fd26b5328d894f8631b3224",
+  "model_id": "Qwen/Qwen3.8-27B",
+  "model_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+  "objective": "class_only",
+  "screen_folds": [0, 3],
+  "remaining_folds_after_screen": [1, 2, 4],
+  "seed": 42,
+  "threshold": 0.0,
+  "sealed_rows": 0,
+  "public_used": false
+}

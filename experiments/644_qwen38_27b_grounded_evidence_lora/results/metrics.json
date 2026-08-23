@@ -1,0 +1,11 @@
+{
+  "experiment_id": "644",
+  "status": "prepared_waiting_for_640_prompt_gate",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "screen_folds": [0, 3],
+  "primary_order": "evidence_first",
+  "diagnostic_order": "class_first",
+  "metrics": null,
+  "decision": "PENDING_640_AND_SCREEN"
+}

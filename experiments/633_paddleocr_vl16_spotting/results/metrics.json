@@ -1,6 +1,6 @@
 {
   "experiment_id": "633",
-  "status": "technical_smoke_running",
+  "status": "full_extraction_running",
   "data_version": "competition_train_v1",
   "planned_output_data_version": "competition_train_paddleocr_vl16_spotting_v1",
   "model_id": "PaddlePaddle/PaddleOCR-VL-1.6",
@@ -9,12 +9,36 @@
     "images": 100,
     "gpus": 1,
     "launched_at_utc": "2026-08-23T11:27:01Z",
-    "attempts": 2,
+    "attempts": 3,
     "first_attempt": "failed_before_model_execution_pep668",
-    "confirmed_fix": "ephemeral_container_pip_break_system_packages",
+    "second_attempt": {
+      "status": "failed_before_ocr_generation",
+      "successful_images": 0,
+      "failed_images": 100,
+      "confirmed_cause": "pinned_processor_does_not_expose_min_pixels_as_runtime_attribute",
+      "artifact_sha256": "ea86ea9e95ea6bff56493b3a81fc2e942cca0e12001602e8152ed3dd9c200a27"
+    },
+    "confirmed_fix": "read_min_pixels_from_pinned_preprocessor_config",
     "restarted_at_utc": "2026-08-23T11:55:20Z",
-    "status": "running_after_confirmed_environment_fix"
+    "second_restart_at_utc": "2026-08-23T12:33:44Z",
+    "status": "passed_after_empty_page_contract_correction",
+    "successful_images": 100,
+    "failed_images": 0,
+    "raw_region_images": 93,
+    "canonical_empty_page_images": 7,
+    "parseable_images": 100,
+    "parseable_fraction_of_successful": 1.0,
+    "detections": 1437,
+    "elapsed_seconds": 1851.2568456679583,
+    "artifact_sha256": "f1e63bb3e1e28baa2d67c27a2556beef9a58e54afec8b55dc8aa61b03c201bdc"
   },
-  "full_extraction": null,
-  "decision": "PENDING_TECHNICAL_SMOKE"
+  "full_extraction": {
+    "images": 49456,
+    "shards": 32,
+    "gpus": 32,
+    "launched_at_utc": "2026-08-23T13:14:50Z",
+    "status": "running",
+    "labels_read": 0
+  },
+  "decision": "PENDING_FULL_EXTRACTION_AND_DATASET_634"
 }

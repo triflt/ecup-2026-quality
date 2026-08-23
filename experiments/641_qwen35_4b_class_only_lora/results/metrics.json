@@ -1,0 +1,12 @@
+{
+  "experiment_id": "641",
+  "status": "screen_training_running",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "screen_folds": [0, 3],
+  "jobs": 2,
+  "gpus": 2,
+  "launched_at_utc": "2026-08-23T13:09:03Z",
+  "metrics": null,
+  "decision": "PENDING_SCREEN"
+}

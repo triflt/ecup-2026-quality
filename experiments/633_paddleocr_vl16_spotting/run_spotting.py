@@ -13,6 +13,7 @@ from typing import Any
 MODEL_ID = "PaddlePaddle/PaddleOCR-VL-1.6"
 MODEL_REVISION = "c5630abae1d940eafe0697512a0325494b02ab42"
 LOC_PATTERN = re.compile(r"([^<\n]+?)((?:<\|LOC_\d+\|>){8})")
+MAX_PIXELS = 2048 * 28 * 28
 
 
 def sha256_file(path: Path) -> str:
@@ -21,6 +22,16 @@ def sha256_file(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def image_size_from_model_config(model_root: Path) -> dict[str, int]:
+    """Read the pinned processor limits without relying on runtime-only attributes."""
+    config_path = model_root / "preprocessor_config.json"
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    min_pixels = int(config["min_pixels"])
+    if min_pixels <= 0:
+        raise ValueError("preprocessor min_pixels must be positive")
+    return {"shortest_edge": min_pixels, "longest_edge": MAX_PIXELS}
 
 
 def parse_spotting(raw: str, *, width: int, height: int, sequence_confidence: float | None) -> list[dict[str, Any]]:
@@ -45,6 +56,11 @@ def parse_spotting(raw: str, *, width: int, height: int, sequence_confidence: fl
             }
         )
     return detections
+
+
+def is_parseable_generation(raw: str, detections: list[dict[str, Any]]) -> bool:
+    """Accept either parsed regions or the model's canonical empty-page answer."""
+    return bool(detections) or raw.strip() in {"", "</s>"}
 
 
 def load_rows(path: Path, *, shard_index: int, num_shards: int, limit: int | None) -> list[dict[str, Any]]:
@@ -101,6 +117,7 @@ def main() -> None:
         local_files_only=True,
     ).to("cuda").eval()
     processor = AutoProcessor.from_pretrained(args.model_root, local_files_only=True)
+    image_size = image_size_from_model_config(args.model_root)
     output_path = args.output_dir / "spotting.jsonl"
     started = time.monotonic()
     failures = 0
@@ -127,7 +144,7 @@ def main() -> None:
                     tokenize=True,
                     return_dict=True,
                     return_tensors="pt",
-                    images_kwargs={"size": {"shortest_edge": processor.image_processor.min_pixels, "longest_edge": 2048 * 28 * 28}},
+                    images_kwargs={"size": image_size},
                 ).to(model.device)
                 with torch.inference_mode():
                     generated = model.generate(
@@ -148,7 +165,7 @@ def main() -> None:
                 confidence = math.exp(sum(math.log(max(value, 1e-12)) for value in selected) / len(selected)) if selected else None
                 detections = parse_spotting(raw, width=width, height=height, sequence_confidence=confidence)
                 detections_total += len(detections)
-                parseable_images += bool(detections)
+                parseable_images += is_parseable_generation(raw, detections)
                 record = {
                     "id": str(row["id"]),
                     "image_index": int(row["image_index"]),

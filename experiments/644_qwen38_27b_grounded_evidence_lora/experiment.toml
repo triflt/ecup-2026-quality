@@ -1,0 +1,62 @@
+[experiment]
+id = "644"
+slug = "qwen38_27b_grounded_evidence_lora"
+title = "Qwen3.8-27B verdict-primary grounded-evidence LoRA"
+status = "prepared_waiting_for_640_prompt_gate"
+entrypoint = "experiments/644_qwen38_27b_grounded_evidence_lora/run_fold.py"
+result_file = "experiments/644_qwen38_27b_grounded_evidence_lora/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+scope = "semantic_family_v3 development only"
+evidence_manifest = "experiment-623 exact text targets plus required checksum-locked OCR shards"
+model_inputs = ["category", "name", "description", "first_image"]
+ocr_in_prompt = false
+sealed_rows = 0
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+full_folds_after_screen = [1, 2, 4]
+primary_order = "evidence_first"
+diagnostic_order = "class_first"
+threshold = 0.0
+threshold_tuned = false
+required_full_fold_wins = 4
+
+[model]
+id = "Qwen/Qwen3.8-27B"
+revision = "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0"
+objective = "grounded_evidence"
+
+[training]
+seed = 42
+epochs = 1
+micro_batch_size = 1
+gradient_accumulation = 16
+effective_batch_size = 16
+learning_rate = 0.0002
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+primary_verdict_weight = 1.0
+evidence_auxiliary_weight = 0.05
+class_first_auxiliary_share = 0.5
+evidence_first_auxiliary_share = 0.5
+free_coordinates = false
+
+[hypothesis]
+changed_factor = "Model scale only relative to experiment 643"
+control = "643"
+mechanism = "The larger model may read packaging and resolve scope well enough for grounded evidence to improve classification and later teach 4B"
+falsification = "Do not distill unless experiment 645 passes its full 4-of-5, category, hard-cohort and manual-audit gates"
+precedents = ["Qwen3.8-27B official model card", "Multimodal-CoT 2023"]
+
+[budget]
+screen_jobs = 2
+gpu_per_job = 1
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

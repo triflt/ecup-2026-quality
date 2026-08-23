@@ -1,0 +1,42 @@
+{
+  "experiment_id": "635",
+  "status": "rejected_by_full_stability_gate",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "parent_full_system": "140",
+  "upstream_component": "632",
+  "replay_kind": "semantic-v3 OOF replay of the frozen 140 recipe",
+  "screen": {
+    "folds": [0, 3],
+    "accepted_variants": ["replace_with_632", "fixed_mean_original_632"],
+    "replace_macro_delta": 0.013041577184747744,
+    "fixed_mean_macro_delta": 0.007753526658706988
+  },
+  "full": {
+    "baseline_macro_f1": 0.9104830822677643,
+    "replace_macro_f1": 0.9165631447483904,
+    "replace_macro_delta": 0.006080062480626092,
+    "replace_winning_folds": 4,
+    "replace_bad_delta": 0.005648929691834836,
+    "replace_flammable_delta": 0.006511195269417347,
+    "replace_corrected": 88,
+    "replace_regressed": 33,
+    "replace_bootstrap_probability_positive": 0.7785,
+    "replace_fold4_delta": -0.02356188182057961,
+    "fixed_mean_macro_f1": 0.9139602206400201,
+    "fixed_mean_macro_delta": 0.003477138372255828,
+    "fixed_mean_winning_folds": 4,
+    "fixed_mean_bootstrap_probability_positive": 0.6983
+  },
+  "runtime": {
+    "replace_projected_public_minutes": 10.16711111111111,
+    "replace_projected_private_minutes": 24.14688888888889,
+    "fixed_mean_projected_public_minutes": 13.855436948200067,
+    "fixed_mean_projected_private_minutes": 32.90666275197516,
+    "direct_candidate_smoke": false
+  },
+  "sealed_holdout_used": false,
+  "public_used_for_selection": false,
+  "decision": "REJECT_KEEP_FULL_SYSTEM_140",
+  "reason": "Both candidates won 4/5 folds and improved aggregate Macro F1, but grouped semantic-component bootstrap confidence stayed below the frozen 0.90 gate; fold 4 regressed strongly."
+}

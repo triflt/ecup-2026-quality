@@ -2,7 +2,7 @@
 id = "640"
 slug = "qwen38_scale_prompt_grid"
 title = "Fair zero-shot prompting comparison of Qwen 4B and 27B"
-status = "large_model_technical_smoke_running"
+status = "complete_prompt_scale_gate_passed"
 entrypoint = "experiments/640_qwen38_scale_prompt_grid/run_prompt_scores.py"
 result_file = "experiments/640_qwen38_scale_prompt_grid/results/metrics.json"
 

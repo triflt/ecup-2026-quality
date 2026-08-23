@@ -2,7 +2,7 @@
 id = "632"
 slug = "span_head_seed_repeat"
 title = "Independent seed reproduction of the experiment-623 exact-span objective"
-status = "full_validation_running"
+status = "accepted_for_full140_integration"
 entrypoint = "experiments/632_span_head_seed_repeat/run_fold.py"
 result_file = "experiments/632_span_head_seed_repeat/results/metrics.json"
 

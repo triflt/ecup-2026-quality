@@ -1,0 +1,16 @@
+{
+  "experiment_id": "634",
+  "status": "prepared_waiting_for_full_633",
+  "input_data_version": "competition_train_v1",
+  "input_ocr_experiment": "633_paddleocr_vl16_spotting",
+  "planned_output_data_version": "competition_train_paddleocr_vl16_spotting_v1",
+  "expected_items": 12971,
+  "expected_images": 49456,
+  "labels_read": 0,
+  "categories_read_by_builder": 0,
+  "sealed_membership_used": false,
+  "public_used": false,
+  "merge_report": null,
+  "category_coverage_report": null,
+  "decision": "PENDING_FULL_EXPERIMENT_633"
+}

@@ -1,0 +1,64 @@
+[experiment]
+id = "634"
+slug = "immutable_ocr_dataset"
+title = "Strict immutable label-blind OCR dataset"
+status = "prepared_waiting_for_full_633"
+entrypoint = "experiments/634_immutable_ocr_dataset/run.py"
+result_file = "experiments/634_immutable_ocr_dataset/results/metrics.json"
+
+[data]
+input_version = "competition_train_v1"
+input_ocr_experiment = "633_paddleocr_vl16_spotting"
+planned_output_version = "competition_train_paddleocr_vl16_spotting_v1"
+source_manifest_schema = ["id", "image_index", "url"]
+expected_items = 12971
+expected_images = 49456
+registry_proposal = "experiments/634_immutable_ocr_dataset/dataset_registry_proposal.toml"
+
+[model]
+id = "PaddlePaddle/PaddleOCR-VL-1.6"
+revision = "c5630abae1d940eafe0697512a0325494b02ab42"
+source_experiment = "633"
+
+[hypothesis]
+parent_experiment = "633_paddleocr_vl16_spotting"
+changed_factor = "Strict deterministic merge and integrity audit of label-blind OCR shards"
+mechanism = "A complete provenance-bound region dataset enables grounded OCR evidence selection without invented coordinates or shard leakage"
+expected_macro_f1_delta = 0.0
+falsification = "Do not publish the version if any expected image is absent or duplicated, any source checksum or model revision disagrees, any processing error remains, or any quadrilateral is malformed"
+precedents = ["PaddleOCR-VL-1.6 structured spotting", "Datasheets for Datasets"]
+
+[validation]
+integrity_version = "ocr_dataset_integrity_v1_local_contract"
+record_schema = "experiments/634_immutable_ocr_dataset/ocr_image_record.schema.json"
+expected_manifest_coverage = 1.0
+maximum_missing_images = 0
+maximum_duplicate_images = 0
+maximum_processing_errors = 0
+maximum_malformed_location_images = 0
+maximum_out_of_bounds_regions = 0
+labels_read = false
+categories_read_by_builder = false
+sealed_membership_used = false
+public_used = false
+category_report_external_only = true
+
+[deduplication]
+scope = "within_same_id_and_image_index_only"
+key = "nfkc_casefold_whitespace_text_plus_exact_normalized_quadrilateral"
+cross_image_deduplication = false
+preserve_source_occurrences = true
+
+[confidence]
+type = "sequence_geomean_token_probability"
+scope = "complete_generated_sequence"
+calibrated = false
+region_specific = false
+
+[budget]
+planned_gpu_hours = 0.0
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

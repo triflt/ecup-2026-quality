@@ -1,0 +1,54 @@
+[experiment]
+id = "642"
+slug = "qwen38_27b_class_only_lora"
+title = "Qwen3.8-27B class-only LoRA in the frozen scale grid"
+status = "technical_smoke_running_after_640_gate"
+entrypoint = "experiments/642_qwen38_27b_class_only_lora/run_fold.py"
+result_file = "experiments/642_qwen38_27b_class_only_lora/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+scope = "semantic_family_v3 development only"
+model_inputs = ["category", "name", "description", "first_image"]
+sealed_rows = 0
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+full_folds_after_screen = [1, 2, 4]
+threshold = 0.0
+threshold_tuned = false
+required_full_fold_wins = 4
+
+[model]
+id = "Qwen/Qwen3.8-27B"
+revision = "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0"
+objective = "class_only"
+
+[training]
+seed = 42
+epochs = 1
+micro_batch_size = 1
+gradient_accumulation = 16
+effective_batch_size = 16
+learning_rate = 0.0002
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+[hypothesis]
+changed_factor = "Model scale only relative to experiment 641"
+control = "641"
+mechanism = "The larger native multimodal model may resolve visual text scope and sold-object relations after identical task adaptation"
+falsification = "Reject as a teacher candidate if 27B does not pass experiment-645 scale gates"
+precedents = ["Qwen3.8-27B official model card", "experiment 640"]
+
+[budget]
+screen_jobs = 2
+gpu_per_job = 1
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

@@ -1,0 +1,77 @@
+[experiment]
+id = "635"
+slug = "span_head_full140_integration"
+title = "Causal integration of accepted span-head seed repeat into full system 140"
+status = "rejected_by_full_stability_gate"
+entrypoint = "experiments/635_span_head_full140_integration/evaluate.py"
+result_file = "experiments/635_span_head_full140_integration/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+folds = "validation/semantic_family_v3/folds.csv"
+primary_metric = "macro_f1"
+screen_folds = [0, 3]
+full_folds = [0, 1, 2, 3, 4]
+sealed_rows_allowed = 0
+public_used_for_selection = false
+
+[hypothesis]
+parent_full_system = "140_dual_lora_fusion"
+upstream_component = "632_span_head_seed_repeat"
+changed_factor = "Only the Qwen3.5 probability supplied to the frozen full-140 route"
+control = "Full system 140 replay with its original Qwen3.5 component"
+mechanism = "Exact-span multitask supervision can regularize the verdict boundary; a strict evidence gate may preserve only trustworthy corrections"
+expected_macro_f1_delta = 0.003
+falsification = "Reject a variant unless it passes both screen folds, then at least four of five full folds, category/FN/change-ratio/bootstrap and runtime gates"
+precedents = ["Rakuten SIGIR 2020 decision-level fusion", "Amazon multimodal product categorization", "experiment 632 independent seed repeat"]
+
+[variants]
+names = ["original_qwen35", "replace_with_632", "fixed_mean_original_632", "evidence_gated_632"]
+fixed_mean_space = "sigmoid_probability"
+fixed_mean_weights = [0.5, 0.5]
+evidence_gate = "exact nonblank canonical substring plus valid boundaries and closed concept"
+candidate_variants_tuned = 0
+
+[frozen_route.bad]
+weight_robust_base = 0.50
+weight_qwen3vl = 0.25
+weight_qwen35 = 0.25
+threshold = 0.27193570137023926
+
+[frozen_route.flammable]
+weight_robust_base = 0.15
+weight_qwen3vl = 0.10
+weight_qwen35 = 0.75
+threshold = 0.953912615776062
+
+[acceptance.screen]
+required_fold_wins = 2
+minimum_mean_macro_delta = 0.0015
+maximum_category_f1_drop = 0.002
+minimum_corrected_to_regressed = 1.5
+maximum_flammable_false_negative_increase = 0
+maximum_all_positive_false_negative_increase = 0
+
+[acceptance.full]
+required_fold_wins = 4
+minimum_macro_delta = 0.003
+minimum_category_delta = 0.0
+minimum_corrected_to_regressed = 1.5
+minimum_component_bootstrap_probability_positive = 0.90
+maximum_flammable_false_negative_increase = 0
+maximum_all_positive_false_negative_increase = 0
+maximum_public_runtime_minutes = 20.0
+maximum_private_runtime_minutes = 40.0
+
+[blocker]
+active = true
+reason = "No checksum-verified semantic-v3 OOF replay of full system 140 with donor-only exact/name post-processing exists; experiment 603 is not an admissible substitute. Experiment 632 has passed its terminal five-fold gate."
+
+[artifacts]
+directory = "artifacts"
+publish = false
