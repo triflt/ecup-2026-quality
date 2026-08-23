@@ -538,13 +538,27 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
     import torch
 
     spec = CELL_SPECS[spec_id]
-    # The Hub fused GDN kernel is hardware-gated and is not the H100 training
-    # path.  Disable Hub substitution and require the official FLA backend.
-    os.environ["USE_HUB_KERNELS"] = "NO"
-    fast_path_packages = verify_fast_linear_attention_dependencies()
+    if args.runtime_backend == "verified_fast_path":
+        # The Hub fused GDN kernel is hardware-gated and is not the H100 training
+        # path. Disable Hub substitution and require the official FLA backend.
+        os.environ["USE_HUB_KERNELS"] = "NO"
+        runtime_packages = verify_fast_linear_attention_dependencies()
+    else:
+        # Reuse the exact operational route that completed experiments 623 and
+        # 632.  It intentionally relies on the competition image's frozen Qwen
+        # implementation and does not install or compile replacement kernels.
+        runtime_packages = {
+            "transformers": importlib.metadata.version("transformers"),
+            "torch": importlib.metadata.version("torch"),
+            "backend": "legacy_eager",
+        }
     from transformers import AutoModelForMultimodalLM, AutoProcessor
 
-    fast_path_bindings = verify_qwen35_fast_path_binding()
+    fast_path_bindings = (
+        verify_qwen35_fast_path_binding()
+        if args.runtime_backend == "verified_fast_path"
+        else {}
+    )
     if args.model_revision != spec.model_revision:
         raise ValueError("model revision differs from frozen cell contract")
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
@@ -579,14 +593,23 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
     one = processor.tokenizer.encode("1", add_special_tokens=False)
     if len(zero) != 1 or len(one) != 1 or zero == one:
         raise ValueError("0/1 must be distinct atomic tokens")
-    model = AutoModelForMultimodalLM.from_pretrained(
-        args.model_root.resolve(),
-        dtype=torch.bfloat16,
-        local_files_only=True,
-        trust_remote_code=True,
-        attn_implementation="eager",
-        use_kernels=False,
-    ).to("cuda")
+    if args.runtime_backend == "verified_fast_path":
+        model = AutoModelForMultimodalLM.from_pretrained(
+            args.model_root.resolve(),
+            dtype=torch.bfloat16,
+            local_files_only=True,
+            trust_remote_code=True,
+            attn_implementation="eager",
+            use_kernels=False,
+        ).to("cuda")
+    else:
+        model = AutoModelForMultimodalLM.from_pretrained(
+            args.model_root.resolve(),
+            dtype=torch.bfloat16,
+            local_files_only=True,
+            trust_remote_code=True,
+            attn_implementation="eager",
+        ).to("cuda")
     model = get_peft_model(
         model,
         LoraConfig(
@@ -690,8 +713,9 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
         "epochs": EPOCHS,
         "effective_batch_size": spec.micro_batch_size * spec.gradient_accumulation,
         "evidence_auxiliary_weight": spec.evidence_auxiliary_weight,
-        "optimized_training_kernels": True,
-        "fast_path_packages": fast_path_packages,
+        "runtime_backend": args.runtime_backend,
+        "optimized_training_kernels": args.runtime_backend == "verified_fast_path",
+        "runtime_packages": runtime_packages,
         "fast_path_bindings": fast_path_bindings,
         "target_orders": (
             ["class_first", "evidence_first"] if spec.objective == "grounded_evidence" else []
@@ -731,5 +755,15 @@ def parser_for(spec_id: str) -> argparse.ArgumentParser:
         "--technical-smoke",
         action="store_true",
         help="Use eight train occurrences and two validation rows; never accepted by evaluator.",
+    )
+    parser.add_argument(
+        "--runtime-backend",
+        choices=("verified_fast_path", "legacy_eager"),
+        default="verified_fast_path",
+        help=(
+            "Technical execution backend. legacy_eager preserves the frozen "
+            "runtime used by successful experiments 623/632 and changes no "
+            "scientific field of the grid contract."
+        ),
     )
     return parser

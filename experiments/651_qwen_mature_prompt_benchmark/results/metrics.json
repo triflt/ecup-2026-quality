@@ -1,6 +1,6 @@
 {
   "experiment_id": "651",
-  "status": "qwen36_smoke_passed_qwen35_122b_pending",
+  "status": "both_smokes_passed_full_prompt_grids_in_progress_or_prepared",
   "launched_at_utc": {
     "Qwen/Qwen3.6-27B": "2026-08-23T17:42:28Z",
     "Qwen/Qwen3.5-122B-A10B": "2026-08-23T17:42:33Z"
@@ -22,9 +22,43 @@
       "decision": "PASS_FULL_GRID_ALLOWED"
     },
     "Qwen/Qwen3.5-122B-A10B": {
-      "status": "pending_resources"
+      "status": "passed",
+      "rows": 20,
+      "finite_scores": 20,
+      "elapsed_seconds": 10.08254336938262,
+      "rows_per_second": 1.9836264786852735,
+      "thinking": false,
+      "cuda_device_count": 4,
+      "all_layers_on_cuda": true,
+      "placement_devices": [0, 1, 2, 3],
+      "artifact_sha256": "edc489242a70e3124e3d498e45127dd93f1ce1e4cd45966c83ba3e907c31abfe",
+      "output_sha256": "3a26070c467ea840631b523f08aa768533860495957d4a84ce51081b29b9bf4d",
+      "decision": "PASS_FULL_GRID_ALLOWED"
+    }
+  },
+  "full_prompt_grid": {
+    "Qwen/Qwen3.6-27B": {
+      "status": "three_of_four_shards_running",
+      "num_shards": 4,
+      "running_shards": [0, 1, 2],
+      "not_launched_shards": [3],
+      "reason": "capacity ceiling after the goal was updated to 32 active GPUs"
+    },
+    "Qwen/Qwen3.5-122B-A10B": {
+      "status": "four_shards_prepared_not_launched_waiting_for_capacity",
+      "num_shards": 4,
+      "gpus_per_shard": 4,
+      "preset_audit_errors": 0,
+      "preset_audit_warnings": 0,
+      "dry_runs": "passed_4_of_4",
+      "preset_sha256": [
+        "df08d707b50b79d2a67b71e7dee00476d07efbcdd8064aae74e3a51f44cfaaad",
+        "14d7bed5c92fbe8690b848ebb43f83750c23e8cde9e89dc571c1cad6d3876ba3",
+        "3b0e00458fcef0ff5cfd06ca8184e2cb68e3b6cbc173af7ce4b69c596f1311f9",
+        "a141eddb239ba229eff4e2e4753e89959b600f43e3ad88f0fb7e93db73985750"
+      ]
     }
   },
   "metrics": null,
-  "decision": "QWEN36_FULL_GRID_ALLOWED_QWEN35_122B_SMOKE_PENDING"
+  "decision": "BOTH_FULL_GRIDS_ALLOWED_CAPACITY_GATED"
 }

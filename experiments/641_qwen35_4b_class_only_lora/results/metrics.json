@@ -1,6 +1,6 @@
 {
   "experiment_id": "641",
-  "status": "functional_fast_path_smoke_failed_missing_cpython_headers",
+  "status": "legacy_eager_smoke_prepared_waiting_for_capacity",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
@@ -73,6 +73,34 @@
     "kernels_data_wheel_sha256": "30efa0e6ee0261c6c5b581fed372321a79db923a3e1934d00b7675565baaffc3",
     "runtime_bundle_sha256": "0f9d73e2a2acf1e16dd9bfa2a87ccfc1cd14ce3c92f5d3b77407b92ec59d02f5"
   },
+  "functional_fast_path_smoke_v3": {
+    "launched_at_utc": "2026-08-23T18:18:41Z",
+    "changed_factor": "install the exact CPython 3.12 development headers before the same kernel-only smoke",
+    "gpus": 1,
+    "status": "failed_before_model_load_missing_cuda_driver_link_target",
+    "confirmed_cause": "the CPython headers installed successfully, then the Triton loader link could not resolve libcuda.so.1",
+    "runtime_bundle_sha256": "e6090a8117e2b685c2baea4e32a433c6f222333dce2aebfe4d49a3674a52835a"
+  },
+  "functional_fast_path_smoke_v4": {
+    "launched_at_utc": "2026-08-23T18:24:40Z",
+    "changed_factor": "add explicit CUDA driver-library discovery to the frozen compiler wrappers",
+    "gpus": 1,
+    "status": "failed_before_model_load_missing_cuda_driver_link_target",
+    "confirmed_cause": "the runtime driver library is not exposed in any of the supported filesystem locations; the same linker error remained",
+    "preset_sha256": "0df7b2be87db194dc18b03db5a2917e7b90f0b4995d9ef9417d67f892a7f98ad",
+    "runtime_bundle_sha256": "e6090a8117e2b685c2baea4e32a433c6f222333dce2aebfe4d49a3674a52835a"
+  },
+  "legacy_eager_fallback": {
+    "control_runtime": "successful experiment-623/632 execution path",
+    "scientific_contract_changed": false,
+    "changed_factor": "stop installing the replacement kernel stack and reuse the frozen eager runtime that already trained the same Qwen3.5-4B revision",
+    "status": "technical_smoke_prepared_waiting_for_capacity",
+    "preset_audit_errors": 0,
+    "preset_audit_warnings": 0,
+    "dry_run": "passed",
+    "preset_sha256": "68d6ea907fe54d1a126a23db096851f9993a1315497c77a4323406cdf585ed10",
+    "runner_sha256": "a6e2c4dbec3a35bb4304ef0173d1503303469ea7361ffd76f0c0e1f05284ab88"
+  },
   "metrics": null,
-  "decision": "PENDING_ONE_KERNEL_ONLY_RETRY_WITH_PINNED_CPYTHON_3_12_HEADERS_THEN_SCREEN"
+  "decision": "PENDING_LEGACY_EAGER_TECHNICAL_SMOKE_THEN_SCREEN_FOLDS_0_AND_3"
 }
