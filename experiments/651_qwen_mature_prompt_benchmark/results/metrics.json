@@ -1,6 +1,6 @@
 {
   "experiment_id": "651",
-  "status": "technical_smokes_running",
+  "status": "qwen36_smoke_passed_qwen35_122b_pending",
   "launched_at_utc": {
     "Qwen/Qwen3.6-27B": "2026-08-23T17:42:28Z",
     "Qwen/Qwen3.5-122B-A10B": "2026-08-23T17:42:33Z"
@@ -9,6 +9,22 @@
     "Qwen/Qwen3.6-27B": 1,
     "Qwen/Qwen3.5-122B-A10B": 4
   },
+  "technical_smoke": {
+    "Qwen/Qwen3.6-27B": {
+      "status": "passed",
+      "rows": 20,
+      "finite_scores": 20,
+      "elapsed_seconds": 8.613273551687598,
+      "rows_per_second": 2.321997540189746,
+      "thinking": false,
+      "artifact_sha256": "449df303070ecba52db217663619b1533b0b7845e40df36878fa1cf48279c8bb",
+      "output_sha256": "1d398e141961e0fa35540d863bca2bb77170c0ba1db0a94984f16dbda4a3659c",
+      "decision": "PASS_FULL_GRID_ALLOWED"
+    },
+    "Qwen/Qwen3.5-122B-A10B": {
+      "status": "pending_resources"
+    }
+  },
   "metrics": null,
-  "decision": "PENDING_TECHNICAL_SMOKES_THEN_FROZEN_FULL_GRID"
+  "decision": "QWEN36_FULL_GRID_ALLOWED_QWEN35_122B_SMOKE_PENDING"
 }

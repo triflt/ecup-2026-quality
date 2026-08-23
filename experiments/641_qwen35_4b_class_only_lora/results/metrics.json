@@ -1,6 +1,6 @@
 {
   "experiment_id": "641",
-  "status": "functional_fast_path_smoke_running",
+  "status": "functional_fast_path_smoke_failed_missing_cpython_headers",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
@@ -68,10 +68,11 @@
     "launched_at_utc": "2026-08-23T17:39:21Z",
     "changed_factor": "add exact kernels-data 0.16.0 and explicit zig cc/c++ wrappers, then rerun the same no-model CUDA forward/backward smoke",
     "gpus": 1,
-    "status": "running",
+    "status": "failed_before_model_load_missing_python_h",
+    "confirmed_cause": "Triton CUDA loader compilation includes Python.h, but the CPython 3.12 development headers are absent from the declared runtime include path",
     "kernels_data_wheel_sha256": "30efa0e6ee0261c6c5b581fed372321a79db923a3e1934d00b7675565baaffc3",
     "runtime_bundle_sha256": "0f9d73e2a2acf1e16dd9bfa2a87ccfc1cd14ce3c92f5d3b77407b92ec59d02f5"
   },
   "metrics": null,
-  "decision": "PENDING_SCREEN"
+  "decision": "PENDING_ONE_KERNEL_ONLY_RETRY_WITH_PINNED_CPYTHON_3_12_HEADERS_THEN_SCREEN"
 }
