@@ -2,7 +2,7 @@
 id = "650"
 slug = "qwen3_text_embedder"
 title = "Compact multilingual text embedder versus strict TF-IDF"
-status = "embedding_extraction_running"
+status = "rejected_on_frozen_screen"
 entrypoint = "experiments/650_qwen3_text_embedder/run_embeddings.py"
 result_file = "experiments/650_qwen3_text_embedder/results/metrics.json"
 

@@ -62,6 +62,9 @@ def test_grid_reuses_exact_prompt_and_frozen_effective_batch() -> None:
         ]
     )
     assert args.technical_smoke is True
+    source = (GRID / "train_lora.py").read_text(encoding="utf-8")
+    assert 'use_kernels=True' in source
+    assert 'optimized training kernels were requested but not activated' in source
 
 
 def test_grounding_is_exact_and_never_generates_coordinates() -> None:

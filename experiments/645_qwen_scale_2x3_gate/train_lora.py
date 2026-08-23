@@ -443,11 +443,14 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("0/1 must be distinct atomic tokens")
     model = AutoModelForMultimodalLM.from_pretrained(
         args.model_root.resolve(),
-        torch_dtype=torch.bfloat16,
+        dtype=torch.bfloat16,
         local_files_only=True,
         trust_remote_code=True,
         attn_implementation="eager",
+        use_kernels=True,
     ).to("cuda")
+    if not getattr(model, "_use_kernels", False):
+        raise RuntimeError("optimized training kernels were requested but not activated")
     model = get_peft_model(
         model,
         LoraConfig(
@@ -551,6 +554,7 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
         "epochs": EPOCHS,
         "effective_batch_size": spec.micro_batch_size * spec.gradient_accumulation,
         "evidence_auxiliary_weight": spec.evidence_auxiliary_weight,
+        "optimized_training_kernels": True,
         "target_orders": (
             ["class_first", "evidence_first"] if spec.objective == "grounded_evidence" else []
         ),

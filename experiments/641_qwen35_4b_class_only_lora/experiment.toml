@@ -36,6 +36,7 @@ lora_rank = 16
 lora_alpha = 32
 lora_dropout = 0.05
 target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+optimized_kernel_package = "kernels==0.15.2"
 
 [hypothesis]
 changed_factor = "Supervised class-only LoRA relative to fixed 4B prompting"

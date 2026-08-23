@@ -1,6 +1,6 @@
 {
   "experiment_id": "650",
-  "status": "embedding_extraction_running_via_direct_model_delivery",
+  "status": "rejected_on_frozen_screen",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "embedding_extraction": {
@@ -13,13 +13,53 @@
     "confirmed_cause": "transient_model_delivery_websocket_failure_before_user_code",
     "restarted_at_utc": "2026-08-23T12:07:31Z",
     "second_restart_at_utc": "2026-08-23T12:30:51Z",
-    "status": "running_after_confirmed_model_registry_bypass",
+    "status": "complete_and_verified",
     "third_attempt": "failed_before_user_code_same_model_registry_websocket_condition",
-    "direct_delivery_launched_at_utc": "2026-08-23T13:16:32Z"
+    "direct_delivery_launched_at_utc": "2026-08-23T13:16:32Z",
+    "dimension": 1024,
+    "finite": true,
+    "norm_min": 0.9999998808,
+    "norm_max": 1.0000001192,
+    "embeddings_sha256": "d9652aa99aa07bf81c256a996c37ee2dc20a3efbeef8ccd8ec6efa8534a99da5",
+    "rows_per_second": 146.1038912007,
+    "labels_read": 0,
+    "sealed_rows": 0
   },
-  "zero_shot": null,
-  "frozen_supervised": null,
-  "finetuned": null,
-  "integration_140": null,
-  "decision": "PENDING_EMBEDDING_EXTRACTION"
+  "zero_shot": {
+    "fold_0_macro_f1": 0.4409301446,
+    "fold_3_macro_f1": 0.4439396547,
+    "mean_macro_f1": 0.4424348997
+  },
+  "frozen_supervised": {
+    "folds": [0, 3],
+    "fold_0": {
+      "tfidf_macro_f1": 0.8103448276,
+      "embedding_macro_f1": 0.6944179844,
+      "delta": -0.1159268432
+    },
+    "fold_3": {
+      "tfidf_macro_f1": 0.8604472768,
+      "embedding_macro_f1": 0.8127047277,
+      "delta": -0.0477425491
+    },
+    "mean_macro_delta": -0.0818346961,
+    "category_delta": {
+      "БАД": -0.0354737863,
+      "Легковоспламеняющиеся": -0.1338866657
+    },
+    "corrected": 121,
+    "regressed": 281,
+    "corrected_to_regressed": 0.4306049822,
+    "screen_report_sha256": "482556ad07c810a7bbbe0c4b9659bc125215e13041bf590c7f545142c27fca9d",
+    "passed": false
+  },
+  "finetuned": {
+    "launched": false,
+    "reason": "frozen representation failed both predeclared screen folds"
+  },
+  "integration_140": {
+    "launched": false,
+    "reason": "component screen failed"
+  },
+  "decision": "NO_GO_REJECT_650"
 }

@@ -8,7 +8,12 @@
   "technical_smoke": {
     "fold": 0,
     "gpus": 1,
-    "launched_at_utc": "2026-08-23T13:09:04Z"
+    "launched_at_utc": "2026-08-23T13:09:04Z",
+    "first_attempt": "failed_confirmed_torch_linear_attention_oom",
+    "second_attempt": "failed_before_training_incompatible_kernel_package_version",
+    "retry_launched_at_utc": "2026-08-23T14:00:06Z",
+    "retry_changed_factor": "activate official optimized training kernel backend at the exact framework-required version only",
+    "retry_status": "running"
   },
   "metrics": null,
   "decision": "PENDING_TECHNICAL_SMOKE_THEN_SCREEN"
