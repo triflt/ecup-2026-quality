@@ -9,10 +9,17 @@ uses_large_teacher = false
 [reproduction]
 outer_folds = [0, 1, 2, 3, 4]
 independent_seed_count = 1
+source_seed = 42
+independent_seed = 31415
+only_changed_factor = "training_seed"
 independent_seed_must_differ_from_parent = true
 recipe_changes_allowed = false
 requires_experiment_624_recipe_manifest_sha256 = true
 comparator_experiment = 603
+source_component_experiment = 623
+one_gpu_per_fold = true
+sealed_rows_allowed = 0
+frozen_full_threshold_contract_sha256 = "c89899069890b514331243fb71b27fec1890749d3dc40032e4e1ce96db03810a"
 
 [gate]
 effect_sign_must_match = true

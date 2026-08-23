@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "exp626_human_audit_schema_v1",
+  "title": "Frozen private explanation-audit row",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "sample_sha256", "audit_id", "row_id",
+    "semantic_component", "development_fold", "category", "source_card",
+    "char_start", "char_end", "exact_span", "concept", "verdict",
+    "explanation", "evidence_relevant", "object_of_sale_correct",
+    "negation_correct", "composition_or_completeness_correct",
+    "verdict_consistent", "unsupported_fact", "strict_pass",
+    "critical_unsupported", "scope_or_negation_failure", "review_notes"
+  ],
+  "properties": {
+    "schema_version": {"const": "exp626_human_audit_row_v1"},
+    "sample_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "audit_id": {"type": "string", "pattern": "^E626-[0-9]{3}$"},
+    "row_id": {"type": "string", "minLength": 1},
+    "semantic_component": {"type": "string", "minLength": 1},
+    "development_fold": {"enum": ["0", "1", "2", "3", "4"]},
+    "category": {"enum": ["БАД", "Легковоспламеняющиеся"]},
+    "source_card": {"type": "string", "minLength": 1},
+    "char_start": {"type": "string", "pattern": "^(-1|[0-9]+)$"},
+    "char_end": {"type": "string", "pattern": "^(-1|[0-9]+)$"},
+    "exact_span": {"type": "string"},
+    "concept": {"type": "string", "minLength": 1},
+    "verdict": {"enum": ["0", "1"]},
+    "explanation": {"type": "string", "minLength": 1},
+    "evidence_relevant": {"enum": ["", "0", "1"]},
+    "object_of_sale_correct": {"enum": ["", "0", "1", "NA"]},
+    "negation_correct": {"enum": ["", "0", "1", "NA"]},
+    "composition_or_completeness_correct": {"enum": ["", "0", "1", "NA"]},
+    "verdict_consistent": {"enum": ["", "0", "1"]},
+    "unsupported_fact": {"enum": ["", "0", "1"]},
+    "strict_pass": {"enum": ["", "0", "1"]},
+    "critical_unsupported": {"enum": ["", "0", "1"]},
+    "scope_or_negation_failure": {"enum": ["", "0", "1"]},
+    "review_notes": {"type": "string"}
+  }
+}

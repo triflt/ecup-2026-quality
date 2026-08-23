@@ -1,0 +1,20 @@
+{
+  "schema_version": "exp626_frozen_audit_spec_v1",
+  "namespace": "exp626-independent-explanation-audit-v1",
+  "sample_size": 300,
+  "minimum_strict_pass": 282,
+  "maximum_critical_unsupported": 0,
+  "maximum_scope_or_negation_failure": 0,
+  "allowed_categories": ["БАД", "Легковоспламеняющиеся"],
+  "allowed_concepts": [
+    "OBJECT_OF_SALE",
+    "COMPOSITION",
+    "COMPLETENESS",
+    "FUEL_OR_IGNITION",
+    "NEGATION",
+    "NO_EVIDENCE"
+  ],
+  "required_exp490_exclusions": 200,
+  "required_exp622_exclusions": 300,
+  "sealed_rows_allowed": 0
+}
