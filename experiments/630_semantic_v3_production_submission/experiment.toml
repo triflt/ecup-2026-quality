@@ -7,6 +7,9 @@ uses_large_teacher = false
 
 [assembly]
 requires_successful_parent = true
+contract_cli = "production_contract.py"
+contract_scaffold_only = true
+official_container_schema_required_for_final_archive = true
 zip_integrity_required = true
 sha256_required = true
 schema_validation_required = true
