@@ -1,0 +1,21 @@
+{
+  "experiment_id": "683",
+  "status": "technical_smoke_prepared",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "seed": 42,
+  "validation": {
+    "protocol": "frozen folds 0/3, then 1/2/4 only after screen",
+    "bad_f1": null,
+    "flammable_f1": null,
+    "flammable_average_precision": null,
+    "macro_f1": null,
+    "fold_scores": []
+  },
+  "runtime": {
+    "technical_smoke_required": true,
+    "gpu_jobs_launched": 0
+  },
+  "artifacts": [],
+  "decision": "OPEN_TECHNICAL_SMOKE_ONLY"
+}
