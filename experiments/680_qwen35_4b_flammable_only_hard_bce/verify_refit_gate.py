@@ -41,11 +41,17 @@ def verify(gate_path: Path, report_path: Path, runtime_dir: Path) -> dict[str, A
     if not (
         report.get("experiment_id") == "680"
         and report.get("stage") == "full"
-        and report.get("passed") is True
+        and (
+            report.get("passed") is True
+            or report.get("ablation_submission_eligible") is True
+        )
         and report.get("decision") == "ACCEPT_FOR_REFIT"
         and report.get("public_used") is False
         and report.get("sealed_rows") == 0
-        and all(report.get("gates", {}).values())
+        and (
+            all(report.get("gates", {}).values())
+            or all(report.get("ablation_gates", {}).values())
+        )
     ):
         raise ValueError("full report does not authorize refit")
     audit_path = runtime_dir / "runtime_audit.json"

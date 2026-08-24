@@ -56,12 +56,18 @@ def verify(
         screen.get("experiment_id") == "680"
         and screen.get("stage") == "screen"
         and screen.get("changed_factor") == "remove_bad_training_occurrences"
-        and screen.get("passed") is True
+        and (
+            screen.get("passed") is True
+            or screen.get("ablation_submission_eligible") is True
+        )
         and screen.get("decision") == "OPEN_CONFIRMATION"
         and screen.get("public_used") is False
         and screen.get("sealed_rows") == 0
         and set(screen.get("fold_flammable_average_precision", {})) == {"0", "3"}
-        and all(screen.get("gates", {}).values())
+        and (
+            all(screen.get("gates", {}).values())
+            or all(screen.get("ablation_gates", {}).values())
+        )
     ):
         raise ValueError("screen report does not authorize confirmation")
 

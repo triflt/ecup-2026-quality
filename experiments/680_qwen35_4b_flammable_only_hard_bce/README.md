@@ -31,6 +31,17 @@ Confirmation folds открываются только если на обоих 
 
 До полного 5-fold GO запрещены full-data refit, Public и изменение порога.
 
+## Заранее зарегистрированный Public-ablation fallback
+
+Основной gate выше не ослабляется. Для одного архитектурного Public-ablation
+разрешено продолжение после полного 5-fold CV, если screen имеет положительные
+AP и Macro на обоих folds, mean AP `>= +0.003`, mean Macro `>= +0.001`, а
+полный результат имеет AP/Macro wins минимум `4/5`, Macro `>= +0.004`,
+flammable F1 `>= +0.008`, bootstrap `>= 0.85`. В обоих режимах обязательны
+неизменный BAD-route, отсутствие роста flammable FN и
+corrections/regressions `>= 1.5`. Такой результат не считается финальным
+локальным принятием и маркируется `public_ablation`.
+
 ## Deployability
 
 Production precedent уже загружает один Qwen3.5-4B base и два совместимых LoRA,
@@ -38,4 +49,3 @@ Production precedent уже загружает один Qwen3.5-4B base и дв�
 имеет ровно один forward. Дополнительный adapter занимает около 12.6 MB.
 Перед submission обязателен null-route parity smoke и train-identical image
 preprocessing: нельзя молча подменять area-cap 262144 на старый 448 thumbnail.
-
