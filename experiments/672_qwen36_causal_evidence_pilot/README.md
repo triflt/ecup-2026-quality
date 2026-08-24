@@ -67,9 +67,18 @@ python experiments/672_qwen36_causal_evidence_pilot/extract_images.py \
   --runtime experiments/672_qwen36_causal_evidence_pilot/.local/pilot_v1/pilot_runtime.jsonl \
   --images-zip /absolute/path/images.zip \
   --output-dir experiments/672_qwen36_causal_evidence_pilot/.local/pilot_v1/images
+
+python experiments/672_qwen36_causal_evidence_pilot/prepare_model_images.py \
+  --runtime experiments/672_qwen36_causal_evidence_pilot/.local/pilot_v1/pilot_runtime.jsonl \
+  --input-dir experiments/672_qwen36_causal_evidence_pilot/.local/pilot_v1/images \
+  --output-dir experiments/672_qwen36_causal_evidence_pilot/.local/pilot_v1/model_images
 ```
 
-`build_bundle.py` собирает ровно runtime, 40 изображений, runner и frozen spec.
+`prepare_model_images.py` заранее применяет тот же предел 262 144 пикселя, который
+иначе применил бы runner, и одинаковое детерминированное JPEG-кодирование для
+обеих моделей. Это удерживает upload bundle ниже транспортного лимита без
+изменения сравниваемого фактора. `build_bundle.py` собирает ровно runtime,
+40 подготовленных изображений, runner и frozen spec.
 `build_presets.py` производит два private remote compute preset из уже успешных 4B/27B
 шаблонов; `.local` передаётся как явный `--context-dir` и затем как
 `--custom-preset-context`, поэтому bundle остаётся внутри разрешённого upload
