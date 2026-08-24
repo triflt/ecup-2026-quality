@@ -1,0 +1,44 @@
+{
+  "decision": "BLOCK_OOF_REFIT_PENDING_SEPARATE_POLICY",
+  "diagnostic_only": true,
+  "experiment_id": "681",
+  "folds": [
+    {
+      "in_sample_ambiguous_soft_targets": 57,
+      "mean_absolute_logit_difference": 1.9076137609649122,
+      "mean_absolute_temperature_2_soft_target_difference": 0.040695770003941374,
+      "occurrences": 2280,
+      "oof_ambiguous_soft_targets": 108,
+      "outer_fold": 0,
+      "pearson_logit_correlation": 0.9415070752777526,
+      "sign_disagreement_occurrences": 68,
+      "unique_ids": 1736
+    },
+    {
+      "in_sample_ambiguous_soft_targets": 26,
+      "mean_absolute_logit_difference": 1.3581620065789475,
+      "mean_absolute_temperature_2_soft_target_difference": 0.030703098071475147,
+      "occurrences": 2280,
+      "oof_ambiguous_soft_targets": 118,
+      "outer_fold": 1,
+      "pearson_logit_correlation": 0.9591774108335301,
+      "sign_disagreement_occurrences": 44,
+      "unique_ids": 1736
+    },
+    {
+      "in_sample_ambiguous_soft_targets": 36,
+      "mean_absolute_logit_difference": 1.405701754385965,
+      "mean_absolute_temperature_2_soft_target_difference": 0.03925342633457092,
+      "occurrences": 2280,
+      "oof_ambiguous_soft_targets": 135,
+      "outer_fold": 3,
+      "pearson_logit_correlation": 0.9417426165478461,
+      "sign_disagreement_occurrences": 70,
+      "unique_ids": 1736
+    }
+  ],
+  "refit_target_scope": "development_rowwise_oof_plus_label_free_sealed_teacher0",
+  "schema_version": 1,
+  "validated_cv_target_scope": "outer_fold_matched_in_sample_teacher",
+  "uses_labels_or_public": false
+}

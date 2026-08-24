@@ -32,9 +32,17 @@ validation blind, but the targets are in-sample and may be overconfident; this
 risk is explicit and is the reason for the two-fold screen.
 
 Ordinary five-fold OOF target merging is forbidden for outer CV because a
-teacher for fold `j != k` has seen labels from student outer fold `k`. For the
-final all-data refit only, rowwise OOF teacher scores are allowed because there
-is no remaining outer validation and each row's teacher excluded that row.
+teacher for fold `j != k` has seen labels from student outer fold `k`.
+
+Rowwise OOF scores are leakage-safe for a final all-data refit, but they are
+not recipe-equivalent to the validated outer-CV targets: outer CV uses
+fold-matched, in-sample teacher scores. The frozen target-shift diagnostic found
+44--70 sign disagreements per 2,280 occurrences, logit MAE 1.36--1.91 and
+2--5x more ambiguous OOF soft targets on folds 0/1/3. Therefore the existing
+OOF full-runtime builder is fail-closed. It may run only after a separately
+preregistered OOF-refit ablation policy is accepted. A recipe-equivalent final
+refit instead requires a full-data 27B teacher which scores its own training
+rows; neither route is authorized merely by a successful 681 CV gate.
 
 The final 2,590-occurrence flammable multiset contains 2,242 development and
 348 sealed-holdout occurrences (1,562/236 unique IDs). The five accepted 654
@@ -59,8 +67,12 @@ scored label-free.
 4. Evaluate against exact 641 control predictions without changing thresholds,
    weights, rules or stop step.
 5. Open folds 1/2/4 only if the screen gate passes.
-6. Allow full-data refit and packaging only after the full gate or the separately
-   preregistered Public-ablation fallback below.
+6. After the full gate, choose and preregister a final-target policy. Full-data
+   refit remains closed until either a recipe-equivalent full-data in-sample
+   teacher is available or the OOF-refit distribution shift is explicitly
+   accepted as a separate ablation.
+7. Package only a refit that passes the target-policy gate and the full runtime
+   rehearsal, or the separately preregistered Public-ablation fallback below.
 
 ## Metrics and gates
 
