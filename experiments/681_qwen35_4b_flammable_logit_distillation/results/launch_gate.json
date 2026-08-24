@@ -1,8 +1,11 @@
 {
-  "allowed_folds": [],
+  "allowed_folds": [
+    0,
+    3
+  ],
   "changed_factor": "hard_bce_to_fixed_hard_plus_teacher_soft_bce",
   "control_experiment_id": 641,
-  "decision": "WAIT_TEACHER_TARGETS",
+  "decision": "OPEN_SCREEN",
   "experiment_id": 681,
   "expected_optimizer_steps": 143,
   "forbidden": [
@@ -18,16 +21,34 @@
   "ordinary_oof_merge_used": false,
   "public_submissions": 0,
   "public_used": false,
-  "runtime_contract_sha256": {},
-  "runtime_payload_sha256": {},
+  "runtime_contract_sha256": {
+    "0": "212238d5c00767c6e65561aadfc6d738d98bcf2661735a1b75f64f704c029830",
+    "3": "1a9165d4855a5f7dfcd3d00270d1ff4e2cbd8e4949804102684149e4c94cf8ec"
+  },
+  "runtime_payload_sha256": {
+    "0": {
+      "train.jsonl": "c130803f1d31c5a127002f5ea629140c03ab7fe4efd30d3d12f88ef2fe3e3f09",
+      "validation.jsonl": "109807781797f51ec8c1d98d0385aef2e9edd0d89183c4a44aab76e2a26f56bc"
+    },
+    "3": {
+      "train.jsonl": "2f32299bfb8afcb718f2db5f821d0ffc544b2c750a631cc3ac16aafc8ae9ab5e",
+      "validation.jsonl": "bbbbae3f4ddb38bf3af238cd53dd8fc1b851b04598101ab7b57809e73c7a2257"
+    }
+  },
   "screen_folds": [0, 3],
   "sealed_rows": 0,
   "soft_loss_weight": 0.5,
-  "teacher_archive_sha256": {},
-  "teacher_scores_sha256": {},
+  "teacher_archive_sha256": {
+    "0": "d58a273fcabeeda1c538ad30aea9aeec22d977cbc654fae132d6e261960bcc26",
+    "3": "30ce351fcbb26c93aad3f81d4ae26e7bf34925f0ed43602a244ddd2bfc3d6036"
+  },
+  "teacher_scores_sha256": {
+    "0": "2dbbb3e1a16be024d4c62f03d150970a1ed62f9afdbc3d98fd8cd69cfc3154ba",
+    "3": "2866f37b2e2cace189c3ac6b0052f8b027dd87fbd9177247ee0ef3473e2bad19"
+  },
   "teacher_scoring_experiment_id": 662,
   "temperature": 2.0,
   "threshold": 0.0,
   "threshold_tuned": false,
-  "training_lane_open": false
+  "training_lane_open": true
 }
