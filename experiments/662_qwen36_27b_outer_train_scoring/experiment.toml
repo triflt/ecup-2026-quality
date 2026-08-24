@@ -1,6 +1,6 @@
 id = "662"
 name = "qwen36_27b_outer_train_scoring"
-status = "full_wave_2_running"
+status = "accepted_full_target_set"
 parent = "659_qwen36_27b_flammable_equal_logit_blend"
 data_version = "competition_train_v1"
 evaluation_version = "semantic_family_v3"
