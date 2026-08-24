@@ -2,9 +2,9 @@
 
 ## Статус
 
-`SCREEN_GATE_OPEN`. Это ближайшая однофакторная абляция, которая при
-полном локальном GO может быть реально упакована в submission. 27B model и её
-adapter не используются ни при обучении, ни при инференсе 679.
+`SCREEN_RUNNING`. Это ближайшая однофакторная абляция, которая при полном
+локальном GO может быть реально упакована в submission. 27B model и её adapter
+не используются ни при обучении, ни при инференсе 679.
 
 ## Недостаток и механизм
 
@@ -47,6 +47,20 @@ Screen открывает folds `1/2/4`, только если:
 минимум на 4/5 folds и mean `>= +0.005`, BAD guard соблюдён,
 corrections/regressions `>= 1.5`, FN не растёт и semantic-singleton slice
 положителен.
+
+Standalone-метрики не дают права на запуск confirmation или refit. После
+каждого standalone gate тот же кандидат проверяется в checksum-locked
+semantic-v3 replay полной production fusion. В production меняется только
+Qwen3.5-сигнал для flammable; BAD использует исходный сигнал побайтово, а
+robust-base, Qwen3-VL, rank transform, веса, пороги и donor-only exact/name
+rules остаются неизменными.
+
+Production screen обязан выиграть folds `0/3`, дать средний fold Macro gain
+`>=+0.0015`, corrections/regressions `>=1.5` и не увеличить FN. Полный
+production gate требует положительные folds `1/2/4`, не менее `4/5` побед,
+Macro gain `>=+0.006`, flammable F1 gain `>=+0.012` и grouped component
+bootstrap `P(gain>0)>=0.90`. Confirmation gate криптографически связан с SHA
+обоих принятых screen reports.
 
 ## Стоимость и deployability
 

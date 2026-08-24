@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "experiment_id": "678",
-  "updated_at": "2026-08-24T12:31:00Z",
+  "updated_at": "2026-08-24T13:35:00Z",
   "captain_contract": {
     "validation_owner": true,
     "critic_of_parallel_agent": true,
@@ -102,7 +102,7 @@
     {
       "id": "deployable_4b_lower_learning_rate",
       "parent_experiment_id": "679",
-      "status": "preparing_frozen_screen",
+      "status": "screen_folds_0_3_running",
       "eligibility": "submission_ready_only_after_full_cv_refit_and_runtime_gate",
       "open_condition": "capacity_available_and_no_duplicate_job",
       "changed_factor": "learning rate only: 0.0002 to 0.0001",
@@ -116,6 +116,10 @@
       "validation": {
         "screen_folds": [0, 3],
         "confirmation_folds": [1, 2, 4],
+        "standalone_gate_required": true,
+        "frozen_full_production_replay_gate_required": true,
+        "production_replacement_scope": "flammable_qwen35_signal_only",
+        "bad_route_byte_identical": true,
         "threshold_tuned": false,
         "public_used": false
       },
