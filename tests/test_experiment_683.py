@@ -59,3 +59,34 @@ def test_target_topology_is_text_only(monkeypatch) -> None:
     assert len(targets) == 132
     assert counts == {"k_proj": 24, "o_proj": 42, "q_proj": 42, "v_proj": 24}
     assert all("vision" not in name and "audio" not in name for name in targets)
+
+
+def test_screen_promotion_requires_self_hashed_acceptance(tmp_path, monkeypatch) -> None:
+    monkeypatch.syspath_prepend(str(HERE))
+    contract = load("contract683c", HERE / "contract.py")
+    promoter = load("promoter683", HERE / "open_screen_gate.py")
+    acceptance = {
+        "schema_version": 1,
+        "experiment_id": "683",
+        "fold": 0,
+        "technical_smoke": True,
+        "archive_sha256": "a" * 64,
+        "predictions_sha256": "b" * 64,
+        "runtime_contract_sha256": "c" * 64,
+        "rows": 2,
+        "exact_runtime_binding": True,
+        "adapter_reload_parity": True,
+        "peak_cuda_memory_bytes": 20 * 1024**3,
+        "target_module_count": 132,
+        "decision": "ACCEPT_ARTIFACT",
+    }
+    acceptance["acceptance_sha256"] = contract.canonical_sha256(acceptance)
+    acceptance_path = tmp_path / "acceptance.json"
+    acceptance_path.write_text(json.dumps(acceptance))
+    output = tmp_path / "screen_gate.json"
+    gate = promoter.open_gate(
+        HERE / "results/launch_gate.json", acceptance_path, output
+    )
+    assert gate["decision"] == "OPEN_SCREEN"
+    assert gate["allowed_folds"] == [0, 3]
+    assert contract.verify_self_hash(gate)

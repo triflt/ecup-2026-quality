@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import zipfile
 from pathlib import Path
 
@@ -21,6 +22,7 @@ from contract import (
     MODEL_ID,
     MODEL_REVISION,
     SCREEN_FOLDS,
+    canonical_sha256,
     sha256_file,
     verify_self_hash,
 )
@@ -79,6 +81,20 @@ def verify(archive_path: Path, runtime_dir: Path, fold: int, technical_smoke: bo
         raise ValueError(f"output contract mismatch: {mismatch}")
     if float(contract.get("reload_score_abs_delta", 1.0)) > 1e-4:
         raise ValueError("adapter reload parity failed")
+    if contract.get("model_class") != "Gemma4ForConditionalGeneration":
+        raise ValueError("unexpected model class")
+    required_processor_keys = {
+        "attention_mask",
+        "image_position_ids",
+        "input_ids",
+        "mm_token_type_ids",
+        "pixel_values",
+    }
+    if not required_processor_keys.issubset(contract.get("processor_output_keys", [])):
+        raise ValueError("Gemma processor contract is incomplete")
+    peak_memory = int(contract.get("peak_cuda_memory_bytes", 0))
+    if peak_memory <= 0 or peak_memory >= 75 * 1024**3:
+        raise ValueError("technical smoke has insufficient H100 memory reserve")
     if contract.get("artifacts", {}).get("predictions.jsonl") != sha256_bytes(predictions_payload):
         raise ValueError("prediction checksum mismatch")
     if len(predictions) != expected_rows:
@@ -95,7 +111,21 @@ def verify(archive_path: Path, runtime_dir: Path, fold: int, technical_smoke: bo
     targets = adapter_config.get("target_modules")
     if not isinstance(targets, list) or len(targets) != EXPECTED_TARGET_TOTAL:
         raise ValueError("adapter target topology mismatch")
-    return {
+    pattern = re.compile(
+        r"^model\.language_model\.layers\.(\d+)\.self_attn\."
+        r"(q_proj|k_proj|v_proj|o_proj)$"
+    )
+    target_counts = {name: 0 for name in EXPECTED_TARGET_COUNTS}
+    for target in targets:
+        match = pattern.fullmatch(str(target))
+        if match is None:
+            raise ValueError(f"non-text LoRA target: {target}")
+        target_counts[match.group(2)] += 1
+    if target_counts != EXPECTED_TARGET_COUNTS:
+        raise ValueError("adapter target counts drifted")
+    if adapter_config.get("base_model_name_or_path") not in {MODEL_ID, "/hf_models"}:
+        raise ValueError("adapter base model mismatch")
+    result = {
         "schema_version": 1,
         "experiment_id": EXPERIMENT_ID,
         "fold": fold,
@@ -106,8 +136,12 @@ def verify(archive_path: Path, runtime_dir: Path, fold: int, technical_smoke: bo
         "rows": len(predictions),
         "exact_runtime_binding": True,
         "adapter_reload_parity": True,
+        "peak_cuda_memory_bytes": peak_memory,
+        "target_module_count": len(targets),
         "decision": "ACCEPT_ARTIFACT",
     }
+    result["acceptance_sha256"] = canonical_sha256(result)
+    return result
 
 
 def sha256_bytes(payload: bytes) -> str:
