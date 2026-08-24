@@ -1,0 +1,56 @@
+[experiment]
+id = "661"
+slug = "qwen35_4b_class_only_full_control"
+title = "Complete Qwen3.5-4B class-only 5-fold control"
+status = "remaining_folds_open"
+entrypoint = "experiments/641_qwen35_4b_class_only_lora/run_fold.py"
+result_file = "experiments/661_qwen35_4b_class_only_full_control/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+source_experiment = "641"
+evaluation_consumer = "659"
+remaining_folds = [1, 2, 4]
+sealed_rows = 0
+
+[hypothesis]
+changed_factor = "Only outer fold changes relative to accepted 641 screen recipe"
+control = "641 folds 0/3"
+mechanism = "Complete OOF control required for an unbiased full evaluation of frozen route 659"
+falsification = "Reject a fold on any recipe, runtime, checksum, identity, finite-score, or leakage mismatch"
+
+[training]
+model_id = "Qwen/Qwen3.5-4B"
+model_revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+objective = "class_only"
+seed = 42
+epochs = 1
+learning_rate = 0.0002
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+runtime_backend = "legacy_eager"
+runtime_micro_batch_size = 2
+runtime_gradient_accumulation = 8
+effective_batch_size = 16
+
+[validation]
+version = "semantic_family_v3"
+continuation_gate = "experiments/661_qwen35_4b_class_only_full_control/results/continuation_gate.json"
+threshold = 0.0
+threshold_tuned = false
+public_used = false
+sealed_rows = 0
+
+[budget]
+jobs = 3
+gpu_per_job = 1
+maximum_parallel_gpus = 16
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"
+private_preset_directory = ".local/compute"
+

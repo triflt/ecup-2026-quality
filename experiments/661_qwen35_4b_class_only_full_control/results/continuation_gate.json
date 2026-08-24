@@ -1,0 +1,19 @@
+{
+  "allowed_folds": [1, 2, 4],
+  "control_experiment_id": "641",
+  "control_screen_folds": [0, 3],
+  "control_screen_macro_delta": 0.3981751285635883,
+  "control_screen_passed": true,
+  "decision": "OPEN_REMAINING_CONTROL_FOLDS",
+  "effective_batch_size": 16,
+  "experiment_id": "661",
+  "micro_batch_size": 2,
+  "gradient_accumulation": 8,
+  "public_used": false,
+  "runtime_backend": "legacy_eager",
+  "sealed_rows": 0,
+  "target_consumer_experiment_id": "659",
+  "threshold": 0.0,
+  "threshold_tuned": false
+}
+

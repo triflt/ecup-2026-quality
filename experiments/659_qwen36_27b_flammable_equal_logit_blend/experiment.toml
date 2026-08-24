@@ -4,6 +4,7 @@ slug = "qwen36_27b_flammable_equal_logit_blend"
 title = "Equal-logit 4B and 27B blend for the flammable category"
 status = "screen_accepted_remaining_folds_waiting_for_gpu"
 entrypoint = "experiments/659_qwen36_27b_flammable_equal_logit_blend/evaluate_screen.py"
+full_evaluator = "experiments/659_qwen36_27b_flammable_equal_logit_blend/evaluate_full.py"
 result_file = "experiments/659_qwen36_27b_flammable_equal_logit_blend/results/metrics.json"
 
 [data]
@@ -28,6 +29,8 @@ minimum_screen_mean_delta = 0.0015
 maximum_category_drop = 0.002
 minimum_corrected_to_regressed = 1.5
 required_full_fold_wins = 4
+minimum_full_mean_delta = 0.0015
+full_screen_reproduction_tolerance = 1e-12
 
 [hypothesis]
 parent_experiment = "658"

@@ -93,3 +93,15 @@ def test_equal_blend_changes_only_flammable(tmp_path: Path) -> None:
     assert result["corrected"] == 2
     assert result["regressed"] == 0
     assert result["weights"] == {"641": 0.5, "654": 0.5}
+
+
+def test_full_evaluator_requires_exact_screen_gate() -> None:
+    spec = importlib.util.spec_from_file_location("exp659_full", EXPERIMENT / "evaluate_full.py")
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    gate = module.validate_screen_gate(EXPERIMENT / "results/screen_acceptance_audit.json")
+    assert gate["decision"] == "OPEN_REMAINING_FOLDS"
+    assert module.FOLDS == (0, 1, 2, 3, 4)
+    assert module.BASELINE_WEIGHT == module.LARGE_WEIGHT == 0.5
+    assert module.THRESHOLD == 0.0

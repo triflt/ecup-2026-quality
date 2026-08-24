@@ -1,0 +1,9 @@
+{
+  "decision": "RUN_REMAINING_CONTROL_FOLDS",
+  "experiment_id": "661",
+  "folds": [1, 2, 4],
+  "public_used": false,
+  "sealed_rows": 0,
+  "status": "remaining_folds_open"
+}
+
