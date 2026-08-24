@@ -87,7 +87,36 @@ def evaluate(
         "public_used": False,
         "passing_action": SPEC["passing_action"],
     }
-    if incomplete:
+    automatic_format = {
+        alias: sum(
+            candidates_by_id[key]["automatic_contract_valid"].lower() == "true"
+            for key, value in mapping.items()
+            if value["candidate_alias"] == alias
+        )
+        for alias in SPEC["candidate_models"]
+    }
+    if automatic_format["qwen36_27b"] < SPEC["required_candidate_format_count"]:
+        result.update(
+            {
+                "decision": "NO_GO_REJECT_27B_EXPLANATION_SCALE_UP",
+                "scores": {
+                    alias: {
+                        "rows": SPEC["rows"],
+                        "automatic_contract_valid": automatic_format[alias],
+                    }
+                    for alias in SPEC["candidate_models"]
+                },
+                "gates": {"qwen36_format_and_verdict_40_of_40": False},
+                "human_review_skipped": True,
+                "human_review_skipped_reason": (
+                    "The preregistered automatic 40/40 gate is already impossible; "
+                    "human ratings cannot reverse it."
+                ),
+                "classification_training_authorized": False,
+                "full_teacher_extraction_authorized": False,
+            }
+        )
+    elif incomplete:
         result.update(
             {
                 "decision": "WAIT_FOR_COMPLETE_80_CANDIDATE_REVIEW",
@@ -101,10 +130,6 @@ def evaluate(
             audit_ids = [key for key, value in mapping.items() if value["candidate_alias"] == alias]
             if len(audit_ids) != SPEC["rows"]:
                 raise ValueError(f"unblinding map has wrong count for {alias}")
-            automatic_format = sum(
-                candidates_by_id[key]["automatic_contract_valid"].lower() == "true"
-                for key in audit_ids
-            )
             counts = Counter()
             for key in audit_ids:
                 review = reviews_by_id[key]
@@ -112,7 +137,7 @@ def evaluate(
                     counts[field] += review[field].strip().lower() == "yes"
             scores[alias] = {
                 "rows": len(audit_ids),
-                "automatic_contract_valid": automatic_format,
+                "automatic_contract_valid": automatic_format[alias],
                 "verdict_consistent": counts["review_verdict_consistent"],
                 "evidence_relevant": counts["review_evidence_relevant"],
                 "object_relation_correct": counts["review_object_relation_correct"],

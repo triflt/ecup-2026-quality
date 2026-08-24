@@ -2,7 +2,7 @@
 id = "672"
 slug = "qwen36_causal_evidence_pilot"
 title = "Fresh paired Qwen3.5-4B versus Qwen3.6-27B causal evidence pilot"
-status = "preflight_passed_awaiting_frozen_two_model_generation"
+status = "no_go_reject_27b_explanation_scale_up"
 entrypoint = "experiments/672_qwen36_causal_evidence_pilot/build_pilot.py"
 result_file = "experiments/672_qwen36_causal_evidence_pilot/results/metrics.json"
 

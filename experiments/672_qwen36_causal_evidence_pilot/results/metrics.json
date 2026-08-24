@@ -1,7 +1,7 @@
 {
   "schema_version": "exp672_metrics_v1",
   "experiment_id": "672",
-  "status": "PREFLIGHT_PASSED_AWAITING_FROZEN_TWO_MODEL_GENERATION",
+  "status": "NO_GO_REJECT_27B_EXPLANATION_SCALE_UP",
   "parent_decision": "EXP670_NO_GO_REJECT_CAUSAL_TARGETS",
   "pilot_rows": 40,
   "candidate_models": ["qwen35_4b", "qwen36_27b"],
@@ -9,12 +9,37 @@
   "classification_training_authorized": false,
   "full_teacher_extraction_authorized": false,
   "public_submissions": 0,
-  "gpu_hours_spent": 0.0,
+  "measured_generation_gpu_hours": 0.1142204324,
   "runtime_sha256": "3c8c212653764744753fa35b167cbd30509c11e276d659cabdcb9ac079a03e8a",
   "bundle_manifest_sha256": "04a69731e41d728575d6cef27739f0c40d701ca0deaf00d56f0bee77c3d8fdc9",
   "preset_audits_clean": 2,
   "preset_dry_runs_passed": 2,
   "registered_generation_jobs_failed_before_model_load": 2,
-  "generation_rows_completed": 0,
-  "controlled_retry_authorized": true
+  "generation_rows_completed": 80,
+  "controlled_retry_authorized": false,
+  "controlled_retry_succeeded": true,
+  "qwen35_4b": {
+    "artifact_sha256": "e8588e67a9814db6897309be788eaebd50f10f5666ae07723afd49b2fe3685d5",
+    "elapsed_seconds": 161.4626997578889,
+    "contract_valid_rows": 26,
+    "contract_invalid_rows": 14,
+    "verdict_lock_failures": 2
+  },
+  "qwen36_27b": {
+    "artifact_sha256": "7ceaa3f420ff30bc01c2f3fc72f5ed49c91ec54fecce3dee279b1f5721599d7a",
+    "elapsed_seconds": 249.73085702210665,
+    "contract_valid_rows": 38,
+    "contract_invalid_rows": 2,
+    "verdict_lock_failures": 0
+  },
+  "frozen_gate": {
+    "required_qwen36_contract_valid_rows": 40,
+    "actual_qwen36_contract_valid_rows": 38,
+    "passed": false
+  },
+  "blind_packet_sha256": "cf4bf7c8be67fc99a13c829348c7cea3f836405f6a008c37716c9aea8da473e9",
+  "score_sha256": "3edcb2c3c736b19429a70b853b1e0014102896c436b2c894e6e59ce1c0f30ff3",
+  "human_review_rows_completed": 0,
+  "human_review_skipped": true,
+  "decision": "NO_GO_REJECT_27B_EXPLANATION_SCALE_UP"
 }

@@ -61,7 +61,13 @@ def test_parser_rejects_extra_text_and_schema_keys() -> None:
     assert errors == ["schema_keys_mismatch"]
 
 
-def _write_review_fixture(base: Path, *, q27_relevant: int, q4_relevant: int) -> tuple[Path, Path, Path]:
+def _write_review_fixture(
+    base: Path,
+    *,
+    q27_relevant: int,
+    q4_relevant: int,
+    q27_contract_valid: int = 40,
+) -> tuple[Path, Path, Path]:
     candidates = base / "candidates.csv"
     reviews = base / "reviews.csv"
     manifest_path = base / "manifest.json"
@@ -87,7 +93,13 @@ def _write_review_fixture(base: Path, *, q27_relevant: int, q4_relevant: int) ->
             for index in range(40):
                 audit_id = f"{alias}-{index}"
                 mapping[audit_id] = {"row_id": str(index), "candidate_alias": alias}
-                cw.writerow({"audit_id": audit_id, "automatic_contract_valid": "true"})
+                contract_valid = alias != "qwen36_27b" or index < q27_contract_valid
+                cw.writerow(
+                    {
+                        "audit_id": audit_id,
+                        "automatic_contract_valid": str(contract_valid).lower(),
+                    }
+                )
                 rw.writerow(
                     {
                         "audit_id": audit_id,
@@ -147,3 +159,29 @@ def test_evaluator_waits_for_complete_review(tmp_path: Path) -> None:
         output=tmp_path / "wait.json",
     )
     assert result["decision"] == "WAIT_FOR_COMPLETE_80_CANDIDATE_REVIEW"
+
+
+def test_evaluator_rejects_before_human_review_when_automatic_gate_is_impossible(
+    tmp_path: Path,
+) -> None:
+    evaluator = _module("exp672_evaluator_early_stop_test", "evaluate_review.py")
+    candidates, reviews, manifest = _write_review_fixture(
+        tmp_path, q27_relevant=34, q4_relevant=30, q27_contract_valid=38
+    )
+    rows = list(csv.DictReader(reviews.open(encoding="utf-8")))
+    for row in rows:
+        for field in evaluator.RATING_FIELDS:
+            row[field] = ""
+    with reviews.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=rows[0])
+        writer.writeheader()
+        writer.writerows(rows)
+    result = evaluator.evaluate(
+        candidates=candidates,
+        reviews=reviews,
+        private_manifest=manifest,
+        output=tmp_path / "early_stop.json",
+    )
+    assert result["decision"] == "NO_GO_REJECT_27B_EXPLANATION_SCALE_UP"
+    assert result["scores"]["qwen36_27b"]["automatic_contract_valid"] == 38
+    assert result["human_review_skipped"] is True
