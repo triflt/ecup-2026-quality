@@ -42,6 +42,7 @@ def build(args: argparse.Namespace) -> str:
         "tokenizers": scalar(base, "TOKENIZERS_PARALLELISM", indent=4),
         "allocator": scalar(base, "PYTORCH_ALLOC_CONF", indent=4),
     }
+    technical_flag = " --technical-smoke" if args.technical_smoke else ""
     command = (
         "mkdir -p /work/input /work/vendor /work/images /work/output && "
         "python -c 'import os, urllib.request; urllib.request.urlretrieve(os.environ[\"BUNDLE_URL\"], \"/work/input/bundle.tar.gz\")' && "
@@ -60,7 +61,9 @@ def build(args: argparse.Namespace) -> str:
         "--model-revision 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a "
         "--vendor /work/vendor --output-dir /work/output "
         "--runtime-backend legacy_eager --micro-batch-size-override 2"
+        f"{technical_flag}"
     )
+    output_name = f"qwen_lr_f{args.fold}" + ("_smoke" if args.technical_smoke else "")
     return f"""job:
   generate_name: qwen-lr
   time_limit: {values['time_limit']}
@@ -82,7 +85,7 @@ def build(args: argparse.Namespace) -> str:
     - {{type: files, src: {args.train_lora_patch}, dst: /work/patch/train_lora.py}}
     {model_inputs[0]}
   output:
-    - {{type: files, name: qwen_lr_f{args.fold}, src: /work/output/, mask: "**/*"}}
+    - {{type: files, name: {output_name}, src: /work/output/, mask: "**/*"}}
 """
 
 
@@ -92,6 +95,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--bundle-url-file", type=Path, required=True)
     result.add_argument("--gate", type=Path, required=True)
     result.add_argument("--train-lora-patch", type=Path, required=True)
+    result.add_argument("--technical-smoke", action="store_true")
     result.add_argument("--fold", type=int, required=True)
     result.add_argument("--output", type=Path, required=True)
     return result

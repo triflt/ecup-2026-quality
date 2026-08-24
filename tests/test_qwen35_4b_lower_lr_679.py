@@ -161,6 +161,7 @@ def test_private_preset_preserves_4b_recipe_and_rejects_closed_gate(tmp_path: Pa
             "bundle_url_file": url,
             "gate": gate_path,
             "train_lora_patch": patch,
+            "technical_smoke": False,
             "fold": 0,
             "output": tmp_path / "preset.yml",
         },
