@@ -106,6 +106,10 @@
 - `681`: следующий deployable ход — перенос outer-safe teacher scores 27B в
   4B. Обычный OOF merge запрещён как second-level leakage; outer-fold
   validation и её метки не попадают в teacher-scoring или student training.
+  Пять development-target файлов не покрывают 236 уникальных sealed-товаров
+  потенциального full refit. Дополнительный label-free расчёт teacher 0 с
+  точной `id/global_index`-привязкой разрешён только после полного CV-gate 681;
+  до этого GPU под него не резервируются.
 - `650`: отклонён на frozen folds 0/3. Эмбеддер проиграл TF-IDF `−0,115927` и
   `−0,047743` Macro F1, ухудшил обе категории и дал 121 исправление против 281
   ухудшения. Дообучение и интеграция в 140 остановлены по заранее записанному
