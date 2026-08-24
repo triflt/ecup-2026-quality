@@ -16,8 +16,30 @@ def scalar(text: str, key: str, *, indent: int = 2) -> str:
 def build(args: argparse.Namespace) -> str:
     if args.output.exists():
         raise FileExistsError("refusing to overwrite an existing private preset")
-    if args.fold not in {0, 3}:
-        raise ValueError("only screen folds 0 and 3 are open")
+    if args.fold not in range(5):
+        raise ValueError("fold must be 0..4")
+    route_gate = getattr(args, "route_gate", None)
+    route_gate_argument = ""
+    if args.fold in {1, 2, 4}:
+        if route_gate is None or not route_gate.is_file():
+            raise ValueError("remaining folds require the passed experiment-659 route gate")
+        gate = json.loads(route_gate.read_text(encoding="utf-8"))
+        if not (
+            gate.get("experiment_id") == "659"
+            and gate.get("large_component_experiment_id") == "654"
+            and gate.get("passed") is True
+            and gate.get("decision") == "OPEN_REMAINING_FOLDS"
+            and gate.get("weights") == {"641": 0.5, "654": 0.5}
+            and gate.get("threshold") == 0.0
+            and gate.get("threshold_tuned") is False
+            and gate.get("sealed_rows") == 0
+            and gate.get("public_used") is False
+        ):
+            raise ValueError("experiment-659 route gate contract mismatch")
+        route_gate_argument = (
+            " --route-gate /work/input/experiments/659_qwen36_27b_flammable_equal_logit_blend/"
+            "results/screen_acceptance_audit.json"
+        )
     bundle = getattr(args, "bundle", None)
     bundle_url_file = getattr(args, "bundle_url_file", None)
     if (bundle is None) == (bundle_url_file is None):
@@ -44,8 +66,8 @@ def build(args: argparse.Namespace) -> str:
             raise ValueError("bundle URL file must contain one HTTPS URL")
         bundle_delivery = (
             "python -c 'import os, urllib.request; "
-            "urllib.request.urlretrieve(os.environ[\"BUNDLE_URL\"], "
-            "\"/work/qwen36_class_bundle.tar.gz\")' && "
+            'urllib.request.urlretrieve(os.environ["BUNDLE_URL"], '
+            '"/work/qwen36_class_bundle.tar.gz")\' && '
         )
         # Keep the signed URL out of the preset even though the generated file is
         # ignored. The submitter supplies it as an ephemeral CLI environment
@@ -57,8 +79,7 @@ def build(args: argparse.Namespace) -> str:
         bundle_env = ""
         bundle_path = json.dumps(str(bundle))
         bundle_input = (
-            f"    - {{type: files, src: {bundle_path}, "
-            "dst: /work/qwen36_class_bundle.tar.gz}}\n"
+            f"    - {{type: files, src: {bundle_path}, dst: /work/qwen36_class_bundle.tar.gz}}}}\n"
         )
     command = (
         "python -m pip install -q --break-system-packages --upgrade "
@@ -74,19 +95,19 @@ def build(args: argparse.Namespace) -> str:
         f"--fold {args.fold} "
         f"--runtime-dir /work/input/experiments/654_qwen36_27b_class_only_lora/.local/runtime/fold{args.fold} "
         "--images /work/images --model-root /hf_models --vendor /work/vendor "
-        "--output-dir /work/output --expected-cuda-devices 4"
+        f"--output-dir /work/output --expected-cuda-devices 4{route_gate_argument}"
     )
     return f"""job:
   generate_name: qwen-train
   time_limit: 8h0m0s
-  flavor: {values['flavor']}
-  region: {values['region']}
-  image: {values['image']}
-  preemption: {values['preemption']}
-  work_dir: {values['work_dir']}
+  flavor: {values["flavor"]}
+  region: {values["region"]}
+  image: {values["image"]}
+  preemption: {values["preemption"]}
+  work_dir: {values["work_dir"]}
   env:
-    TOKENIZERS_PARALLELISM: {values['tokenizers']}
-    PYTORCH_ALLOC_CONF: {values['allocator']}
+    TOKENIZERS_PARALLELISM: {values["tokenizers"]}
+    PYTORCH_ALLOC_CONF: {values["allocator"]}
 {bundle_env.rstrip()}
   entrypoint: /bin/bash
   args:
@@ -109,6 +130,7 @@ def parser() -> argparse.ArgumentParser:
     delivery.add_argument("--bundle", type=Path)
     delivery.add_argument("--bundle-url-file", type=Path)
     result.add_argument("--fold", type=int, required=True)
+    result.add_argument("--route-gate", type=Path)
     result.add_argument("--output", type=Path, required=True)
     return result
 

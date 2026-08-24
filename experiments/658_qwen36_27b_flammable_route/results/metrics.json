@@ -1,6 +1,6 @@
 {
   "experiment_id": "658",
-  "status": "screen_frozen_not_scored",
+  "status": "rejected_at_frozen_screen",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
@@ -9,5 +9,14 @@
   "threshold_tuned": false,
   "sealed_rows": 0,
   "public_used": false,
-  "decision": "RUN_FROZEN_SCREEN"
+  "mean_screen_macro_f1_delta": 0.022112479502212623,
+  "fold_deltas": {"0": 0.017763157894736814, "3": 0.026461801109688432},
+  "category_deltas": {"БАД": 0.0, "Легковоспламеняющиеся": 0.0440257438671765},
+  "corrected": 18,
+  "regressed": 13,
+  "corrected_to_regressed": 1.3846153846153846,
+  "flammable_false_negatives": {"baseline": 10, "candidate": 3, "delta": -7},
+  "passed": false,
+  "remaining_folds_launched": false,
+  "decision": "REJECT_AT_SCREEN"
 }

@@ -10,9 +10,10 @@ from typing import Any
 EXPERIMENT_ID = "654"
 SOURCE_EXPERIMENT_ID = "641"
 SOURCE_GRID_SHA256 = "aad63f99ee9ddd5ecfa133575ea5cf1a803c11ab3fd26b5328d894f8631b3224"
-EXPECTED_TRAIN_OCCURRENCES = 4892
-EXPECTED_VALIDATION_ROWS = 2224
+EXPECTED_TRAIN_OCCURRENCES = {0: 4892, 1: 4894, 2: 4892, 3: 4892, 4: 4894}
+EXPECTED_VALIDATION_ROWS = {0: 2224, 1: 2223, 2: 2224, 3: 2224, 4: 2223}
 SCREEN_FOLDS = {0, 3}
+ROUTE_EXTENSION_FOLDS = {1, 2, 4}
 
 
 def sha256_file(path: Path) -> str:
@@ -33,9 +34,39 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
         return [json.loads(line) for line in stream]
 
 
-def build(source: Path, output: Path, *, fold: int) -> dict[str, Any]:
-    if fold not in SCREEN_FOLDS:
-        raise ValueError("only frozen screen folds 0 and 3 are open")
+def verify_route_gate(path: Path | None) -> None:
+    if path is None or not path.is_file():
+        raise ValueError("remaining folds require the passed experiment-659 route gate")
+    gate = json.loads(path.read_text(encoding="utf-8"))
+    expected = {
+        "experiment_id": "659",
+        "control_experiment_id": "641",
+        "large_component_experiment_id": "654",
+        "passed": True,
+        "decision": "OPEN_REMAINING_FOLDS",
+        "screen_folds": [0, 3],
+        "threshold": 0.0,
+        "threshold_tuned": False,
+        "sealed_rows": 0,
+        "public_used": False,
+    }
+    if any(gate.get(key) != value for key, value in expected.items()):
+        raise ValueError("experiment-659 route gate contract mismatch")
+    if gate.get("weights") != {"641": 0.5, "654": 0.5}:
+        raise ValueError("experiment-659 blend weights differ from the frozen route")
+
+
+def build(
+    source: Path,
+    output: Path,
+    *,
+    fold: int,
+    route_gate_path: Path | None = None,
+) -> dict[str, Any]:
+    if fold not in SCREEN_FOLDS | ROUTE_EXTENSION_FOLDS:
+        raise ValueError("fold must be 0..4")
+    if fold in ROUTE_EXTENSION_FOLDS:
+        verify_route_gate(route_gate_path)
     if output.exists():
         raise FileExistsError("refusing to overwrite a runtime directory")
     train_path = source / "train.jsonl"
@@ -54,8 +85,8 @@ def build(source: Path, output: Path, *, fold: int) -> dict[str, Any]:
         "grid_contract_sha256": SOURCE_GRID_SHA256,
         "objective": "class_only",
         "outer_fold": fold,
-        "train_occurrences": EXPECTED_TRAIN_OCCURRENCES,
-        "validation_rows": EXPECTED_VALIDATION_ROWS,
+        "train_occurrences": EXPECTED_TRAIN_OCCURRENCES[fold],
+        "validation_rows": EXPECTED_VALIDATION_ROWS[fold],
         "validation_labels_written": 0,
         "sealed_rows_written": 0,
         "outer_validation_occurrences": 0,
@@ -75,7 +106,10 @@ def build(source: Path, output: Path, *, fold: int) -> dict[str, Any]:
         raise ValueError("source runtime file checksum mismatch")
     train = read_jsonl(train_path)
     validation = read_jsonl(validation_path)
-    if len(train) != EXPECTED_TRAIN_OCCURRENCES or len(validation) != EXPECTED_VALIDATION_ROWS:
+    if (
+        len(train) != EXPECTED_TRAIN_OCCURRENCES[fold]
+        or len(validation) != EXPECTED_VALIDATION_ROWS[fold]
+    ):
         raise ValueError("runtime row count mismatch")
     if any("label" not in row or int(row["fold"]) == fold for row in train):
         raise ValueError("invalid training supervision or outer-fold leakage")
@@ -124,9 +158,20 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--source-runtime", type=Path, required=True)
     result.add_argument("--output-dir", type=Path, required=True)
     result.add_argument("--fold", type=int, required=True)
+    result.add_argument("--route-gate", type=Path)
     return result
 
 
 if __name__ == "__main__":
     args = parser().parse_args()
-    print(json.dumps(build(args.source_runtime, args.output_dir, fold=args.fold), indent=2))
+    print(
+        json.dumps(
+            build(
+                args.source_runtime,
+                args.output_dir,
+                fold=args.fold,
+                route_gate_path=args.route_gate,
+            ),
+            indent=2,
+        )
+    )

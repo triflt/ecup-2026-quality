@@ -33,7 +33,7 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
 
 
 def test_runtime_rejects_non_screen_fold(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="screen folds"):
+    with pytest.raises(ValueError, match="route gate"):
         BUILD.build(tmp_path / "source", tmp_path / "output", fold=1)
 
 
@@ -172,8 +172,36 @@ def test_private_preset_builder_supports_presigned_bundle_delivery(tmp_path: Pat
 
 
 def test_private_preset_builder_rejects_closed_fold(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="screen folds"):
+    with pytest.raises(ValueError, match="route gate"):
         PRESET.build(SimpleNamespace(output=tmp_path / "out", fold=1))
+
+
+def test_remaining_fold_gate_must_be_passed_and_frozen(tmp_path: Path) -> None:
+    gate = tmp_path / "gate.json"
+    gate.write_text(
+        json.dumps(
+            {
+                "experiment_id": "659",
+                "control_experiment_id": "641",
+                "large_component_experiment_id": "654",
+                "passed": True,
+                "decision": "OPEN_REMAINING_FOLDS",
+                "screen_folds": [0, 3],
+                "weights": {"641": 0.5, "654": 0.5},
+                "threshold": 0.0,
+                "threshold_tuned": False,
+                "sealed_rows": 0,
+                "public_used": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    BUILD.verify_route_gate(gate)
+    payload = json.loads(gate.read_text(encoding="utf-8"))
+    payload["weights"] = {"641": 0.4, "654": 0.6}
+    gate.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match="weights"):
+        BUILD.verify_route_gate(gate)
 
 
 def test_score_loader_rejects_supervision(tmp_path: Path) -> None:
