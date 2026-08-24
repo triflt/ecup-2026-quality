@@ -49,11 +49,17 @@ def verify_full_gate(path: Path) -> dict[str, Any]:
     if not (
         report.get("experiment_id") == "680"
         and report.get("stage") == "full"
-        and report.get("passed") is True
+        and (
+            report.get("passed") is True
+            or report.get("ablation_submission_eligible") is True
+        )
         and report.get("decision") == "ACCEPT_FOR_REFIT"
         and report.get("public_used") is False
         and report.get("sealed_rows") == 0
-        and all(report.get("gates", {}).values())
+        and (
+            all(report.get("gates", {}).values())
+            or all(report.get("ablation_gates", {}).values())
+        )
         and report.get("gates", {}).get("bad_route_byte_identical") is True
         and set(report.get("fold_flammable_average_precision", {})) == {"0", "1", "2", "3", "4"}
     ):

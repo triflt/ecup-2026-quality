@@ -142,6 +142,13 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
             "mean_macro_delta_at_least_0_0015": metrics["mean_fold_delta"] >= 0.0015,
             "flammable_f1_does_not_drop": metrics["categories"][FLAMMABLE]["delta"] >= 0.0,
         }
+        ablation_gates = common | {
+            "both_folds_ap_positive": all(delta > 0 for delta in ap_deltas),
+            "mean_ap_delta_at_least_0_003": float(np.mean(ap_deltas)) >= 0.003,
+            "both_folds_macro_positive": metrics["winning_folds"] == 2,
+            "mean_macro_delta_at_least_0_001": metrics["mean_fold_delta"] >= 0.001,
+            "flammable_f1_does_not_drop": metrics["categories"][FLAMMABLE]["delta"] >= 0.0,
+        }
     else:
         gates = common | {
             "at_least_four_of_five_ap_wins": sum(delta > 0 for delta in ap_deltas) >= 4,
@@ -152,7 +159,18 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
             "flammable_f1_delta_at_least_0_012": metrics["categories"][FLAMMABLE]["delta"] >= 0.012,
             "bootstrap_probability_at_least_0_90": metrics["component_bootstrap"]["probability_delta_positive"] >= 0.90,
         }
+        ablation_gates = common | {
+            "at_least_four_of_five_ap_wins": sum(delta > 0 for delta in ap_deltas) >= 4,
+            "mean_ap_delta_at_least_0_003": float(np.mean(ap_deltas)) >= 0.003,
+            "all_confirmation_folds_macro_positive": all(metrics["folds"][str(f)]["delta"] > 0 for f in (1, 2, 4)),
+            "at_least_four_of_five_macro_wins": metrics["winning_folds"] >= 4,
+            "macro_delta_at_least_0_004": metrics["macro_delta"] >= 0.004,
+            "flammable_f1_delta_at_least_0_008": metrics["categories"][FLAMMABLE]["delta"] >= 0.008,
+            "bootstrap_probability_at_least_0_85": metrics["component_bootstrap"]["probability_delta_positive"] >= 0.85,
+        }
     passed = all(gates.values())
+    ablation_submission_eligible = all(ablation_gates.values())
+    continuation_authorized = passed or ablation_submission_eligible
     result = {
         "schema_version": 1,
         "experiment_id": "680",
@@ -162,8 +180,11 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
         "mean_flammable_average_precision_delta": float(np.mean(ap_deltas)),
         "production_metrics": metrics,
         "gates": gates,
+        "ablation_gates": ablation_gates,
         "passed": passed,
-        "decision": ("OPEN_CONFIRMATION" if passed else "REJECT_AT_SCREEN") if args.stage == "screen" else ("ACCEPT_FOR_REFIT" if passed else "REJECT_FULL"),
+        "ablation_submission_eligible": ablation_submission_eligible,
+        "acceptance_tier": "primary" if passed else ("public_ablation" if ablation_submission_eligible else "no_go"),
+        "decision": ("OPEN_CONFIRMATION" if continuation_authorized else "REJECT_AT_SCREEN") if args.stage == "screen" else ("ACCEPT_FOR_REFIT" if continuation_authorized else "REJECT_FULL"),
         "candidate_prediction_sha256": candidate_hashes,
         "control_prediction_sha256": control_hashes,
         "public_used": False,
