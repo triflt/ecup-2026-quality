@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "experiment_id": "678",
-  "updated_at": "2026-08-24T12:16:38Z",
+  "updated_at": "2026-08-24T12:19:49Z",
   "captain_contract": {
     "validation_owner": true,
     "critic_of_parallel_agent": true,
@@ -48,7 +48,13 @@
         "corrected": 17,
         "regressed": 3,
         "flammable_false_negatives_before": 10,
-        "flammable_false_negatives_after": 2
+        "flammable_false_negatives_after": 2,
+        "changed_semantic_components": 12,
+        "pure_correction_components": 10,
+        "pure_regression_components": 1,
+        "mixed_change_components": 1,
+        "singleton_corrections": 7,
+        "singleton_regressions": 0
       },
       "full_acceptance": {
         "minimum_fold_wins": 4,

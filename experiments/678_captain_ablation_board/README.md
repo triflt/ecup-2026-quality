@@ -53,6 +53,19 @@ runtime-only smoke с неизменным binary BCE:
 Машиночитаемый диагноз и gate записаны в
 [`results/qwen27b_runtime_topology_audit.json`](results/qwen27b_runtime_topology_audit.json).
 
+## Разбор screen corrections
+
+Fixed blend меняет 20 строк на folds 0/3: 17 исправляет и 3 портит. На уровне
+semantic families изменено 12 components: 10 содержат только исправления, одна
+— только регрессии, одна mixed-label family одновременно получает исправление и
+регрессию. На singleton families наблюдается `7/0`; все три регрессии находятся
+в repeated families и имеют абсолютный blend margin `<0.5`. Медианный margin
+исправлений `1.3125`, регрессий `0.3125`.
+
+Это усиливает гипотезу переноса на новые families, но не отменяет полный 5-fold
+gate: fold 0 дал 12/2 изменений, fold 3 — 5/1. Подробный diagnostic находится в
+[`results/screen_change_family_audit.json`](results/screen_change_family_audit.json).
+
 ## Кандидаты
 
 Машиночитаемая доска находится в
