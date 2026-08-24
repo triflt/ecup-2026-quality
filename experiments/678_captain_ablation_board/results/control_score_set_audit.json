@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "experiment_id": "678",
+  "created_at": "2026-08-24T12:03:29Z",
+  "decision": "ACCEPT_FULL_CONTROL_SCORE_SET",
+  "registry": {
+    "path": "validation/semantic_family_v3/folds.csv",
+    "sha256": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+    "scope": "development"
+  },
+  "prediction_artifacts": [
+    {
+      "fold": 0,
+      "sha256": "5164909b7b56298f074e2d21a6e40f1ed53fd2d28d599609527715760f3468ae",
+      "rows": 2224
+    },
+    {
+      "fold": 1,
+      "sha256": "d7dff899b1af47858cd8855226f2688aad6756ed5472b175f0a7576891fe2ab1",
+      "rows": 2223,
+      "independently_downloaded_and_verified": true
+    },
+    {
+      "fold": 2,
+      "sha256": "4ff669918b7bdcc9c1dddee458ce101f77d931c556171040e90794839a871211",
+      "rows": 2224
+    },
+    {
+      "fold": 3,
+      "sha256": "f73d1b06f33c74c40cce03afac1537134e8da251e5e101c14616459414d0ab6a",
+      "rows": 2224
+    },
+    {
+      "fold": 4,
+      "sha256": "a0649d7f25db993211c758aa8f9158ef71701eefa2dd2dc6938de7f94353a435",
+      "rows": 2223,
+      "independently_downloaded_and_verified": true
+    }
+  ],
+  "checks": {
+    "rows": 11118,
+    "fold_counts": {
+      "0": 2224,
+      "1": 2223,
+      "2": 2224,
+      "3": 2224,
+      "4": 2223
+    },
+    "global_index_exact_cover": true,
+    "id_order_matches_registry": true,
+    "fold_order_matches_registry": true,
+    "category_order_matches_registry": true,
+    "duplicate_ids": 0,
+    "non_finite_scores": 0,
+    "frozen_zero_threshold_reproduced": true
+  },
+  "sealed_rows_used": 0,
+  "public_used": false
+}

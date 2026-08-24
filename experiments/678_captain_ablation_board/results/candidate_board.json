@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "experiment_id": "678",
-  "updated_at": "2026-08-24T11:59:46Z",
+  "updated_at": "2026-08-24T12:03:29Z",
   "captain_contract": {
     "validation_owner": true,
     "critic_of_parallel_agent": true,
@@ -11,6 +11,8 @@
   },
   "critical_path": {
     "control_folds_ready": [0, 1, 2, 3, 4],
+    "control_full_oof_binding": "ACCEPT_FULL_CONTROL_SCORE_SET",
+    "control_full_oof_rows": 11118,
     "large_folds_ready": [0, 3],
     "large_folds_running": [1, 2, 4],
     "missing_for_terminal_parent_evaluation": [

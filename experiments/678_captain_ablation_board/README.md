@@ -33,6 +33,8 @@ prediction SHA, exact fold/runtime-row binding. После третьего ар
 
 Машиночитаемая доска находится в
 [`results/candidate_board.json`](results/candidate_board.json).
+Независимая сборка полного control OOF зафиксирована в
+[`results/control_score_set_audit.json`](results/control_score_set_audit.json).
 
 1. `fixed_equal_logit_route` — единственный ближайший кандидат, который может
    стать `submission_ready` сегодня. Веса 0.5/0.5 и threshold 0 заморожены до
@@ -59,4 +61,3 @@ gates. Они не возвращаются в очередь только по�
 возможна лишь для заранее зарегистрированной однофакторной архитектурной
 гипотезы с полной честной проверкой. Ablation-only результат на leaderboard не
 отправляется.
-
