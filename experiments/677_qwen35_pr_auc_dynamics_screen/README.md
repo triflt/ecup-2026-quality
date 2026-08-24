@@ -61,6 +61,12 @@ Non-final fraction принимается, только если против ф
 nested selector, построенный исключительно внутри outer3-train; только после этого можно читать
 outer3 labels. При неуспехе на outer0 направление закрывается без 27B обучения.
 
+Преобразование fraction в полный outer0 runtime заморожено до inner selection в
+[`results/outer0_step_mapping.json`](results/outer0_step_mapping.json):
+`0.25→76`, `0.5→153`, `0.75→230`, `1.0→306` optimizer steps. Будущий confirm обязан
+сохранить выбранный и финальный checkpoints из одной training trajectory. Отдельно обученные
+selected/final runs не считаются однофакторным сравнением.
+
 ## Стоимость
 
 - подготовка runtime: CPU, завершена;

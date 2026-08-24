@@ -236,6 +236,7 @@ def evaluate(registry_path: Path, run_dirs: list[Path], output: Path) -> dict[st
             else "NO_GO_KEEP_FINAL_CHECKPOINT_RECIPE"
         ),
     }
+    result["contract_sha256"] = canonical_sha256(result)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
     return result

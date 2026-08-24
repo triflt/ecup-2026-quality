@@ -27,6 +27,7 @@ TRAIN = load("experiment_677_train", "train_dynamics.py")
 EVALUATE = load("experiment_677_evaluate", "evaluate_inner.py")
 GATE = load("experiment_677_gate", "verify_launch_gate.py")
 PRESET = load("experiment_677_preset", "build_private_preset.py")
+FREEZE = load("experiment_677_freeze_outer0", "freeze_outer0_confirmation.py")
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -106,6 +107,7 @@ def test_tail_trim_only_removes_bad_negatives() -> None:
 
 def test_checkpoint_schedule_is_fractional_and_final() -> None:
     assert TRAIN.checkpoint_steps(229) == [57, 114, 172, 229]
+    assert TRAIN.checkpoint_steps(306) == [76, 153, 230, 306]
     assert TRAIN.checkpoint_steps(2) == [1, 2]
 
 
@@ -255,6 +257,77 @@ def test_private_preset_reuses_proven_single_gpu_runtime(tmp_path: Path) -> None
     assert "pip install" not in payload
     assert payload.count("type: model_registry") == 1
     assert "example.invalid" not in payload
+
+
+def test_outer0_mapping_is_frozen_before_selection() -> None:
+    mapping = FREEZE.load_self_hashed(EXPERIMENT / "results/outer0_step_mapping.json")
+    assert mapping["optimizer_updates"] == 306
+    assert [row["optimizer_step"] for row in mapping["fraction_to_optimizer_step"]] == [
+        76,
+        153,
+        230,
+        306,
+    ]
+    assert mapping["comparison_same_training_trajectory_required"] is True
+
+
+def test_outer0_confirmation_binds_selected_and_final_to_same_trajectory(
+    tmp_path: Path,
+) -> None:
+    selection = {
+        "schema_version": 1,
+        "experiment_id": "677",
+        "status": "complete",
+        "outer_screen_fold": 0,
+        "inner_folds": [1, 2, 3, 4],
+        "selected_training_fraction": 0.5,
+        "sealed_rows": 0,
+        "public_used": False,
+        "threshold_tuned": False,
+        "decision": "GO_CONFIRM_SELECTED_STOP_ON_OUTER_FOLD_0_ONLY",
+    }
+    selection["contract_sha256"] = FREEZE.canonical_sha256(selection)
+    selection_path = tmp_path / "selection.json"
+    selection_path.write_text(json.dumps(selection), encoding="utf-8")
+
+    runtime = tmp_path / "runtime"
+    runtime.mkdir()
+    write_jsonl(runtime / "train.jsonl", [{"id": str(index)} for index in range(4892)])
+    write_jsonl(runtime / "validation.jsonl", [{"id": str(index)} for index in range(2224)])
+    audit = {
+        "experiment_id": "641",
+        "outer_fold": 0,
+        "train_occurrences": 4892,
+        "validation_rows": 2224,
+        "validation_labels_written": 0,
+        "sealed_rows_written": 0,
+        "decision": "GO",
+        "output_sha256": {
+            "train.jsonl": FREEZE.sha256_file(runtime / "train.jsonl"),
+            "validation.jsonl": FREEZE.sha256_file(runtime / "validation.jsonl"),
+        },
+    }
+    audit["contract_sha256"] = FREEZE.canonical_sha256(audit)
+    (runtime / "runtime_audit.json").write_text(json.dumps(audit), encoding="utf-8")
+
+    mapping = json.loads(
+        (EXPERIMENT / "results/outer0_step_mapping.json").read_text(encoding="utf-8")
+    )
+    mapping["source_runtime_contract_sha256"] = audit["contract_sha256"]
+    mapping.pop("contract_sha256")
+    mapping["contract_sha256"] = FREEZE.canonical_sha256(mapping)
+    mapping_path = tmp_path / "mapping.json"
+    mapping_path.write_text(json.dumps(mapping), encoding="utf-8")
+
+    result = FREEZE.freeze(
+        inner_selection_path=selection_path,
+        step_mapping_path=mapping_path,
+        source_runtime_dir=runtime,
+        output_path=tmp_path / "outer0_contract.json",
+    )
+    assert result["required_checkpoint_steps"] == [153, 306]
+    assert result["comparison_same_training_trajectory_required"] is True
+    assert result["outer0_labels_read"] is False
 
 
 def test_committed_runtime_manifest_and_gate_are_fail_closed() -> None:
