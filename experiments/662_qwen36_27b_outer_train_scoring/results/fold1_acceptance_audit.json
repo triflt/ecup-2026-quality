@@ -1,0 +1,16 @@
+{
+  "archive_sha256": "d80d06f05c5c7337384851e7f76ccb94d6fd27bb639c505442ea5073a4e404d3",
+  "decision": "ACCEPT_ARTIFACT",
+  "exact_ordered_occurrence_binding": true,
+  "experiment_id": "662",
+  "finite_scores": 4894,
+  "mode": "full",
+  "outer_fold": 1,
+  "report_contract_sha256": "0395ee17ddbba8e6eb8e96470a8ced5d53fbfef2298885102f5c81b57d39a674",
+  "rows": 4894,
+  "runtime_contract_sha256": "8be023f1c5d70c92650012000d4655d3a2f3b1316aef4f95e35bd1a4619ec7d1",
+  "schema_version": 1,
+  "teacher_scores_sha256": "98a4d57f103293c20009ebbfbf27c61eed66647baae530df4b00709f7b60c163",
+  "validation_labels_read": 0,
+  "validation_rows_read": 0
+}
