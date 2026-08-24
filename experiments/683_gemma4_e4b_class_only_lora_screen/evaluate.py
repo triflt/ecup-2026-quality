@@ -8,10 +8,10 @@ from collections import Counter
 from pathlib import Path
 
 import numpy as np
-from contract import EXPERIMENT_ID, sha256_file
+from contract import EXPERIMENT_ID, canonical_sha256, sha256_file
 
 HERE = Path(__file__).resolve().parent
-BASE_PATH = HERE.parents[1] / "680_qwen35_4b_flammable_only_hard_bce" / "evaluate.py"
+BASE_PATH = HERE.parent / "680_qwen35_4b_flammable_only_hard_bce" / "evaluate.py"
 
 
 def load_base():
@@ -25,19 +25,58 @@ def load_base():
 
 
 BASE = load_base()
+CONTROL_SCORE_SHA256 = {
+    0: "5164909b7b56298f074e2d21a6e40f1ed53fd2d28d599609527715760f3468ae",
+    3: "f73d1b06f33c74c40cce03afac1537134e8da251e5e101c14616459414d0ab6a",
+}
+
+
+def verify_prediction_provenance(
+    *,
+    candidate_scores: list[Path],
+    candidate_acceptances: list[Path],
+    control_scores: list[Path],
+    folds_scope: tuple[int, ...],
+) -> list[str]:
+    if not (
+        len(candidate_acceptances) == len(candidate_scores) == len(folds_scope)
+        and len(control_scores) == len(folds_scope)
+    ):
+        raise ValueError("each fold requires candidate, acceptance and control files")
+    audit_hashes = []
+    for fold, score_path, audit_path, control_path in zip(
+        folds_scope,
+        candidate_scores,
+        candidate_acceptances,
+        control_scores,
+        strict=True,
+    ):
+        audit = json.loads(audit_path.read_text(encoding="utf-8"))
+        digest = audit.pop("acceptance_sha256", None)
+        if digest != canonical_sha256(audit):
+            raise ValueError("candidate acceptance audit self-hash mismatch")
+        if not (
+            audit.get("experiment_id") == EXPERIMENT_ID
+            and audit.get("fold") == fold
+            and audit.get("technical_smoke") is False
+            and audit.get("decision") == "ACCEPT_ARTIFACT"
+            and audit.get("predictions_sha256") == sha256_file(score_path)
+        ):
+            raise ValueError("candidate prediction provenance mismatch")
+        if sha256_file(control_path) != CONTROL_SCORE_SHA256[fold]:
+            raise ValueError("frozen 641 control prediction checksum mismatch")
+        audit_hashes.append(sha256_file(audit_path))
+    return audit_hashes
 
 
 def evaluate(args: argparse.Namespace) -> dict:
-    if len(args.candidate_acceptance) != len(args.candidate_score):
-        raise ValueError("each candidate score requires an acceptance audit")
-    audit_hashes = []
-    for score_path, audit_path in zip(args.candidate_score, args.candidate_acceptance, strict=True):
-        audit = json.loads(audit_path.read_text(encoding="utf-8"))
-        if audit.get("experiment_id") != EXPERIMENT_ID or audit.get("decision") != "ACCEPT_ARTIFACT":
-            raise ValueError("candidate artifact was not accepted")
-        if audit.get("predictions_sha256") != sha256_file(score_path):
-            raise ValueError("candidate prediction provenance mismatch")
-        audit_hashes.append(sha256_file(audit_path))
+    folds_scope = BASE.SCREEN_FOLDS if args.stage == "screen" else BASE.FULL_FOLDS
+    audit_hashes = verify_prediction_provenance(
+        candidate_scores=args.candidate_score,
+        candidate_acceptances=args.candidate_acceptance,
+        control_scores=args.control_score,
+        folds_scope=folds_scope,
+    )
     temporary = args.output.with_suffix(".base680.tmp.json")
     if temporary.exists() or args.output.exists():
         raise FileExistsError("refusing to overwrite evaluation")
@@ -52,7 +91,6 @@ def evaluate(args: argparse.Namespace) -> dict:
     )
     result = BASE.evaluate(base_args)
     temporary.unlink()
-    folds_scope = BASE.SCREEN_FOLDS if args.stage == "screen" else BASE.FULL_FOLDS
     spec = BASE.LEGACY.load_spec()
     contract = BASE.LEGACY.verify_replay_contract(
         path=args.replay_contract,

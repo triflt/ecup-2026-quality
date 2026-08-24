@@ -90,3 +90,36 @@ def test_screen_promotion_requires_self_hashed_acceptance(tmp_path, monkeypatch)
     assert gate["decision"] == "OPEN_SCREEN"
     assert gate["allowed_folds"] == [0, 3]
     assert contract.verify_self_hash(gate)
+
+
+def test_evaluator_rejects_forged_acceptance(tmp_path, monkeypatch) -> None:
+    monkeypatch.syspath_prepend(str(HERE))
+    evaluator = load("evaluator683", HERE / "evaluate.py")
+    candidate = tmp_path / "candidate.jsonl"
+    candidate.write_text("{}\n")
+    control = tmp_path / "control.jsonl"
+    control.write_text("{}\n")
+    audit = tmp_path / "acceptance.json"
+    audit.write_text(
+        json.dumps(
+            {
+                "experiment_id": "683",
+                "fold": 0,
+                "technical_smoke": False,
+                "decision": "ACCEPT_ARTIFACT",
+                "predictions_sha256": evaluator.sha256_file(candidate),
+                "acceptance_sha256": "0" * 64,
+            }
+        )
+    )
+    try:
+        evaluator.verify_prediction_provenance(
+            candidate_scores=[candidate],
+            candidate_acceptances=[audit],
+            control_scores=[control],
+            folds_scope=(0,),
+        )
+    except ValueError as error:
+        assert "self-hash" in str(error)
+    else:
+        raise AssertionError("forged acceptance must fail closed")
