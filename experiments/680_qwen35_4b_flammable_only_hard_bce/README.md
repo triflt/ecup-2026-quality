@@ -2,7 +2,7 @@
 
 ## Статус
 
-`OPEN_SCREEN_FOLDS_0_3`. Это однофакторная проверка category specialization:
+`TERMINAL_REJECT_AT_SCREEN`. Это однофакторная проверка category specialization:
 из фактического runtime 641 удаляются только BAD training occurrences. Модель,
 revision, prompt, image view, BCE, LR, scheduler, LoRA, seed, одна эпоха и
 inference score остаются неизменными. Число updates `306 → 143` является
@@ -29,7 +29,12 @@ Confirmation folds открываются только если на обоих 
 - corrections/regressions `>= 1.5`;
 - BAD production route побайтово неизменён.
 
-До полного 5-fold GO запрещены full-data refit, Public и изменение порога.
+Screen завершён терминальным NO_GO. Fold 0 был положителен (AP
+`+0.033460`, Macro `+0.012605`), но fold 3 регрессировал (AP
+`-0.026387`, Macro `-0.029762`). В сумме mean AP `+0.003536`, Macro
+`-0.008879`, flammable F1 `-0.017759`, FN `+3`, corrections/regressions
+`3/5`. Не прошёл ни основной gate, ни заранее зарегистрированный
+Public-ablation fallback. Confirmation, full-data refit и Public запрещены.
 
 ## Заранее зарегистрированный Public-ablation fallback
 

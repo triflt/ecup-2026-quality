@@ -2,9 +2,9 @@
   "schema_version": 1,
   "experiment_id": "680",
   "control_experiment_id": "641",
-  "decision": "OPEN_SCREEN",
-  "training_lane_open": true,
-  "allowed_folds": [0, 3],
+  "decision": "CLOSED_TERMINAL_REJECT_AT_SCREEN",
+  "training_lane_open": false,
+  "allowed_folds": [],
   "screen_folds": [0, 3],
   "confirmation_folds": [1, 2, 4],
   "model_id": "Qwen/Qwen3.5-4B",
@@ -36,5 +36,8 @@
   "public_used": false,
   "sealed_rows": 0,
   "non_duplication_audit": "PASS_GENUINELY_NEW_FACTOR",
-  "gpu_jobs": 0
+  "gpu_jobs": 3,
+  "screen_passed": false,
+  "ablation_screen_passed": false,
+  "screen_report_sha256": "58613c341acf09fbdf2d440e86fbe8bc5da33eb43b92658042cd5a0e5514335b"
 }
