@@ -2,7 +2,7 @@
 id = "657"
 slug = "paddleocr_recursive_tiled_repair"
 title = "Recursive failed-tile PaddleOCR-VL repair"
-status = "bounded_smoke_running"
+status = "bounded_smoke_accepted_production_open"
 entrypoint = "experiments/657_paddleocr_recursive_tiled_repair/run_recursive_repair.py"
 result_file = "experiments/657_paddleocr_recursive_tiled_repair/results/metrics.json"
 
@@ -58,3 +58,14 @@ publish = false
 directory = "artifacts"
 private_preset_directory = ".local/compute"
 native_source_artifacts = true
+
+[results.smoke]
+accepted_images = 8
+failed_images = 0
+terminal_failed_tiles = 0
+tile_attempts = 28
+refined_attempts = 6
+detections = 304
+overlap_duplicates_removed = 9
+manual_overlay_rows_reviewed = 8
+decision = "OPEN_TWO_WAVE_PRODUCTION_REPAIR"
