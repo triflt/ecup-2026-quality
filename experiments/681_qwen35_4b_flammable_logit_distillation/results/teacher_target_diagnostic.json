@@ -1,0 +1,43 @@
+{
+  "decision_impact": "diagnostic_only_no_gate_change",
+  "experiment_id": "681",
+  "folds": {
+    "0": {
+      "hard_disagreement_occurrences": 15,
+      "median_absolute_teacher_logit": 8.75,
+      "temperature_2_ambiguous_soft_targets": 57,
+      "temperature_2_soft_target_mean_negative": 0.01919129779177847,
+      "temperature_2_soft_target_mean_positive": 0.956122478924786,
+      "teacher_false_negative_occurrences": 0,
+      "teacher_false_positive_occurrences": 15,
+      "teacher_train_average_precision": 0.9989384914720228,
+      "teacher_train_f1": 0.9890909090909091
+    },
+    "1": {
+      "hard_disagreement_occurrences": 11,
+      "median_absolute_teacher_logit": 8.25,
+      "temperature_2_ambiguous_soft_targets": 26,
+      "temperature_2_soft_target_mean_negative": 0.02273039009519309,
+      "temperature_2_soft_target_mean_positive": 0.9623035898031406,
+      "teacher_false_negative_occurrences": 0,
+      "teacher_false_positive_occurrences": 11,
+      "teacher_train_average_precision": 0.996947041123265,
+      "teacher_train_f1": 0.9919766593727206
+    },
+    "3": {
+      "hard_disagreement_occurrences": 5,
+      "median_absolute_teacher_logit": 8.5,
+      "temperature_2_ambiguous_soft_targets": 36,
+      "temperature_2_soft_target_mean_negative": 0.016429561485384,
+      "temperature_2_soft_target_mean_positive": 0.9478830462894106,
+      "teacher_false_negative_occurrences": 0,
+      "teacher_false_positive_occurrences": 5,
+      "teacher_train_average_precision": 0.9998237198190767,
+      "teacher_train_f1": 0.9963369963369964
+    }
+  },
+  "risk": "outer_train_teacher_targets_are_highly_saturated_and_may_add_little_beyond_hard_bce",
+  "rows_per_fold": 2280,
+  "schema_version": 1,
+  "temperature": 2.0
+}
