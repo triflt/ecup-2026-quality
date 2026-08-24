@@ -1,0 +1,23 @@
+{
+  "experiment_id": "662",
+  "status": "smoke8_running",
+  "training": false,
+  "submission_eligible": false,
+  "source_experiment_id": "654",
+  "folds": [0, 1, 2, 3, 4],
+  "first_gate": "fold0_smoke8",
+  "full_bundle_sha256": "5655099a00d3a0214d6e4a71d844451b33e132616f97945dc4516c46fc76397c",
+  "smoke_bundle_sha256": "da93876aa34ee395472fca62b20b65c0945ed21fd61cd772964b44f887730836",
+  "runtime_contract_sha256": {
+    "0": "3c83e1219264ca1e90ce81ed1e27ab3da65fd8d9059a2486452a817bae42078e",
+    "1": "8be023f1c5d70c92650012000d4655d3a2f3b1316aef4f95e35bd1a4619ec7d1",
+    "2": "2b64ea4ed988268b580c73abc409b5beea5895d3c3a432fd9bbb43528be60d26",
+    "3": "c917497696c0eb877b587eaf219789e129a40fda6147f1b5ffc48578023d62ec",
+    "4": "485c5a404dc1b7c265a7515ddcba56741a738f6ffa02561a97e8d69459994825"
+  },
+  "validation_rows_read": 0,
+  "validation_labels_read": 0,
+  "sealed_rows": 0,
+  "public_used": false,
+  "decision": "WAIT_FOR_SMOKE_ARTIFACT"
+}

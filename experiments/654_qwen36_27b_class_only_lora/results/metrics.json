@@ -1,6 +1,6 @@
 {
   "experiment_id": "654",
-  "status": "standalone_rejected_component_extension_open_via_659",
+  "status": "standalone_rejected_full_artifacts_accepted_for_offline_659",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "model_id": "Qwen/Qwen3.6-27B",
@@ -57,9 +57,12 @@
     "mean_screen_macro_f1_delta": 0.04881152512731468,
     "corrected": 17,
     "regressed": 3,
-    "remaining_folds": [1, 2, 4],
+    "remaining_folds": [],
     "scientific_recipe_changed": false,
-    "status": "WAITING_FOR_12_GPU"
+    "full_fold_wins": 5,
+    "full_mean_macro_f1_delta": 0.03066892881030041,
+    "deployable": false,
+    "status": "ACCEPTED_OFFLINE_TEACHER_PROBE_ONLY"
   },
   "decision": "REJECT_STANDALONE_OPEN_COMPONENT_EXTENSION_VIA_659"
 }

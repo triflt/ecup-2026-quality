@@ -1,23 +1,40 @@
 {
   "experiment_id": "659",
-  "status": "screen_accepted_remaining_folds_waiting_for_gpu",
+  "status": "accepted_offline_teacher_probe_only",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
-  "screen_folds": [0, 3],
+  "folds": [0, 1, 2, 3, 4],
   "route": {"БАД": "641", "Легковоспламеняющиеся": "equal_logit_blend_641_654"},
   "weights": {"641": 0.5, "654": 0.5},
   "threshold": 0.0,
   "threshold_tuned": false,
   "sealed_rows": 0,
   "public_used": false,
-  "mean_screen_macro_f1_delta": 0.04881152512731468,
-  "fold_deltas": {"0": 0.06472261735419638, "3": 0.032900432900432985},
-  "category_deltas": {"БАД": 0.0, "Легковоспламеняющиеся": 0.09976525821596238},
-  "corrected": 17,
+  "mean_fold_macro_f1_delta": 0.03066892881030041,
+  "fold_deltas": {
+    "0": 0.06472261735419638,
+    "1": 0.006610259122157625,
+    "2": 0.028571428571428692,
+    "3": 0.032900432900432985,
+    "4": 0.020539906103286376
+  },
+  "fold_wins": 5,
+  "category_f1": {
+    "БАД": {"baseline": 0.9515615041427661, "candidate": 0.9515615041427661, "delta": 0.0},
+    "Легковоспламеняющиеся": {"baseline": 0.8439306358381503, "candidate": 0.9075144508670521, "delta": 0.06358381502890176}
+  },
+  "flammable_pr_auc": {
+    "diagnostic_only": true,
+    "baseline_4b": 0.8803789183585108,
+    "large_27b": 0.9195422256734048,
+    "equal_logit_blend": 0.9320378545710759
+  },
+  "corrected": 25,
   "regressed": 3,
-  "corrected_to_regressed": 5.666666666666667,
-  "flammable_false_negatives": {"baseline": 10, "candidate": 2, "delta": -8},
+  "corrected_to_regressed": 8.333333333333334,
+  "flammable_false_negatives": {"baseline": 24, "candidate": 13, "delta": -11},
   "passed": true,
-  "remaining_folds_launched": false,
-  "decision": "OPEN_REMAINING_FOLDS"
+  "deployable": false,
+  "submission_packaging_allowed": false,
+  "decision": "ACCEPT_FULL_COMPONENT_ROUTE_OFFLINE_ONLY"
 }

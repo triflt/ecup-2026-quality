@@ -30,6 +30,14 @@
 | 440–470 | R-Drop, transaction scope, embedding and seed repeat | Rejected | Независимые проверки не прошли замороженные gates |
 | 480 | Fisher blockwise soup | Paused | Не запускать до новой semantic-family validation |
 | 490 | Evidence-grounded explanations | Research prepared | Нужен verdict-locked span/concept baseline и слепой ручной аудит 200 строк |
+| 600–631 | Новая semantic-v3 проверка Qwen | Mixed/Rejected | Лучшие component gains не пережили full-route stability или Public; детали в карточках |
+| 632–635 | Exact-span reasoning repeat | Rejected in full route | Компонент воспроизвёлся, но интеграция в 140 не прошла bootstrap/stability gate |
+| 633–660 | Offline OCR и строгий repair | Partial dataset only | 41 691 изображение доступны fail-closed; тяжёлый OCR запрещён в submission-runtime |
+| 640–659 | Масштаб Qwen и 27B LoRA | Offline teacher accepted | 659 выиграл 5/5 для опасного класса, но 27B не deployable |
+| 661 | Полный контроль Qwen3.5-4B | Accepted control | 11 118 строк, immutable five-fold input для 659 |
+| 662 | Outer-train scoring Qwen3.6-27B | Smoke running | Только label-free train-targets для честной дистилляции |
+| 679 | Qwen3.5-4B с LR 1e-4 | Rejected at screen | Один fold вырос, второй упал; PR-AUC опасного класса ухудшился |
+| 680–681 | Deployable specialist и distillation | Gated/Prepared | Безопасный перенос 27B-сигнала без second-level leakage |
 | 900 | Infrastructure checks | Completed | Runtime/schema/preprocessing safeguards |
 
 Новый experiment создаётся из `templates/experiment/`, затем добавляется отдельной строкой в `reports/experiment-log.csv`.
