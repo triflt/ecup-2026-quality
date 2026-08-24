@@ -15,7 +15,15 @@ def sha256_bytes(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def verify(path: Path, *, fold: int, expected_rows: int = 2224) -> dict[str, Any]:
+EXPECTED_TRAIN_OCCURRENCES = {0: 4892, 1: 4894, 2: 4892, 3: 4892, 4: 4894}
+EXPECTED_VALIDATION_ROWS = {0: 2224, 1: 2223, 2: 2224, 3: 2224, 4: 2223}
+
+
+def verify(path: Path, *, fold: int, expected_rows: int | None = None) -> dict[str, Any]:
+    if fold not in EXPECTED_VALIDATION_ROWS:
+        raise ValueError("fold must be 0..4")
+    if expected_rows is None:
+        expected_rows = EXPECTED_VALIDATION_ROWS[fold]
     with zipfile.ZipFile(path) as archive:
         bad = archive.testzip()
         if bad is not None:
@@ -37,7 +45,7 @@ def verify(path: Path, *, fold: int, expected_rows: int = 2224) -> dict[str, Any
         "experiment_id": "654",
         "model_revision": MODEL_REVISION,
         "outer_fold": fold,
-        "train_occurrences": 4892,
+        "train_occurrences": EXPECTED_TRAIN_OCCURRENCES[fold],
         "validation_rows": expected_rows,
         "optimizer_steps": 306,
         "threshold": 0.0,
@@ -92,10 +100,12 @@ def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
     result.add_argument("--archive", type=Path, required=True)
     result.add_argument("--fold", type=int, required=True)
-    result.add_argument("--expected-rows", type=int, default=2224)
+    result.add_argument("--expected-rows", type=int)
     return result
 
 
 if __name__ == "__main__":
     args = parser().parse_args()
-    print(json.dumps(verify(args.archive, fold=args.fold, expected_rows=args.expected_rows), indent=2))
+    print(
+        json.dumps(verify(args.archive, fold=args.fold, expected_rows=args.expected_rows), indent=2)
+    )

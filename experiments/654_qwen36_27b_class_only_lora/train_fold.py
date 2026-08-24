@@ -35,9 +35,11 @@ MODEL_REVISION = "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9"
 SEED = 42
 MICRO_BATCH_SIZE = 1
 GRADIENT_ACCUMULATION = 16
-EXPECTED_TRAIN_OCCURRENCES = 4892
-EXPECTED_VALIDATION_ROWS = 2224
+EXPECTED_TRAIN_OCCURRENCES = {0: 4892, 1: 4894, 2: 4892, 3: 4892, 4: 4894}
+EXPECTED_VALIDATION_ROWS = {0: 2224, 1: 2223, 2: 2224, 3: 2224, 4: 2223}
 EXPECTED_OPTIMIZER_STEPS = 306
+SCREEN_FOLDS = {0, 3}
+ROUTE_EXTENSION_FOLDS = {1, 2, 4}
 
 
 def canonical_sha256(value: dict[str, Any]) -> str:
@@ -50,7 +52,9 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
         return [json.loads(line) for line in stream]
 
 
-def load_runtime(runtime: Path, *, fold: int) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+def load_runtime(
+    runtime: Path, *, fold: int
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     train_path = runtime / "train.jsonl"
     validation_path = runtime / "validation.jsonl"
     audit_path = runtime / "runtime_audit.json"
@@ -63,8 +67,8 @@ def load_runtime(runtime: Path, *, fold: int) -> tuple[list[dict[str, Any]], lis
         "experiment_id": EXPERIMENT_ID,
         "objective": "class_only",
         "outer_fold": fold,
-        "train_occurrences": EXPECTED_TRAIN_OCCURRENCES,
-        "validation_rows": EXPECTED_VALIDATION_ROWS,
+        "train_occurrences": EXPECTED_TRAIN_OCCURRENCES[fold],
+        "validation_rows": EXPECTED_VALIDATION_ROWS[fold],
         "validation_labels_written": 0,
         "sealed_rows_written": 0,
         "public_used": False,
@@ -97,7 +101,15 @@ def last_token_score(model: Any, batch: Any, *, zero_token: int, one_token: int,
     return logits[:, one_token] - logits[:, zero_token]
 
 
-def one_score(model: Any, processor: Any, row: dict[str, Any], image: Any, zero: int, one: int, input_device: Any):
+def one_score(
+    model: Any,
+    processor: Any,
+    row: dict[str, Any],
+    image: Any,
+    zero: int,
+    one: int,
+    input_device: Any,
+):
     local = SimpleNamespace(**row)
     batch = _processor_batch(
         processor,
@@ -129,8 +141,25 @@ def package(output: Path, report: Path, predictions: Path, adapter: Path) -> Pat
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
-    if args.fold not in {0, 3}:
-        raise ValueError("only frozen screen folds 0 and 3 are open")
+    if args.fold not in SCREEN_FOLDS | ROUTE_EXTENSION_FOLDS:
+        raise ValueError("fold must be 0..4")
+    if args.fold in ROUTE_EXTENSION_FOLDS:
+        gate_path = getattr(args, "route_gate", None)
+        if gate_path is None or not gate_path.is_file():
+            raise ValueError("remaining folds require the passed experiment-659 route gate")
+        gate = json.loads(gate_path.read_text(encoding="utf-8"))
+        if not (
+            gate.get("experiment_id") == "659"
+            and gate.get("large_component_experiment_id") == "654"
+            and gate.get("passed") is True
+            and gate.get("decision") == "OPEN_REMAINING_FOLDS"
+            and gate.get("weights") == {"641": 0.5, "654": 0.5}
+            and gate.get("threshold") == 0.0
+            and gate.get("threshold_tuned") is False
+            and gate.get("sealed_rows") == 0
+            and gate.get("public_used") is False
+        ):
+            raise ValueError("experiment-659 route gate contract mismatch")
     if args.model_revision != MODEL_REVISION:
         raise ValueError("model revision differs from the frozen contract")
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
@@ -242,9 +271,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             try:
                 with torch.inference_mode():
                     value = float(
-                        one_score(
-                            model, processor, row, image, zero[0], one[0], input_device
-                        ).float().cpu()[0]
+                        one_score(model, processor, row, image, zero[0], one[0], input_device)
+                        .float()
+                        .cpu()[0]
                     )
             finally:
                 image.close()
@@ -334,6 +363,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--vendor", type=Path, required=True)
     result.add_argument("--output-dir", type=Path, required=True)
     result.add_argument("--expected-cuda-devices", type=int, default=4)
+    result.add_argument("--route-gate", type=Path)
     return result
 
 

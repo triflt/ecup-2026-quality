@@ -1,6 +1,6 @@
 {
   "experiment_id": "659",
-  "status": "screen_frozen_not_scored",
+  "status": "screen_accepted_remaining_folds_waiting_for_gpu",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
@@ -10,5 +10,14 @@
   "threshold_tuned": false,
   "sealed_rows": 0,
   "public_used": false,
-  "decision": "RUN_FROZEN_SCREEN"
+  "mean_screen_macro_f1_delta": 0.04881152512731468,
+  "fold_deltas": {"0": 0.06472261735419638, "3": 0.032900432900432985},
+  "category_deltas": {"БАД": 0.0, "Легковоспламеняющиеся": 0.09976525821596238},
+  "corrected": 17,
+  "regressed": 3,
+  "corrected_to_regressed": 5.666666666666667,
+  "flammable_false_negatives": {"baseline": 10, "candidate": 2, "delta": -8},
+  "passed": true,
+  "remaining_folds_launched": false,
+  "decision": "OPEN_REMAINING_FOLDS"
 }

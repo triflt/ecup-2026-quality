@@ -2,7 +2,7 @@
 id = "654"
 slug = "qwen36_27b_class_only_lora"
 title = "Qwen3.6-27B class-only LoRA fallback"
-status = "rejected_at_frozen_screen"
+status = "standalone_rejected_component_extension_open_via_659"
 entrypoint = "experiments/654_qwen36_27b_class_only_lora/train_fold.py"
 result_file = "experiments/654_qwen36_27b_class_only_lora/results/metrics.json"
 
@@ -40,8 +40,15 @@ lora_rank = 16
 lora_alpha = 32
 lora_dropout = 0.05
 target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
-expected_train_occurrences = 4892
+expected_train_occurrences_by_fold = [4892, 4894, 4892, 4892, 4894]
+expected_validation_rows_by_fold = [2224, 2223, 2224, 2224, 2223]
 expected_optimizer_steps = 306
+
+[extension_gate]
+experiment = "659"
+screen_passed = true
+remaining_folds = [1, 2, 4]
+scientific_recipe_changed = false
 
 [hypothesis]
 parent_experiment = "641"
