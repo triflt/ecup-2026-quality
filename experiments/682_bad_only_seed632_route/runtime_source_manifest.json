@@ -1,0 +1,52 @@
+{
+  "schema_version": "exp682_development_runtime_sources_v1",
+  "experiment_id": "682",
+  "source_experiment": "623",
+  "development_rows": 11118,
+  "sealed_rows": 0,
+  "frozen_input_sha256": {
+    "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "folds": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+    "evidence_manifest": "bae8b85912a62778a785126a5d3077a6449084f7d3daa10814e86a7277c699a6",
+    "selector": "107ef2bc83d77bc674c0734e8c1b62fc323eba9f9731d69b5e2353796e97c3be",
+    "image_manifest": "409e10a4035c5964a08bf2343603a1557148ec15e22674043c442a8c1bcea178"
+  },
+  "folds": {
+    "0": {
+      "runtime_audit_sha256": "5659669c1c1a423df23f8dc0f956ae4a258c9138e087c5ad76fb643584426553",
+      "train_jsonl_sha256": "2f55269da2d4d7e15ffe9dfbf1cf2213f5d3778d74842f0966a85836b6c82dd1",
+      "train_rows": 8894,
+      "validation_rows": 2224
+    },
+    "1": {
+      "runtime_audit_sha256": "7d43d5d57e35979c045513f7e514a5ec6a444d731eaf47397e7191b79e083a8b",
+      "train_jsonl_sha256": "fdb50784a123ea37d6f2b3b83d50cd64cd0fbf2e7d3d4f3d6f1a24f3077bf063",
+      "train_rows": 8895,
+      "validation_rows": 2223
+    },
+    "2": {
+      "runtime_audit_sha256": "7f13756e11f6b8b5eb6baa5a9cd7254d2a107d2e59df777d25ba6006d8a2c244",
+      "train_jsonl_sha256": "6cc4021ccbbf1d39055144b07554f665116ac2088d85bc16fa36ad0c17794e33",
+      "train_rows": 8894,
+      "validation_rows": 2224
+    },
+    "3": {
+      "runtime_audit_sha256": "f6f37efa0cfa403da3f474de0033c6f993216e5464cd88c23c0e7ed4aaf1f70c",
+      "train_jsonl_sha256": "92d885ab4b259ae0aadbd1ce73c8f5d30d6743ca20745d377b259f619716253b",
+      "train_rows": 8894,
+      "validation_rows": 2224
+    },
+    "4": {
+      "runtime_audit_sha256": "2c335f3440d61f3a63eb6341396e8d3db59bbfcb6f211a7fe35bbcd3daf4ed61",
+      "train_jsonl_sha256": "217cd95b13d2c624d5e900402b4a1289b1b4eb1f5a98a320c74c0851c0771c1d",
+      "train_rows": 8895,
+      "validation_rows": 2223
+    }
+  },
+  "selector_source_fold": 1,
+  "selector_file_sha256": "107ef2bc83d77bc674c0734e8c1b62fc323eba9f9731d69b5e2353796e97c3be",
+  "image_manifest_source_fold": 1,
+  "image_manifest_file_sha256": "409e10a4035c5964a08bf2343603a1557148ec15e22674043c442a8c1bcea178",
+  "label_reconstruction": "each development row must appear with one byte-identical supervised payload in exactly four outer-fold train.jsonl files",
+  "manifest_sha256": "f85efa23fa5fbd832b0f6efa243cc04283c4eacbd232eab1c4a7cc32a5d4cc28"
+}

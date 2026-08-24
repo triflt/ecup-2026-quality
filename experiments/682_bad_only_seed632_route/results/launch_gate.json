@@ -1,0 +1,23 @@
+{
+  "decision": "GO_GPU",
+  "experiment_id": "682",
+  "gate_sha256": "4115a8864d20d73a0fe8cdabaed69bffc503a6e5ac79ebcfd5fb2a861cdaf12a",
+  "gates": {
+    "accepted_post_validation_refit_policy": true,
+    "exact_refit_sources_bound": true,
+    "five_fold_replay_accepted": true,
+    "flammable_route_byte_identical": true,
+    "no_public_or_sealed_selection": true
+  },
+  "gpu_launch_allowed": true,
+  "input_sha256": {
+    "frozen_spec": "4b8959b3527b444f6b5de6d1731affbc70d13d1053d467f5b961d9b7adae0e9b",
+    "full_refit_gate": "23db907874d423341cd475ad9773ad6c6e596609a4cd1f279c82e3febfb9f4e9",
+    "replay_report": "0922d5a5c7e21201570e2cd4b316de5f82d0efa345c159d05859664a54f60f78"
+  },
+  "package_allowed": false,
+  "preset_generation_allowed": true,
+  "public_submission_allowed": false,
+  "schema_version": "exp682_launch_gate_v1",
+  "validation_signal_accepted": true
+}
