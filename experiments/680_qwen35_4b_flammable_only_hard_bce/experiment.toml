@@ -1,0 +1,11 @@
+id = "680"
+name = "qwen35_4b_flammable_only_hard_bce"
+status = "screen_open"
+parent = "641"
+model_id = "Qwen/Qwen3.5-4B"
+model_revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+objective = "class_only_binary_bce"
+changed_factor = "remove_bad_training_occurrences"
+public_used = false
+sealed_rows = 0
+
