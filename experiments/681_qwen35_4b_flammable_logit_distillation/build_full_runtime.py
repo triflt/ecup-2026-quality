@@ -25,6 +25,9 @@ EXPECTED_OOF_SHA256 = {
     3: "c731d3de64cd37fbc45461121d208ba5589981bb9a1971854098db2e6dc0cb81",
     4: "e970f01c41b3d35b1407abca7c2e37fb4e0a610d00f290ff55a83816df4c551c",
 }
+EXPECTED_TARGET_SHIFT_DIAGNOSTIC_SHA256 = (
+    "61891b1356ec23acbd8bd825cb068e3f706eda5bf3512e81593dcc04832e686b"
+)
 
 
 def sha256_file(path: Path) -> str:
@@ -63,6 +66,29 @@ def verify_full_gate(path: Path) -> dict[str, Any]:
         and report.get("uses_27b_at_inference") is False
     ):
         raise ValueError("full experiment-681 report does not authorize refit")
+    return report
+
+
+def verify_refit_policy(path: Path) -> dict[str, Any]:
+    report = json.loads(path.read_text(encoding="utf-8"))
+    body = dict(report)
+    digest = body.pop("contract_sha256", None)
+    expected = {
+        "experiment_id": "681",
+        "stage": "full_refit_target_policy",
+        "decision": "ACCEPT_OOF_REFIT_AS_SEPARATE_ABLATION",
+        "validated_cv_target_scope": "outer_fold_matched_in_sample_teacher",
+        "refit_target_scope": (
+            "development_rowwise_oof_plus_label_free_sealed_teacher0"
+        ),
+        "target_shift_diagnostic_sha256": EXPECTED_TARGET_SHIFT_DIAGNOSTIC_SHA256,
+        "public_used": False,
+    }
+    if digest != canonical_sha256(body) or any(report.get(k) != v for k, v in expected.items()):
+        raise ValueError(
+            "OOF full refit is a different target distribution and requires a "
+            "frozen, separately accepted target-policy contract"
+        )
     return report
 
 
@@ -179,6 +205,7 @@ def load_sealed_scores(
 def build(args: argparse.Namespace) -> dict[str, Any]:
     parent = load_parent()
     verify_full_gate(args.full_report)
+    refit_policy = verify_refit_policy(args.refit_policy)
     original_verify = parent.verify_full_gate
     parent.verify_full_gate = verify_full_gate
     try:
@@ -236,6 +263,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "teacher_target_scope": (
                 "development_rowwise_oof_plus_label_free_sealed_teacher0"
             ),
+            "refit_target_policy_contract_sha256": refit_policy["contract_sha256"],
             "teacher_score_semantics": "raw_last_token_logit_1_minus_logit_0",
             "teacher_oof_prediction_sha256": prediction_hashes,
             "sealed_teacher_completion": sealed_manifest,
@@ -260,6 +288,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
     result.add_argument("--full-report", type=Path, required=True)
+    result.add_argument("--refit-policy", type=Path, required=True)
     result.add_argument("--data", type=Path, required=True)
     result.add_argument("--registry", type=Path, required=True)
     result.add_argument("--selector", type=Path, required=True)
