@@ -60,3 +60,39 @@ def test_evaluator_waits_on_blank_review(tmp_path: Path) -> None:
         output=tmp_path / "score.json",
     )
     assert result["decision"] == "WAIT_FOR_COMPLETE_120_ROW_REVIEW"
+
+
+def test_merge_reviews_preserves_template_order(tmp_path: Path) -> None:
+    merger = _module("exp674_merge_test", "merge_reviews.py")
+    template = tmp_path / "template.csv"
+    chunks = [tmp_path / "a.csv", tmp_path / "b.csv"]
+    rows = []
+    for audit_id in ("E674-001", "E674-002", "E674-003"):
+        rows.append(
+            {
+                "audit_id": audit_id,
+                "review_visual_critical_span_present": "no",
+                "review_ocr_captures_all_critical_text": "na",
+                "review_ocr_preserves_scope_relation": "na",
+                "review_unsupported_critical_text": "no",
+                "review_evidence_relevant": "no",
+                "review_notes": "",
+            }
+        )
+    with template.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=merger.FIELDS)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({field: row["audit_id"] if field == "audit_id" else "" for field in row})
+    for path, subset in zip(chunks, ([rows[1]], [rows[2], rows[0]]), strict=True):
+        with path.open("w", encoding="utf-8", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=merger.FIELDS)
+            writer.writeheader()
+            writer.writerows(subset)
+    output = tmp_path / "merged.csv"
+    assert merger.merge(template=template, chunks=chunks, output=output) == 3
+    assert [row["audit_id"] for row in csv.DictReader(output.open(encoding="utf-8"))] == [
+        "E674-001",
+        "E674-002",
+        "E674-003",
+    ]
