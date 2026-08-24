@@ -1,0 +1,45 @@
+[experiment]
+id = "659"
+slug = "qwen36_27b_flammable_equal_logit_blend"
+title = "Equal-logit 4B and 27B blend for the flammable category"
+status = "screen_frozen_not_scored"
+entrypoint = "experiments/659_qwen36_27b_flammable_equal_logit_blend/evaluate_screen.py"
+result_file = "experiments/659_qwen36_27b_flammable_equal_logit_blend/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+source_experiments = ["641", "654"]
+scope = "semantic_family_v3 development only"
+sealed_rows = 0
+
+[route]
+"БАД" = "641_qwen35_4b_class_only_lora"
+"Легковоспламеняющиеся" = "equal_logit_blend_641_654"
+baseline_weight = 0.5
+large_weight = 0.5
+threshold = 0.0
+threshold_tuned = false
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+full_folds_after_screen = [1, 2, 4]
+minimum_screen_mean_delta = 0.0015
+maximum_category_drop = 0.002
+minimum_corrected_to_regressed = 1.5
+required_full_fold_wins = 4
+
+[hypothesis]
+parent_experiment = "658"
+changed_factor = "Equal-logit blend instead of full replacement on the known flammable category"
+control = "641"
+mechanism = "Averaging independently trained logits can preserve complementary rare-positive corrections while suppressing model-specific regressions"
+falsification = "Reject if either screen fold loses or any frozen correction-ratio category or false-negative gate fails"
+precedents = ["experiment 658 complementary 27B flammable signal", "fixed equal-weight deep ensemble"]
+
+[budget]
+screen_gpu_hours = 0
+remaining_fold_jobs_if_passed = 3
+gpu_per_training_job = 4
+maximum_parallel_gpus = 16
+planned_public_submissions = 0
