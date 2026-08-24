@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "experiment_id": "662",
+  "stage": "smoke8",
+  "decision": "ACCEPT_SMOKE8_AND_OPEN_FULL_SCORING",
+  "rows": 8,
+  "finite_scores": 8,
+  "exact_ordered_occurrence_binding": true,
+  "outer_archive_sha256": "7564fdc68dfac9a7c7f86232871eee431eeec6e4ad0a9cef49dde63d13839849",
+  "inner_archive_sha256": "bdae23b1ef0099f284228329c44366033c4dd6e4a5ac6b9a3f8030d3bf3480ed",
+  "teacher_scores_sha256": "e1aa275fa718070475e100fd1b3ca473bda6a66923e2fcd198cb939279802824",
+  "runtime_contract_sha256": "00b34b43384ef3a8cb0ef52cdbbbeb061bd4adbac8a28c3643323054c74b09e8",
+  "report_contract_sha256": "07dd3049e0597bc9c1953694aac9ebf8b32276dbdcc95f0ac30b661b2a26051b",
+  "elapsed_seconds": 94.7376456335187,
+  "base_weight_load_seconds_approx": 85.0,
+  "prior_steady_state_rows_per_second": 2.322,
+  "full_rows_max": 4894,
+  "sequential_two_hour_runtime_authorized": true,
+  "validation_rows_read": 0,
+  "validation_labels_read": 0,
+  "labels_read": 0,
+  "sealed_rows": 0,
+  "public_used": false,
+  "transport_history": {
+    "initial_attempt": "rejected_before_model_load_due_to_macos_appledouble_files",
+    "controlled_retry": "same_scientific_payload_clean_manifest_remote_sha_verified"
+  }
+}

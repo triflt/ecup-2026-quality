@@ -1,6 +1,6 @@
 id = "662"
 name = "qwen36_27b_outer_train_scoring"
-status = "smoke8_running"
+status = "full_wave_1_running"
 parent = "659_qwen36_27b_flammable_equal_logit_blend"
 data_version = "competition_train_v1"
 evaluation_version = "semantic_family_v3"
