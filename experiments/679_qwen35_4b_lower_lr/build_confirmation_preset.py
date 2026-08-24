@@ -23,7 +23,8 @@ def build(args: argparse.Namespace) -> str:
         gate.get("decision") != "OPEN_CONFIRMATION"
         or gate.get("training_lane_open") is not True
         or gate.get("allowed_folds") != [1, 2, 4]
-        or not gate.get("screen_report_sha256")
+        or not gate.get("standalone_screen_report_sha256")
+        or not gate.get("production_screen_report_sha256")
     ):
         raise ValueError("experiment-679 confirmation gate is not open")
     url = args.bundle_url_file.read_text(encoding="utf-8").strip()
@@ -51,7 +52,8 @@ def build(args: argparse.Namespace) -> str:
         "python /work/input/experiments/679_qwen35_4b_lower_lr/verify_confirmation_gate.py "
         "--gate /work/input/experiments/679_qwen35_4b_lower_lr/results/confirmation_gate.json "
         f"--runtime-dir /work/input/experiments/641_qwen35_4b_class_only_lora/.local/runtime/fold{args.fold} "
-        "--screen-report /work/input/experiments/679_qwen35_4b_lower_lr/results/screen_evaluation.json "
+        "--standalone-screen-report /work/input/experiments/679_qwen35_4b_lower_lr/results/standalone_screen_evaluation.json "
+        "--production-screen-report /work/input/experiments/679_qwen35_4b_lower_lr/results/production_screen_evaluation.json "
         f"--fold {args.fold} && "
         "python -m zipfile -e /work/input/research/peft-vendor-extracted/peft-0.20.0.zip /work/vendor && "
         "PYTHONPATH=/work/input/experiments/645_qwen_scale_2x3_gate:/work/vendor "

@@ -410,6 +410,24 @@ def make_screen_report(path: Path) -> None:
     )
 
 
+def make_production_screen_report(path: Path, standalone: Path) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "experiment_id": "679",
+                "stage": "screen",
+                "passed": True,
+                "decision": "OPEN_CONFIRMATION",
+                "bad_route_byte_identical": True,
+                "public_used": False,
+                "sealed_rows": 0,
+                "standalone_report_sha256": CONFIRM_GATE.sha256_file(standalone),
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
 def test_confirmation_gate_stays_closed_until_bound_screen_pass(tmp_path: Path) -> None:
     gate = json.loads(
         (EXPERIMENT / "results/confirmation_gate.json").read_text(encoding="utf-8")
@@ -418,22 +436,25 @@ def test_confirmation_gate_stays_closed_until_bound_screen_pass(tmp_path: Path) 
     write_runtime(runtime, gate, 1)
     screen = tmp_path / "screen.json"
     make_screen_report(screen)
+    production_screen = tmp_path / "production_screen.json"
+    make_production_screen_report(production_screen, screen)
     gate_path = tmp_path / "gate.json"
     gate_path.write_text(json.dumps(gate), encoding="utf-8")
     with pytest.raises(ValueError, match="closed"):
-        CONFIRM_GATE.verify(gate_path, runtime, screen, 1)
+        CONFIRM_GATE.verify(gate_path, runtime, screen, production_screen, 1)
 
     gate["decision"] = "OPEN_CONFIRMATION"
     gate["training_lane_open"] = True
     gate["allowed_folds"] = [1, 2, 4]
-    gate["screen_report_sha256"] = CONFIRM_GATE.sha256_file(screen)
+    gate["standalone_screen_report_sha256"] = CONFIRM_GATE.sha256_file(screen)
+    gate["production_screen_report_sha256"] = CONFIRM_GATE.sha256_file(production_screen)
     gate_path.write_text(json.dumps(gate), encoding="utf-8")
-    result = CONFIRM_GATE.verify(gate_path, runtime, screen, 1)
+    result = CONFIRM_GATE.verify(gate_path, runtime, screen, production_screen, 1)
     assert result["candidate_learning_rate"] == 1e-4
 
     screen.write_text("{}\n", encoding="utf-8")
-    with pytest.raises(ValueError, match="checksum"):
-        CONFIRM_GATE.verify(gate_path, runtime, screen, 1)
+    with pytest.raises(ValueError, match="standalone screen checksum"):
+        CONFIRM_GATE.verify(gate_path, runtime, screen, production_screen, 1)
 
 
 def test_confirmation_preset_rejects_prepared_gate_and_preserves_recipe(
@@ -482,7 +503,8 @@ def test_confirmation_preset_rejects_prepared_gate_and_preserves_recipe(
     gate["decision"] = "OPEN_CONFIRMATION"
     gate["training_lane_open"] = True
     gate["allowed_folds"] = [1, 2, 4]
-    gate["screen_report_sha256"] = "frozen-screen-sha"
+    gate["standalone_screen_report_sha256"] = "frozen-standalone-screen-sha"
+    gate["production_screen_report_sha256"] = "frozen-production-screen-sha"
     gate_path.write_text(json.dumps(gate), encoding="utf-8")
     payload = CONFIRM_PRESET.build(args)
     assert "h100-1x" in payload

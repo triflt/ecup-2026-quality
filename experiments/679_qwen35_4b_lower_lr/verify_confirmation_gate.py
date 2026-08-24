@@ -16,7 +16,11 @@ def sha256_file(path: Path) -> str:
 
 
 def verify(
-    gate_path: Path, runtime_dir: Path, screen_report_path: Path, fold: int
+    gate_path: Path,
+    runtime_dir: Path,
+    standalone_screen_report_path: Path,
+    production_screen_report_path: Path,
+    fold: int,
 ) -> dict[str, Any]:
     gate = json.loads(gate_path.read_text(encoding="utf-8"))
     expected = (
@@ -43,10 +47,10 @@ def verify(
     )
     if not expected or fold not in gate.get("allowed_folds", []):
         raise ValueError("experiment-679 confirmation gate is closed or inconsistent")
-    screen_sha256 = sha256_file(screen_report_path)
-    if screen_sha256 != gate.get("screen_report_sha256"):
-        raise ValueError("screen report checksum differs from frozen confirmation gate")
-    screen = json.loads(screen_report_path.read_text(encoding="utf-8"))
+    standalone_sha256 = sha256_file(standalone_screen_report_path)
+    if standalone_sha256 != gate.get("standalone_screen_report_sha256"):
+        raise ValueError("standalone screen checksum differs from frozen confirmation gate")
+    screen = json.loads(standalone_screen_report_path.read_text(encoding="utf-8"))
     if not (
         screen.get("experiment_id") == "679"
         and screen.get("control_experiment_id") == "641"
@@ -57,7 +61,22 @@ def verify(
         and screen.get("sealed_rows") == 0
         and set(screen.get("folds", {})) == {"0", "3"}
     ):
-        raise ValueError("screen report does not authorize confirmation")
+        raise ValueError("standalone screen does not authorize confirmation")
+    production_sha256 = sha256_file(production_screen_report_path)
+    if production_sha256 != gate.get("production_screen_report_sha256"):
+        raise ValueError("production screen checksum differs from frozen confirmation gate")
+    production = json.loads(production_screen_report_path.read_text(encoding="utf-8"))
+    if not (
+        production.get("experiment_id") == "679"
+        and production.get("stage") == "screen"
+        and production.get("passed") is True
+        and production.get("decision") == "OPEN_CONFIRMATION"
+        and production.get("bad_route_byte_identical") is True
+        and production.get("public_used") is False
+        and production.get("sealed_rows") == 0
+        and production.get("standalone_report_sha256") == standalone_sha256
+    ):
+        raise ValueError("production screen does not authorize confirmation")
     audit = json.loads((runtime_dir / "runtime_audit.json").read_text(encoding="utf-8"))
     if audit.get("contract_sha256") != gate["runtime_contract_sha256"][str(fold)]:
         raise ValueError("runtime contract differs from frozen control")
@@ -72,7 +91,8 @@ def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
     result.add_argument("--gate", type=Path, required=True)
     result.add_argument("--runtime-dir", type=Path, required=True)
-    result.add_argument("--screen-report", type=Path, required=True)
+    result.add_argument("--standalone-screen-report", type=Path, required=True)
+    result.add_argument("--production-screen-report", type=Path, required=True)
     result.add_argument("--fold", type=int, choices=(1, 2, 4), required=True)
     return result
 
@@ -81,7 +101,13 @@ if __name__ == "__main__":
     args = parser().parse_args()
     print(
         json.dumps(
-            verify(args.gate, args.runtime_dir, args.screen_report, args.fold),
+            verify(
+                args.gate,
+                args.runtime_dir,
+                args.standalone_screen_report,
+                args.production_screen_report,
+                args.fold,
+            ),
             indent=2,
             sort_keys=True,
         )
