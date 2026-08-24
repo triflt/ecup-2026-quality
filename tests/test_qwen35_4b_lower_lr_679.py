@@ -36,6 +36,9 @@ CONFIRM_PRESET = load_module(
 PRODUCTION = load_module(
     EXPERIMENT / "evaluate_production_route.py", "experiment_679_production_route"
 )
+FULL_RUNTIME = load_module(
+    EXPERIMENT / "build_full_runtime.py", "experiment_679_full_runtime"
+)
 
 
 def canonical_without_hash(payload: dict) -> str:
@@ -553,3 +556,35 @@ def test_production_full_gate_requires_blind_folds_and_component_stability() -> 
     metrics["folds"]["2"]["delta"] = -0.001
     gates = PRODUCTION.production_gates(metrics, stage="full")
     assert gates["all_confirmation_folds_positive"] is False
+
+
+def test_full_runtime_selection_preserves_frozen_class_sampling() -> None:
+    labels = FULL_RUNTIME.np.asarray(
+        [1] * 5564 + [0] * 1905 + [1] * 198 + [0] * 5304,
+        dtype=FULL_RUNTIME.np.int8,
+    )
+    categories = FULL_RUNTIME.np.asarray(
+        ["БАД"] * (5564 + 1905) + ["Легковоспламеняющиеся"] * (198 + 5304)
+    )
+    scores = FULL_RUNTIME.np.linspace(0.0, 1.0, len(labels), dtype=FULL_RUNTIME.np.float32)
+    selected = FULL_RUNTIME.select_full_training_indices(
+        labels=labels, categories=categories, fused_scores=scores
+    )
+    selected_labels = labels[selected]
+    selected_categories = categories[selected]
+    assert len(selected) == 5590
+    assert int(((selected_categories == "БАД") & (selected_labels == 1)).sum()) == 1500
+    assert int(((selected_categories == "БАД") & (selected_labels == 0)).sum()) == 1500
+    assert int(
+        ((selected_categories == "Легковоспламеняющиеся") & (selected_labels == 1)).sum()
+    ) == 990
+    assert int(
+        ((selected_categories == "Легковоспламеняющиеся") & (selected_labels == 0)).sum()
+    ) == 1600
+
+
+def test_full_runtime_gate_rejects_unaccepted_report(tmp_path: Path) -> None:
+    path = tmp_path / "full.json"
+    path.write_text(json.dumps({"experiment_id": "679", "passed": False}), encoding="utf-8")
+    with pytest.raises(ValueError, match="does not authorize"):
+        FULL_RUNTIME.verify_full_gate(path)
