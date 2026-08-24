@@ -6,8 +6,12 @@
   "source_experiment_id": "654",
   "folds": [0, 1, 2, 3, 4],
   "first_gate": "fold0_smoke8",
-  "full_bundle_sha256": "5655099a00d3a0214d6e4a71d844451b33e132616f97945dc4516c46fc76397c",
-  "smoke_bundle_sha256": "da93876aa34ee395472fca62b20b65c0945ed21fd61cd772964b44f887730836",
+  "full_bundle_sha256": "26a7b98ce0639e5b954b8193662eefdfed798a431fa171d0c5c1fcd9d1110303",
+  "smoke_bundle_sha256": "4b8d6e4d2d70727f9b4ac1869dbd135972476fccecfd940d62256d241afd3105",
+  "transport_attempts": {
+    "initial": "rejected_before_model_load_due_to_macos_appledouble_files",
+    "controlled_retry": "running_with_identical_scientific_payload_and_clean_tar_manifest"
+  },
   "runtime_contract_sha256": {
     "0": "3c83e1219264ca1e90ce81ed1e27ab3da65fd8d9059a2486452a817bae42078e",
     "1": "8be023f1c5d70c92650012000d4655d3a2f3b1316aef4f95e35bd1a4619ec7d1",
