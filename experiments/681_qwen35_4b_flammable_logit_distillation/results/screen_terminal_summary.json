@@ -1,0 +1,59 @@
+{
+  "active_gpu_jobs": 0,
+  "candidate_artifacts": {
+    "0": {
+      "archive_sha256": "bee6cb3933bf2a0d81eade673c5c11dbe3cde1d447f300687cf0aad4ab9a291e",
+      "predictions_sha256": "3f18aa8d9cf1ffb43e6d6982814b513e3177e2c453046cc495fc90485f8c5427"
+    },
+    "3": {
+      "archive_sha256": "14c6ec213e4639bf567e704110a295fbd1319664658e1f3a29beca977cf441ea",
+      "predictions_sha256": "650c5d90f114fd550c261f19a5a07ec0bca6f41b33f78549aa23b94620300128"
+    }
+  },
+  "causal_control": {
+    "corrected": 2,
+    "flammable_f1_delta": -0.05138339920948609,
+    "flammable_fn_delta": 6,
+    "fold_ap_delta": {
+      "0": -0.07198303363884218,
+      "3": 0.015707182548919563
+    },
+    "mean_ap_delta": -0.028137925544961306,
+    "mean_fold_macro_delta": -0.02631632363090164,
+    "regressed": 8
+  },
+  "decision": "REJECT_AT_SCREEN",
+  "experiment_id": "681",
+  "forbidden_next": [
+    "folds_1_2_4",
+    "full_refit",
+    "submission_packaging",
+    "public_submission",
+    "raw_teacher_T_lambda_LR_steps_grid",
+    "raw_teacher_full_parent_conditional_KD"
+  ],
+  "full_local_evaluation_sha256": "1fd9916d0f0aa7a1393a099dfffbdfd0f96e60a6a951f17153f84f1520aee27c",
+  "public_used": false,
+  "ranking_control": {
+    "fold_ap_delta": {
+      "0": -0.03852258266114428,
+      "3": -0.01068030259641417
+    },
+    "mean_ap_delta": -0.024601442628779224
+  },
+  "routed_production": {
+    "bad_f1_delta": 0.0,
+    "corrected": 5,
+    "flammable_f1_delta": -0.06914212548015364,
+    "flammable_fn_delta": 9,
+    "fold_macro_delta": {
+      "0": -0.031746031746031744,
+      "3": -0.03804347826086962
+    },
+    "mean_fold_macro_delta": -0.034894755003450684,
+    "regressed": 13,
+    "singleton_net_corrections": -1
+  },
+  "schema_version": 1,
+  "uses_27b_at_inference": false
+}
