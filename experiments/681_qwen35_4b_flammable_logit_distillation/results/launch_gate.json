@@ -1,7 +1,10 @@
 {
   "allowed_folds": [],
+  "changed_factor": "hard_bce_to_fixed_hard_plus_teacher_soft_bce",
+  "control_experiment_id": 641,
   "decision": "WAIT_TEACHER_TARGETS",
   "experiment_id": 681,
+  "expected_optimizer_steps": 143,
   "forbidden": [
     "ordinary_oof_target_merge_for_outer_cv",
     "outer_fold_tuning",
@@ -11,9 +14,20 @@
     "27b_submission_packaging"
   ],
   "gpu_jobs": 0,
+  "learning_rate": 0.0002,
+  "ordinary_oof_merge_used": false,
   "public_submissions": 0,
-  "required_teacher_scoring_experiment": 662,
+  "public_used": false,
+  "runtime_contract_sha256": {},
+  "runtime_payload_sha256": {},
   "screen_folds": [0, 3],
+  "sealed_rows": 0,
   "soft_loss_weight": 0.5,
-  "temperature": 2.0
+  "teacher_archive_sha256": {},
+  "teacher_scores_sha256": {},
+  "teacher_scoring_experiment_id": 662,
+  "temperature": 2.0,
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "training_lane_open": false
 }
