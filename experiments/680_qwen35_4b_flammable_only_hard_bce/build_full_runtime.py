@@ -151,6 +151,22 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
                 "label": int(source["label"]),
             }
         )
+    view_by_id = {str(row["id"]): row for row in train_rows}
+    model_input_view = [
+        {
+            key: row[key]
+            for key in (
+                "global_index",
+                "id",
+                "fold",
+                "category",
+                "name",
+                "description",
+                "image_url",
+            )
+        }
+        for row in sorted(view_by_id.values(), key=lambda item: int(item["global_index"]))
+    ]
     args.output_dir.mkdir(parents=True, exist_ok=True)
     train_path = args.output_dir / "train.jsonl"
     validation_path = args.output_dir / "validation.jsonl"
@@ -172,6 +188,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         "flammable_train_occurrences": len(train_rows),
         "flammable_positive_repeat": 5,
         "flammable_negative_limit": 1600,
+        "model_input_view_sha256": parent.canonical_sha256(model_input_view),
         "selected_multiset_sha256": parent.canonical_sha256(
             sorted(Counter(row["id"] for row in train_rows).items())
         ),
