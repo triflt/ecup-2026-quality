@@ -102,7 +102,16 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
     result["uses_27b_at_inference"] = False
     singleton = singleton_slice(args)
     result["semantic_singleton_flammable"] = singleton
-    if args.stage == "full":
+    if args.stage == "screen":
+        # Experiment 681 preregistered no relaxed screen continuation.  The
+        # parent evaluator exposes an ablation screen for its own experiment;
+        # carrying that decision forward here would silently weaken the gate.
+        result["ablation_submission_eligible"] = False
+        result["acceptance_tier"] = "primary" if result["passed"] else "no_go"
+        result["decision"] = (
+            "OPEN_CONFIRMATION" if result["passed"] else "REJECT_AT_SCREEN"
+        )
+    else:
         primary = result["gates"]
         fallback = result["ablation_gates"]
         primary["mean_macro_delta_at_least_0_006"] = (
