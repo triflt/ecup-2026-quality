@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import csv
 import json
 import sys
 from pathlib import Path
@@ -24,6 +25,7 @@ def load_module(path: Path, name: str):
 TRAIN = load_module(EXPERIMENT / "train_fold.py", "experiment_679_train")
 GATE = load_module(EXPERIMENT / "verify_launch_gate.py", "experiment_679_gate")
 PRESET = load_module(EXPERIMENT / "build_private_preset.py", "experiment_679_preset")
+EVALUATOR = load_module(EXPERIMENT / "evaluate.py", "experiment_679_evaluator")
 
 
 def canonical_without_hash(payload: dict) -> str:
@@ -177,3 +179,106 @@ def test_private_preset_preserves_4b_recipe_and_rejects_closed_gate(tmp_path: Pa
     assert "679_qwen35_4b_lower_lr/train_fold.py" in payload
     assert "--micro-batch-size-override 2" in payload
     assert "Qwen3.6" not in payload and "27B" not in payload
+
+
+def write_jsonl(path: Path, rows: list[dict]) -> None:
+    path.write_text(
+        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+
+def make_evaluation_fixture(tmp_path: Path, folds: list[int]):
+    registry_rows = []
+    per_fold: dict[int, tuple[Path, Path]] = {}
+    global_index = 0
+    for fold in folds:
+        baseline_rows, candidate_rows = [], []
+        for category, labels, base_scores, candidate_scores in (
+            ("БАД", [1, 0, 1, 0], [2.0, -2.0, 1.0, -1.0], [2.0, -2.0, 1.0, -1.0]),
+            (
+                "Легковоспламеняющиеся",
+                [1, 0, 1, 0],
+                [-0.5, 0.4, 0.3, -0.2],
+                [1.0, -1.0, 0.8, -0.8],
+            ),
+        ):
+            for local_index, (label, base_score, candidate_score) in enumerate(
+                zip(labels, base_scores, candidate_scores, strict=True)
+            ):
+                row_id = f"{fold}{0 if category == 'БАД' else 1}{local_index}"
+                registry_rows.append(
+                    {
+                        "id": row_id,
+                        "category": category,
+                        "label": label,
+                        "semantic_component": f"component-{row_id}",
+                        "component_size": 1,
+                        "split": "development",
+                        "development_fold": fold,
+                    }
+                )
+                common = {
+                    "global_index": global_index,
+                    "id": row_id,
+                    "fold": fold,
+                    "category": category,
+                }
+                baseline_rows.append(
+                    {
+                        **common,
+                        "score": base_score,
+                        "prediction": int(base_score >= 0.0),
+                    }
+                )
+                candidate_rows.append(
+                    {
+                        **common,
+                        "score": candidate_score,
+                        "prediction": int(candidate_score >= 0.0),
+                    }
+                )
+                global_index += 1
+        baseline_path = tmp_path / f"baseline{fold}.jsonl"
+        candidate_path = tmp_path / f"candidate{fold}.jsonl"
+        write_jsonl(baseline_path, baseline_rows)
+        write_jsonl(candidate_path, candidate_rows)
+        per_fold[fold] = (baseline_path, candidate_path)
+    registry = tmp_path / "folds.csv"
+    with registry.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(registry_rows[0]))
+        writer.writeheader()
+        writer.writerows(registry_rows)
+    return registry, per_fold
+
+
+def test_tie_aware_average_precision_matches_expected_grouping() -> None:
+    labels = EVALUATOR.np.asarray([1, 0, 1, 0], dtype=EVALUATOR.np.int8)
+    scores = EVALUATOR.np.asarray([1.0, 1.0, 0.0, 0.0])
+    assert EVALUATOR.average_precision(labels, scores) == pytest.approx(0.5)
+
+
+def test_screen_and_full_gates_use_ap_and_blind_confirmation(tmp_path: Path) -> None:
+    registry, per_fold = make_evaluation_fixture(tmp_path, [0, 1, 2, 3, 4])
+    screen = EVALUATOR.evaluate(
+        registry_path=registry,
+        baseline_paths=[per_fold[fold][0] for fold in (0, 3)],
+        candidate_paths=[per_fold[fold][1] for fold in (0, 3)],
+        mode="screen",
+        output_path=tmp_path / "screen.json",
+    )
+    assert screen["passed"] is True
+    assert screen["decision"] == "OPEN_CONFIRMATION_FOLDS"
+    assert screen["gates"]["both_screen_folds_flammable_ap_positive"] is True
+    full = EVALUATOR.evaluate(
+        registry_path=registry,
+        baseline_paths=[per_fold[fold][0] for fold in (0, 1, 2, 3, 4)],
+        candidate_paths=[per_fold[fold][1] for fold in (0, 1, 2, 3, 4)],
+        mode="full",
+        screen_gate_path=tmp_path / "screen.json",
+        output_path=tmp_path / "full.json",
+    )
+    assert full["passed"] is True
+    assert full["decision"] == "ACCEPT_FOR_FULL_REFIT"
+    assert full["gates"]["all_confirmation_folds_macro_positive"] is True
+    assert full["gates"]["screen_reproduced_exactly"] is True
