@@ -96,3 +96,56 @@ def test_merge_reviews_preserves_template_order(tmp_path: Path) -> None:
         "E674-002",
         "E674-003",
     ]
+
+
+def test_evaluator_reports_category_error_and_fold_slices(tmp_path: Path) -> None:
+    evaluator = _module("exp674_evaluator_slices_test", "evaluate_review.py")
+    packet = tmp_path / "packet.csv"
+    reviews = tmp_path / "reviews.csv"
+    mapping = {}
+    with packet.open("w", encoding="utf-8", newline="") as pstream, reviews.open(
+        "w", encoding="utf-8", newline=""
+    ) as rstream:
+        pw = csv.DictWriter(pstream, fieldnames=["audit_id"])
+        rw = csv.DictWriter(rstream, fieldnames=["audit_id", *evaluator.FIELDS])
+        pw.writeheader()
+        rw.writeheader()
+        for index in range(120):
+            audit_id = f"E674-{index:03d}"
+            pw.writerow({"audit_id": audit_id})
+            rw.writerow(
+                {
+                    "audit_id": audit_id,
+                    "review_visual_critical_span_present": "yes",
+                    "review_ocr_captures_all_critical_text": "yes",
+                    "review_ocr_preserves_scope_relation": "yes",
+                    "review_unsupported_critical_text": "no",
+                    "review_evidence_relevant": "yes",
+                }
+            )
+            mapping[audit_id] = {
+                "category": "БАД" if index < 60 else "Легковоспламеняющиеся",
+                "baseline_error": index % 2 == 0,
+                "development_fold": index % 5,
+            }
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "schema_version": "exp674_private_manifest_v1",
+                "blind_packet_sha256": evaluator.sha256_file(packet),
+                "mapping": mapping,
+            }
+        ),
+        encoding="utf-8",
+    )
+    result = evaluator.evaluate(
+        packet=packet,
+        reviews=reviews,
+        private_manifest=manifest,
+        output=tmp_path / "score.json",
+    )
+    assert result["decision"] == "GO_BUILD_OCR_CONSUMER_SCREEN_675_ONLY"
+    assert result["metrics"]["by_category"]["БАД"]["rows"] == 60
+    assert result["metrics"]["by_baseline_state"]["error"]["rows"] == 60
+    assert result["metrics"]["by_fold"]["0"]["rows"] == 24

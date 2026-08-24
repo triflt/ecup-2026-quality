@@ -21,6 +21,29 @@ FIELDS = (
 )
 
 
+def summarize(review_rows: list[dict[str, str]]) -> dict[str, Any]:
+    critical = [
+        row for row in review_rows if row["review_visual_critical_span_present"] == "yes"
+    ]
+    captured = sum(row["review_ocr_captures_all_critical_text"] == "yes" for row in critical)
+    scope = sum(row["review_ocr_preserves_scope_relation"] == "yes" for row in critical)
+    unsupported = sum(row["review_unsupported_critical_text"] == "yes" for row in review_rows)
+    return {
+        "rows": len(review_rows),
+        "visual_critical_rows": len(critical),
+        "critical_span_captured": captured,
+        "critical_span_recall": captured / len(critical) if critical else None,
+        "scope_relation_preserved": scope,
+        "scope_preservation_rate": scope / len(critical) if critical else None,
+        "unsupported_critical_rows": unsupported,
+        "unsupported_rate": unsupported / len(review_rows) if review_rows else None,
+        "relevant_rows": sum(row["review_evidence_relevant"] == "yes" for row in review_rows),
+        "unclear_visual_rows": sum(
+            row["review_visual_critical_span_present"] == "unclear" for row in review_rows
+        ),
+    }
+
+
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -88,32 +111,51 @@ def evaluate(*, packet: Path, reviews: Path, private_manifest: Path, output: Pat
     if completed != SPEC["sample_rows"]:
         result.update({"decision": "WAIT_FOR_COMPLETE_120_ROW_REVIEW", "metrics": {}, "gates": {}})
     else:
-        values = [
-            {field: row[field].strip().lower() for field in FIELDS}
-            for row in reviews_by_id.values()
-        ]
-        critical = [row for row in values if row["review_visual_critical_span_present"] == "yes"]
-        captured = sum(row["review_ocr_captures_all_critical_text"] == "yes" for row in critical)
-        scope = sum(row["review_ocr_preserves_scope_relation"] == "yes" for row in critical)
-        unsupported = sum(row["review_unsupported_critical_text"] == "yes" for row in values)
-        recall = captured / len(critical) if critical else 0.0
-        scope_rate = scope / len(critical) if critical else 0.0
-        unsupported_rate = unsupported / len(values)
-        metrics = {
-            "visual_critical_rows": len(critical),
-            "critical_span_captured": captured,
-            "critical_span_recall": recall,
-            "scope_relation_preserved": scope,
-            "scope_preservation_rate": scope_rate,
-            "unsupported_critical_rows": unsupported,
-            "unsupported_rate": unsupported_rate,
-            "relevant_rows": sum(row["review_evidence_relevant"] == "yes" for row in values),
-            "unclear_visual_rows": sum(
-                row["review_visual_critical_span_present"] == "unclear" for row in values
-            ),
+        values_by_id = {
+            audit_id: {field: row[field].strip().lower() for field in FIELDS}
+            for audit_id, row in reviews_by_id.items()
         }
+        overall = summarize(list(values_by_id.values()))
+        mapping = manifest["mapping"]
+        metrics = {
+            "overall": overall,
+            "by_category": {
+                category: summarize(
+                    [
+                        values_by_id[audit_id]
+                        for audit_id, metadata in mapping.items()
+                        if metadata["category"] == category
+                    ]
+                )
+                for category in ("БАД", "Легковоспламеняющиеся")
+            },
+            "by_baseline_state": {
+                state: summarize(
+                    [
+                        values_by_id[audit_id]
+                        for audit_id, metadata in mapping.items()
+                        if bool(metadata["baseline_error"]) is is_error
+                    ]
+                )
+                for state, is_error in (("error", True), ("correct", False))
+            },
+            "by_fold": {
+                str(fold): summarize(
+                    [
+                        values_by_id[audit_id]
+                        for audit_id, metadata in mapping.items()
+                        if int(metadata["development_fold"]) == fold
+                    ]
+                )
+                for fold in range(5)
+            },
+        }
+        critical_rows = overall["visual_critical_rows"]
+        recall = overall["critical_span_recall"] or 0.0
+        scope_rate = overall["scope_preservation_rate"] or 0.0
+        unsupported_rate = overall["unsupported_rate"] or 0.0
         gates = {
-            "at_least_50_visual_critical_rows": len(critical) >= SPEC["minimum_visual_critical_rows"],
+            "at_least_50_visual_critical_rows": critical_rows >= SPEC["minimum_visual_critical_rows"],
             "critical_span_recall_at_least_0_90": recall >= SPEC["minimum_critical_span_recall"],
             "scope_preservation_at_least_0_95": scope_rate >= SPEC["minimum_scope_preservation"],
             "unsupported_rate_at_most_0_01": unsupported_rate <= SPEC["maximum_unsupported_rate"],
