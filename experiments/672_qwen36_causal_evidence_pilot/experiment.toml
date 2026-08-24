@@ -1,0 +1,46 @@
+[experiment]
+id = "672"
+slug = "qwen36_causal_evidence_pilot"
+title = "Fresh paired Qwen3.5-4B versus Qwen3.6-27B causal evidence pilot"
+status = "preflight_passed_awaiting_frozen_two_model_generation"
+entrypoint = "experiments/672_qwen36_causal_evidence_pilot/build_pilot.py"
+result_file = "experiments/672_qwen36_causal_evidence_pilot/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+folds = "validation/semantic_family_v3/folds.csv"
+primary_metric = "paired_blind_strict_explanation_quality"
+
+[hypothesis]
+parent_experiment = "670_causal_attribute_dataset_audit"
+changed_factor = "Replace deterministic causal targets by verdict-locked multimodal structured explanations from a mature open 27B model, with the 4B base as a paired control"
+mechanism = "A multimodal model may resolve the sold-object versus mentioned-fuel relation that exact lexicons and exact evidence spans failed to resolve"
+expected_macro_f1_delta = 0.0
+falsification = "Reject 27B scale-up unless all 40 outputs preserve format/verdict, unsupported facts are zero, and the paired blind gain is at least four relevant explanations or six decisive visual explanations"
+precedents = ["experiments 490, 626, 635 and 670", "ERASER ACL 2020", "Faithful rationalization by construction ACL 2020"]
+
+[acceptance]
+pilot_rows = 40
+candidate_outputs_per_model = 40
+required_27b_format_and_verdict = 40
+maximum_27b_unsupported = 0
+minimum_relevance_count_delta = 4
+minimum_visual_count_delta = 6
+classification_training_authorized = false
+
+[budget]
+planned_gpu_hours = 1.5
+planned_public_submissions = 0
+runtime_limit_minutes = 45
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false

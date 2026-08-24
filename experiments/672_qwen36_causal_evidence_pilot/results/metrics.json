@@ -1,0 +1,17 @@
+{
+  "schema_version": "exp672_metrics_v1",
+  "experiment_id": "672",
+  "status": "PREFLIGHT_PASSED_AWAITING_FROZEN_TWO_MODEL_GENERATION",
+  "parent_decision": "EXP670_NO_GO_REJECT_CAUSAL_TARGETS",
+  "pilot_rows": 40,
+  "candidate_models": ["qwen35_4b", "qwen36_27b"],
+  "classification_predictions_changed": false,
+  "classification_training_authorized": false,
+  "full_teacher_extraction_authorized": false,
+  "public_submissions": 0,
+  "gpu_hours_spent": 0.0,
+  "runtime_sha256": "3c8c212653764744753fa35b167cbd30509c11e276d659cabdcb9ac079a03e8a",
+  "bundle_manifest_sha256": "76af544eefd790c54e9ef0e16d08889dc94727fdf4cbd5e4ea30aa05b47d32f7",
+  "preset_audits_clean": 2,
+  "preset_dry_runs_passed": 2
+}

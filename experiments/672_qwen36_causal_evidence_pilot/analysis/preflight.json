@@ -1,0 +1,47 @@
+{
+  "schema_version": "exp672_preflight_v1",
+  "experiment_id": "672",
+  "decision": "READY_FOR_TWO_MODEL_LIVE_PILOT",
+  "frozen_runtime": {
+    "rows": 40,
+    "unique_semantic_components": 40,
+    "labels_read": 0,
+    "sealed_rows_read": 0,
+    "public_used": false,
+    "scope_priority_rows": 20,
+    "fold_counts": {"0": 4, "1": 9, "2": 6, "3": 13, "4": 8},
+    "strata": {
+      "БАД|0": 10,
+      "БАД|1": 10,
+      "Легковоспламеняющиеся|0": 10,
+      "Легковоспламеняющиеся|1": 10
+    },
+    "runtime_sha256": "3c8c212653764744753fa35b167cbd30509c11e276d659cabdcb9ac079a03e8a",
+    "private_manifest_sha256": "303b46c24af4aa781792884919d57bfcfb813386eb71056b91544d67bb0f28fd"
+  },
+  "images": {
+    "rows": 40,
+    "archive_sha256": "9ff051272e9ee1b08d6d05939470ebc7006403f4647c546b29647efb03837edc",
+    "source_data_sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+  },
+  "bundle": {
+    "rows": 40,
+    "images": 40,
+    "files": 44,
+    "manifest_sha256": "76af544eefd790c54e9ef0e16d08889dc94727fdf4cbd5e4ea30aa05b47d32f7"
+  },
+  "execution_checks": {
+    "preset_audits_clean": 2,
+    "preset_dry_runs_passed": 2,
+    "requested_gpus_per_candidate": 1,
+    "candidate_time_limit_minutes": 45,
+    "global_default_project_changed": false
+  },
+  "authorizes": "TWO_PARALLEL_40_ROW_GENERATION_JOBS_ONLY",
+  "does_not_authorize": [
+    "CLASSIFICATION_TRAINING",
+    "FULL_TEACHER_EXTRACTION",
+    "DISTILLATION",
+    "PUBLIC_SUBMISSION"
+  ]
+}
