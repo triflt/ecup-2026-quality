@@ -1,0 +1,23 @@
+{
+  "schema_version": "exp674_metrics_v1",
+  "experiment_id": "674",
+  "status": "FROZEN_PACKET_AWAITING_BLIND_REVIEW",
+  "review_rows": 120,
+  "completed_rows": 0,
+  "critical_span_recall": null,
+  "unsupported_rate": null,
+  "sealed_rows_read": 0,
+  "public_submissions": 0,
+  "gpu_hours": 0.0,
+  "blind_packet_sha256": "6607de6d12917f7e18423fdec7192172fae940bf0cb3c96576cac3e48252d043",
+  "private_manifest_sha256": "cb12490d10847bd732d52c937af8d95062dc93dd372ad27b7901576ef35948e6",
+  "unique_semantic_components": 120,
+  "excluded_reviewed_or_generated_row_ids": 244,
+  "strata": {
+    "bad_error_by_fold": [6, 6, 6, 6, 6],
+    "bad_correct_by_fold": [6, 6, 6, 6, 6],
+    "flammable_error_all_remaining_by_fold": [8, 8, 8, 5, 1],
+    "flammable_correct_by_fold": [6, 6, 6, 6, 6]
+  },
+  "decision": "WAIT_FOR_COMPLETE_120_ROW_REVIEW"
+}
