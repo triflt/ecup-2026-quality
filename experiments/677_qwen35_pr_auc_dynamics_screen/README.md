@@ -79,8 +79,10 @@ selected/final runs не считаются однофакторным срав�
 
 ## Launch gate
 
-[`results/launch_gate.json`](results/launch_gate.json) открыт точным SHA принятого
-parent report. Private preset встраивает фактический quoted HTTPS URL и до
-распаковки проверяет immutable bundle SHA-256; это устраняет уже известный
-literal-URL transport failure. Полная inner wave остаётся operationally закрыта
-до принятия technical smoke и повторной проверки свободной ёмкости.
+[`results/launch_gate.json`](results/launch_gate.json) разрешает только один inner-fold-1
+technical smoke. Runtime verifier читает вложенный terminal audit 659, проверяет его фактический
+SHA, решение, все acceptance gates и покрытие пяти folds. Private preset встраивает фактический
+quoted HTTPS URL и до распаковки проверяет immutable bundle SHA-256; это устраняет уже известный
+literal-URL transport failure. Сам builder fail-closed запрещает full preset. Полная inner wave
+будет открыта отдельным gate только после принятия smoke artifact и повторной проверки свободной
+ёмкости.

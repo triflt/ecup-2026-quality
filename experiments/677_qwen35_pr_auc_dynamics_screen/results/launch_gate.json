@@ -2,17 +2,19 @@
   "blind_confirmation_folds": [
     0
   ],
-  "decision": "OPEN_FOUR_INNER_DYNAMICS_SCREENS",
+  "decision": "OPEN_TECHNICAL_SMOKE_ONLY",
   "experiment_id": "677",
   "fold3_is_blind": false,
-  "gpu_jobs": 4,
+  "full_wave_open": false,
+  "gpu_jobs": 1,
   "gpus_per_job": 1,
-  "inner_folds": [1, 2, 3, 4],
+  "inner_folds": [1],
   "parent_decision": "ACCEPT_FULL_COMPONENT_ROUTE",
   "parent_experiment_id": "659",
   "parent_passed": true,
   "parent_result_sha256": "e2999faf11f4bbc98c9adaea5a7e8514c50d03b6571b8c62f4cced0260b4c91a",
   "public_used": false,
   "sealed_rows": 0,
-  "training_lane_open": true
+  "smoke_lane_open": true,
+  "technical_smoke_only": true
 }
