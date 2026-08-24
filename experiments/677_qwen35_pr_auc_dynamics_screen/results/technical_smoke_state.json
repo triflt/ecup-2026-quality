@@ -1,0 +1,24 @@
+{
+  "attempts": [
+    {
+      "artifact_created": false,
+      "bundle_download_started": false,
+      "bundle_sha256": "efa42b1b493dd6d1ef1bac75969ae846c0634fcec8de8aa23fcd8edaaedc3ffc",
+      "classification": "TRANSPORT_PRELOAD_FAILURE",
+      "model_load_started": false,
+      "quality_evidence": false,
+      "scientific_runtime_started": false,
+      "state": "FAILED",
+      "technical_factor": "cli_env_file_did_not_override_preset_placeholder"
+    }
+  ],
+  "decision": "ALLOW_ONE_CONTROLLED_TRANSPORT_RETRY",
+  "experiment_id": "677",
+  "full_wave_open": false,
+  "gpu_jobs_authorized": 1,
+  "next_attempt_changed_factor": "embed_actual_quoted_https_in_ignored_private_preset",
+  "next_attempt_scientific_change": false,
+  "public_used": false,
+  "schema_version": 1,
+  "sealed_rows": 0
+}

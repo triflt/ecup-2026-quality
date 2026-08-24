@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from pathlib import Path
 
@@ -12,11 +13,9 @@ def scalar(text: str, key: str, *, indent: int = 2) -> str:
     return match.group(1)
 
 
-def build(args: argparse.Namespace) -> tuple[str, str]:
+def build(args: argparse.Namespace) -> str:
     if args.output.exists():
         raise FileExistsError("refusing to overwrite a private preset")
-    if args.env_output.exists():
-        raise FileExistsError("refusing to overwrite a private environment file")
     if not args.technical_smoke:
         raise ValueError("full inner wave remains closed until smoke artifact acceptance")
     if args.inner_fold not in {1, 2, 3, 4}:
@@ -65,7 +64,7 @@ def build(args: argparse.Namespace) -> tuple[str, str]:
         + (" --technical-smoke" if args.technical_smoke else "")
     )
     output_name = f"dyn_i{args.inner_fold}" + ("_smoke" if args.technical_smoke else "")
-    preset = f"""job:
+    return f"""job:
   generate_name: qwen-dynamics
   time_limit: {values['time_limit']}
   flavor: {values['flavor']}
@@ -76,7 +75,7 @@ def build(args: argparse.Namespace) -> tuple[str, str]:
   env:
     TOKENIZERS_PARALLELISM: {values['tokenizers']}
     PYTORCH_ALLOC_CONF: {values['allocator']}
-    BUNDLE_URL: override_on_submit
+    BUNDLE_URL: {json.dumps(url)}
   entrypoint: bash
   args:
     - -lc
@@ -87,7 +86,6 @@ def build(args: argparse.Namespace) -> tuple[str, str]:
   output:
     - {{type: files, name: {output_name}, src: /work/output/, mask: "**/*"}}
 """
-    return preset, f"BUNDLE_URL={url}\n"
 
 
 def parser() -> argparse.ArgumentParser:
@@ -97,15 +95,12 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--bundle-sha256", required=True)
     result.add_argument("--inner-fold", type=int, required=True)
     result.add_argument("--output", type=Path, required=True)
-    result.add_argument("--env-output", type=Path, required=True)
     result.add_argument("--technical-smoke", action="store_true")
     return result
 
 
 if __name__ == "__main__":
     arguments = parser().parse_args()
-    payload, env_payload = build(arguments)
+    payload = build(arguments)
     arguments.output.parent.mkdir(parents=True, exist_ok=True)
-    arguments.env_output.parent.mkdir(parents=True, exist_ok=True)
     arguments.output.write_text(payload, encoding="utf-8")
-    arguments.env_output.write_text(env_payload, encoding="utf-8")
