@@ -54,7 +54,7 @@ def build(args: argparse.Namespace) -> str:
         "--vendor /work/vendor --output-dir /work/output --runtime-backend legacy_eager "
         f"--micro-batch-size-override 2{smoke}"
     )
-    name = f"qwen_flammable_hard_f{args.fold}" + ("_smoke" if args.technical_smoke else "")
+    name = f"fl_hard_f{args.fold}" + ("_smk" if args.technical_smoke else "")
     return f"""job:
   generate_name: qwen-fl-hard
   time_limit: {values['time_limit']}
@@ -92,4 +92,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(build(args), encoding="utf-8")
-
