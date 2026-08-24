@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import importlib.util
 import csv
+import importlib.util
 import json
 import sys
 import zipfile
 from pathlib import Path
 
 import pytest
-
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENT = ROOT / "experiments/679_qwen35_4b_lower_lr"
@@ -28,6 +27,12 @@ GATE = load_module(EXPERIMENT / "verify_launch_gate.py", "experiment_679_gate")
 PRESET = load_module(EXPERIMENT / "build_private_preset.py", "experiment_679_preset")
 EVALUATOR = load_module(EXPERIMENT / "evaluate.py", "experiment_679_evaluator")
 ARTIFACT = load_module(EXPERIMENT / "verify_artifact.py", "experiment_679_artifact")
+CONFIRM_GATE = load_module(
+    EXPERIMENT / "verify_confirmation_gate.py", "experiment_679_confirmation_gate"
+)
+CONFIRM_PRESET = load_module(
+    EXPERIMENT / "build_confirmation_preset.py", "experiment_679_confirmation_preset"
+)
 
 
 def canonical_without_hash(payload: dict) -> str:
@@ -382,3 +387,102 @@ def test_full_artifact_verifier_rejects_row_reordering(tmp_path: Path) -> None:
     write_jsonl(runtime_path, list(reversed(rows)))
     with pytest.raises(ValueError, match="frozen runtime validation"):
         ARTIFACT.verify(archive_path, fold=0, runtime_validation=runtime_path)
+
+
+def make_screen_report(path: Path) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "experiment_id": "679",
+                "control_experiment_id": "641",
+                "mode": "screen",
+                "passed": True,
+                "decision": "OPEN_CONFIRMATION_FOLDS",
+                "public_used": False,
+                "sealed_rows": 0,
+                "folds": {"0": {}, "3": {}},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_confirmation_gate_stays_closed_until_bound_screen_pass(tmp_path: Path) -> None:
+    gate = json.loads(
+        (EXPERIMENT / "results/confirmation_gate.json").read_text(encoding="utf-8")
+    )
+    runtime = tmp_path / "runtime"
+    write_runtime(runtime, gate, 1)
+    screen = tmp_path / "screen.json"
+    make_screen_report(screen)
+    gate_path = tmp_path / "gate.json"
+    gate_path.write_text(json.dumps(gate), encoding="utf-8")
+    with pytest.raises(ValueError, match="closed"):
+        CONFIRM_GATE.verify(gate_path, runtime, screen, 1)
+
+    gate["decision"] = "OPEN_CONFIRMATION"
+    gate["training_lane_open"] = True
+    gate["allowed_folds"] = [1, 2, 4]
+    gate["screen_report_sha256"] = CONFIRM_GATE.sha256_file(screen)
+    gate_path.write_text(json.dumps(gate), encoding="utf-8")
+    result = CONFIRM_GATE.verify(gate_path, runtime, screen, 1)
+    assert result["candidate_learning_rate"] == 1e-4
+
+    screen.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="checksum"):
+        CONFIRM_GATE.verify(gate_path, runtime, screen, 1)
+
+
+def test_confirmation_preset_rejects_prepared_gate_and_preserves_recipe(
+    tmp_path: Path,
+) -> None:
+    base = tmp_path / "base.yml"
+    base.write_text(
+        """job:
+  time_limit: 4h
+  flavor: h100-1x
+  region: frozen-region
+  image: frozen-image
+  preemption: never
+  work_dir: /work
+  env:
+    TOKENIZERS_PARALLELISM: "false"
+    PYTORCH_ALLOC_CONF: expandable_segments:True
+  input:
+    - {type: model_registry, name: frozen-model, dst: /hf_models}
+""",
+        encoding="utf-8",
+    )
+    url = tmp_path / "url.txt"
+    url.write_text("https://example.invalid/unique-bundle.tar.gz\n", encoding="utf-8")
+    patch = tmp_path / "train_lora.py"
+    patch.write_text("# frozen", encoding="utf-8")
+    gate = json.loads(
+        (EXPERIMENT / "results/confirmation_gate.json").read_text(encoding="utf-8")
+    )
+    gate_path = tmp_path / "gate.json"
+    gate_path.write_text(json.dumps(gate), encoding="utf-8")
+    args = type(
+        "Args",
+        (),
+        {
+            "base_preset": base,
+            "bundle_url_file": url,
+            "gate": gate_path,
+            "train_lora_patch": patch,
+            "fold": 1,
+            "output": tmp_path / "preset.yml",
+        },
+    )()
+    with pytest.raises(ValueError, match="not open"):
+        CONFIRM_PRESET.build(args)
+    gate["decision"] = "OPEN_CONFIRMATION"
+    gate["training_lane_open"] = True
+    gate["allowed_folds"] = [1, 2, 4]
+    gate["screen_report_sha256"] = "frozen-screen-sha"
+    gate_path.write_text(json.dumps(gate), encoding="utf-8")
+    payload = CONFIRM_PRESET.build(args)
+    assert "h100-1x" in payload
+    assert "verify_confirmation_gate.py" in payload
+    assert "--micro-batch-size-override 2" in payload
+    assert "Qwen3.6" not in payload and "27B" not in payload

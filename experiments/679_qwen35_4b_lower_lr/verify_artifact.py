@@ -8,7 +8,6 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-
 MODEL_REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
 EXPECTED_TRAIN_OCCURRENCES = {0: 4892, 1: 4894, 2: 4892, 3: 4892, 4: 4894}
 EXPECTED_VALIDATION_ROWS = {0: 2224, 1: 2223, 2: 2224, 3: 2224, 4: 2223}
