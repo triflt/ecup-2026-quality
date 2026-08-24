@@ -93,6 +93,27 @@ def test_legacy_eager_runtime_batch_override_preserves_effective_batch() -> None
     assert plan["frozen_optimizer_updates"] == 306
     assert plan["runtime_optimizer_updates"] == 306
     assert plan["tail_rows"] == 12
+    assert plan["frozen_micro_batch_tail_rows"] == 0
+    assert plan["tail_loss_divisor"] == 8
+
+
+def test_legacy_override_reproduces_two_row_frozen_tail() -> None:
+    plan = train_lora.build_batching_plan(
+        grid_contract.CELL_SPECS["641"],
+        train_occurrences=4894,
+        runtime_micro_batch_size=2,
+        runtime_gradient_accumulation=8,
+    )
+    assert plan["frozen_optimizer_updates"] == 306
+    assert plan["runtime_optimizer_updates"] == 306
+    assert plan["frozen_micro_batch_tail_rows"] == 2
+    assert plan["tail_loss_divisor"] == 4
+    assert train_lora.loss_divisor_for_micro_batch(
+        plan, offset=4892, batch_rows=2, total_rows=4894
+    ) == 4
+    assert train_lora.loss_divisor_for_micro_batch(
+        plan, offset=4890, batch_rows=2, total_rows=4894
+    ) == 8
 
 
 def test_legacy_eager_runtime_batch_override_preserves_smoke_plan() -> None:
@@ -108,11 +129,11 @@ def test_legacy_eager_runtime_batch_override_preserves_smoke_plan() -> None:
     assert plan["runtime_optimizer_updates"] == 1
 
 
-@pytest.mark.parametrize("train_occurrences", [4890, 4891, 4893])
-def test_legacy_override_rejects_incomplete_frozen_micro_batch_tail(
+@pytest.mark.parametrize("train_occurrences", [4891, 4893])
+def test_legacy_override_rejects_unreproducible_frozen_micro_batch_tail(
     train_occurrences: int,
 ) -> None:
-    with pytest.raises(ValueError, match="complete frozen micro-batch tail"):
+    with pytest.raises(ValueError, match="cannot reproduce"):
         train_lora.build_batching_plan(
             grid_contract.CELL_SPECS["641"],
             train_occurrences=train_occurrences,

@@ -5,6 +5,7 @@ import json
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -105,3 +106,19 @@ def test_full_evaluator_requires_exact_screen_gate() -> None:
     assert module.FOLDS == (0, 1, 2, 3, 4)
     assert module.BASELINE_WEIGHT == module.LARGE_WEIGHT == 0.5
     assert module.THRESHOLD == 0.0
+    assert module.screen_fold_deltas(gate) == {
+        "0": gate["folds"]["0"]["delta"],
+        "3": gate["folds"]["3"]["delta"],
+    }
+
+
+def test_average_precision_handles_tied_scores_at_one_threshold() -> None:
+    spec = importlib.util.spec_from_file_location("exp659_full_ap", EXPERIMENT / "evaluate_full.py")
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    labels = np.asarray([1, 0, 1, 0], dtype=np.int8)
+    scores = np.asarray([0.9, 0.8, 0.8, 0.1], dtype=np.float64)
+    # First positive contributes precision 1.0 at recall 0.5; the tied second
+    # threshold contributes precision 2/3 for the remaining recall 0.5.
+    assert abs(module.average_precision(labels, scores) - (0.5 + 1.0 / 3.0)) < 1e-12

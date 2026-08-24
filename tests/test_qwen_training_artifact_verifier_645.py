@@ -16,19 +16,24 @@ import grid_contract
 import verify_training_artifact
 
 
-def build_artifact(path: Path, *, include_label: bool = False) -> None:
+def build_artifact(
+    path: Path, *, include_label: bool = False, fold: int = 0, rows: int = 1
+) -> None:
     path.mkdir()
-    prediction = {
-        "id": "row-1",
-        "fold": 0,
-        "model_id": grid_contract.CELL_SPECS["641"].model_id,
-        "score": 0.25,
-        "prediction": 1,
-    }
-    if include_label:
-        prediction["label"] = 1
     predictions = path / "predictions.jsonl"
-    predictions.write_text(json.dumps(prediction) + "\n", encoding="utf-8")
+    prediction_rows = []
+    for index in range(rows):
+        prediction = {
+            "id": f"row-{index}",
+            "fold": fold,
+            "model_id": grid_contract.CELL_SPECS["641"].model_id,
+            "score": 0.25,
+            "prediction": 1,
+        }
+        if include_label:
+            prediction["label"] = 1
+        prediction_rows.append(json.dumps(prediction) + "\n")
+    predictions.write_text("".join(prediction_rows), encoding="utf-8")
     adapter = path / "adapter.zip"
     with zipfile.ZipFile(adapter, "w") as archive:
         archive.writestr("adapter/adapter_config.json", "{}")
@@ -36,7 +41,7 @@ def build_artifact(path: Path, *, include_label: bool = False) -> None:
     contract = {
         "schema_version": 1,
         "experiment_id": "641",
-        "outer_fold": 0,
+        "outer_fold": fold,
         "model_id": grid_contract.CELL_SPECS["641"].model_id,
         "model_revision": grid_contract.CELL_SPECS["641"].model_revision,
         "objective": "class_only",
@@ -57,7 +62,7 @@ def build_artifact(path: Path, *, include_label: bool = False) -> None:
         },
         "target_orders": [],
         "train_occurrences": 10,
-        "validation_rows": 1,
+        "validation_rows": rows,
         "technical_smoke": False,
         "validation_labels_read": 0,
         "sealed_rows_used": 0,
@@ -86,7 +91,7 @@ def test_verifier_accepts_complete_class_only_output(tmp_path: Path) -> None:
 
 def test_verifier_accepts_frozen_641_legacy_eager_execution(tmp_path: Path) -> None:
     artifact = tmp_path / "artifact"
-    build_artifact(artifact)
+    build_artifact(artifact, rows=2224)
     contract_path = artifact / "output_contract.json"
     contract = json.loads(contract_path.read_text(encoding="utf-8"))
     contract.update(
@@ -119,6 +124,48 @@ def test_verifier_accepts_frozen_641_legacy_eager_execution(tmp_path: Path) -> N
         artifact, experiment_id="641", fold=0, technical_smoke=False
     )
     assert report["runtime_backend"] == "legacy_eager"
+
+
+def test_verifier_accepts_fold1_legacy_eager_row_counts(tmp_path: Path) -> None:
+    artifact = tmp_path / "artifact"
+    build_artifact(artifact, fold=1, rows=2223)
+    predictions_path = artifact / "predictions.jsonl"
+    contract_path = artifact / "output_contract.json"
+    contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    contract.update(
+        {
+            "runtime_backend": "legacy_eager",
+            "runtime_packages": verify_training_artifact.EXPECTED_LEGACY_PACKAGES,
+            "fast_path_bindings": {},
+            "optimized_training_kernels": False,
+            "frozen_micro_batch_size": 4,
+            "frozen_gradient_accumulation": 4,
+            "runtime_micro_batch_size": 2,
+            "runtime_gradient_accumulation": 8,
+            "effective_batch_size": 16,
+            "batching_override": True,
+            "train_occurrences": 4894,
+            "validation_rows": 2223,
+            "frozen_optimizer_updates": 306,
+            "runtime_optimizer_updates": 306,
+            "optimizer_steps_executed": 306,
+            "tail_rows": 14,
+            "frozen_micro_batch_tail_rows": 2,
+            "tail_loss_divisor": 4,
+            "selection_contract_changed": False,
+            "numerical_accumulation_order_changed": True,
+        }
+    )
+    contract["artifacts"]["predictions.jsonl"] = grid_contract.sha256_file(predictions_path)
+    contract.pop("fast_path_packages")
+    contract.pop("contract_sha256")
+    contract["contract_sha256"] = grid_contract.canonical_sha256(contract)
+    contract_path.write_text(json.dumps(contract), encoding="utf-8")
+
+    report = verify_training_artifact.verify_artifact(
+        artifact, experiment_id="641", fold=1, technical_smoke=False
+    )
+    assert report["prediction_rows"] == 2223
 
 
 def test_verifier_rejects_legacy_eager_package_drift(tmp_path: Path) -> None:

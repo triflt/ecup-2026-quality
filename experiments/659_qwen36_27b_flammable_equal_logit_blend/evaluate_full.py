@@ -52,7 +52,35 @@ def validate_screen_gate(path: Path) -> dict[str, Any]:
     )
     if not expected:
         raise ValueError("screen gate contract mismatch")
+    screen_folds = gate.get("folds")
+    if not isinstance(screen_folds, dict) or any(
+        str(fold) not in screen_folds or "delta" not in screen_folds[str(fold)]
+        for fold in (0, 3)
+    ):
+        raise ValueError("screen gate fold metrics are incomplete")
     return gate
+
+
+def screen_fold_deltas(gate: dict[str, Any]) -> dict[str, float]:
+    return {str(fold): float(gate["folds"][str(fold)]["delta"]) for fold in (0, 3)}
+
+
+def average_precision(labels: np.ndarray, scores: np.ndarray) -> float:
+    labels = np.asarray(labels, dtype=np.int8)
+    scores = np.asarray(scores, dtype=np.float64)
+    positives = int((labels == 1).sum())
+    if positives == 0:
+        raise ValueError("PR-AUC requires at least one positive row")
+    if not np.isfinite(scores).all():
+        raise ValueError("PR-AUC scores must be finite")
+    order = np.argsort(-scores, kind="mergesort")
+    ranked_labels = labels[order]
+    ranked_scores = scores[order]
+    true_positives = np.cumsum(ranked_labels == 1)
+    threshold_ends = np.r_[np.flatnonzero(np.diff(ranked_scores)), len(ranked_scores) - 1]
+    precision = true_positives[threshold_ends] / (threshold_ends + 1)
+    recall = true_positives[threshold_ends] / positives
+    return float(np.sum(np.diff(np.r_[0.0, recall]) * precision))
 
 
 def evaluate(
@@ -138,12 +166,35 @@ def evaluate(
     regressed = int(((baseline_pred == labels) & (routed_pred != labels)).sum())
     ratio = None if regressed == 0 else corrected / regressed
     flammable = categories == "Легковоспламеняющиеся"
+    flammable_pr_auc_folds: dict[str, Any] = {}
+    for fold in FOLDS:
+        local = flammable & (folds == fold)
+        flammable_pr_auc_folds[str(fold)] = {
+            "baseline_4b": average_precision(labels[local], baseline_score[local]),
+            "large_27b": average_precision(labels[local], large_score[local]),
+            "equal_logit_blend": average_precision(labels[local], routed_score[local]),
+            "positives": int((labels[local] == 1).sum()),
+            "rows": int(local.sum()),
+        }
+    flammable_pr_auc = {
+        "metric": "average_precision",
+        "diagnostic_only": True,
+        "used_for_weights_or_threshold": False,
+        "folds": flammable_pr_auc_folds,
+        "pooled": {
+            "baseline_4b": average_precision(labels[flammable], baseline_score[flammable]),
+            "large_27b": average_precision(labels[flammable], large_score[flammable]),
+            "equal_logit_blend": average_precision(labels[flammable], routed_score[flammable]),
+            "positives": int((labels[flammable] == 1).sum()),
+            "rows": int(flammable.sum()),
+        },
+    }
     baseline_fn = int((flammable & (labels == 1) & (baseline_pred == 0)).sum())
     candidate_fn = int((flammable & (labels == 1) & (routed_pred == 0)).sum())
     fold_deltas = {key: float(value["delta"]) for key, value in fold_metrics.items()}
     fold_wins = sum(delta > 0.0 for delta in fold_deltas.values())
     mean_delta = float(np.mean(list(fold_deltas.values())))
-    screen_deltas = gate.get("fold_deltas", {})
+    screen_deltas = screen_fold_deltas(gate)
     screen_reproduced = all(
         abs(fold_deltas[str(fold)] - float(screen_deltas[str(fold)])) <= 1e-12
         for fold in (0, 3)
@@ -183,6 +234,7 @@ def evaluate(
             "candidate": candidate_fn,
             "delta": candidate_fn - baseline_fn,
         },
+        "flammable_pr_auc": flammable_pr_auc,
         "screen_gate_sha256": sha256_file(screen_gate_path),
         "gates": gates,
         "passed": passed,

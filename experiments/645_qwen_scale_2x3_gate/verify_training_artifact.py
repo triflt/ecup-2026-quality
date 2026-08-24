@@ -31,6 +31,8 @@ EXPECTED_LEGACY_PACKAGES = {
     "torch": "2.10.0+cu128",
     "transformers": "5.14.1",
 }
+EXPECTED_641_TRAIN_OCCURRENCES = {0: 4892, 1: 4894, 2: 4892, 3: 4892, 4: 4894}
+EXPECTED_641_VALIDATION_ROWS = {0: 2224, 1: 2223, 2: 2224, 3: 2224, 4: 2223}
 FORBIDDEN_PREDICTION_FIELDS = {
     "label",
     "target",
@@ -129,17 +131,26 @@ def verify_artifact(
             "batching_override": True,
         }
         if not technical_smoke:
+            train_occurrences = EXPECTED_641_TRAIN_OCCURRENCES[fold]
             expected_legacy.update(
                 {
-                    "train_occurrences": 4892,
+                    "train_occurrences": train_occurrences,
+                    "validation_rows": EXPECTED_641_VALIDATION_ROWS[fold],
                     "frozen_optimizer_updates": 306,
                     "runtime_optimizer_updates": 306,
                     "optimizer_steps_executed": 306,
-                    "tail_rows": 12,
+                    "tail_rows": train_occurrences % 16,
                     "selection_contract_changed": False,
                     "numerical_accumulation_order_changed": True,
                 }
             )
+            if train_occurrences % 4:
+                expected_legacy.update(
+                    {
+                        "frozen_micro_batch_tail_rows": 2,
+                        "tail_loss_divisor": 4,
+                    }
+                )
         mismatch = {
             key: {"expected": value, "actual": contract.get(key)}
             for key, value in expected_legacy.items()

@@ -75,9 +75,13 @@ def build_batching_plan(
     override = runtime_micro_batch_size != frozen_micro
     if runtime_effective != frozen_effective:
         raise ValueError("runtime effective batch differs from the frozen contract")
-    if override and train_occurrences % frozen_micro:
+    frozen_micro_batch_tail_rows = train_occurrences % frozen_micro
+    if override and frozen_micro_batch_tail_rows not in {
+        0,
+        runtime_micro_batch_size,
+    }:
         raise ValueError(
-            "641 micro-batch override requires a complete frozen micro-batch tail"
+            "641 micro-batch override cannot reproduce this frozen micro-batch tail"
         )
     frozen_batches = math.ceil(train_occurrences / frozen_micro)
     runtime_batches = math.ceil(train_occurrences / runtime_micro_batch_size)
@@ -99,7 +103,32 @@ def build_batching_plan(
         "frozen_optimizer_updates": frozen_updates,
         "runtime_optimizer_updates": runtime_updates,
         "tail_rows": train_occurrences % frozen_effective,
+        "frozen_micro_batch_tail_rows": frozen_micro_batch_tail_rows,
+        "tail_loss_divisor": (
+            frozen_accumulation
+            if override and frozen_micro_batch_tail_rows
+            else runtime_gradient_accumulation
+        ),
     }
+
+
+def loss_divisor_for_micro_batch(
+    batching_plan: dict[str, int | bool],
+    *,
+    offset: int,
+    batch_rows: int,
+    total_rows: int,
+) -> int:
+    """Match the frozen micro-batch mean for its final two-row tail."""
+    tail_rows = int(batching_plan["frozen_micro_batch_tail_rows"])
+    runtime_divisor = int(batching_plan["runtime_gradient_accumulation"])
+    if not bool(batching_plan["batching_override"]) or tail_rows == 0:
+        return runtime_divisor
+    if offset + batch_rows < total_rows:
+        return runtime_divisor
+    if batch_rows != tail_rows:
+        raise ValueError("runtime tail differs from the frozen micro-batch tail")
+    return int(batching_plan["tail_loss_divisor"])
 
 
 def verify_frozen_c_compiler() -> str:
@@ -726,7 +755,13 @@ def run(spec_id: str, args: argparse.Namespace) -> dict[str, Any]:
                     loss = loss + spec.evidence_auxiliary_weight * auxiliary_loss(
                         model, processor, rows, images
                     )
-                (loss / gradient_accumulation).backward()
+                loss_divisor = loss_divisor_for_micro_batch(
+                    batching_plan,
+                    offset=offset,
+                    batch_rows=len(local),
+                    total_rows=len(indices),
+                )
+                (loss / loss_divisor).backward()
             finally:
                 for image in images:
                     image.close()
