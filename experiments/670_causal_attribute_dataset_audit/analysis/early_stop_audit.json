@@ -1,0 +1,29 @@
+{
+  "audit_sha256": "012def05a7370608cb959aa9a0d73326bc48b1f6d93cb1c9faea2bb7a8842b7a",
+  "decision": "NO_GO_REJECT_CAUSAL_TARGETS",
+  "experiment_id": "670",
+  "incomplete_rows_not_needed_for_decision": 296,
+  "irreversible_gates": {
+    "overall_282_of_300_no_longer_reachable": false,
+    "priority_95_of_100_no_longer_reachable": false,
+    "unsupported_claim_limit_exceeded": true
+  },
+  "packet": {
+    "baseline_errors": 53,
+    "categories": {
+      "БАД": 31,
+      "Легковоспламеняющиеся": 269
+    },
+    "rows": 300,
+    "unique_semantic_components": 300
+  },
+  "priority_failures_observed": 4,
+  "public_used": false,
+  "review_overlay_sha256": "ce347109a12fdd51bf2b327e6d7cdd58fc68ed8393e15460de786618a3041494",
+  "reviewed_rows": 4,
+  "schema_version": "exp670_causal_audit_score_v1",
+  "sealed_rows_loaded": 0,
+  "status": "completed_early_rejection",
+  "strict_failures_observed": 4,
+  "unsupported_claims_observed": 4
+}

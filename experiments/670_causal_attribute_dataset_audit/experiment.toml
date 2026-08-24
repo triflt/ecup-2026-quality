@@ -1,0 +1,44 @@
+[experiment]
+id = "670"
+slug = "causal_attribute_dataset_audit"
+title = "Blind audit of sold-object, regulated-substance and relation targets"
+status = "rejected_pre_gpu_by_irreversible_audit_gate"
+entrypoint = "experiments/670_causal_attribute_dataset_audit/run.py"
+result_file = "experiments/670_causal_attribute_dataset_audit/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+folds = "validation/semantic_family_v3/folds.csv"
+primary_metric = "strict_causal_target_accuracy"
+
+[hypothesis]
+parent_experiment = "632_span_head_seed_repeat"
+changed_factor = "Replace the broad five-way evidence concept by sold-object, regulated-substance and relation targets"
+mechanism = "Exact fuel text is insufficient when it describes equipment, compatibility or an excluded item; explicit transaction scope should prevent the fold-4 false-positive mechanism of experiment 635"
+expected_macro_f1_delta = 0.006
+falsification = "Reject before GPU below 282/300 strict target passes, below 95/100 priority object/relation passes, or above three unsupported claims"
+precedents = ["Efficient Learning for Product Attributes, ICCVW 2025", "ERASER, ACL 2020", "experiments 632 and 635"]
+
+[acceptance]
+required_strict_passes = 282
+required_priority_object_relation_passes = 95
+maximum_unsupported_claims = 3
+audit_rows = 300
+priority_rows = 100
+
+[budget]
+planned_gpu_hours = 0.0
+planned_public_submissions = 0
+runtime_limit_minutes = 0
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false
