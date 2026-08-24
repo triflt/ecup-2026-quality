@@ -18,3 +18,9 @@ score = "raw_last_token_logit_1_minus_logit_0"
 validation_rows_read = 0
 validation_labels_read = 0
 first_gate = "fold0_smoke8"
+
+[usage_constraints]
+cv_train_targets_only = true
+opens_final_refit = false
+oof_full_refit_requires_separate_experiment = true
+recipe_equivalent_final_teacher = "full_data_teacher_scoring_own_train_occurrences"

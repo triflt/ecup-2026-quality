@@ -52,5 +52,14 @@
   "validation_labels_read": 0,
   "sealed_rows": 0,
   "public_used": false,
+  "target_policy": {
+    "cv_targets": "outer_fold_teacher_scoring_own_outer_train_occurrences",
+    "final_refit_opened": false,
+    "oof_full_refit_allowed": false,
+    "reason": "oof_and_in_sample_teacher_targets_are_materially_different",
+    "diagnostic_logit_mae_folds_0_1_3": [1.908, 1.358, 1.406],
+    "diagnostic_ambiguous_targets_t2_oof_folds_0_1_3": [108, 118, 135],
+    "diagnostic_ambiguous_targets_t2_in_sample_folds_0_1_3": [57, 26, 36]
+  },
   "decision": "WAIT_FOR_FOLDS_2_AND_4"
 }
