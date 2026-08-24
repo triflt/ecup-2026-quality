@@ -2,9 +2,11 @@
 
 ## Статус
 
-`TECHNICAL_SMOKE_PENDING`. Runtime построен на CPU и проверен; терминальный
-пятиfoldовый parent gate принят. Сначала разрешён ровно один 1×H100 smoke,
-затем четыре inner trajectories только после artifact acceptance. Public и
+`INNER_WAVE_OPEN_AFTER_ACCEPTED_SMOKE`. Первый smoke упал до скачивания bundle
+из-за неприменившегося CLI env override и не дал научных данных. Controlled retry с
+actual quoted HTTPS завершился успешно: ZIP/CRC, self-hash, exact runtime binding,
+два checkpoints и 4/4 finite predictions проверены. Старый smoke lane закрыт;
+новый gate разрешает ровно четыре full inner trajectories по одной H100. Public и
 sealed rows не используются.
 
 ## Конкретный недостаток
@@ -79,13 +81,13 @@ selected/final runs не считаются однофакторным срав�
 
 ## Launch gate
 
-[`results/launch_gate.json`](results/launch_gate.json) разрешает только один inner-fold-1
-technical smoke. Runtime verifier читает вложенный terminal audit 659, проверяет его фактический
-SHA, решение, все acceptance gates и покрытие пяти folds. Signed HTTPS URL записывается только в
+[`results/launch_gate.json`](results/launch_gate.json) разрешает full inner folds 1/2/3/4 только
+после принятого smoke. Runtime verifier читает вложенные terminal audit 659 и
+[`technical_smoke_acceptance.json`](results/technical_smoke_acceptance.json), проверяет их
+фактические SHA, self-hash, решения, acceptance gates и покрытие. Signed HTTPS URL записывается только в
 ignored private preset как quoted scalar: попытка передать его через CLI `--env-files` была
 терминально отклонена до скачивания, потому что preset placeholder получил более высокий приоритет.
 Runtime читает фактическое значение из окружения и до распаковки проверяет immutable bundle SHA-256.
 Это точный transport-only fix, уже доказанный успешным smoke 681. Сам builder fail-closed запрещает
-full preset. Полная inner wave
-будет открыта отдельным gate только после принятия smoke artifact и повторной проверки свободной
-ёмкости.
+повторный smoke. Каждый full preset использует тот же immutable bundle и scientific recipe; меняется
+только заранее разрешённый inner-fold runtime.

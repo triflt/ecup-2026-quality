@@ -16,12 +16,10 @@ def scalar(text: str, key: str, *, indent: int = 2) -> str:
 def build(args: argparse.Namespace) -> str:
     if args.output.exists():
         raise FileExistsError("refusing to overwrite a private preset")
-    if not args.technical_smoke:
-        raise ValueError("full inner wave remains closed until smoke artifact acceptance")
+    if args.technical_smoke:
+        raise ValueError("technical smoke lane is closed after artifact acceptance")
     if args.inner_fold not in {1, 2, 3, 4}:
         raise ValueError("inner fold must be 1/2/3/4")
-    if args.inner_fold != 1:
-        raise ValueError("pre-smoke gate authorizes only inner-fold-1 technical smoke")
     url = args.bundle_url_file.read_text(encoding="utf-8").strip()
     if not url.startswith("https://") or any(character.isspace() for character in url):
         raise ValueError("bundle URL file must contain one HTTPS URL")
@@ -52,7 +50,8 @@ def build(args: argparse.Namespace) -> str:
         "python /work/input/experiments/677_qwen35_pr_auc_dynamics_screen/verify_launch_gate.py "
         "--gate /work/input/experiments/677_qwen35_pr_auc_dynamics_screen/results/launch_gate.json "
         "--parent-result /work/input/experiments/659_qwen36_27b_flammable_equal_logit_blend/results/full_acceptance_audit.json "
-        f"--inner-fold {args.inner_fold} --technical-smoke && "
+        "--smoke-acceptance /work/input/experiments/677_qwen35_pr_auc_dynamics_screen/results/technical_smoke_acceptance.json "
+        f"--inner-fold {args.inner_fold} && "
         "python -m zipfile -e /work/input/research/peft-vendor-extracted/peft-0.20.0.zip /work/vendor && "
         "PYTHONPATH=/work/input/experiments/645_qwen_scale_2x3_gate:/work/vendor "
         "python -u /work/input/experiments/677_qwen35_pr_auc_dynamics_screen/train_dynamics.py "

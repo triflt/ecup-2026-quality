@@ -7,6 +7,7 @@ from pathlib import Path
 
 
 PARENT_RESULT_SHA256 = "e2999faf11f4bbc98c9adaea5a7e8514c50d03b6571b8c62f4cced0260b4c91a"
+SMOKE_ACCEPTANCE_SHA256 = "185c72bdcd8ce2d349f94374049b6b6fe89571b0f353db3eaeb2462175c25032"
 
 
 def sha256_file(path: Path) -> str:
@@ -17,18 +18,30 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def verify(path: Path, parent_result_path: Path, inner_fold: int, technical_smoke: bool) -> dict:
+def canonical_sha256(value: dict) -> str:
+    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
+def verify(
+    path: Path,
+    parent_result_path: Path,
+    smoke_acceptance_path: Path,
+    inner_fold: int,
+    technical_smoke: bool,
+) -> dict:
     gate = json.loads(path.read_text(encoding="utf-8"))
     expected = {
         "experiment_id": "677",
         "parent_experiment_id": "659",
         "parent_passed": True,
         "parent_decision": "ACCEPT_FULL_COMPONENT_ROUTE",
-        "smoke_lane_open": True,
-        "full_wave_open": False,
-        "technical_smoke_only": True,
-        "decision": "OPEN_TECHNICAL_SMOKE_ONLY",
-        "gpu_jobs": 1,
+        "smoke_lane_open": False,
+        "full_wave_open": True,
+        "technical_smoke_only": False,
+        "technical_smoke_accepted": True,
+        "decision": "OPEN_FOUR_INNER_DYNAMICS_SCREENS",
+        "gpu_jobs": 4,
         "gpus_per_job": 1,
         "blind_confirmation_folds": [0],
         "fold3_is_blind": False,
@@ -37,10 +50,10 @@ def verify(path: Path, parent_result_path: Path, inner_fold: int, technical_smok
     }
     if any(gate.get(key) != value for key, value in expected.items()):
         raise ValueError("experiment-677 launch gate is closed or malformed")
-    if not technical_smoke:
-        raise ValueError("full inner wave is closed until technical smoke artifact acceptance")
-    if gate.get("inner_folds") != [1] or inner_fold != 1:
-        raise ValueError("pre-smoke gate authorizes only one inner-fold-1 technical smoke")
+    if technical_smoke:
+        raise ValueError("technical smoke lane is closed after artifact acceptance")
+    if gate.get("inner_folds") != [1, 2, 3, 4]:
+        raise ValueError("full inner-fold authorization is incomplete")
     if inner_fold not in gate.get("inner_folds", []):
         raise ValueError("requested inner fold is not authorized")
     parent_sha = str(gate.get("parent_result_sha256", ""))
@@ -72,6 +85,34 @@ def verify(path: Path, parent_result_path: Path, inner_fold: int, technical_smok
         raise ValueError("terminal parent acceptance gates are incomplete")
     if set(parent.get("folds", {})) != {"0", "1", "2", "3", "4"}:
         raise ValueError("terminal parent artifact does not cover five folds")
+    if (
+        gate.get("smoke_acceptance_sha256") != SMOKE_ACCEPTANCE_SHA256
+        or sha256_file(smoke_acceptance_path) != SMOKE_ACCEPTANCE_SHA256
+    ):
+        raise ValueError("technical smoke acceptance file SHA-256 mismatch")
+    smoke = json.loads(smoke_acceptance_path.read_text(encoding="utf-8"))
+    smoke_contract_sha256 = str(smoke.get("contract_sha256", ""))
+    if smoke_contract_sha256 != canonical_sha256(
+        {key: value for key, value in smoke.items() if key != "contract_sha256"}
+    ):
+        raise ValueError("technical smoke acceptance self-hash mismatch")
+    smoke_expected = {
+        "schema_version": 1,
+        "experiment_id": "677",
+        "inner_validation_fold": 1,
+        "decision": "ACCEPT_TECHNICAL_SMOKE_ONLY",
+        "artifact_schema_passed": True,
+        "ordered_runtime_binding_passed": True,
+        "finite_scores": True,
+        "labels_read": 0,
+        "sealed_rows": 0,
+        "public_used": False,
+        "scientific_quality_evidence": False,
+        "optimizer_steps": 2,
+        "rows_per_checkpoint": 4,
+    }
+    if any(smoke.get(key) != value for key, value in smoke_expected.items()):
+        raise ValueError("technical smoke acceptance contract mismatch")
     return gate
 
 
@@ -79,6 +120,7 @@ def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
     result.add_argument("--gate", type=Path, required=True)
     result.add_argument("--parent-result", type=Path, required=True)
+    result.add_argument("--smoke-acceptance", type=Path, required=True)
     result.add_argument("--inner-fold", type=int, choices=(1, 2, 3, 4), required=True)
     result.add_argument("--technical-smoke", action="store_true")
     return result
@@ -91,6 +133,7 @@ if __name__ == "__main__":
             verify(
                 arguments.gate,
                 arguments.parent_result,
+                arguments.smoke_acceptance,
                 arguments.inner_fold,
                 arguments.technical_smoke,
             ),
