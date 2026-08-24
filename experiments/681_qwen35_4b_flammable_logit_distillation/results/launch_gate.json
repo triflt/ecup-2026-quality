@@ -1,0 +1,19 @@
+{
+  "allowed_folds": [],
+  "decision": "WAIT_TEACHER_TARGETS",
+  "experiment_id": 681,
+  "forbidden": [
+    "ordinary_oof_target_merge_for_outer_cv",
+    "outer_fold_tuning",
+    "temperature_tuning",
+    "lambda_tuning",
+    "threshold_tuning",
+    "27b_submission_packaging"
+  ],
+  "gpu_jobs": 0,
+  "public_submissions": 0,
+  "required_teacher_scoring_experiment": 662,
+  "screen_folds": [0, 3],
+  "soft_loss_weight": 0.5,
+  "temperature": 2.0
+}
