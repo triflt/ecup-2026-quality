@@ -2,7 +2,7 @@
 id = "677"
 slug = "qwen35_pr_auc_dynamics_screen"
 title = "Nested PR-AUC checkpoint dynamics for Qwen3.5-4B"
-status = "prepared"
+status = "technical_smoke_pending"
 entrypoint = "experiments/677_qwen35_pr_auc_dynamics_screen/train_dynamics.py"
 result_file = "experiments/677_qwen35_pr_auc_dynamics_screen/results/metrics.json"
 

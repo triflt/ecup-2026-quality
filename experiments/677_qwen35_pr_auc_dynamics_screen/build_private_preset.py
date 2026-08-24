@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from pathlib import Path
 
@@ -20,6 +21,11 @@ def build(args: argparse.Namespace) -> str:
     url = args.bundle_url_file.read_text(encoding="utf-8").strip()
     if not url.startswith("https://") or any(character.isspace() for character in url):
         raise ValueError("bundle URL file must contain one HTTPS URL")
+    bundle_sha256 = args.bundle_sha256.strip().lower()
+    if len(bundle_sha256) != 64 or any(
+        character not in "0123456789abcdef" for character in bundle_sha256
+    ):
+        raise ValueError("bundle SHA-256 must be 64 lowercase hex characters")
     base = args.base_preset.read_text(encoding="utf-8")
     model_inputs = [line.strip() for line in base.splitlines() if "type: model_registry" in line]
     if len(model_inputs) != 1:
@@ -37,6 +43,7 @@ def build(args: argparse.Namespace) -> str:
     command = (
         "mkdir -p /work/input /work/vendor /work/images /work/output && "
         "python -c 'import os, urllib.request; urllib.request.urlretrieve(os.environ[\"BUNDLE_URL\"], \"/work/input/bundle.tar.gz\")' && "
+        f"test \"$(sha256sum /work/input/bundle.tar.gz | cut -d' ' -f1)\" = \"{bundle_sha256}\" && "
         "tar -xzf /work/input/bundle.tar.gz -C /work/input && "
         "python /work/input/experiments/677_qwen35_pr_auc_dynamics_screen/verify_launch_gate.py "
         "--gate /work/input/experiments/677_qwen35_pr_auc_dynamics_screen/results/launch_gate.json "
@@ -49,7 +56,9 @@ def build(args: argparse.Namespace) -> str:
         "--images /work/images --model-root /hf_models "
         "--model-revision 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a "
         "--vendor /work/vendor --output-dir /work/output"
+        + (" --technical-smoke" if args.technical_smoke else "")
     )
+    output_name = f"dyn_i{args.inner_fold}" + ("_smoke" if args.technical_smoke else "")
     return f"""job:
   generate_name: qwen-dynamics
   time_limit: {values['time_limit']}
@@ -61,7 +70,7 @@ def build(args: argparse.Namespace) -> str:
   env:
     TOKENIZERS_PARALLELISM: {values['tokenizers']}
     PYTORCH_ALLOC_CONF: {values['allocator']}
-    BUNDLE_URL: ${{BUNDLE_URL}}
+    BUNDLE_URL: {json.dumps(url)}
   entrypoint: bash
   args:
     - -lc
@@ -70,7 +79,7 @@ def build(args: argparse.Namespace) -> str:
   input:
     {model_inputs[0]}
   output:
-    - {{type: files, name: qwen_dynamics_inner{args.inner_fold}, src: /work/output/, mask: "**/*"}}
+    - {{type: files, name: {output_name}, src: /work/output/, mask: "**/*"}}
 """
 
 
@@ -78,8 +87,10 @@ def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
     result.add_argument("--base-preset", type=Path, required=True)
     result.add_argument("--bundle-url-file", type=Path, required=True)
+    result.add_argument("--bundle-sha256", required=True)
     result.add_argument("--inner-fold", type=int, required=True)
     result.add_argument("--output", type=Path, required=True)
+    result.add_argument("--technical-smoke", action="store_true")
     return result
 
 

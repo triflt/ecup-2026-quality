@@ -2,8 +2,10 @@
 
 ## Статус
 
-`PREPARED_NOT_LAUNCHED`. Runtime построен на CPU и проверен; GPU gate закрыт до терминального
-пятиfoldового результата родительского маршрута. Public и sealed rows не используются.
+`TECHNICAL_SMOKE_PENDING`. Runtime построен на CPU и проверен; терминальный
+пятиfoldовый parent gate принят. Сначала разрешён ровно один 1×H100 smoke,
+затем четыре inner trajectories только после artifact acceptance. Public и
+sealed rows не используются.
 
 ## Конкретный недостаток
 
@@ -75,9 +77,10 @@ selected/final runs не считаются однофакторным срав�
 - Public submissions: 0;
 - лимит одного job: 8 часов с большим operational запасом.
 
-## Почему запуск закрыт
+## Launch gate
 
-[`results/launch_gate.json`](results/launch_gate.json) остаётся fail-closed. Его можно открыть
-только после терминального принятого результата родительского пятиfoldового маршрута и проверки
-свободной ёмкости. Это предотвращает конкуренцию с активными jobs и дорогой запуск по слабому
-родителю.
+[`results/launch_gate.json`](results/launch_gate.json) открыт точным SHA принятого
+parent report. Private preset встраивает фактический quoted HTTPS URL и до
+распаковки проверяет immutable bundle SHA-256; это устраняет уже известный
+literal-URL transport failure. Полная inner wave остаётся operationally закрыта
+до принятия technical smoke и повторной проверки свободной ёмкости.
