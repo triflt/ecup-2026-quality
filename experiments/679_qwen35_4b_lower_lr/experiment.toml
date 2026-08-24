@@ -2,7 +2,7 @@
 id = "679"
 slug = "qwen35_4b_lower_lr"
 title = "Deployable Qwen3.5-4B class-only LoRA with lower learning rate"
-status = "prepared_wait_capacity"
+status = "screen_gate_open"
 entrypoint = "experiments/679_qwen35_4b_lower_lr/train_fold.py"
 result_file = "experiments/679_qwen35_4b_lower_lr/results/metrics.json"
 

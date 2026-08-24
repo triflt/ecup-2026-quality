@@ -91,6 +91,9 @@ def write_runtime(path: Path, gate: dict, fold: int) -> None:
 
 def test_launch_gate_is_fail_closed_until_explicitly_opened(tmp_path: Path) -> None:
     gate = json.loads((EXPERIMENT / "results/launch_gate.json").read_text(encoding="utf-8"))
+    gate["decision"] = "PREPARED_WAIT_CAPACITY"
+    gate["training_lane_open"] = False
+    gate["allowed_folds"] = []
     runtime = tmp_path / "runtime"
     write_runtime(runtime, gate, 0)
     path = tmp_path / "gate.json"
@@ -107,6 +110,9 @@ def test_launch_gate_is_fail_closed_until_explicitly_opened(tmp_path: Path) -> N
 
 def test_gate_rejects_runtime_payload_drift(tmp_path: Path) -> None:
     gate = json.loads((EXPERIMENT / "results/launch_gate.json").read_text(encoding="utf-8"))
+    gate["decision"] = "PREPARED_WAIT_CAPACITY"
+    gate["training_lane_open"] = False
+    gate["allowed_folds"] = []
     gate["decision"] = "OPEN_SCREEN"
     gate["training_lane_open"] = True
     gate["allowed_folds"] = [0, 3]
@@ -142,6 +148,9 @@ def test_private_preset_preserves_4b_recipe_and_rejects_closed_gate(tmp_path: Pa
     patch = tmp_path / "train_lora.py"
     patch.write_text("# frozen", encoding="utf-8")
     gate = json.loads((EXPERIMENT / "results/launch_gate.json").read_text(encoding="utf-8"))
+    gate["decision"] = "PREPARED_WAIT_CAPACITY"
+    gate["training_lane_open"] = False
+    gate["allowed_folds"] = []
     gate_path = tmp_path / "gate.json"
     gate_path.write_text(json.dumps(gate), encoding="utf-8")
     args = type(
