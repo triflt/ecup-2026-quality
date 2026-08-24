@@ -27,7 +27,7 @@ def read_csv(path: Path) -> list[dict[str, str]]:
         return list(reader)
 
 
-def merge(*, template: Path, chunks: list[Path], output: Path) -> int:
+def merge(*, template: Path, chunks: list[Path], output: Path, allow_partial: bool = False) -> int:
     if output.exists():
         raise FileExistsError(f"refusing to overwrite {output}")
     template_rows = read_csv(template)
@@ -45,21 +45,22 @@ def merge(*, template: Path, chunks: list[Path], output: Path) -> int:
             if any(not row[field].strip() for field in REQUIRED_RATINGS):
                 raise ValueError(f"incomplete reviewed row: {audit_id}")
             merged[audit_id] = row
-    if set(merged) != set(template_ids):
+    if not allow_partial and set(merged) != set(template_ids):
         missing = sorted(set(template_ids) - set(merged))
         raise ValueError(f"review chunks do not cover the frozen template: {missing[:5]}")
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("x", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=FIELDS)
         writer.writeheader()
-        writer.writerows(merged[audit_id] for audit_id in template_ids)
-    return len(template_ids)
+        writer.writerows(merged.get(audit_id, template_rows[index]) for index, audit_id in enumerate(template_ids))
+    return len(merged)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--template", type=Path, required=True)
     parser.add_argument("--chunk", type=Path, action="append", required=True, dest="chunks")
+    parser.add_argument("--allow-partial", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     count = merge(**vars(parser.parse_args()))
     print(f"merged review rows: {count}")

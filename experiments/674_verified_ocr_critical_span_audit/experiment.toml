@@ -2,7 +2,7 @@
 id = "674"
 slug = "verified_ocr_critical_span_audit"
 title = "Blind visual audit of fail-closed OCR critical-span recall"
-status = "frozen_packet_awaiting_blind_review"
+status = "no_go_reject_verified_ocr_feature_screen"
 entrypoint = "experiments/674_verified_ocr_critical_span_audit/build_audit.py"
 result_file = "experiments/674_verified_ocr_critical_span_audit/results/metrics.json"
 

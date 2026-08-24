@@ -44,6 +44,33 @@ def summarize(review_rows: list[dict[str, str]]) -> dict[str, Any]:
     }
 
 
+def sliced_metrics(
+    values_by_id: dict[str, dict[str, str]], mapping: dict[str, dict[str, Any]]
+) -> dict[str, Any]:
+    def selected(**requirements: object) -> list[dict[str, str]]:
+        return [
+            values_by_id[audit_id]
+            for audit_id, metadata in mapping.items()
+            if audit_id in values_by_id
+            and all(metadata[key] == value for key, value in requirements.items())
+        ]
+
+    return {
+        "overall": summarize(list(values_by_id.values())),
+        "by_category": {
+            category: summarize(selected(category=category))
+            for category in ("БАД", "Легковоспламеняющиеся")
+        },
+        "by_baseline_state": {
+            state: summarize(selected(baseline_error=is_error))
+            for state, is_error in (("error", True), ("correct", False))
+        },
+        "by_fold": {
+            str(fold): summarize(selected(development_fold=fold)) for fold in range(5)
+        },
+    }
+
+
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -78,6 +105,7 @@ def evaluate(*, packet: Path, reviews: Path, private_manifest: Path, output: Pat
     ):
         raise ValueError("packet, review and private scopes differ")
     completed = 0
+    values_by_id: dict[str, dict[str, str]] = {}
     for audit_id, row in reviews_by_id.items():
         values = {field: row.get(field, "").strip().lower() for field in FIELDS}
         if all(not value for value in values.values()):
@@ -97,6 +125,7 @@ def evaluate(*, packet: Path, reviews: Path, private_manifest: Path, output: Pat
         if values["review_ocr_preserves_scope_relation"] not in expected:
             raise ValueError(f"scope rating conflicts with visual rating: {audit_id}")
         completed += 1
+        values_by_id[audit_id] = values
     result: dict[str, Any] = {
         "schema_version": "exp674_review_score_v1",
         "experiment_id": "674",
@@ -108,48 +137,69 @@ def evaluate(*, packet: Path, reviews: Path, private_manifest: Path, output: Pat
         "public_used": False,
         "gpu_hours": 0.0,
     }
-    if completed != SPEC["sample_rows"]:
-        result.update({"decision": "WAIT_FOR_COMPLETE_120_ROW_REVIEW", "metrics": {}, "gates": {}})
+    mapping = manifest["mapping"]
+    partial_metrics = sliced_metrics(values_by_id, mapping) if completed else {}
+    remaining = SPEC["sample_rows"] - completed
+    overall = partial_metrics.get("overall", {})
+    critical_rows = int(overall.get("visual_critical_rows", 0))
+    captured = int(overall.get("critical_span_captured", 0))
+    scope = int(overall.get("scope_relation_preserved", 0))
+    unsupported = int(overall.get("unsupported_critical_rows", 0))
+    maximum_attainable = {
+        "visual_critical_rows": critical_rows + remaining,
+        "critical_span_recall": (
+            (captured + remaining) / (critical_rows + remaining)
+            if critical_rows + remaining
+            else 0.0
+        ),
+        "scope_preservation_rate": (
+            (scope + remaining) / (critical_rows + remaining)
+            if critical_rows + remaining
+            else 0.0
+        ),
+        "minimum_final_unsupported_rate": unsupported / SPEC["sample_rows"],
+    }
+    irreversible_failures = {
+        "at_least_50_visual_critical_rows": (
+            maximum_attainable["visual_critical_rows"] < SPEC["minimum_visual_critical_rows"]
+        ),
+        "critical_span_recall_at_least_0_90": (
+            maximum_attainable["critical_span_recall"] < SPEC["minimum_critical_span_recall"]
+        ),
+        "scope_preservation_at_least_0_95": (
+            maximum_attainable["scope_preservation_rate"] < SPEC["minimum_scope_preservation"]
+        ),
+        "unsupported_rate_at_most_0_01": (
+            maximum_attainable["minimum_final_unsupported_rate"]
+            > SPEC["maximum_unsupported_rate"]
+        ),
+    }
+    if completed < SPEC["sample_rows"] and any(irreversible_failures.values()):
+        result.update(
+            {
+                "decision": "NO_GO_REJECT_VERIFIED_OCR_FEATURE_SCREEN",
+                "metrics": partial_metrics,
+                "maximum_attainable_if_all_remaining_are_perfect": maximum_attainable,
+                "irreversible_failed_gates": [
+                    gate for gate, failed in irreversible_failures.items() if failed
+                ],
+                "human_review_stopped_early": True,
+                "full_training_authorized": False,
+                "public_submission_authorized": False,
+            }
+        )
+    elif completed != SPEC["sample_rows"]:
+        result.update(
+            {
+                "decision": "WAIT_FOR_COMPLETE_120_ROW_REVIEW",
+                "metrics": partial_metrics,
+                "gates": {},
+                "maximum_attainable_if_all_remaining_are_perfect": maximum_attainable,
+            }
+        )
     else:
-        values_by_id = {
-            audit_id: {field: row[field].strip().lower() for field in FIELDS}
-            for audit_id, row in reviews_by_id.items()
-        }
-        overall = summarize(list(values_by_id.values()))
-        mapping = manifest["mapping"]
-        metrics = {
-            "overall": overall,
-            "by_category": {
-                category: summarize(
-                    [
-                        values_by_id[audit_id]
-                        for audit_id, metadata in mapping.items()
-                        if metadata["category"] == category
-                    ]
-                )
-                for category in ("БАД", "Легковоспламеняющиеся")
-            },
-            "by_baseline_state": {
-                state: summarize(
-                    [
-                        values_by_id[audit_id]
-                        for audit_id, metadata in mapping.items()
-                        if bool(metadata["baseline_error"]) is is_error
-                    ]
-                )
-                for state, is_error in (("error", True), ("correct", False))
-            },
-            "by_fold": {
-                str(fold): summarize(
-                    [
-                        values_by_id[audit_id]
-                        for audit_id, metadata in mapping.items()
-                        if int(metadata["development_fold"]) == fold
-                    ]
-                )
-                for fold in range(5)
-            },
-        }
+        metrics = partial_metrics
+        overall = metrics["overall"]
         critical_rows = overall["visual_critical_rows"]
         recall = overall["critical_span_recall"] or 0.0
         scope_rate = overall["scope_preservation_rate"] or 0.0
