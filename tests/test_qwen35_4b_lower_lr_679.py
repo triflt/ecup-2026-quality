@@ -4,6 +4,7 @@ import importlib.util
 import csv
 import json
 import sys
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -26,6 +27,7 @@ TRAIN = load_module(EXPERIMENT / "train_fold.py", "experiment_679_train")
 GATE = load_module(EXPERIMENT / "verify_launch_gate.py", "experiment_679_gate")
 PRESET = load_module(EXPERIMENT / "build_private_preset.py", "experiment_679_preset")
 EVALUATOR = load_module(EXPERIMENT / "evaluate.py", "experiment_679_evaluator")
+ARTIFACT = load_module(EXPERIMENT / "verify_artifact.py", "experiment_679_artifact")
 
 
 def canonical_without_hash(payload: dict) -> str:
@@ -282,3 +284,101 @@ def test_screen_and_full_gates_use_ap_and_blind_confirmation(tmp_path: Path) -> 
     assert full["decision"] == "ACCEPT_FOR_FULL_REFIT"
     assert full["gates"]["all_confirmation_folds_macro_positive"] is True
     assert full["gates"]["screen_reproduced_exactly"] is True
+
+
+def make_full_artifact(tmp_path: Path, fold: int = 0) -> tuple[Path, Path]:
+    runtime_path = tmp_path / "validation.jsonl"
+    predictions: list[dict] = []
+    runtime_rows: list[dict] = []
+    for index in range(ARTIFACT.EXPECTED_VALIDATION_ROWS[fold]):
+        common = {
+            "global_index": index,
+            "id": f"item-{index}",
+            "fold": fold,
+            "category": "БАД",
+        }
+        score = 1.0 if index % 2 == 0 else -1.0
+        runtime_rows.append(common)
+        predictions.append(
+            {
+                **common,
+                "concept": "synthetic",
+                "format_valid": True,
+                "generated_verdict": "да" if score >= 0.0 else "нет",
+                "grounded": True,
+                "grounding_source": "text",
+                "image_index": 0,
+                "model_id": "Qwen/Qwen3.5-4B",
+                "model_revision": ARTIFACT.MODEL_REVISION,
+                "objective": "class_only",
+                "prediction": int(score >= 0.0),
+                "preprocessing_version": "v1",
+                "prompt_version": "v1",
+                "quote": "synthetic",
+                "raw_generation": "synthetic",
+                "region_index": 0,
+                "score": score,
+                "target_order": 0,
+            }
+        )
+    write_jsonl(runtime_path, runtime_rows)
+    predictions_payload = "".join(
+        json.dumps(row, ensure_ascii=False) + "\n" for row in predictions
+    ).encode()
+    contract = {
+        "schema_version": 1,
+        "experiment_id": "679",
+        "control_experiment_id": "641",
+        "model_id": "Qwen/Qwen3.5-4B",
+        "model_revision": ARTIFACT.MODEL_REVISION,
+        "objective": "class_only",
+        "changed_factor": "learning_rate_only",
+        "control_learning_rate": 0.0002,
+        "candidate_learning_rate": 0.0001,
+        "outer_fold": fold,
+        "train_occurrences": ARTIFACT.EXPECTED_TRAIN_OCCURRENCES[fold],
+        "validation_rows": ARTIFACT.EXPECTED_VALIDATION_ROWS[fold],
+        "optimizer_steps_executed": 306,
+        "runtime_micro_batch_size": 2,
+        "runtime_gradient_accumulation": 8,
+        "effective_batch_size": 16,
+        "runtime_contract_sha256": ARTIFACT.EXPECTED_RUNTIME_CONTRACTS[fold],
+        "technical_smoke": False,
+        "threshold": 0.0,
+        "threshold_tuned": False,
+        "validation_labels_read": 0,
+        "sealed_rows_used": 0,
+        "uses_27b_at_training": False,
+        "uses_27b_at_inference": False,
+        "submission_base_model": "Qwen/Qwen3.5-4B",
+        "decision": "GO_EVALUATE",
+        "artifacts": {"predictions.jsonl": ARTIFACT.sha256_bytes(predictions_payload)},
+    }
+    contract["contract_sha256"] = ARTIFACT.canonical_sha256(contract)
+    archive_path = tmp_path / "artifact.zip"
+    with zipfile.ZipFile(archive_path, "w") as archive:
+        archive.writestr("output_contract.json", json.dumps(contract, ensure_ascii=False))
+        archive.writestr("predictions.jsonl", predictions_payload)
+        archive.writestr(
+            "adapter/adapter_config.json",
+            json.dumps({"base_model_name_or_path": "Qwen/Qwen3.5-4B"}),
+        )
+        archive.writestr("adapter/adapter_model.safetensors", b"synthetic")
+    return archive_path, runtime_path
+
+
+def test_full_artifact_verifier_is_bound_to_frozen_4b_runtime(tmp_path: Path) -> None:
+    archive_path, runtime_path = make_full_artifact(tmp_path)
+    result = ARTIFACT.verify(archive_path, fold=0, runtime_validation=runtime_path)
+    assert result["decision"] == "PASS"
+    assert result["rows"] == 2224
+    assert result["exact_runtime_binding"] is True
+    assert result["deployable_4b_only"] is True
+
+
+def test_full_artifact_verifier_rejects_row_reordering(tmp_path: Path) -> None:
+    archive_path, runtime_path = make_full_artifact(tmp_path)
+    rows = [json.loads(line) for line in runtime_path.read_text(encoding="utf-8").splitlines()]
+    write_jsonl(runtime_path, list(reversed(rows)))
+    with pytest.raises(ValueError, match="frozen runtime validation"):
+        ARTIFACT.verify(archive_path, fold=0, runtime_validation=runtime_path)
