@@ -1,11 +1,19 @@
 {
-  "allowed_folds": [
-    0,
-    3
-  ],
-  "changed_factor": "hard_bce_to_fixed_hard_plus_teacher_soft_bce",
-  "control_experiment_id": 641,
-  "decision": "OPEN_SCREEN",
+  "allowed_folds": [],
+  "changed_factor": "hard_bce_to_fixed_hard_plus_teacher_soft_bce_on_680_specialist",
+  "causal_control_archive_sha256": {
+    "0": "56a4475b0f7af880fa1766d8091df91c71e0263035ef08fdd1f7b96cd73f70e5",
+    "3": "fb90e45525e8f04cf78ac33955cd63caa7bb9b93ed484f8e085a85c3afcf402b"
+  },
+  "causal_control_experiment_id": 680,
+  "causal_control_prediction_sha256": {
+    "0": "3b9ce5f4178690efdb3a4c5079928f92141764dac7d1db77cd202c6636e54fbb",
+    "3": "13de94c324f02cdcbba8adc7826994d22e841bb9c1deb02a22a90fb94897c8de"
+  },
+  "ranking_control_experiment_id": 641,
+  "routed_production_baseline": "frozen_semantic_v3_replay",
+  "routed_production_baseline_contract_sha256": "1771dceda26996529b9f70f46a97653c2d29afa099983260c3b40a62fca518b0",
+  "decision": "REJECT_AT_SCREEN",
   "experiment_id": 681,
   "expected_optimizer_steps": 143,
   "forbidden": [
@@ -14,9 +22,15 @@
     "temperature_tuning",
     "lambda_tuning",
     "threshold_tuning",
-    "27b_submission_packaging"
+    "27b_submission_packaging",
+    "confirmation_folds_1_2_4",
+    "full_refit",
+    "submission_packaging",
+    "public_submission",
+    "raw_teacher_temperature_lambda_lr_steps_grid"
   ],
-  "gpu_jobs": 2,
+  "full_causal_control_status": "BLOCKED_MISSING_FOLDS_1_2_4",
+  "gpu_jobs": 0,
   "learning_rate": 0.0002,
   "ordinary_oof_merge_used": false,
   "public_submissions": 0,
@@ -50,5 +64,6 @@
   "temperature": 2.0,
   "threshold": 0.0,
   "threshold_tuned": false,
-  "training_lane_open": true
+  "screen_evaluation_sha256": "1fd9916d0f0aa7a1393a099dfffbdfd0f96e60a6a951f17153f84f1520aee27c",
+  "training_lane_open": false
 }

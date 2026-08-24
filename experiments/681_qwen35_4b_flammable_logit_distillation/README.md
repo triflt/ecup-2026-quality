@@ -1,6 +1,16 @@
 # Experiment 681 — deployable 4B flammable logit distillation
 
-Status: `SCREEN_FOLDS_RUNNING`. GPU jobs: `2`. Public submissions: `0`.
+Status: `TERMINAL_REJECT_AT_SCREEN`. Active GPU jobs: `0`. Public submissions:
+`0`. Folds 1/2/4, refit, packaging and Public are forbidden.
+
+Terminal screen result: ranking AP deltas were `-0.03852/-0.01068` on folds
+0/3. Against the selection-identical hard-BCE causal control, AP deltas were
+`-0.07198/+0.01571` (mean `-0.02814`), routed Macro mean delta `-0.02632`,
+flammable F1 delta `-0.05138`, FN `+6`, and corrections/regressions `2/8`.
+Against the frozen routed production replay, mean Macro delta was `-0.03489`,
+flammable F1 delta `-0.06914`, FN `+9`, and corrections/regressions `5/13`.
+This closes raw-27B logit distillation; no `T`, lambda, LR, step or threshold
+grid is authorized.
 
 ## Defect and mechanism
 
@@ -10,10 +20,15 @@ frozen folds. The 27B model is too large for the competition runtime and is
 strictly forbidden from the submission.
 
 Experiment 681 transfers only the binary flammable logit into a fresh
-Qwen3.5-4B LoRA. The 4B model, prompt, preprocessing, selector, image budget,
-LoRA configuration, optimizer, learning rate, batching, seed, update count and
-inference route remain frozen to the accepted 641 control. The only scientific
-factor is the flammable training objective:
+Qwen3.5-4B LoRA. The model, prompt, preprocessing, selector, image budget,
+LoRA configuration, optimizer, learning rate, batching and seed remain frozen.
+The actual training support and trajectory are the flammable-only experiment
+680 runtime: 2,280 occurrences and 143 updates, not the mixed-category 641
+runtime with 4,892 occurrences and 306 updates. Therefore the only-factor
+causal control for the objective is frozen 680. The accepted 641 fold scores
+remain the ranking/AP control, while routed Macro/F1 is measured against the
+frozen semantic-v3 submission replay. All three roles are mandatory and must
+not be conflated:
 
 ```text
 hard = BCEWithLogits(student_logit, gold_label)
@@ -59,13 +74,24 @@ teacher-score artifacts. Sealed rows are forbidden in outer-CV artifacts; the
 post-gate final-refit completion artifact is the only explicit exception and is
 scored label-free.
 
+The row-level outer validation remains blind: teacher `k` never saw outer fold
+`k`, and its labels are absent from the student runtime. However, the 681
+hypothesis was selected after the five-fold 27B probe had already been examined.
+Thus the five-fold estimate is honest for row-level leakage but is not an
+untouched post-selection confirmation; its Private uncertainty must be treated
+as larger than the nominal component bootstrap suggests.
+
 ## Frozen launch order
 
 1. Accept technical teacher-scoring smoke and all required target manifests.
 2. Build and verify fold 0/3 student runtimes; run one 8-row technical smoke.
 3. Train folds 0 and 3 on at most two H100 GPUs in parallel.
-4. Evaluate against exact 641 control predictions without changing thresholds,
-   weights, rules or stop step.
+4. Evaluate against exact 680 flammable-only hard-BCE predictions for causal
+   objective attribution, exact 641 scores for AP/ranking, and the frozen
+   semantic-v3 replay for routed production Macro/F1. Thresholds, weights,
+   rules and stop step do not change. Candidate inputs must be full verified
+   681 archives bound to frozen runtimes; arbitrary prediction JSONL files are
+   rejected.
 5. Open folds 1/2/4 only if the screen gate passes.
 6. After the full gate, choose and preregister a final-target policy. Full-data
    refit remains closed until either a recipe-equivalent full-data in-sample
@@ -83,24 +109,33 @@ corrections/regressions, semantic singleton families and exact BAD parity.
 
 ### Screen gate (folds 0 and 3)
 
-- AP delta positive on both folds and mean AP delta at least `+0.005`.
-- production Macro delta positive on both folds and mean at least `+0.0015`.
-- pooled flammable F1 delta non-negative; flammable FN do not increase.
-- corrections/regressions at least `1.5`.
-- BAD predictions byte-identical.
+- Against ranking 641: AP delta positive on both folds and mean at least
+  `+0.005`. Against the frozen routed production replay: Macro positive on both
+  and mean at least `+0.0015`;
+  flammable F1 non-negative; FN do not increase; corrections/regressions at
+  least `1.5`; BAD byte-identical.
+- Against causal 680: AP delta positive on both and mean at least `+0.003`;
+  production Macro positive on both and mean at least `+0.001`; flammable F1
+  non-negative; FN do not increase; corrections/regressions at least `1.5`.
 
 Any failed condition is terminal `REJECT_AT_SCREEN`; no tuning of `T`, lambda,
 threshold, weights, rules or step is allowed under experiment 681.
 
 ### Full primary gate
 
-- AP delta positive on at least 4/5 folds; mean AP delta at least `+0.005`.
+- AP delta against ranking 641 positive on at least 4/5 folds; mean AP delta at
+  least `+0.005`.
 - Macro wins at least 4/5; folds 1/2/4 all positive; mean Macro delta at least
   `+0.006`.
 - pooled flammable F1 delta at least `+0.012`; FN do not increase.
 - corrections/regressions at least `1.5`.
 - bootstrap `P(Macro gain > 0) >= 0.90`.
-- singleton-family Macro delta positive; BAD byte-identical.
+- routed production singleton-family Macro delta positive; BAD byte-identical.
+- Against causal 680: AP and Macro wins at least 4/5, confirmation folds 1/2/4
+  Macro-positive, mean AP and mean Macro deltas each at least `+0.003`,
+  flammable F1 non-negative, no FN increase and corrections/regressions at
+  least `1.5`. Full evaluation is closed until immutable 680 controls for
+  folds 1/2/4 exist; the rejected 680 recipe is never a submission candidate.
 
 ### Preregistered Public-ablation fallback
 

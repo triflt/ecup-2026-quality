@@ -23,15 +23,30 @@ def verify(gate_path: Path, runtime_dir: Path, fold: int) -> dict:
     allowed = gate.get("allowed_folds")
     required = (
         gate.get("experiment_id") == 681
-        and gate.get("control_experiment_id") == 641
+        and gate.get("ranking_control_experiment_id") == 641
+        and gate.get("routed_production_baseline") == "frozen_semantic_v3_replay"
+        and gate.get("routed_production_baseline_contract_sha256")
+        == "1771dceda26996529b9f70f46a97653c2d29afa099983260c3b40a62fca518b0"
+        and gate.get("causal_control_experiment_id") == 680
         and gate.get("teacher_scoring_experiment_id") == 662
+        and set(gate.get("causal_control_archive_sha256", {})) == {"0", "3"}
+        and set(gate.get("causal_control_prediction_sha256", {})) == {"0", "3"}
+        and all(
+            isinstance(value, str) and len(value) == 64
+            for value in gate.get("causal_control_archive_sha256", {}).values()
+        )
+        and all(
+            isinstance(value, str) and len(value) == 64
+            for value in gate.get("causal_control_prediction_sha256", {}).values()
+        )
+        and gate.get("full_causal_control_status") == "BLOCKED_MISSING_FOLDS_1_2_4"
         and gate.get("decision") == "OPEN_SCREEN"
         and gate.get("training_lane_open") is True
         and isinstance(allowed, list)
         and set(allowed).issubset({0, 3})
         and allowed == sorted(allowed)
         and gate.get("changed_factor")
-        == "hard_bce_to_fixed_hard_plus_teacher_soft_bce"
+        == "hard_bce_to_fixed_hard_plus_teacher_soft_bce_on_680_specialist"
         and gate.get("temperature") == 2.0
         and gate.get("soft_loss_weight") == 0.5
         and gate.get("learning_rate") == 0.0002
@@ -94,4 +109,3 @@ if __name__ == "__main__":
     parser.add_argument("--fold", type=int, choices=(0, 3), required=True)
     args = parser.parse_args()
     print(json.dumps(verify(args.gate, args.runtime_dir, args.fold), indent=2, sort_keys=True))
-
