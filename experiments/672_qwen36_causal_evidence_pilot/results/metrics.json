@@ -13,5 +13,8 @@
   "runtime_sha256": "3c8c212653764744753fa35b167cbd30509c11e276d659cabdcb9ac079a03e8a",
   "bundle_manifest_sha256": "04a69731e41d728575d6cef27739f0c40d701ca0deaf00d56f0bee77c3d8fdc9",
   "preset_audits_clean": 2,
-  "preset_dry_runs_passed": 2
+  "preset_dry_runs_passed": 2,
+  "registered_generation_jobs_failed_before_model_load": 2,
+  "generation_rows_completed": 0,
+  "controlled_retry_authorized": true
 }

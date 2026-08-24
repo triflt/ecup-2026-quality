@@ -64,8 +64,8 @@ def derive(
         }
     ]
     command = (
-        "python -m pip install --no-cache-dir 'transformers>=5,<6' "
-        "'accelerate>=1.12,<2' pillow && "
+        "python -m pip install -q --break-system-packages --no-cache-dir --upgrade "
+        "'transformers>=5,<6' 'accelerate>=1.12,<2' pillow && "
         "python /work/input/run_explanations.py "
         "--runtime /work/input/pilot_runtime.jsonl "
         "--images-dir /work/input/images "

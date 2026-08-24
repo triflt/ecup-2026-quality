@@ -43,7 +43,12 @@
     "first_live_submit_jobs_created": 0,
     "first_live_submit_failure": "INPUT_BUNDLE_EXCEEDED_TRANSPORT_MESSAGE_LIMIT",
     "compact_bundle_preset_audits_clean": 2,
-    "compact_bundle_preset_dry_runs_passed": 2
+    "compact_bundle_preset_dry_runs_passed": 2,
+    "first_registered_generation_jobs": 2,
+    "first_registered_generation_result": "FAILED_BEFORE_MODEL_LOAD",
+    "first_registered_generation_failure": "PEP668_EXTERNALLY_MANAGED_ENVIRONMENT",
+    "cuda_forward_calls_before_failure": 0,
+    "controlled_retry_change": "ADD_PROVEN_BREAK_SYSTEM_PACKAGES_INSTALL_FLAG_ONLY"
   },
   "authorizes": "TWO_PARALLEL_40_ROW_GENERATION_JOBS_ONLY",
   "does_not_authorize": [
