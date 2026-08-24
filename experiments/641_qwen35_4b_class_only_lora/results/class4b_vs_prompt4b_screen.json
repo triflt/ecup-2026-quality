@@ -1,0 +1,39 @@
+{
+  "candidate": {
+    "categories": {
+      "БАД": {"f1": 0.9531869875694261, "fn": 106, "fp": 71, "tp": 1802},
+      "Легковоспламеняющиеся": {"f1": 0.8169014084507042, "fn": 10, "fp": 16, "tp": 58}
+    },
+    "fold_macro_f1": {"0": 0.87183004905629, "3": 0.9003316909799375},
+    "macro_f1": 0.8850441980100652
+  },
+  "comparison": {
+    "category_delta": {"БАД": 0.05628500686856275, "Легковоспламеняющиеся": 0.7400652502586138},
+    "corrected": 1920,
+    "corrected_to_regressed": 23.132530120481928,
+    "fold_delta": {"0": 0.38750040985765505, "3": 0.4109302505111356},
+    "left_macro_f1": 0.4868690694464769,
+    "macro_delta": 0.3981751285635883,
+    "regressed": 83,
+    "right_macro_f1": 0.8850441980100652,
+    "winning_folds": 2
+  },
+  "control": "640_prompt_4b",
+  "decision": "READY_AS_SMALL_CLASS_ONLY_GRID_CELL",
+  "diagnostic_gates": {
+    "both_screen_folds_positive": true,
+    "corrected_to_regressed_at_least_1_5": true,
+    "macro_delta_at_least_0_003": true,
+    "no_category_drop_below_minus_0_002": true
+  },
+  "diagnostic_passed": true,
+  "evaluation_version": "semantic_family_v3",
+  "experiment_id": "641",
+  "folds_evaluated": [0, 3],
+  "model_input_view_sha256": "e5a6cff45542774001601ea513d7b58ffe1050c46dde509453bf6c449d0255b8",
+  "public_used": false,
+  "schema_version": 1,
+  "sealed_rows": 0,
+  "threshold": 0.0,
+  "threshold_tuned": false
+}

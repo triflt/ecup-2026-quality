@@ -52,13 +52,16 @@ def success_row(
     detections: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     detections = [] if detections is None else detections
+    raw_generation = "\n".join(f"{row['text']}{LOC}" for row in detections)
+    if raw_generation:
+        raw_generation += "</s>"
     return {
         "id": item_id,
         "image_index": image_index,
         "global_index": global_index,
         "width": 200,
         "height": 100,
-        "raw_generation": "\n".join(f"{row['text']}{LOC}" for row in detections),
+        "raw_generation": raw_generation,
         "sequence_confidence": 0.8,
         "detections": detections,
         "error": None,
@@ -234,6 +237,90 @@ def test_merge_rejects_missing_or_duplicate_shards_and_processing_errors(tmp_pat
             expected_items=2,
             expected_images=3,
         )
+
+
+def test_truncated_source_requires_complete_identity_bound_repair_overlay(tmp_path: Path) -> None:
+    manifest, shards = make_inputs(tmp_path)
+    spotting = shards[0] / "spotting.jsonl"
+    rows = [json.loads(line) for line in spotting.read_text().splitlines()]
+    rows[0] = success_row("a", 0, 0)
+    rows[0]["raw_generation"] = "Газ<|LOC_100|>"
+    write_jsonl(spotting, rows)
+    source_report_path = shards[0] / "report.json"
+    source_report = json.loads(source_report_path.read_text())
+    source_report.update(
+        {
+            "output_sha256": sha256_file(spotting),
+            "parseable_images": 1,
+            "parseable_fraction_of_successful": 0.5,
+            "detections": 1,
+        }
+    )
+    source_report_path.write_text(json.dumps(source_report), encoding="utf-8")
+    with pytest.raises(ValueError, match="OCR repair required for 1 images"):
+        BUILD.build_dataset(
+            manifest_path=manifest,
+            shard_dirs=shards,
+            output_dir=tmp_path / "unrepaired",
+            expected_items=2,
+            expected_images=3,
+        )
+
+    manifest_rows = BUILD.load_manifest(manifest, expected_items=2, expected_images=3)
+    _, source_provenance = BUILD.collect_shards(
+        shards,
+        manifest_rows=manifest_rows,
+        manifest_sha256=sha256_file(manifest),
+    )
+    repair_dirs: list[Path] = []
+    repaired_row = success_row("a", 0, 0, detections=[detection("Газ")])
+    for repair_shard in range(2):
+        repair_dir = tmp_path / f"repair-{repair_shard}"
+        repair_dir.mkdir()
+        repair_rows = [repaired_row] if repair_shard == 0 else []
+        repair_spotting = repair_dir / "spotting.jsonl"
+        write_jsonl(repair_spotting, repair_rows)
+        repair_report = {
+            "schema_version": 1,
+            "experiment_id": "655",
+            "source_experiment_id": "633",
+            "source_manifest_sha256": sha256_file(manifest),
+            "source_shards": source_provenance,
+            "model_id": BUILD.MODEL_ID,
+            "model_revision": BUILD.MODEL_REVISION,
+            "source_max_new_tokens": 512,
+            "repair_max_new_tokens": 1536,
+            "all_truncation_candidates": 1,
+            "repair_shard_index": repair_shard,
+            "num_repair_shards": 2,
+            "requested_images": len(repair_rows),
+            "successful_images": len(repair_rows),
+            "failed_images": 0,
+            "accepted_images": len(repair_rows),
+            "detections": sum(len(row["detections"]) for row in repair_rows),
+            "elapsed_seconds": 1.0,
+            "output_sha256": sha256_file(repair_spotting),
+            "labels_read": 0,
+            "folds_read": 0,
+            "public_used": False,
+        }
+        assert set(repair_report) == BUILD.REPAIR_REPORT_KEYS
+        (repair_dir / "report.json").write_text(json.dumps(repair_report), encoding="utf-8")
+        repair_dirs.append(repair_dir)
+
+    output = tmp_path / "repaired"
+    bundle = BUILD.build_dataset(
+        manifest_path=manifest,
+        shard_dirs=shards,
+        repair_dirs=list(reversed(repair_dirs)),
+        output_dir=output,
+        expected_items=2,
+        expected_images=3,
+    )
+    assert bundle["records"] == 3
+    provenance = json.loads((output / "provenance.json").read_text())
+    assert provenance["repair_overlay"]["candidate_images"] == 1
+    assert provenance["repair_overlay"]["repaired_images"] == 1
 
 
 def test_verify_detects_tampering(tmp_path: Path) -> None:

@@ -1,0 +1,62 @@
+[experiment]
+id = "654"
+slug = "qwen36_27b_class_only_lora"
+title = "Qwen3.6-27B class-only LoRA fallback"
+status = "rejected_at_frozen_screen"
+entrypoint = "experiments/654_qwen36_27b_class_only_lora/train_fold.py"
+result_file = "experiments/654_qwen36_27b_class_only_lora/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+source_selection_experiment = "641"
+scope = "semantic_family_v3 development only"
+model_inputs = ["category", "name", "description", "first_image"]
+sealed_rows = 0
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+full_folds_after_screen = [1, 2, 4]
+threshold = 0.0
+threshold_tuned = false
+minimum_screen_mean_delta = 0.0015
+maximum_category_drop = 0.002
+minimum_corrected_to_regressed = 1.5
+required_full_fold_wins = 4
+
+[model]
+id = "Qwen/Qwen3.6-27B"
+revision = "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9"
+objective = "class_only"
+
+[training]
+seed = 42
+epochs = 1
+micro_batch_size = 1
+gradient_accumulation = 16
+effective_batch_size = 16
+learning_rate = 0.0002
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+expected_train_occurrences = 4892
+expected_optimizer_steps = 306
+
+[hypothesis]
+parent_experiment = "641"
+changed_factor = "Replace Qwen3.5-4B by mature Qwen3.6-27B under the same supervised class-only recipe"
+control = "641"
+mechanism = "The larger model may learn sold-object scope and rare visual-text policy boundaries that prompting alone misses"
+falsification = "Reject at folds 0/3 if either fold loses or category safety correction-ratio or runtime gates fail"
+precedents = ["experiment 640 scale gate", "experiment 651 mature runtime", "PEFT LoRA"]
+
+[budget]
+screen_jobs = 2
+gpu_per_job = 4
+planned_gpu_hours = 32
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

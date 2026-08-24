@@ -62,6 +62,30 @@ DETECTION_KEYS = {
     "confidence",
     "confidence_type",
 }
+REPAIR_REPORT_KEYS = {
+    "schema_version",
+    "experiment_id",
+    "source_experiment_id",
+    "source_manifest_sha256",
+    "source_shards",
+    "model_id",
+    "model_revision",
+    "source_max_new_tokens",
+    "repair_max_new_tokens",
+    "all_truncation_candidates",
+    "repair_shard_index",
+    "num_repair_shards",
+    "requested_images",
+    "successful_images",
+    "failed_images",
+    "accepted_images",
+    "detections",
+    "elapsed_seconds",
+    "output_sha256",
+    "labels_read",
+    "folds_read",
+    "public_used",
+}
 FORBIDDEN_KEYS = {
     "answer",
     "category",
@@ -334,6 +358,11 @@ def canonicalize_success_record(
 
     loc_tokens = LOC_TOKEN_PATTERN.findall(raw)
     _require(len(loc_tokens) % 8 == 0, "malformed location-token count")
+    stripped_raw = raw.strip()
+    _require(
+        stripped_raw in {"", "</s>"} or stripped_raw.endswith("</s>"),
+        "OCR generation did not terminate with EOS",
+    )
     _require(
         len(detections) == len(loc_tokens) // 8,
         "parsed detections disagree with location-token blocks",
@@ -491,6 +520,127 @@ def collect_shards(
     return by_global_index, sorted(provenance, key=lambda row: int(row["shard_index"]))
 
 
+def repair_reasons(source: dict[str, Any]) -> list[str]:
+    if source.get("error") is not None:
+        raise ValueError("processing error remains in source OCR")
+    raw = source["raw_generation"]
+    detections = source["detections"]
+    _require(isinstance(raw, str), "source raw_generation must be a string")
+    _require(isinstance(detections, list), "source detections must be a list")
+    stripped = raw.strip()
+    reasons: list[str] = []
+    if len(LOC_TOKEN_PATTERN.findall(raw)) % 8:
+        reasons.append("partial_location_block")
+    if not detections and stripped not in {"", "</s>"}:
+        reasons.append("noncanonical_unparseable_generation")
+    if stripped not in {"", "</s>"} and not stripped.endswith("</s>"):
+        reasons.append("generation_reached_limit_without_eos")
+    return reasons
+
+
+def apply_repair_overlay(
+    shard_rows: dict[int, dict[str, Any]],
+    repair_dirs: list[Path],
+    *,
+    manifest_rows: list[dict[str, Any]],
+    manifest_sha256: str,
+    source_provenance: list[dict[str, Any]],
+) -> dict[str, Any]:
+    candidates = [index for index in sorted(shard_rows) if repair_reasons(shard_rows[index])]
+    _require(bool(candidates), "repair overlay supplied but no source row requires repair")
+    reports: list[dict[str, Any]] = []
+    repaired: dict[int, dict[str, Any]] = {}
+    expected_num_shards: int | None = None
+    seen_repair_shards: set[int] = set()
+    for repair_dir in repair_dirs:
+        report_path = repair_dir / "report.json"
+        spotting_path = repair_dir / "spotting.jsonl"
+        _require(
+            report_path.is_file() and spotting_path.is_file(),
+            "each repair directory needs report.json and spotting.jsonl",
+        )
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        _require(isinstance(report, dict), "repair report is not an object")
+        _exact_keys(report, REPAIR_REPORT_KEYS, "repair report")
+        _reject_forbidden_keys(
+            {key: value for key, value in report.items() if key != "public_used"},
+            "repair report",
+        )
+        _require(report["schema_version"] == 1, "unsupported repair schema")
+        _require(report["experiment_id"] == "655", "wrong repair experiment")
+        _require(report["source_experiment_id"] == SOURCE_EXPERIMENT_ID, "wrong repair source")
+        _require(report["source_manifest_sha256"] == manifest_sha256, "repair manifest mismatch")
+        _require(report["source_shards"] == source_provenance, "repair source provenance mismatch")
+        _require(report["model_id"] == MODEL_ID, "wrong repair model")
+        _require(report["model_revision"] == MODEL_REVISION, "wrong repair model revision")
+        _require(report["source_max_new_tokens"] == 512, "wrong source generation limit")
+        _require(report["repair_max_new_tokens"] > 512, "repair limit did not increase")
+        _require(
+            report["labels_read"] == 0
+            and report["folds_read"] == 0
+            and report["public_used"] is False,
+            "repair overlay is not label-blind",
+        )
+        _require(
+            report["all_truncation_candidates"] == len(candidates),
+            "repair candidate count mismatch",
+        )
+        repair_shard = report["repair_shard_index"]
+        num_repair_shards = report["num_repair_shards"]
+        _require(type(repair_shard) is int and type(num_repair_shards) is int, "invalid repair shard")
+        _require(0 <= repair_shard < num_repair_shards, "repair shard outside range")
+        if expected_num_shards is None:
+            expected_num_shards = num_repair_shards
+        _require(num_repair_shards == expected_num_shards, "repair reports disagree on shard count")
+        _require(repair_shard not in seen_repair_shards, "duplicate repair shard")
+        seen_repair_shards.add(repair_shard)
+        _require(
+            report["failed_images"] == 0
+            and report["successful_images"] == report["requested_images"]
+            and report["accepted_images"] == report["requested_images"],
+            "repair shard did not accept every requested image",
+        )
+        _require(report["output_sha256"] == sha256_file(spotting_path), "repair output checksum mismatch")
+        expected_indices = candidates[repair_shard::num_repair_shards]
+        observed_indices: list[int] = []
+        for line_number, row in _iter_jsonl(spotting_path):
+            _reject_forbidden_keys(row, f"repair[{repair_shard}][{line_number}]")
+            _exact_keys(row, SUCCESS_KEYS, f"repair[{repair_shard}][{line_number}]")
+            _require(row["error"] is None, "accepted repair row has an error")
+            global_index = row["global_index"]
+            _require(type(global_index) is int, "repair global_index is invalid")
+            _require(global_index not in repaired, "duplicate repaired global_index")
+            _require(global_index in shard_rows, "repair global_index outside source")
+            expected_identity = manifest_rows[global_index]
+            for key in ("id", "image_index", "global_index"):
+                _require(row[key] == expected_identity[key], f"repair {key} differs from manifest")
+            _require(not repair_reasons(row), "repair output remains truncated or unparseable")
+            repaired[global_index] = row
+            observed_indices.append(global_index)
+        _require(observed_indices == expected_indices, "repair shard rows differ from frozen assignment")
+        _require(len(observed_indices) == report["requested_images"], "repair row count mismatch")
+        reports.append(report)
+    _require(expected_num_shards is not None, "no repair reports found")
+    _require(
+        seen_repair_shards == set(range(expected_num_shards)),
+        "repair shard set is incomplete",
+    )
+    _require(set(repaired) == set(candidates), "repair overlay does not cover every candidate")
+    shard_rows.update(repaired)
+    _require(
+        not [index for index in sorted(shard_rows) if repair_reasons(shard_rows[index])],
+        "truncated OCR remains after repair overlay",
+    )
+    return {
+        "experiment_id": "655",
+        "candidate_images": len(candidates),
+        "repaired_images": len(repaired),
+        "repair_shards": expected_num_shards,
+        "repair_max_new_tokens": sorted({report["repair_max_new_tokens"] for report in reports}),
+        "reports_sha256": [sha256_file(path / "report.json") for path in repair_dirs],
+    }
+
+
 def _bundle_digest(file_hashes: dict[str, str]) -> str:
     payload = "".join(f"{name}\0{file_hashes[name]}\n" for name in sorted(file_hashes))
     return sha256_text(payload)
@@ -501,6 +651,7 @@ def build_dataset(
     manifest_path: Path,
     shard_dirs: list[Path],
     output_dir: Path,
+    repair_dirs: list[Path] | None = None,
     expected_items: int = EXPECTED_ITEMS,
     expected_images: int = EXPECTED_IMAGES,
 ) -> dict[str, Any]:
@@ -518,6 +669,21 @@ def build_dataset(
         manifest_rows=manifest_rows,
         manifest_sha256=manifest_sha256,
     )
+    repair_candidates = [
+        index for index in sorted(shard_rows) if repair_reasons(shard_rows[index])
+    ]
+    repair_provenance = None
+    if repair_candidates:
+        _require(bool(repair_dirs), f"OCR repair required for {len(repair_candidates)} images")
+        repair_provenance = apply_repair_overlay(
+            shard_rows,
+            list(repair_dirs or []),
+            manifest_rows=manifest_rows,
+            manifest_sha256=manifest_sha256,
+            source_provenance=shard_provenance,
+        )
+    else:
+        _require(not repair_dirs, "repair overlay supplied but source is already complete")
 
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix=f".{output_dir.name}.tmp-", dir=output_dir.parent))
@@ -609,6 +775,7 @@ def build_dataset(
                 "sha256": sha256_file(Path(__file__)),
             },
             "shards": shard_provenance,
+            "repair_overlay": repair_provenance,
             "deduplication": {
                 "scope": "within_same_id_and_image_index_only",
                 "key": "nfkc_casefold_whitespace_text_plus_exact_normalized_quadrilateral",
@@ -971,6 +1138,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Merge and audit all exp633 OCR shards.")
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--shard-dir", type=Path, action="append", default=[])
+    parser.add_argument("--repair-dir", type=Path, action="append", default=[])
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--verify-only", action="store_true")
     parser.add_argument(
@@ -981,7 +1149,7 @@ def main() -> None:
     )
     args = parser.parse_args()
     if args.verify_only:
-        if args.manifest is not None or args.shard_dir:
+        if args.manifest is not None or args.shard_dir or args.repair_dir:
             raise ValueError("--verify-only accepts only --output-dir")
         result = verify_bundle(
             args.output_dir,
@@ -995,6 +1163,7 @@ def main() -> None:
             manifest_path=args.manifest,
             shard_dirs=args.shard_dir,
             output_dir=args.output_dir,
+            repair_dirs=args.repair_dir,
             expected_items=args.expected_items,
             expected_images=args.expected_images,
         )

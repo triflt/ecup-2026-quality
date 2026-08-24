@@ -26,6 +26,11 @@ EXPECTED_BINDING_PREFIXES = {
     "causal_conv1d_fn": "causal_conv1d",
     "causal_conv1d_update": "causal_conv1d",
 }
+EXPECTED_LEGACY_PACKAGES = {
+    "backend": "legacy_eager",
+    "torch": "2.10.0+cu128",
+    "transformers": "5.14.1",
+}
 FORBIDDEN_PREDICTION_FIELDS = {
     "label",
     "target",
@@ -95,16 +100,55 @@ def verify_artifact(
     }
     if mismatch:
         raise ValueError(f"output contract mismatch: {mismatch}")
-    if contract.get("fast_path_packages") != EXPECTED_FAST_PATH_PACKAGES:
-        raise ValueError("fast-path package versions differ from the frozen contract")
-    bindings = contract.get("fast_path_bindings", {})
-    if set(bindings) != set(EXPECTED_BINDING_PREFIXES):
-        raise ValueError("fast-path binding set is incomplete")
-    for name, prefix in EXPECTED_BINDING_PREFIXES.items():
-        if not str(bindings[name]).startswith(prefix):
-            raise ValueError(f"fast-path binding is not compiled: {name}")
-    if contract.get("optimized_training_kernels") is not True:
-        raise ValueError("optimized training kernels were not recorded")
+    backend = str(contract.get("runtime_backend", "verified_fast_path"))
+    if backend == "verified_fast_path":
+        packages = contract.get("fast_path_packages", contract.get("runtime_packages"))
+        if packages != EXPECTED_FAST_PATH_PACKAGES:
+            raise ValueError("fast-path package versions differ from the frozen contract")
+        bindings = contract.get("fast_path_bindings", {})
+        if set(bindings) != set(EXPECTED_BINDING_PREFIXES):
+            raise ValueError("fast-path binding set is incomplete")
+        for name, prefix in EXPECTED_BINDING_PREFIXES.items():
+            if not str(bindings[name]).startswith(prefix):
+                raise ValueError(f"fast-path binding is not compiled: {name}")
+        if contract.get("optimized_training_kernels") is not True:
+            raise ValueError("optimized training kernels were not recorded")
+    elif backend == "legacy_eager":
+        if experiment_id != "641":
+            raise ValueError("legacy eager execution is frozen only for experiment 641")
+        if contract.get("runtime_packages") != EXPECTED_LEGACY_PACKAGES:
+            raise ValueError("legacy eager package versions differ from the accepted smoke")
+        expected_legacy = {
+            "fast_path_bindings": {},
+            "optimized_training_kernels": False,
+            "frozen_micro_batch_size": 4,
+            "frozen_gradient_accumulation": 4,
+            "runtime_micro_batch_size": 2,
+            "runtime_gradient_accumulation": 8,
+            "effective_batch_size": 16,
+            "batching_override": True,
+        }
+        if not technical_smoke:
+            expected_legacy.update(
+                {
+                    "train_occurrences": 4892,
+                    "frozen_optimizer_updates": 306,
+                    "runtime_optimizer_updates": 306,
+                    "optimizer_steps_executed": 306,
+                    "tail_rows": 12,
+                    "selection_contract_changed": False,
+                    "numerical_accumulation_order_changed": True,
+                }
+            )
+        mismatch = {
+            key: {"expected": value, "actual": contract.get(key)}
+            for key, value in expected_legacy.items()
+            if contract.get(key) != value
+        }
+        if mismatch:
+            raise ValueError(f"legacy eager execution contract mismatch: {mismatch}")
+    else:
+        raise ValueError(f"unsupported runtime backend: {backend}")
 
     artifacts = contract.get("artifacts")
     if not isinstance(artifacts, dict) or not artifacts:
@@ -157,6 +201,7 @@ def verify_artifact(
         "experiment_id": experiment_id,
         "outer_fold": fold,
         "technical_smoke": technical_smoke,
+        "runtime_backend": backend,
         "prediction_rows": prediction_rows,
         "adapter_zip": zip_report,
         "contract_sha256": digest,

@@ -1,0 +1,25 @@
+{
+  "experiment_id": "653",
+  "status": "technical_smoke_passed",
+  "data_version": "synthetic_runtime_smoke_v1",
+  "evaluation_version": "technical_runtime_gate_v1",
+  "competition_rows": 0,
+  "sealed_rows": 0,
+  "quality_metrics_released": false,
+  "technical_gate": {
+    "model_loaded_without_cpu_or_disk_offload": true,
+    "cuda_devices": 4,
+    "multimodal_forward": true,
+    "finite_losses": 2,
+    "backward": true,
+    "optimizer_step": true,
+    "optimizer_steps": 1,
+    "adapter_saved": true,
+    "adapter_reloaded": true,
+    "finite_score_after_reload": true,
+    "artifact_integrity": true,
+    "outer_archive_sha256": "08cf66dc0371bc6c0c80e1357a79f285bc5c3c5cad95cfa7112b6e2e54c8f523",
+    "inner_archive_sha256": "3164f5bd4271ef8d07e1256f4928e58d9fbbaa5d0aeacf6a8e1ef9cdbf7f4b55"
+  },
+  "decision": "PASS_OPEN_EXPERIMENT_654"
+}

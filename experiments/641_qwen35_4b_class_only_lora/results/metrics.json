@@ -1,6 +1,6 @@
 {
   "experiment_id": "641",
-  "status": "legacy_eager_micro2_screen_running",
+  "status": "screen_complete_grid_cell_accepted",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "screen_folds": [0, 3],
@@ -144,7 +144,7 @@
     "dry_run": "passed"
   },
   "legacy_eager_micro2_screen": {
-    "status": "running",
+    "status": "complete_and_integrity_checked",
     "folds": [0, 3],
     "gpus": 2,
     "train_occurrences_per_fold": 4892,
@@ -161,8 +161,23 @@
     "numerical_accumulation_order_changed": true,
     "preset_audit_errors": 0,
     "preset_audit_warnings": 0,
-    "dry_runs": "passed_2_of_2"
+    "dry_runs": "passed_2_of_2",
+    "artifact_archives_checked": 2,
+    "artifact_archives_corrupt": 0,
+    "fold0_outer_archive_sha256": "0dc7745edfc674c4315b95e9c686c5641a09952c07cb6fc253433e144d86849a",
+    "fold3_outer_archive_sha256": "c800283f3e5fc406ad92f7b1767c0b7307d7236eddc4d83cd341adb210b602a3"
   },
-  "metrics": null,
-  "decision": "PENDING_FROZEN_FOLD_0_AND_3_SCREEN"
+  "metrics": {
+    "macro_f1": 0.8850441980100652,
+    "fold_macro_f1": {"0": 0.87183004905629, "3": 0.9003316909799375},
+    "bad_f1": 0.9531869875694261,
+    "flammable_f1": 0.8169014084507042,
+    "prompt_4b_control_macro_f1": 0.4868690694464769,
+    "macro_delta": 0.3981751285635883,
+    "winning_folds": 2,
+    "corrected": 1920,
+    "regressed": 83,
+    "corrected_to_regressed": 23.132530120481928
+  },
+  "decision": "READY_AS_SMALL_CLASS_ONLY_GRID_CELL"
 }

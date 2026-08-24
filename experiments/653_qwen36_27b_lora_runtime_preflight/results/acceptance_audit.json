@@ -1,0 +1,11 @@
+{
+  "adapter_reloaded": true,
+  "cuda_devices": 4,
+  "decision": "PASS_OPEN_EXPERIMENT_654",
+  "experiment_id": "653",
+  "finite_losses": 2,
+  "inner_archive_sha256": "3164f5bd4271ef8d07e1256f4928e58d9fbbaa5d0aeacf6a8e1ef9cdbf7f4b55",
+  "optimizer_steps": 1,
+  "outer_archive_sha256": "08cf66dc0371bc6c0c80e1357a79f285bc5c3c5cad95cfa7112b6e2e54c8f523",
+  "schema_version": 1
+}

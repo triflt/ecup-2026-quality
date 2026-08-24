@@ -2,7 +2,7 @@
 id = "641"
 slug = "qwen35_4b_class_only_lora"
 title = "Qwen3.5-4B class-only LoRA in the frozen scale grid"
-status = "legacy_eager_micro2_screen_running"
+status = "screen_complete_grid_cell_accepted"
 entrypoint = "experiments/641_qwen35_4b_class_only_lora/run_fold.py"
 result_file = "experiments/641_qwen35_4b_class_only_lora/results/metrics.json"
 

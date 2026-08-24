@@ -84,6 +84,67 @@ def test_verifier_accepts_complete_class_only_output(tmp_path: Path) -> None:
     assert report["prediction_rows"] == 1
 
 
+def test_verifier_accepts_frozen_641_legacy_eager_execution(tmp_path: Path) -> None:
+    artifact = tmp_path / "artifact"
+    build_artifact(artifact)
+    contract_path = artifact / "output_contract.json"
+    contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    contract.update(
+        {
+            "runtime_backend": "legacy_eager",
+            "runtime_packages": verify_training_artifact.EXPECTED_LEGACY_PACKAGES,
+            "fast_path_bindings": {},
+            "optimized_training_kernels": False,
+            "frozen_micro_batch_size": 4,
+            "frozen_gradient_accumulation": 4,
+            "runtime_micro_batch_size": 2,
+            "runtime_gradient_accumulation": 8,
+            "effective_batch_size": 16,
+            "batching_override": True,
+            "train_occurrences": 4892,
+            "frozen_optimizer_updates": 306,
+            "runtime_optimizer_updates": 306,
+            "optimizer_steps_executed": 306,
+            "tail_rows": 12,
+            "selection_contract_changed": False,
+            "numerical_accumulation_order_changed": True,
+        }
+    )
+    contract.pop("fast_path_packages")
+    contract.pop("contract_sha256")
+    contract["contract_sha256"] = grid_contract.canonical_sha256(contract)
+    contract_path.write_text(json.dumps(contract), encoding="utf-8")
+
+    report = verify_training_artifact.verify_artifact(
+        artifact, experiment_id="641", fold=0, technical_smoke=False
+    )
+    assert report["runtime_backend"] == "legacy_eager"
+
+
+def test_verifier_rejects_legacy_eager_package_drift(tmp_path: Path) -> None:
+    artifact = tmp_path / "artifact"
+    build_artifact(artifact)
+    contract_path = artifact / "output_contract.json"
+    contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    contract.update(
+        {
+            "runtime_backend": "legacy_eager",
+            "runtime_packages": {**verify_training_artifact.EXPECTED_LEGACY_PACKAGES, "torch": "other"},
+            "fast_path_bindings": {},
+            "optimized_training_kernels": False,
+        }
+    )
+    contract.pop("fast_path_packages")
+    contract.pop("contract_sha256")
+    contract["contract_sha256"] = grid_contract.canonical_sha256(contract)
+    contract_path.write_text(json.dumps(contract), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="package versions"):
+        verify_training_artifact.verify_artifact(
+            artifact, experiment_id="641", fold=0, technical_smoke=False
+        )
+
+
 def test_verifier_rejects_prediction_supervision(tmp_path: Path) -> None:
     artifact = tmp_path / "artifact"
     build_artifact(artifact, include_label=True)

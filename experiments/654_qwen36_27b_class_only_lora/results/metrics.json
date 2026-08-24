@@ -1,0 +1,55 @@
+{
+  "experiment_id": "654",
+  "status": "rejected_at_frozen_screen",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "model_id": "Qwen/Qwen3.6-27B",
+  "model_revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+  "screen_folds": [0, 3],
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "sealed_rows": 0,
+  "public_used": false,
+  "runtime_gate": {
+    "source_experiment": "653",
+    "passed": true,
+    "cuda_devices": 4,
+    "cpu_or_disk_offload": false,
+    "optimizer_step": true,
+    "adapter_reload": true,
+    "artifact_integrity": true
+  },
+  "screen": {
+    "status": "completed",
+    "folds": [0, 3],
+    "jobs": 2,
+    "gpus_per_job": 4,
+    "delivery_retry_changed_scientific_contract": false,
+    "delivery_retry_reason": "local attachment exceeded request-size limit; immutable bundle delivered by verified object URL",
+    "fold_macro_delta": {"0": 0.017469950943709955, "3": 0.023830979412389652},
+    "mean_fold_delta": 0.020650465178049804,
+    "categories": {
+      "БАД": {"baseline_f1": 0.9531869875694261, "candidate_f1": 0.9502673796791444, "delta": -0.0029196078902816724},
+      "Легковоспламеняющиеся": {"baseline_f1": 0.8169014084507042, "candidate_f1": 0.8609271523178808, "delta": 0.0440257438671765}
+    },
+    "corrected": 53,
+    "regressed": 57,
+    "corrected_to_regressed": 0.9298245614035088,
+    "flammable_false_negatives": {"baseline": 10, "candidate": 3, "delta": -7},
+    "passed": false,
+    "failed_gates": ["no_category_drop_below_minus_0_002", "corrected_to_regressed_at_least_1_5"],
+    "folds_1_2_4_launched": false,
+    "artifact_verification": {
+      "fold0_archive_sha256": "eb7dd2c42f93c4bdd41c3642304a0c511433a05d3a8d108bf4fc390d908a41f7",
+      "fold3_archive_sha256": "5ab34f74c0114d608692a9426a27cc38dd964cdf679f830e39b5a4ae48e138bb",
+      "fold0_predictions_sha256": "b74c50947ad2ea65e8ff77cdd0567aff61c8e6ddd2299320723c2eabea5c0b40",
+      "fold3_predictions_sha256": "c731d3de64cd37fbc45461121d208ba5589981bb9a1971854098db2e6dc0cb81",
+      "rows_per_fold": 2224,
+      "zip_integrity": true,
+      "contract": true,
+      "finite_scores": true,
+      "labels_or_sealed_or_public_in_predictions": false
+    }
+  },
+  "decision": "REJECT_AT_SCREEN_DO_NOT_OPEN_REMAINING_FOLDS"
+}

@@ -2,7 +2,7 @@
 id = "633"
 slug = "paddleocr_vl16_spotting"
 title = "Grounded OCR regions for every competition image"
-status = "full_extraction_running"
+status = "full_extraction_complete"
 entrypoint = "experiments/633_paddleocr_vl16_spotting/run_spotting.py"
 result_file = "experiments/633_paddleocr_vl16_spotting/results/metrics.json"
 

@@ -1,0 +1,23 @@
+{
+  "experiment_id": "655",
+  "status": "rejected_bounded_smoke",
+  "data_version": "competition_train_v1",
+  "source_experiment": "633_paddleocr_vl16_spotting",
+  "model_id": "PaddlePaddle/PaddleOCR-VL-1.6",
+  "model_revision": "c5630abae1d940eafe0697512a0325494b02ab42",
+  "source_max_new_tokens": 512,
+  "repair_max_new_tokens": 1536,
+  "source_images": 49456,
+  "source_shards": 32,
+  "repair_shards": 32,
+  "labels_read": 0,
+  "folds_read": 0,
+  "sealed_membership_used": false,
+  "public_used": false,
+  "candidate_images": 7737,
+  "bounded_smoke_images": 8,
+  "bounded_smoke_images_processed": 5,
+  "accepted_images": 0,
+  "full_wave_launched": false,
+  "decision": "REJECT_MAX_NEW_TOKENS_ONLY_REPAIR_AND_TEST_TILED_REPAIR_SEPARATELY"
+}

@@ -2,13 +2,14 @@
 id = "634"
 slug = "immutable_ocr_dataset"
 title = "Strict immutable label-blind OCR dataset"
-status = "prepared_waiting_for_full_633"
+status = "waiting_for_truncation_repair_655"
 entrypoint = "experiments/634_immutable_ocr_dataset/run.py"
 result_file = "experiments/634_immutable_ocr_dataset/results/metrics.json"
 
 [data]
 input_version = "competition_train_v1"
 input_ocr_experiment = "633_paddleocr_vl16_spotting"
+repair_overlay_experiment = "655_paddleocr_truncation_repair"
 planned_output_version = "competition_train_paddleocr_vl16_spotting_v1"
 source_manifest_schema = ["id", "image_index", "url"]
 expected_items = 12971

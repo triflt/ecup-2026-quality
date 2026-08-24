@@ -1,6 +1,6 @@
 id = "651"
 name = "qwen_mature_prompt_benchmark"
-status = "qwen36_rejected_qwen35_122b_final_shard_running"
+status = "complete_both_mature_prompt_candidates_rejected"
 data_version = "competition_train_v1"
 evaluation_version = "semantic_family_v3"
 parent_experiment = "640"

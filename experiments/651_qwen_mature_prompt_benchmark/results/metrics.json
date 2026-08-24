@@ -1,6 +1,6 @@
 {
   "experiment_id": "651",
-  "status": "qwen36_rejected_qwen35_122b_final_shard_running",
+  "status": "complete_both_mature_prompt_candidates_rejected",
   "launched_at_utc": {
     "Qwen/Qwen3.6-27B": "2026-08-23T17:42:28Z",
     "Qwen/Qwen3.5-122B-A10B": "2026-08-23T17:42:33Z"
@@ -68,13 +68,34 @@
       "fourth_shard_launched_at_utc": "2026-08-23T19:12:03Z"
     },
     "Qwen/Qwen3.5-122B-A10B": {
-      "status": "three_shards_verified_fourth_running",
+      "status": "complete_rejected",
       "num_shards": 4,
       "gpus_per_shard": 4,
       "submitted_shards": [0, 1, 2, 3],
-      "verified_shards": [0, 1, 2],
-      "verified_unique_rows": 8339,
-      "running_shards": [3],
+      "verified_shards": [0, 1, 2, 3],
+      "verified_unique_rows": 11118,
+      "exact_global_index_cover": true,
+      "finite_scores": 11118,
+      "artifact_sha256": [
+        "0beb88025167f208b87347a83c34a2530bc1428476290d10c1d1c26a7e082662",
+        "101ddc621ee2df369d1aa0ad9214aff5c5911bda521cecd5dd1d3b9254bbdf80",
+        "a1a7fcbc88783a561b357b55d1ada7007f2b213ad23a475e1887e466cdc3b94b",
+        "037fabc032254b998b85a20e9671cf83324a07c61fb5393f9d0f063e3eb065bf"
+      ],
+      "macro_f1": 0.5036278354356723,
+      "baseline_qwen38_macro_f1": 0.5527541862050617,
+      "delta_macro_f1": -0.04912635076938943,
+      "fold_deltas": [-0.0641592281346347, -0.041538076717552386, -0.04463737067639073, -0.05489404684687227, -0.04329215963017802],
+      "bad_f1": 0.9099302622532168,
+      "bad_delta": -0.011550332379128725,
+      "flammable_f1": 0.09732540861812779,
+      "flammable_delta": -0.08670236915965,
+      "corrected": 531,
+      "regressed": 1681,
+      "corrected_to_regressed": 0.31588340273646637,
+      "screen_gate_passed": false,
+      "decision": "REJECT_NO_PROMPT_OR_THRESHOLD_RETUNING",
+      "running_shards": [],
       "not_launched_shards": [],
       "submitted_at_utc": "2026-08-23T19:12:06Z",
       "preset_audit_errors": 0,
@@ -88,6 +109,10 @@
       ]
     }
   },
-  "metrics": null,
-  "decision": "QWEN36_REJECTED_WAIT_QWEN35_122B_COMPLETE_GRID"
+  "metrics": {
+    "best_fixed_prompt_model": "Qwen/Qwen3.8-27B",
+    "best_fixed_prompt_macro_f1": 0.5527541862050617,
+    "mature_candidates_winning_folds": 0
+  },
+  "decision": "BOTH_MATURE_ALTERNATIVES_REJECTED_QWEN38_REMAINS_PROMPT_REFERENCE"
 }

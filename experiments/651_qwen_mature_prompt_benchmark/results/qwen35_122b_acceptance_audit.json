@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "experiment_id": "651",
+  "model_id": "Qwen/Qwen3.5-122B-A10B",
+  "model_revision": "dc4d348443bc740c68e2d77492492c11606384d5",
+  "control_model_id": "Qwen/Qwen3.8-27B",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "rows": 11118,
+  "verified_shards": [0, 1, 2, 3],
+  "exact_global_index_cover": true,
+  "finite_scores": 11118,
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "candidate": {
+    "bad_f1": 0.9099302622532168,
+    "flammable_f1": 0.09732540861812779,
+    "macro_f1": 0.5036278354356723
+  },
+  "control": {
+    "bad_f1": 0.9214805946323456,
+    "flammable_f1": 0.1840277777777778,
+    "macro_f1": 0.5527541862050617
+  },
+  "delta_macro_f1": -0.04912635076938943,
+  "fold_deltas": [
+    -0.0641592281346347,
+    -0.041538076717552386,
+    -0.04463737067639073,
+    -0.05489404684687227,
+    -0.04329215963017802
+  ],
+  "winning_folds": 0,
+  "corrected": 531,
+  "regressed": 1681,
+  "corrected_to_regressed": 0.31588340273646637,
+  "screen_gate_passed": false,
+  "sealed_rows": 0,
+  "public_used": false,
+  "decision": "REJECT_NO_PROMPT_OR_THRESHOLD_RETUNING"
+}
