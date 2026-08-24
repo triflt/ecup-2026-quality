@@ -74,7 +74,7 @@ def build(args: argparse.Namespace) -> str:
   env:
     TOKENIZERS_PARALLELISM: {values['tokenizers']}
     PYTORCH_ALLOC_CONF: {values['allocator']}
-    BUNDLE_URL: ${{BUNDLE_URL}}
+    BUNDLE_URL: {json.dumps(url)}
   entrypoint: bash
   args:
     - -lc
@@ -101,4 +101,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(build(args), encoding="utf-8")
-
