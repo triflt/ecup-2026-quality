@@ -1,6 +1,6 @@
 {
   "experiment_id": "657",
-  "status": "bounded_smoke_running",
+  "status": "bounded_smoke_accepted_production_open",
   "data_version": "competition_train_v1",
   "evaluation_version": "label_blind_ocr_integrity_v1",
   "source_experiment": "633_paddleocr_vl16_spotting",
@@ -10,8 +10,19 @@
   "tile_max_new_tokens": 512,
   "maximum_refine_depth": 3,
   "bounded_smoke_images": 8,
-  "bounded_smoke_accepted": null,
-  "terminal_failed_tiles": null,
+  "bounded_smoke_accepted": 8,
+  "bounded_smoke_failed": 0,
+  "terminal_failed_tiles": 0,
+  "tile_attempts": 28,
+  "refined_attempts": 6,
+  "detections": 304,
+  "overlap_duplicates_removed": 9,
+  "archive_sha256": "e213892e0819efa1d249f64d04f720034fde64aaa858d4f12d0baf7340560f2a",
+  "report_sha256": "a5b80ca056bec053213005ec057f5e5b70b0085dc7849741245af9ad5556a793",
+  "spotting_sha256": "9fe05186c7d8984ab297307c485f0be8119526a8df98712ceda6ca3215212934",
+  "tile_provenance_sha256": "c02296951085cbb89fe36e6fea83487b0ade30d84d5dd3e2193a9f4ae568a034",
+  "manual_overlay_rows_reviewed": 8,
+  "manual_coordinate_audit_passed": true,
   "labels_read": 0,
   "categories_read": 0,
   "folds_read": 0,
@@ -21,5 +32,5 @@
   "runtime_code_sha256": "f8bb3b37670db1d266646a846d9ac9556d75734fe965faed96e5fc76ac1a23b0",
   "preset_audit_errors": 0,
   "dry_run_passed": true,
-  "decision": "WAIT_FOR_AUDITED_8_OF_8_RECURSIVE_SMOKE"
+  "decision": "OPEN_TWO_WAVE_PRODUCTION_REPAIR"
 }

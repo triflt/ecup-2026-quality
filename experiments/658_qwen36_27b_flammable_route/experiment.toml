@@ -1,0 +1,43 @@
+[experiment]
+id = "658"
+slug = "qwen36_27b_flammable_route"
+title = "Category-routed 4B BAD and 27B flammable class-only components"
+status = "screen_frozen_not_scored"
+entrypoint = "experiments/658_qwen36_27b_flammable_route/evaluate_screen.py"
+result_file = "experiments/658_qwen36_27b_flammable_route/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+source_experiments = ["641", "654"]
+scope = "semantic_family_v3 development only"
+sealed_rows = 0
+
+[route]
+"БАД" = "641_qwen35_4b_class_only_lora"
+"Легковоспламеняющиеся" = "654_qwen36_27b_class_only_lora"
+threshold = 0.0
+threshold_tuned = false
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+full_folds_after_screen = [1, 2, 4]
+minimum_screen_mean_delta = 0.0015
+maximum_category_drop = 0.002
+minimum_corrected_to_regressed = 1.5
+required_full_fold_wins = 4
+
+[hypothesis]
+parent_experiment = "654"
+changed_factor = "Route Qwen3.6-27B only to the known flammable category while retaining Qwen3.5-4B for BAD"
+control = "641"
+mechanism = "The 27B learned rare safety boundaries but traded away BAD decisions; category routing isolates the complementary signal"
+falsification = "Reject if either screen fold loses or any category correction-ratio or false-negative gate fails"
+precedents = ["experiment 400 category routing", "experiment 654 category-separated result"]
+
+[budget]
+screen_gpu_hours = 0
+remaining_fold_jobs_if_passed = 3
+gpu_per_training_job = 4
+maximum_parallel_gpus = 16
+planned_public_submissions = 0
