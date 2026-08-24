@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "experiment_id": "678",
+  "created_at": "2026-08-24T12:16:38Z",
+  "status": "complete",
+  "scope": "read_only_runtime_topology_audit",
+  "runner": {
+    "source_experiment_id": "654",
+    "training_script_sha256": "f8613b1e4f5bf7254365a94cce4484e993c850abab1ade12c6cc378dec529fd5",
+    "processes": 1,
+    "cuda_devices": 4,
+    "model_placement": "device_map_balanced",
+    "distributed_training_backend": null,
+    "deepspeed": false,
+    "fsdp": false,
+    "ddp": false,
+    "precision": "bf16",
+    "objective": "binary BCE on final-token logit(1)-logit(0)",
+    "micro_batch_size": 1,
+    "gradient_accumulation": 16,
+    "optimizer_steps": 306
+  },
+  "accepted_fold_runtime_seconds": {
+    "0": 14928.639570651576,
+    "3": 15165.65944541432
+  },
+  "findings": [
+    "The current runner is naive layer-wise model parallelism, not data-parallel or sharded distributed training.",
+    "Accepted artifacts remain scientifically usable because exact data, model, objective, device binding and prediction contracts passed.",
+    "The topology is operationally inefficient and should not be copied into a new training hypothesis without a runtime preflight.",
+    "Changing to ordinary token-level SFT would change the scientific objective and is not a technical retry."
+  ],
+  "future_preflight": {
+    "allowed_only_after_terminal_parent_result": true,
+    "changed_factor": "runtime topology only",
+    "step_1": "one-H100 max-shape model load plus finite forward and backward with identical binary BCE",
+    "step_2_if_fit": "measure optimizer-step throughput and peak memory without training a fold",
+    "step_2_if_oom": "use Accelerate with DeepSpeed ZeRO-3 or FSDP while retaining custom binary BCE",
+    "parity_gate": [
+      "same model and revision",
+      "same preprocessing and max sequence/image shape",
+      "same LoRA configuration",
+      "same binary BCE objective",
+      "finite loss and gradients",
+      "exact trainable parameter names",
+      "no CPU or disk offload",
+      "one fixed-batch prediction/loss parity report"
+    ],
+    "full_fold_training_authorized": false
+  },
+  "official_references": [
+    "https://huggingface.co/docs/accelerate/main/en/concept_guides/big_model_inference",
+    "https://huggingface.co/docs/peft/accelerate/deepspeed",
+    "https://swift.readthedocs.io/en/v4.0/BestPractices/Qwen3_5-Best-Practice.html"
+  ],
+  "active_jobs_changed": false,
+  "new_gpu_jobs_launched": 0,
+  "public_used": false,
+  "sealed_rows_used": 0,
+  "decision": "FINISH_FROZEN_JOBS_DO_NOT_REUSE_TOPOLOGY_WITHOUT_PREFLIGHT"
+}

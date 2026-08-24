@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "experiment_id": "678",
-  "updated_at": "2026-08-24T12:07:00Z",
+  "updated_at": "2026-08-24T12:16:38Z",
   "captain_contract": {
     "validation_owner": true,
     "critic_of_parallel_agent": true,
@@ -15,6 +15,8 @@
     "control_full_oof_rows": 11118,
     "large_folds_ready": [0, 3],
     "large_folds_running": [1, 2, 4],
+    "large_runtime_topology": "naive_balanced_model_parallel_frozen_for_active_jobs",
+    "large_future_runtime_gate": "single_h100_fit_then_deepspeed_or_fsdp_preflight",
     "missing_for_terminal_parent_evaluation": [
       "large_fold_1_predictions",
       "large_fold_2_predictions",
@@ -79,7 +81,7 @@
     },
     {
       "id": "lower_learning_rate",
-      "parent_experiment_id": "679",
+      "parent_experiment_id": null,
       "status": "conditional_not_prepared",
       "eligibility": "ablation_only",
       "open_condition": "optimizer trajectory has no accepted early peak and parent full route passes",

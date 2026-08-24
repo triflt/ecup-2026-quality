@@ -34,6 +34,25 @@ prediction SHA, exact fold/runtime-row binding. После третьего ар
 flammable positives/negatives, OCR availability и каждый fold. Скрипт использует
 те же заранее замороженные веса и threshold и не может настраивать кандидата.
 
+## Аудит 27B runtime
+
+Текущий 27B runner использует один Python process и
+`device_map="balanced"` на четырёх H100. Это наивный model parallel, а не
+DeepSpeed/FSDP/DDP. Он уже дал валидные artifacts на двух folds и не меняется у
+активных jobs, но официальная документация Accelerate предупреждает, что такой
+режим выполняет слои последовательно и оставляет остальные GPU простаивать.
+
+Любой следующий новый 27B training experiment сначала проходит отдельный
+runtime-only smoke с неизменным binary BCE:
+
+1. max-shape forward/backward на одной H100;
+2. если модель помещается — measured single-GPU throughput;
+3. если нет — custom BCE через Accelerate + DeepSpeed/FSDP;
+4. обычный ms-swift token SFT не считается retry, потому что меняет objective.
+
+Машиночитаемый диагноз и gate записаны в
+[`results/qwen27b_runtime_topology_audit.json`](results/qwen27b_runtime_topology_audit.json).
+
 ## Кандидаты
 
 Машиночитаемая доска находится в
