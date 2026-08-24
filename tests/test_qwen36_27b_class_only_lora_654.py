@@ -85,7 +85,28 @@ def test_artifact_verifier_accepts_contract_and_rejects_tamper(tmp_path: Path) -
         output.writestr("predictions.jsonl", payload)
         output.writestr("adapter/adapter_config.json", adapter_config)
         output.writestr("adapter/adapter_model.safetensors", adapter_model)
-    assert VERIFY.verify(archive, fold=0, expected_rows=2)["decision"] == "PASS"
+    runtime = tmp_path / "validation.jsonl"
+    write_jsonl(
+        runtime,
+        [
+            {
+                "global_index": row["global_index"],
+                "id": row["id"],
+                "fold": row["fold"],
+                "category": row["category"],
+                "name": "x",
+            }
+            for row in predictions
+        ],
+    )
+    accepted = VERIFY.verify(
+        archive,
+        fold=0,
+        expected_rows=2,
+        runtime_validation=runtime,
+    )
+    assert accepted["decision"] == "PASS"
+    assert accepted["exact_runtime_binding"] is True
     predictions[0]["prediction"] = 0
     bad_payload = "".join(json.dumps(row) + "\n" for row in predictions).encode()
     report["predictions_sha256"] = VERIFY.sha256_bytes(bad_payload)
@@ -96,6 +117,60 @@ def test_artifact_verifier_accepts_contract_and_rejects_tamper(tmp_path: Path) -
         output.writestr("adapter/adapter_model.safetensors", adapter_model)
     with pytest.raises(ValueError, match="zero threshold"):
         VERIFY.verify(archive, fold=0, expected_rows=2)
+
+
+def test_artifact_verifier_rejects_runtime_row_mismatch(tmp_path: Path) -> None:
+    predictions = [
+        {
+            "global_index": 1,
+            "id": "a",
+            "fold": 0,
+            "category": "БАД",
+            "score": 0.25,
+            "prediction": 1,
+        }
+    ]
+    payload = (json.dumps(predictions[0]) + "\n").encode()
+    adapter_config = b"{}"
+    adapter_model = b"weights"
+    report = {
+        "experiment_id": "654",
+        "model_revision": VERIFY.MODEL_REVISION,
+        "outer_fold": 0,
+        "train_occurrences": 4892,
+        "validation_rows": 1,
+        "optimizer_steps": 306,
+        "threshold": 0.0,
+        "threshold_tuned": False,
+        "validation_labels_written": 0,
+        "sealed_rows": 0,
+        "public_used": False,
+        "cpu_or_disk_offload": False,
+        "decision": "READY_FOR_FROZEN_EVALUATION",
+        "predictions_sha256": VERIFY.sha256_bytes(payload),
+        "adapter_manifest": {
+            "adapter_config.json": VERIFY.sha256_bytes(adapter_config),
+            "adapter_model.safetensors": VERIFY.sha256_bytes(adapter_model),
+        },
+    }
+    archive = tmp_path / "artifact.zip"
+    with zipfile.ZipFile(archive, "w") as output:
+        output.writestr("report.json", json.dumps(report))
+        output.writestr("predictions.jsonl", payload)
+        output.writestr("adapter/adapter_config.json", adapter_config)
+        output.writestr("adapter/adapter_model.safetensors", adapter_model)
+    runtime = tmp_path / "validation.jsonl"
+    write_jsonl(
+        runtime,
+        [{"global_index": 2, "id": "b", "fold": 0, "category": "БАД"}],
+    )
+    with pytest.raises(ValueError, match="frozen runtime validation"):
+        VERIFY.verify(
+            archive,
+            fold=0,
+            expected_rows=1,
+            runtime_validation=runtime,
+        )
 
 
 def test_private_preset_builder_uses_frozen_fold_and_four_gpu_flavor(tmp_path: Path) -> None:

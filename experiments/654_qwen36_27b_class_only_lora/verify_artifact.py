@@ -19,7 +19,13 @@ EXPECTED_TRAIN_OCCURRENCES = {0: 4892, 1: 4894, 2: 4892, 3: 4892, 4: 4894}
 EXPECTED_VALIDATION_ROWS = {0: 2224, 1: 2223, 2: 2224, 3: 2224, 4: 2223}
 
 
-def verify(path: Path, *, fold: int, expected_rows: int | None = None) -> dict[str, Any]:
+def verify(
+    path: Path,
+    *,
+    fold: int,
+    expected_rows: int | None = None,
+    runtime_validation: Path | None = None,
+) -> dict[str, Any]:
     if fold not in EXPECTED_VALIDATION_ROWS:
         raise ValueError("fold must be 0..4")
     if expected_rows is None:
@@ -83,6 +89,25 @@ def verify(path: Path, *, fold: int, expected_rows: int | None = None) -> dict[s
     required_adapter = {"adapter_config.json", "adapter_model.safetensors"}
     if not required_adapter <= set(adapter_files):
         raise ValueError("adapter files missing")
+    runtime_validation_sha256 = None
+    exact_runtime_binding = None
+    if runtime_validation is not None:
+        runtime_payload = runtime_validation.read_bytes()
+        runtime_rows = [json.loads(line) for line in runtime_payload.decode().splitlines()]
+        if len(runtime_rows) != expected_rows:
+            raise ValueError("runtime validation row count mismatch")
+        forbidden = {"label", "target", "is_banned", "sealed", "public"}
+        if any(forbidden.intersection(row) for row in runtime_rows):
+            raise ValueError("runtime validation contains supervision or sealed fields")
+        prediction_keys = ("global_index", "id", "fold", "category")
+        exact_runtime_binding = all(
+            tuple(prediction[key] for key in prediction_keys)
+            == tuple(runtime_row[key] for key in prediction_keys)
+            for prediction, runtime_row in zip(predictions, runtime_rows, strict=True)
+        )
+        if not exact_runtime_binding:
+            raise ValueError("predictions differ from frozen runtime validation")
+        runtime_validation_sha256 = sha256_bytes(runtime_payload)
     return {
         "schema_version": 1,
         "experiment_id": "654",
@@ -92,6 +117,8 @@ def verify(path: Path, *, fold: int, expected_rows: int | None = None) -> dict[s
         "archive_sha256": sha256_bytes(path.read_bytes()),
         "predictions_sha256": sha256_bytes(predictions_payload),
         "adapter_files": len(adapter_files),
+        "runtime_validation_sha256": runtime_validation_sha256,
+        "exact_runtime_binding": exact_runtime_binding,
         "decision": "PASS",
     }
 
@@ -101,11 +128,20 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--archive", type=Path, required=True)
     result.add_argument("--fold", type=int, required=True)
     result.add_argument("--expected-rows", type=int)
+    result.add_argument("--runtime-validation", type=Path)
     return result
 
 
 if __name__ == "__main__":
     args = parser().parse_args()
     print(
-        json.dumps(verify(args.archive, fold=args.fold, expected_rows=args.expected_rows), indent=2)
+        json.dumps(
+            verify(
+                args.archive,
+                fold=args.fold,
+                expected_rows=args.expected_rows,
+                runtime_validation=args.runtime_validation,
+            ),
+            indent=2,
+        )
     )
