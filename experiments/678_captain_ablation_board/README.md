@@ -27,7 +27,9 @@ equal-logit route не хватает только 27B predictions folds 1/2/4. 
 
 После появления каждого артефакта выполняются CRC, self-hashed contract,
 prediction SHA, exact fold/runtime-row binding. После третьего артефакта один
-замороженный evaluator считает полный пятиfoldовый verdict.
+замороженный evaluator считает полный пятиfoldовый verdict. Этот verdict оценивает
+только наличие полезного offline teacher-сигнала: 27B base model и её adapter не
+являются deployable и не могут входить в submission.
 
 `slice_full_candidate.py` затем строит диагностические, не участвующие в выборе
 срезы: singleton/repeated families, mixed/consistent-label components,
@@ -66,6 +68,14 @@ semantic families изменено 12 components: 10 содержат тольк
 gate: fold 0 дал 12/2 изменений, fold 3 — 5/1. Подробный diagnostic находится в
 [`results/screen_change_family_audit.json`](results/screen_change_family_audit.json).
 
+После применения замороженного кандидата на screen folds остаётся 12 flammable
+ошибок: 10 FP и 2 FN. Четыре ошибки имеют абсолютный margin `<0.5`, но несколько
+ошибок в burner/fire-starting/candle-like товарах остаются высокоуверенными.
+Следовательно, глобальный threshold не является достаточным механизмом. Это
+только диагностический вывод: новый rule/object-role кандидат не открывается,
+пока профиль не воспроизведён на пяти folds. Полный перечень находится в
+[`results/screen_residual_error_audit.json`](results/screen_residual_error_audit.json).
+
 ## Кандидаты
 
 Машиночитаемая доска находится в
@@ -73,18 +83,18 @@ gate: fold 0 дал 12/2 изменений, fold 3 — 5/1. Подробный 
 Независимая сборка полного control OOF зафиксирована в
 [`results/control_score_set_audit.json`](results/control_score_set_audit.json).
 
-1. `fixed_equal_logit_route` — единственный ближайший кандидат, который может
-   стать `submission_ready` сегодня. Веса 0.5/0.5 и threshold 0 заморожены до
-   получения folds 1/2/4.
+1. `fixed_equal_logit_route` — только offline teacher/probe ablation. Веса
+   0.5/0.5 и threshold 0 заморожены до получения folds 1/2/4, но даже полный GO
+   не разрешает packaging или submission 27B.
 2. `optimizer_stop_step` — честная однофакторная абляция качества обучения.
    Сначала stop fraction выбирается на donor-inner folds внутри outer0-train,
    затем заранее преобразуется в целое число optimizer steps и проверяется на
    слепом outer0. Даже положительный outer0 ещё не разрешает submission.
-3. `lower_learning_rate` — условный следующий эксперимент, а не активный
-   кандидат. Он открывается только если trajectory не показывает раннего пика.
-   Тогда меняется только LR `2e-4 -> 1e-4`; checkpoint policy, LoRA и данные
-   остаются фиксированными. Это мотивировано официальным Qwen3.5 dense-LoRA
-   примером, но не принимается по внешнему примеру без наших folds.
+3. `lower_learning_rate` — ближайшая deployable однофакторная абляция. Меняется
+   только LR `2e-4 -> 1e-4`; checkpoint policy, LoRA, objective, данные и 4B
+   inference route остаются фиксированными. Это мотивировано официальным
+   Qwen3.5 dense-LoRA примером, но принимается только по frozen screen и затем
+   по полным нашим folds.
 
 Direct 27B route и verified-OCR classification уже отклонены своими frozen
 gates. Они не возвращаются в очередь только потому, что необходимые predictions
@@ -98,9 +108,9 @@ selection, но приблизительный hidden prior не превращ�
 
 ## Submission policy
 
-Количество отправок не является gate. Сегодня допустима одна новая отправка,
-если и только если полный fixed-route проходит все gates и затем улучшает
-неизменный production pipeline при byte-identical BAD route. Вторая отправка
-возможна лишь для заранее зарегистрированной однофакторной архитектурной
-гипотезы с полной честной проверкой. Ablation-only результат на leaderboard не
-отправляется.
+Количество отправок не является gate. 27B route запрещено отправлять независимо
+от его локальной метрики. Сегодня допустима новая отправка только для отдельного
+deployable 4B кандидата, прошедшего frozen screen, подтверждение на оставшихся
+folds, full-data refit и runtime smoke. Вторая отправка возможна лишь для заранее
+зарегистрированной однофакторной архитектурной гипотезы с полной честной
+проверкой. Ablation-only результат на leaderboard не отправляется.
