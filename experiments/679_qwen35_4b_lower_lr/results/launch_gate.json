@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "experiment_id": "679",
+  "control_experiment_id": "641",
+  "decision": "PREPARED_WAIT_CAPACITY",
+  "training_lane_open": false,
+  "allowed_folds": [],
+  "screen_folds": [0, 3],
+  "confirmation_folds": [1, 2, 4],
+  "model_id": "Qwen/Qwen3.5-4B",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "objective": "class_only_binary_bce",
+  "changed_factor": "learning_rate_only",
+  "control_learning_rate": 0.0002,
+  "candidate_learning_rate": 0.0001,
+  "runtime_backend": "legacy_eager",
+  "micro_batch_size": 2,
+  "gradient_accumulation": 8,
+  "effective_batch_size": 16,
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "control_prediction_sha256": {
+    "0": "5164909b7b56298f074e2d21a6e40f1ed53fd2d28d599609527715760f3468ae",
+    "3": "f73d1b06f33c74c40cce03afac1537134e8da251e5e101c14616459414d0ab6a"
+  },
+  "runtime_contract_sha256": {
+    "0": "38802115365cef7e3a0c1a82abc5efc5ce92a41e0046f1ddad4ab9e02647c568",
+    "3": "e08a51c2db16163953c45841f3dd1e7b30b293a7265b2bbd8084d1479c20ea36"
+  },
+  "runtime_payload_sha256": {
+    "0": {
+      "train.jsonl": "3b79e512c60f4f18531da6d1b5c866ff6f1927dc6b26ac9e52b21da841744964",
+      "validation.jsonl": "a9abfc5bc8dc8cb62c8add9f061d2ba9e9f1e0d165add23fca518519a848f4d0"
+    },
+    "3": {
+      "train.jsonl": "404146157667adca1419d272a9bb5200a027d3ba0d15711bcfee9da07df805cf",
+      "validation.jsonl": "3381a41f8e7a8819d9831d4e6d3ba8a03580d81e741df4fbe8818fb855c7ce31"
+    }
+  },
+  "public_used": false,
+  "sealed_rows": 0,
+  "gpu_jobs": 0
+}
