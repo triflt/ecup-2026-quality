@@ -15,6 +15,20 @@
   "smoke_acceptance_audit": "results/smoke_acceptance_audit.json",
   "accepted_full_folds": [0, 1, 3],
   "accepted_full_rows": 14678,
+  "accepted_full_runtime": {
+    "elapsed_seconds_by_fold": {
+      "0": 2458.4644504860044,
+      "1": 1982.0506731569767,
+      "3": 2333.1081213653088
+    },
+    "end_to_end_rows_per_second_by_fold": {
+      "0": 1.9899,
+      "1": 2.4692,
+      "3": 2.0968
+    },
+    "total_gpu_hours": 7.5262,
+    "gpu_per_fold": 4
+  },
   "active_full_folds": [2, 4],
   "pending_full_folds": [],
   "full_acceptance_audits": {
