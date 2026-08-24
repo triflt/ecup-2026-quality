@@ -82,6 +82,7 @@ def rewrite_contract(report: dict[str, Any]) -> dict[str, Any]:
             "uses_27b_at_training": False,
             "uses_27b_at_training_targets": True,
             "uses_27b_at_inference": False,
+            "public_used": False,
         }
     )
     result["contract_sha256"] = control.canonical_sha256(result)

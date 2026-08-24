@@ -105,6 +105,8 @@ fallback.
 
 The submission contains only the already available competition base models and
 4B/2B deployable components. It must contain no 27B base, adapter or runtime.
-Each row receives one Qwen3.5-4B forward through exactly one category adapter.
-Before upload: null-route parity, mixed-category official smoke, archive
-manifest/SHA, format audit and runtime projection must pass.
+The existing all-row Qwen3.5-4B pass is retained byte-for-byte so BAD is not
+affected by category-dependent batching. Flammable rows then receive one
+additional pass with the distillation adapter and the exact 641 image-area
+preprocessing. Before upload: null-route parity, mixed-category official smoke,
+archive manifest/SHA, format audit and a full runtime rehearsal must pass.

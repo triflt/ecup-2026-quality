@@ -137,6 +137,7 @@ def verify(
         "uses_27b_at_training": False,
         "uses_27b_at_training_targets": True,
         "uses_27b_at_inference": False,
+        "public_used": False,
         "outer_fold": fold,
         "train_occurrences": expected_train,
         "validation_rows": expected_validation,
