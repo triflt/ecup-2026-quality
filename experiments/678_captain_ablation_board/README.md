@@ -53,6 +53,12 @@ Direct 27B route и verified-OCR classification уже отклонены сво
 gates. Они не возвращаются в очередь только потому, что необходимые predictions
 или OCR payload существуют.
 
+Аналитическая компенсация 5-кратного oversampling редкого класса через threshold
+`log(5)` также закрыта: на fixed blend она ухудшила flammable F1 на обоих
+screen folds и увеличила FN. PR-AUC используется для ranking/checkpoint
+selection, но приблизительный hidden prior не превращается в ручную правку
+порога.
+
 ## Submission policy
 
 Количество отправок не является gate. Сегодня допустима одна новая отправка,
