@@ -1,6 +1,6 @@
 # Experiment 681 — deployable 4B flammable logit distillation
 
-Status: `TECHNICAL_RETRY_PREPARED`. GPU jobs: `0`. Public submissions: `0`.
+Status: `TECHNICAL_RETRY_RUNNING`. GPU jobs: `1`. Public submissions: `0`.
 
 ## Defect and mechanism
 
