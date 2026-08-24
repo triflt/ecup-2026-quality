@@ -2,9 +2,15 @@
 
 ## Статус
 
-`SCREEN_RUNNING`. Это ближайшая однофакторная абляция, которая при полном
-локальном GO может быть реально упакована в submission. 27B model и её adapter
-не используются ни при обучении, ни при инференсе 679.
+`TERMINAL_REJECT_AT_SCREEN`. Оба заранее выбранных screen folds технически
+валидны, но научный gate провален. Fold 0 дал Macro F1 `+0.003928`, fold 3 —
+`-0.026805`; tie-aware Average Precision для flammable ухудшилась на обоих
+folds (`-0.018402` и `-0.026813`). В pooled screen flammable FN выросли на 2,
+а corrections/regressions составили `27/42`.
+
+Production replay, confirmation folds `1/2/4`, full-data refit и Public для
+этого направления запрещены. 27B model и её adapter не использовались ни при
+обучении, ни при инференсе 679.
 
 ## Недостаток и механизм
 

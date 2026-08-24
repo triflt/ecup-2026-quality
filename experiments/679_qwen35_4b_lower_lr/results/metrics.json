@@ -1,7 +1,33 @@
 {
   "schema_version": 1,
   "experiment_id": "679",
-  "status": "prepared_not_launched",
-  "folds_ready": [],
-  "decision": "WAIT_FOR_SCREEN"
+  "status": "terminal",
+  "folds_ready": [0, 3],
+  "decision": "REJECT_AT_SCREEN",
+  "changed_factor": "learning_rate_only_0.0002_to_0.0001",
+  "screen_report_sha256": "8a37b1baeb728e0c9c7818e2c78a2617c8912a8363dc4fed0d38d5523fd9d0c0",
+  "candidate_prediction_sha256": {
+    "0": "a31ecc8bdf4ff09513e2c15756e2e4dfe8a55cbb417eea0f6e87d8baadfeb9a4",
+    "3": "40f1107a06250efbdce3eb176ab1c6763e1e9fab5a69acb99ce55dca9a4a88d8"
+  },
+  "fold_macro_f1_delta": {
+    "0": 0.0039279320387697325,
+    "3": -0.02680538992540682
+  },
+  "mean_macro_f1_delta": -0.011438728943318544,
+  "fold_flammable_average_precision_delta": {
+    "0": -0.01840174917596682,
+    "3": -0.026812776882752187
+  },
+  "mean_flammable_average_precision_delta": -0.022607263029359503,
+  "pooled_flammable_f1_delta": -0.016901408450704203,
+  "pooled_bad_f1_delta": -0.0037189024630430723,
+  "flammable_false_negative_delta": 2,
+  "corrected": 27,
+  "regressed": 42,
+  "corrected_to_regressed": 0.6428571428571429,
+  "public_used": false,
+  "production_replay_run": false,
+  "confirmation_folds_run": false,
+  "rejection_reason": "Both flammable AP deltas are negative, fold 3 Macro F1 is negative, pooled FN increase, and corrections/regressions is below gate."
 }

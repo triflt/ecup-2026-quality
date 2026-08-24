@@ -2,12 +2,12 @@
   "schema_version": 1,
   "experiment_id": "679",
   "control_experiment_id": "641",
-  "decision": "PREPARED_WAIT_SCREEN",
+  "decision": "CLOSED_TERMINAL_REJECT_AT_SCREEN",
   "training_lane_open": false,
   "allowed_folds": [],
   "screen_folds": [0, 3],
   "confirmation_folds": [1, 2, 4],
-  "standalone_screen_report_sha256": null,
+  "standalone_screen_report_sha256": "8a37b1baeb728e0c9c7818e2c78a2617c8912a8363dc4fed0d38d5523fd9d0c0",
   "production_screen_report_sha256": null,
   "model_id": "Qwen/Qwen3.5-4B",
   "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
@@ -48,5 +48,8 @@
   "public_used": false,
   "sealed_rows": 0,
   "prepared_commit": "e0a211c",
+  "screen_passed": false,
+  "production_replay_authorized": false,
+  "confirmation_authorized": false,
   "gpu_jobs": 0
 }
