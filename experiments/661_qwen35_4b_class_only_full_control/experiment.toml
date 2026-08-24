@@ -2,7 +2,7 @@
 id = "661"
 slug = "qwen35_4b_class_only_full_control"
 title = "Complete Qwen3.5-4B class-only 5-fold control"
-status = "remaining_folds_open"
+status = "complete"
 entrypoint = "experiments/641_qwen35_4b_class_only_lora/run_fold.py"
 result_file = "experiments/661_qwen35_4b_class_only_full_control/results/metrics.json"
 
@@ -53,4 +53,3 @@ planned_public_submissions = 0
 publish = false
 directory = "artifacts"
 private_preset_directory = ".local/compute"
-
