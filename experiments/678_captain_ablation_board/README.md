@@ -29,6 +29,11 @@ equal-logit route не хватает только 27B predictions folds 1/2/4. 
 prediction SHA, exact fold/runtime-row binding. После третьего артефакта один
 замороженный evaluator считает полный пятиfoldовый verdict.
 
+`slice_full_candidate.py` затем строит диагностические, не участвующие в выборе
+срезы: singleton/repeated families, mixed/consistent-label components,
+flammable positives/negatives, OCR availability и каждый fold. Скрипт использует
+те же заранее замороженные веса и threshold и не может настраивать кандидата.
+
 ## Кандидаты
 
 Машиночитаемая доска находится в
