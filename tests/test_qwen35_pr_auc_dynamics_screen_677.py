@@ -76,12 +76,19 @@ def test_builder_excludes_outer_and_inner_folds(tmp_path: Path) -> None:
         outer_runtime=outer, validation_runtimes=validation_runtimes, output_dir=output
     )
     assert result["public_used"] is False
+    assert result["selection_scope"]["blind_confirmation_folds"] == [0]
+    assert result["selection_scope"]["fold3_is_blind"] is False
     for fold in (1, 2, 3, 4):
         train = BUILD.read_jsonl(output / f"inner_fold{fold}" / "train.jsonl")
         validation = BUILD.read_jsonl(output / f"inner_fold{fold}" / "validation.jsonl")
         assert len(train) == 12
         assert all(row["fold"] not in {0, fold} for row in train)
         assert all(row["fold"] == fold and "label" not in row for row in validation)
+    train, validation, audit = TRAIN.load_runtime(output / "inner_fold1", 1)
+    assert len(train) == 12
+    assert len(validation) == 2
+    assert audit["blind_confirmation_folds"] == [0]
+    assert audit["fold3_is_blind"] is False
 
 
 def test_tail_trim_only_removes_bad_negatives() -> None:
@@ -159,6 +166,8 @@ def test_evaluator_selects_one_shared_nonfinal_fraction(tmp_path: Path) -> None:
             "experiment_id": "677",
             "outer_screen_fold": 0,
             "inner_validation_fold": fold,
+            "blind_confirmation_folds": [0],
+            "fold3_is_blind": False,
             "changed_factor": "optimizer_stop_fraction_only",
             "technical_smoke": False,
             "validation_labels_read": 0,
@@ -178,7 +187,9 @@ def test_evaluator_selects_one_shared_nonfinal_fraction(tmp_path: Path) -> None:
         writer.writerows(registry_rows)
     result = EVALUATE.evaluate(registry_path, run_dirs, tmp_path / "metrics.json")
     assert result["selected_training_fraction"] == 0.5
-    assert result["decision"] == "GO_CONFIRM_SELECTED_STOP_ON_OUTER_FOLDS_0_AND_3"
+    assert result["decision"] == "GO_CONFIRM_SELECTED_STOP_ON_OUTER_FOLD_0_ONLY"
+    assert result["selection_scope"]["blind_confirmation_folds"] == [0]
+    assert result["selection_scope"]["fold3_is_blind"] is False
     assert result["public_used"] is False
 
 
@@ -194,6 +205,8 @@ def test_launch_gate_requires_terminal_accepted_parent(tmp_path: Path) -> None:
         "decision": "OPEN_FOUR_INNER_DYNAMICS_SCREENS",
         "gpu_jobs": 4,
         "gpus_per_job": 1,
+        "blind_confirmation_folds": [0],
+        "fold3_is_blind": False,
         "inner_folds": [1, 2, 3, 4],
         "sealed_rows": 0,
         "public_used": False,
@@ -238,6 +251,7 @@ def test_private_preset_reuses_proven_single_gpu_runtime(tmp_path: Path) -> None
     assert "flavor: h100-1x" in payload
     assert "--inner-fold 2" in payload
     assert "train_dynamics.py" in payload
+    assert "inner_runtime_v2/inner_fold2" in payload
     assert "pip install" not in payload
     assert payload.count("type: model_registry") == 1
     assert "example.invalid" not in payload
@@ -254,5 +268,7 @@ def test_committed_runtime_manifest_and_gate_are_fail_closed() -> None:
         results / "runtime_manifest.json"
     )
     assert metrics["gpu_jobs_launched"] == 0
+    assert metrics["blind_confirmation_folds"] == [0]
+    assert metrics["fold3_is_blind"] is False
     with pytest.raises(ValueError, match="closed"):
         GATE.verify(results / "launch_gate.json", 1)

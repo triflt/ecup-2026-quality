@@ -118,6 +118,8 @@ def evaluate(registry_path: Path, run_dirs: list[Path], output: Path) -> dict[st
             "experiment_id": EXPERIMENT_ID,
             "outer_screen_fold": 0,
             "inner_validation_fold": expected_fold,
+            "blind_confirmation_folds": [0],
+            "fold3_is_blind": False,
             "changed_factor": "optimizer_stop_fraction_only",
             "technical_smoke": False,
             "validation_labels_read": 0,
@@ -211,6 +213,15 @@ def evaluate(registry_path: Path, run_dirs: list[Path], output: Path) -> dict[st
         "registry_sha256": sha256_file(registry_path),
         "outer_screen_fold": 0,
         "inner_folds": [1, 2, 3, 4],
+        "selection_scope": {
+            "blind_confirmation_folds": [0],
+            "fold3_is_blind": False,
+            "fold3_reason": "fold 3 participates in donor-inner stop-fraction selection",
+            "required_follow_up": (
+                "A separate nested selector built only inside outer-fold-3 training data is required "
+                "before evaluating outer fold 3."
+            ),
+        },
         "fold_results": fold_results,
         "candidate_deltas_vs_final": candidates,
         "selected_training_fraction": (
@@ -220,7 +231,7 @@ def evaluate(registry_path: Path, run_dirs: list[Path], output: Path) -> dict[st
         "public_used": False,
         "threshold_tuned": False,
         "decision": (
-            "GO_CONFIRM_SELECTED_STOP_ON_OUTER_FOLDS_0_AND_3"
+            "GO_CONFIRM_SELECTED_STOP_ON_OUTER_FOLD_0_ONLY"
             if selected is not None
             else "NO_GO_KEEP_FINAL_CHECKPOINT_RECIPE"
         ),

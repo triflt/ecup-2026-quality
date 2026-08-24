@@ -32,7 +32,8 @@ stack, distributed launch или runtime `pip install`. Обычный ms-swift 
 ## Честная nested validation
 
 Outer fold 0 остаётся полностью закрытым. Его training runtime делится на четыре donor-inner
-screen по уже замороженным semantic-family folds 1/2/3/4:
+screen по уже замороженным semantic-family folds 1/2/3/4. **Outer fold 3 в этой схеме не является
+слепым:** он участвует в inner selection и влияет на выбор stop fraction.
 
 - train исключает и outer fold 0, и текущий inner fold;
 - validation берётся целиком и остаётся label-free в GPU runtime;
@@ -55,9 +56,10 @@ Non-final fraction принимается, только если против ф
 - средний flammable AP gain не меньше `+0.010`;
 - BAD AP не падает больше чем на `0.002` ни на одном inner fold.
 
-При успехе выбранный fraction сначала подтверждается новыми outer-fold 0/3 моделями. Только после
-положительных обоих outer folds обсуждается перенос на 27B. При неуспехе направление закрывается
-без 27B обучения.
+При успехе выбранный fraction разрешено подтверждать только на outer fold 0. Положительный outer0
+результат не делает outer3 независимым подтверждением. Для проверки outer3 потребуется отдельный
+nested selector, построенный исключительно внутри outer3-train; только после этого можно читать
+outer3 labels. При неуспехе на outer0 направление закрывается без 27B обучения.
 
 ## Стоимость
 

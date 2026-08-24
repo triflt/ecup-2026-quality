@@ -45,7 +45,7 @@ def build(args: argparse.Namespace) -> str:
         "PYTHONPATH=/work/input/experiments/645_qwen_scale_2x3_gate:/work/vendor "
         "python -u /work/input/experiments/677_qwen35_pr_auc_dynamics_screen/train_dynamics.py "
         f"--inner-fold {args.inner_fold} "
-        f"--runtime-dir /work/input/experiments/677_qwen35_pr_auc_dynamics_screen/.local/inner_runtime/inner_fold{args.inner_fold} "
+        f"--runtime-dir /work/input/experiments/677_qwen35_pr_auc_dynamics_screen/.local/inner_runtime_v2/inner_fold{args.inner_fold} "
         "--images /work/images --model-root /hf_models "
         "--model-revision 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a "
         "--vendor /work/vendor --output-dir /work/output"

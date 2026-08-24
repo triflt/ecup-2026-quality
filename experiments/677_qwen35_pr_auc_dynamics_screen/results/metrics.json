@@ -2,10 +2,14 @@
   "decision": "PREPARED_NOT_LAUNCHED_WAIT_FOR_TERMINAL_659",
   "experiment_id": "677",
   "gpu_jobs_launched": 0,
-  "mlc_preset_dry_run": "PASS",
+  "blind_confirmation_folds": [
+    0
+  ],
+  "fold3_is_blind": false,
+  "mlc_preset_dry_run": "PENDING_V2_SCOPE_RECHECK",
   "public_used": false,
-  "runtime_contract_sha256": "4b134305cec578762dddd6edb50db89a8254f5d2407c648780e543cb81def40e",
-  "runtime_manifest_sha256": "220f1f32c78538f231560b66d87210105d822892688f8562b181b127969daa29",
+  "runtime_contract_sha256": "872d5f9cd771c168eec57fba35553a591953d55d45f2eab3281858a41b9522e2",
+  "runtime_manifest_sha256": "f273c110c05cd409386426381eb650ee51dddc31dfc740baef2fc2433c4be362",
   "schema_version": 1,
   "sealed_rows": 0,
   "status": "prepared"

@@ -16,6 +16,8 @@ def verify(path: Path, inner_fold: int) -> dict:
         "decision": "OPEN_FOUR_INNER_DYNAMICS_SCREENS",
         "gpu_jobs": 4,
         "gpus_per_job": 1,
+        "blind_confirmation_folds": [0],
+        "fold3_is_blind": False,
         "sealed_rows": 0,
         "public_used": False,
     }

@@ -19,7 +19,7 @@ primary_metric = "flammable_average_precision"
 [hypothesis]
 parent_experiment = "659"
 changed_factor = "optimizer stop fraction only"
-mechanism = "Use donor-inner PR-AUC to detect whether rare-class ranking peaks before the final one-epoch adapter"
+mechanism = "Select one stop fraction on donor-inner folds 1/2/3/4, then confirm it only on blind outer fold 0"
 expected_macro_f1_delta = 0.003
 falsification = "No non-final fraction wins at least three inner folds with mean flammable AP gain >=0.010 and BAD AP guard"
 precedents = [
