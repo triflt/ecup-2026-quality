@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "experiment_id": "656",
+  "scope": "first_8_global_strict_candidates",
+  "requested_images": 8,
+  "accepted_images": 6,
+  "failed_images": 2,
+  "failed_tiles": 2,
+  "all_truncation_candidates": 7737,
+  "detections": 149,
+  "overlap_duplicates_removed": 5,
+  "elapsed_seconds": 275.265248991549,
+  "integrity": {
+    "outer_zip": true,
+    "report_matches_outputs": true,
+    "spotting_rows": 8,
+    "provenance_rows": 8,
+    "labels_read": 0,
+    "categories_read": 0,
+    "folds_read": 0,
+    "sealed_membership_used": false,
+    "public_used": false
+  },
+  "sha256": {
+    "archive": "834abeeafafd4829a7d266dd23d0ac0d10dc7596ddb77933b1152a3b8cc4883a",
+    "report": "9350a5ba4971a6f982151f13a68e9d693abc0fb222fccb4532daaa41cd4a9fde",
+    "spotting": "02617ccb53907da584e3274eae199858132ef7f3682f696df74d417cc66dc793",
+    "tile_provenance": "5b0e6a40ed8696d6d583fecbb8a12712d99f8a8395c307aad7d09b20d9dcf379"
+  },
+  "failed_tile_observations": [
+    {"source_loc_tokens": 244, "failed_tile_loc_tokens": 245, "eos": false},
+    {"source_loc_tokens": 232, "failed_tile_loc_tokens": 204, "eos": false}
+  ],
+  "gate": {"required_accepted": 8, "maximum_failed_tiles": 0, "passed": false},
+  "decision": "REJECT_NO_PRODUCTION"
+}

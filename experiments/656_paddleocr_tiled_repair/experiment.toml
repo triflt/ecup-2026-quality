@@ -2,7 +2,7 @@
 id = "656"
 slug = "paddleocr_tiled_repair"
 title = "Deterministic overlapping-tile repair of dense PaddleOCR-VL outputs"
-status = "bounded_smoke_running"
+status = "rejected_at_bounded_smoke"
 entrypoint = "experiments/656_paddleocr_tiled_repair/run_tiled_repair.py"
 result_file = "experiments/656_paddleocr_tiled_repair/results/metrics.json"
 
@@ -58,6 +58,8 @@ smoke_jobs = 1
 smoke_images = 8
 planned_full_jobs = 32
 gpu_per_job = 1
+maximum_parallel_gpus = 16
+production_waves = 2
 planned_public_submissions = 0
 
 [artifacts]

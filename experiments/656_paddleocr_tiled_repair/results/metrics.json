@@ -1,6 +1,6 @@
 {
   "experiment_id": "656",
-  "status": "bounded_smoke_running",
+  "status": "rejected_at_bounded_smoke",
   "data_version": "competition_train_v1",
   "evaluation_version": "label_blind_ocr_integrity_v1",
   "source_experiment": "633_paddleocr_vl16_spotting",
@@ -19,15 +19,24 @@
   "sealed_membership_used": false,
   "public_used": false,
   "bounded_smoke_images": 8,
-  "bounded_smoke_accepted": null,
+  "bounded_smoke_accepted": 6,
+  "bounded_smoke_failed": 2,
   "production_images_requested": null,
   "production_images_accepted": null,
-  "failed_tiles": null,
-  "overlap_duplicates_removed": null,
+  "failed_tiles": 2,
+  "overlap_duplicates_removed": 5,
   "manifest_sha256": null,
-  "runtime_code_sha256": null,
-  "spotting_sha256": null,
-  "tile_provenance_sha256": null,
+  "runtime_code_sha256": "2390323cc6d23858ba62819acef09fecdf88312e84944822a57be5d5ada5be85",
+  "spotting_sha256": "02617ccb53907da584e3274eae199858132ef7f3682f696df74d417cc66dc793",
+  "tile_provenance_sha256": "5b0e6a40ed8696d6d583fecbb8a12712d99f8a8395c307aad7d09b20d9dcf379",
+  "report_sha256": "9350a5ba4971a6f982151f13a68e9d693abc0fb222fccb4532daaa41cd4a9fde",
+  "archive_sha256": "834abeeafafd4829a7d266dd23d0ac0d10dc7596ddb77933b1152a3b8cc4883a",
+  "elapsed_seconds": 275.265248991549,
+  "all_truncation_candidates": 7737,
+  "failed_tile_observations": [
+    {"source_loc_tokens": 244, "failed_tile_loc_tokens": 245, "eos": false},
+    {"source_loc_tokens": 232, "failed_tile_loc_tokens": 204, "eos": false}
+  ],
   "preset_sha256": "1bc61856556e6d96fda4ae58f7153342f60d4be73264aa78b8308f4981c4f96d",
   "preset_audit_errors": 0,
   "dry_run_passed": true,
@@ -36,5 +45,5 @@
     "changed_factor": "shortened output artifact name only",
     "scientific_contract_changed": false
   },
-  "decision": "WAIT_FOR_8_OF_8_FAIL_CLOSED_NATIVE_ARTIFACT_SMOKE"
+  "decision": "REJECT_NO_PRODUCTION_USE_RECURSIVE_FAILED_TILE_SPLIT"
 }
