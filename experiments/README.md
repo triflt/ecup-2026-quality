@@ -35,9 +35,10 @@
 | 633–660 | Offline OCR и строгий repair | Partial dataset only | 41 691 изображение доступны fail-closed; тяжёлый OCR запрещён в submission-runtime |
 | 640–659 | Масштаб Qwen и 27B LoRA | Offline teacher accepted | 659 выиграл 5/5 для опасного класса, но 27B не deployable |
 | 661 | Полный контроль Qwen3.5-4B | Accepted control | 11 118 строк, immutable five-fold input для 659 |
-| 662 | Outer-train scoring Qwen3.6-27B | Smoke running | Только label-free train-targets для честной дистилляции |
+| 662 | Outer-train scoring Qwen3.6-27B | Controlled smoke retry | Только label-free train-targets для честной дистилляции; первый архив отвергнут по лишним macOS-метаданным |
 | 679 | Qwen3.5-4B с LR 1e-4 | Rejected at screen | Один fold вырос, второй упал; PR-AUC опасного класса ухудшился |
-| 680–681 | Deployable specialist и distillation | Gated/Prepared | Безопасный перенос 27B-сигнала без second-level leakage |
+| 680 | Flammable-only Qwen3.5-4B | Rejected at screen | Положительный fold 0 не перенёсся на fold 3; Macro и F1 редкого класса снизились |
+| 681 | Outer-safe 27B→4B distillation | Prepared | Ближайший deployable перенос 27B-сигнала без second-level leakage |
 | 900 | Infrastructure checks | Completed | Runtime/schema/preprocessing safeguards |
 
 Новый experiment создаётся из `templates/experiment/`, затем добавляется отдельной строкой в `reports/experiment-log.csv`.
