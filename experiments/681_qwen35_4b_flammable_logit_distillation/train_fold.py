@@ -79,6 +79,8 @@ def rewrite_contract(report: dict[str, Any]) -> dict[str, Any]:
             "teacher_target_scope": "outer_train_in_sample_outer_validation_unread",
             "ordinary_oof_merge_used": False,
             "submission_base_model": "Qwen/Qwen3.5-4B",
+            "uses_27b_at_training": False,
+            "uses_27b_at_training_targets": True,
             "uses_27b_at_inference": False,
         }
     )
@@ -104,4 +106,3 @@ def run(args: Any) -> dict[str, Any]:
 if __name__ == "__main__":
     args = control.parser_for(CONTROL_EXPERIMENT_ID).parse_args()
     print(json.dumps(run(args), ensure_ascii=False, indent=2, sort_keys=True))
-

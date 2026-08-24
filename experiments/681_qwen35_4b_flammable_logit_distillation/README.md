@@ -36,10 +36,20 @@ teacher for fold `j != k` has seen labels from student outer fold `k`. For the
 final all-data refit only, rowwise OOF teacher scores are allowed because there
 is no remaining outer validation and each row's teacher excluded that row.
 
+The final 2,590-occurrence flammable multiset contains 2,242 development and
+348 sealed-holdout occurrences (1,562/236 unique IDs). The five accepted 654
+OOF files cover only development. Therefore full refit also requires a separate
+label-free teacher-0 score artifact for the exact 236 selected sealed IDs, with
+raw-logit semantics, labels read 0, Public 0 and exact immutable binding. This
+artifact is forbidden before the full CV gate; missing sealed targets close the
+refit rather than falling back to hard labels silently.
+
 Every target artifact must bind exact `(global_index, id, fold, occurrence)`
 keys, raw finite pre-sigmoid teacher logit difference, source adapter SHA,
-source runtime SHA and payload SHA. Labels, sealed rows and Public data are
-forbidden in the teacher-score artifact.
+source runtime SHA and payload SHA. Labels and Public data are forbidden in all
+teacher-score artifacts. Sealed rows are forbidden in outer-CV artifacts; the
+post-gate final-refit completion artifact is the only explicit exception and is
+scored label-free.
 
 ## Frozen launch order
 
@@ -98,4 +108,3 @@ The submission contains only the already available competition base models and
 Each row receives one Qwen3.5-4B forward through exactly one category adapter.
 Before upload: null-route parity, mixed-category official smoke, archive
 manifest/SHA, format audit and runtime projection must pass.
-

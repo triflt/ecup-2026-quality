@@ -196,6 +196,9 @@ def build(
             "soft_loss_weight": 0.5,
             "ordinary_oof_merge_used": False,
             "outer_validation_teacher_overlap": 0,
+            "validation_labels_read": 0,
+            "sealed_rows_used": 0,
+            "public_used": False,
             "output_sha256": {
                 "train.jsonl": sha256_file(output / "train.jsonl"),
                 "validation.jsonl": sha256_file(output / "validation.jsonl"),
