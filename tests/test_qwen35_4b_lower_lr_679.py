@@ -33,6 +33,9 @@ CONFIRM_GATE = load_module(
 CONFIRM_PRESET = load_module(
     EXPERIMENT / "build_confirmation_preset.py", "experiment_679_confirmation_preset"
 )
+PRODUCTION = load_module(
+    EXPERIMENT / "evaluate_production_route.py", "experiment_679_production_route"
+)
 
 
 def canonical_without_hash(payload: dict) -> str:
@@ -486,3 +489,45 @@ def test_confirmation_preset_rejects_prepared_gate_and_preserves_recipe(
     assert "verify_confirmation_gate.py" in payload
     assert "--micro-batch-size-override 2" in payload
     assert "Qwen3.6" not in payload and "27B" not in payload
+
+
+def test_production_candidate_replaces_only_flammable_qwen_signal() -> None:
+    bundle = {
+        "categories": PRODUCTION.np.asarray(
+            ["БАД", "Легковоспламеняющиеся", "БАД", "Легковоспламеняющиеся"]
+        ),
+        "qwen35_original_logit": PRODUCTION.np.asarray([-2.0, -1.0, 2.0, 1.0]),
+    }
+    candidate_logits = PRODUCTION.np.asarray([20.0, -3.0, -20.0, 3.0])
+    baseline, candidate = PRODUCTION.flammable_only_probabilities(
+        bundle=bundle, candidate_logits=candidate_logits
+    )
+    bad = bundle["categories"] == "БАД"
+    flammable = ~bad
+    assert PRODUCTION.np.array_equal(candidate[bad], baseline[bad])
+    assert not PRODUCTION.np.array_equal(candidate[flammable], baseline[flammable])
+
+
+def test_production_full_gate_requires_blind_folds_and_component_stability() -> None:
+    metrics = {
+        "corrected": 9,
+        "regressed": 3,
+        "corrected_to_regressed": 3.0,
+        "winning_folds": 5,
+        "macro_delta": 0.007,
+        "mean_fold_delta": 0.007,
+        "categories": {
+            "БАД": {"delta": 0.0},
+            "Легковоспламеняющиеся": {"delta": 0.014},
+        },
+        "folds": {str(fold): {"delta": 0.001} for fold in range(5)},
+        "false_negatives": {
+            "flammable": {"delta": 0},
+            "all_positive": {"delta": 0},
+        },
+        "component_bootstrap": {"probability_delta_positive": 0.91},
+    }
+    assert all(PRODUCTION.production_gates(metrics, stage="full").values())
+    metrics["folds"]["2"]["delta"] = -0.001
+    gates = PRODUCTION.production_gates(metrics, stage="full")
+    assert gates["all_confirmation_folds_positive"] is False
