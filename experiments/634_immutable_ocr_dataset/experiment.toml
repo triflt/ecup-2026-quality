@@ -2,14 +2,14 @@
 id = "634"
 slug = "immutable_ocr_dataset"
 title = "Strict immutable label-blind OCR dataset"
-status = "waiting_for_truncation_repair_655"
+status = "full_dataset_rejected_superseded_by_partial_660"
 entrypoint = "experiments/634_immutable_ocr_dataset/run.py"
 result_file = "experiments/634_immutable_ocr_dataset/results/metrics.json"
 
 [data]
 input_version = "competition_train_v1"
 input_ocr_experiment = "633_paddleocr_vl16_spotting"
-repair_overlay_experiment = "655_paddleocr_truncation_repair"
+repair_overlay_experiment = "655_656_657_rejected"
 planned_output_version = "competition_train_paddleocr_vl16_spotting_v1"
 source_manifest_schema = ["id", "image_index", "url"]
 expected_items = 12971
@@ -63,3 +63,10 @@ planned_public_submissions = 0
 [artifacts]
 publish = false
 directory = "artifacts"
+
+[results]
+full_dataset_published = false
+partial_successor_experiment = "660"
+partial_available_images = 41691
+partial_unavailable_images = 7765
+decision = "REJECT_FULL_DATASET_USE_FAIL_CLOSED_PARTIAL_660"

@@ -1,6 +1,6 @@
 {
   "experiment_id": "657",
-  "status": "bounded_smoke_accepted_production_open",
+  "status": "production_rejected_throughput_and_terminal_failures",
   "data_version": "competition_train_v1",
   "evaluation_version": "label_blind_ocr_integrity_v1",
   "source_experiment": "633_paddleocr_vl16_spotting",
@@ -32,5 +32,21 @@
   "runtime_code_sha256": "f8bb3b37670db1d266646a846d9ac9556d75734fe965faed96e5fc76ac1a23b0",
   "preset_audit_errors": 0,
   "dry_run_passed": true,
-  "decision": "OPEN_TWO_WAVE_PRODUCTION_REPAIR"
+  "production": {
+    "assigned_rows_per_shard": 242,
+    "cancelled_jobs": 16,
+    "failed_rows_per_affected_shard_max": 5,
+    "failed_rows_per_affected_shard_min": 1,
+    "gpu_per_job": 1,
+    "job_time_limit_hours": 4.0,
+    "observed_after_minutes": 42,
+    "progress_rows_max": 20,
+    "progress_rows_min": 10,
+    "projected_hours_per_shard_max": 17.0,
+    "projected_hours_per_shard_min": 8.0,
+    "shards_with_failed_rows": 13,
+    "wave1_jobs": 16,
+    "wave2_jobs": 0
+  },
+  "decision": "REJECT_FULL_REPAIR_USE_PARTIAL_AVAILABILITY_660"
 }

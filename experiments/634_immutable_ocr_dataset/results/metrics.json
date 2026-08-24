@@ -1,6 +1,6 @@
 {
   "experiment_id": "634",
-  "status": "waiting_for_truncation_repair_655",
+  "status": "full_dataset_rejected_superseded_by_partial_660",
   "input_data_version": "competition_train_v1",
   "input_ocr_experiment": "633_paddleocr_vl16_spotting",
   "planned_output_data_version": "competition_train_paddleocr_vl16_spotting_v1",
@@ -33,5 +33,10 @@
   ],
   "merge_report": null,
   "category_coverage_report": null,
-  "decision": "WAIT_ACCEPTED_REPAIR_OVERLAY_655_THEN_REBUILD"
+  "partial_successor": {
+    "available_images": 41691,
+    "experiment_id": "660",
+    "unavailable_images": 7765
+  },
+  "decision": "REJECT_FULL_DATASET_USE_FAIL_CLOSED_PARTIAL_660"
 }

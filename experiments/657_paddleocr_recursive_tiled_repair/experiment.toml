@@ -2,7 +2,7 @@
 id = "657"
 slug = "paddleocr_recursive_tiled_repair"
 title = "Recursive failed-tile PaddleOCR-VL repair"
-status = "bounded_smoke_accepted_production_open"
+status = "production_rejected_throughput_and_terminal_failures"
 entrypoint = "experiments/657_paddleocr_recursive_tiled_repair/run_recursive_repair.py"
 result_file = "experiments/657_paddleocr_recursive_tiled_repair/results/metrics.json"
 
@@ -69,3 +69,20 @@ detections = 304
 overlap_duplicates_removed = 9
 manual_overlay_rows_reviewed = 8
 decision = "OPEN_TWO_WAVE_PRODUCTION_REPAIR"
+
+[results.production]
+wave1_jobs = 16
+gpu_per_job = 1
+observed_after_minutes = 42
+progress_rows_min = 10
+progress_rows_max = 20
+assigned_rows_per_shard = 242
+shards_with_failed_rows = 13
+failed_rows_per_affected_shard_min = 1
+failed_rows_per_affected_shard_max = 5
+projected_hours_per_shard_min = 8.0
+projected_hours_per_shard_max = 17.0
+job_time_limit_hours = 4.0
+cancelled_jobs = 16
+wave2_jobs = 0
+decision = "REJECT_FULL_REPAIR_USE_PARTIAL_AVAILABILITY_660"
