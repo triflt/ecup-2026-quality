@@ -16,7 +16,7 @@
     "threshold_tuning",
     "27b_submission_packaging"
   ],
-  "gpu_jobs": 1,
+  "gpu_jobs": 2,
   "learning_rate": 0.0002,
   "ordinary_oof_merge_used": false,
   "public_submissions": 0,
