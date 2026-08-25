@@ -54,7 +54,10 @@ def build(repo: Path, output: Path) -> dict[str, Any]:
                     not name
                     or path.is_absolute()
                     or ".." in path.parts
-                    or not name.startswith(f"{SOURCE_PATH}/")
+                    or (
+                        name not in {"experiments", SOURCE_PATH}
+                        and not name.startswith(f"{SOURCE_PATH}/")
+                    )
                     or any(
                         part == "__MACOSX"
                         or part == ".DS_Store"
