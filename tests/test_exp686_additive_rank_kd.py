@@ -72,7 +72,7 @@ def write_promotion_receipt(
     if stage == "blind3":
         folds = [3]
         decision = "OPEN_CONFIRMATION_FOLDS124"
-        output_source = "/approved/project/exp686/eval/f3"
+        output_source = "approved/project/exp686/eval/f3"
         parent = {
             "parent_promotion_gate_sha256": None,
             "parent_promotion_gate_file_sha256": None,
@@ -82,7 +82,7 @@ def write_promotion_receipt(
     elif stage == "confirmation":
         folds = [1, 2, 4]
         decision = "OPEN_FULL_REPLAY"
-        output_source = "/approved/project/exp686/eval/confirmation"
+        output_source = "approved/project/exp686/eval/confirmation"
         parent = {
             "parent_promotion_gate_sha256": "d" * 64,
             "parent_promotion_gate_file_sha256": "e" * 64,

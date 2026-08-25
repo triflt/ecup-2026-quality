@@ -60,6 +60,10 @@ def sanitize(source_runtime: Path, pair_runtime: Path, transport: Path) -> dict[
         .get("sha256"),
     ]
     actual = sha256_file(validation)
+    if derived_validation_sha == actual:
+        raise ValueError(
+            "filtered validation checksum equals full source validation checksum"
+        )
     if any(value != actual for value in expected):
         raise ValueError("validation transport differs from frozen source/pair contracts")
     bytes_verified = validation.stat().st_size

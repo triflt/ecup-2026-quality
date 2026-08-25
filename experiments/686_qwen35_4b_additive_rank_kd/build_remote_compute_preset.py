@@ -56,6 +56,13 @@ def safe_relative(value: str) -> str:
     return path.as_posix()
 
 
+def promotion_evidence_source(value: str) -> str:
+    """Map an absolute S3 mount prefix to the gate's bucket-relative source."""
+    if not value.startswith("/") or value.startswith("//"):
+        raise ValueError("promotion mount source must be one absolute S3 prefix")
+    return value.removeprefix("/")
+
+
 def sha256_value(value: str) -> str:
     if not re.fullmatch(r"[0-9a-f]{64}", value):
         raise ValueError("SHA-256 must be 64 lowercase hexadecimal characters")
@@ -121,7 +128,7 @@ def validate_promotion_receipt(
         expected_stage=expected_stage,
         expected_folds=expected_folds,
         expected_decision=expected_decision,
-        expected_source=args.promotion_src,
+        expected_source=promotion_evidence_source(args.promotion_src),
     )
 
 
@@ -524,7 +531,8 @@ def build_train(args: argparse.Namespace) -> str:
         promotion_argument = (
             f" --promotion-receipt {promotion_path}"
             f" --promotion-evaluation {promotion_evaluation_path}"
-            f" --promotion-receipt-source {shlex.quote(args.promotion_src)}"
+            " --promotion-receipt-source "
+            f"{shlex.quote(promotion_evidence_source(args.promotion_src))}"
         )
     vendor_root = "/work/input/vendor"
     vendor_archive = f"{vendor_root}/peft-0.20.0.zip"
@@ -641,7 +649,8 @@ def build_eval(args: argparse.Namespace) -> str:
         promotion_argument = (
             f" --promotion-receipt {promotion_path}"
             f" --promotion-evaluation {promotion_evaluation_path}"
-            f" --promotion-receipt-source {shlex.quote(args.promotion_src)}"
+            " --promotion-receipt-source "
+            f"{shlex.quote(promotion_evidence_source(args.promotion_src))}"
         )
     candidates = parse_fold_sources(args.candidate_src, folds, "candidate")
     controls = parse_fold_sources(args.control_src, folds, "control")

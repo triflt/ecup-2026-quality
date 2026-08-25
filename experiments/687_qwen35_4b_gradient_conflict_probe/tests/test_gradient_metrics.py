@@ -213,6 +213,43 @@ def test_sanitizer_rejects_pair_source_contract_mismatch(tmp_path: Path) -> None
     assert validation.exists()
 
 
+def test_sanitizer_rejects_filtered_checksum_equal_to_full_source(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    pair = tmp_path / "pair"
+    source.mkdir()
+    pair.mkdir()
+    validation = source / "validation.jsonl"
+    validation.write_text('{"id":"x"}\n', encoding="utf-8")
+    sha = __import__("hashlib").sha256(validation.read_bytes()).hexdigest()
+    source_audit = {
+        "outer_fold": 3,
+        "output_sha256": {"validation.jsonl": sha},
+    }
+    _write_self_hashed(
+        source / "runtime_audit.json", source_audit, "contract_sha256"
+    )
+    _write_self_hashed(
+        pair / "runtime_audit.json",
+        {
+            "outer_fold": 3,
+            "source_641_runtime_contract_sha256": source_audit["contract_sha256"],
+            "derived_680_output_sha256": {"validation.jsonl": sha},
+        },
+        "contract_sha256",
+    )
+    transport = tmp_path / "transport.json"
+    _write_self_hashed(
+        transport,
+        {"accepted_files": {"source_runtime/validation.jsonl": {"sha256": sha}}},
+        "transport_acceptance_sha256",
+    )
+    with pytest.raises(ValueError, match="filtered validation checksum equals"):
+        sanitize(source, pair, transport)
+    assert validation.exists()
+
+
 def test_measurement_schema_rejects_extra_fields_and_bool_indices() -> None:
     row = {
         "checkpoint_step": 0,
