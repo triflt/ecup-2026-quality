@@ -5,7 +5,6 @@ import hashlib
 import json
 import re
 import shlex
-import subprocess
 import sys
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -108,41 +107,16 @@ def _validate_code_acceptance(
     return value
 
 
-def _read_s3_credentials(path: Path) -> tuple[str, str]:
-    if not path.is_file() or path.is_symlink():
-        raise ValueError("S3 environment file must be a regular ignored file")
-    values: dict[str, str] = {}
-    for line in path.read_text(encoding="utf-8").splitlines():
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-        key, separator, value = stripped.partition("=")
-        if not separator:
-            raise ValueError("invalid S3 environment-file line")
-        values[key.strip()] = value.strip().strip("'\"")
-    access = [
-        value
-        for key, value in values.items()
-        if key.endswith("_ACCESS_KEY") and not key.endswith("_SECRET_ACCESS_KEY")
-    ]
-    secret = [value for key, value in values.items() if key.endswith("_SECRET_ACCESS_KEY")]
-    if len(access) != 1 or len(secret) != 1 or not access[0] or not secret[0]:
-        raise ValueError("S3 environment file must contain exactly one access/secret pair")
-    return access[0], secret[0]
-
-
-def _require_sensitive_output_ignored(repo: Path, path: Path) -> None:
-    resolved_repo = repo.resolve()
-    resolved_path = path.resolve()
-    if not resolved_path.is_relative_to(resolved_repo):
-        return
-    relative = resolved_path.relative_to(resolved_repo)
-    result = subprocess.run(
-        ["git", "-C", str(repo), "check-ignore", "--quiet", "--", str(relative)],
-        check=False,
-    )
-    if result.returncode != 0:
-        raise ValueError("raw and secret-override presets must be git-ignored")
+def _approved_prefix(value: str) -> str:
+    path = PurePosixPath(value)
+    if (
+        not path.is_absolute()
+        or ".." in path.parts
+        or len(path.parts) < 3
+        or any(character.isspace() for character in value)
+    ):
+        raise ValueError("approved S3 prefix must be an absolute scoped path")
+    return value.rstrip("/")
 
 
 def _extract(archive: str, destination: str, expected_sha256: str) -> str:
@@ -173,7 +147,6 @@ def _input_spec(
     bucket: str,
     src: str,
     dst: str,
-    credentials: tuple[str, str] | None,
     file: str | None = None,
     cache: bool = False,
 ) -> list[str]:
@@ -190,21 +163,12 @@ def _input_spec(
             f"      bucket: {json.dumps(bucket)}",
         ]
     )
-    if credentials is not None:
-        lines.extend(
-            [
-                f"      access_key: {json.dumps(credentials[0])}",
-                f"      secret_key: {json.dumps(credentials[1])}",
-            ]
-        )
     if cache:
         lines.extend(["      cache:", "        enable: true", "        location: cluster"])
     return lines
 
 
-def _output_spec(
-    *, name: str, bucket: str, dst: str, credentials: tuple[str, str] | None
-) -> list[str]:
+def _output_spec(*, name: str, bucket: str, dst: str) -> list[str]:
     lines = [
         "    - type: s3msk",
         f"      name: {json.dumps(name)}",
@@ -212,18 +176,11 @@ def _output_spec(
         f"      dst: {json.dumps(dst)}",
         f"      bucket: {json.dumps(bucket)}",
     ]
-    if credentials is not None:
-        lines.extend(
-            [
-                f"      access_key: {json.dumps(credentials[0])}",
-                f"      secret_key: {json.dumps(credentials[1])}",
-            ]
-        )
     lines.extend(["      upload_policies:", "        - when: on_job_status=succeeded"])
     return lines
 
 
-def _header(base: str, command: str) -> list[str]:
+def _header(base: str, command: str, expected_region: str) -> list[str]:
     values = {
         "time_limit": _scalar(base, "time_limit"),
         "flavor": _scalar(base, "flavor"),
@@ -236,7 +193,7 @@ def _header(base: str, command: str) -> list[str]:
     }
     if (
         values["flavor"] != "h100-1x"
-        or values["region"] != "ix-m5-sm11"
+        or values["region"] != expected_region
         or values["time_limit"] != "3h"
     ):
         raise ValueError("base preset is not the frozen one-H100 exp687 recipe")
@@ -371,9 +328,10 @@ def _command(args: argparse.Namespace, selected_mode: str) -> str:
 def _preset(
     args: argparse.Namespace,
     command: str,
-    credentials: tuple[str, str] | None,
 ) -> str:
-    lines = _header(args.base_preset.read_text(encoding="utf-8"), command)
+    lines = _header(
+        args.base_preset.read_text(encoding="utf-8"), command, args.expected_region
+    )
     lines.append("  input:")
     specs = (
         ("parent_code", args.parent_bundle_src, f"/work/input/parent_code/{args.parent_bundle_file}", args.parent_bundle_file, True),
@@ -392,7 +350,6 @@ def _preset(
                 dst=dst,
                 file=file,
                 cache=cache,
-                credentials=credentials,
             )
         )
     model_line = args.model_input_line_file.read_text(encoding="utf-8").strip()
@@ -411,7 +368,6 @@ def _preset(
             name="exp688_output",
             bucket=args.bucket,
             dst=args.output_dst,
-            credentials=credentials,
         )
     )
     return "\n".join(lines) + "\n"
@@ -424,11 +380,8 @@ def _write_new(path: Path, payload: str) -> None:
 
 
 def build(args: argparse.Namespace) -> dict[str, Any]:
-    output_paths = (args.raw_output, args.clean_output, args.overrides_output)
-    if len({path.resolve() for path in output_paths}) != len(output_paths):
-        raise ValueError("raw, clean and override output paths must be distinct")
-    if any(path.exists() for path in output_paths):
-        raise FileExistsError("refusing to overwrite exp688 preset material")
+    if args.clean_output.exists():
+        raise FileExistsError("refusing to overwrite exp688 clean preset")
     for value in (
         args.parent_bundle_sha256,
         args.probe_bundle_sha256,
@@ -453,22 +406,27 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         args.exp688_bundle_file,
     ):
         _safe_basename(value)
+    approved_prefix = _approved_prefix(args.approved_prefix)
     args.parent_bundle_src = _safe_s3(
-        args.parent_bundle_src, "/d.strizhakov/ecup/experiments/686"
+        args.parent_bundle_src, f"{approved_prefix}/experiments/686"
     )
     args.probe_bundle_src = _safe_s3(
-        args.probe_bundle_src, "/d.strizhakov/ecup/experiments/687"
+        args.probe_bundle_src, f"{approved_prefix}/experiments/687"
     )
     args.exp688_bundle_src = _safe_s3(
-        args.exp688_bundle_src, "/d.strizhakov/ecup/experiments/688/code"
+        args.exp688_bundle_src, f"{approved_prefix}/experiments/688/code"
     )
-    args.pair_src = _safe_s3(args.pair_src, "/d.strizhakov/ecup/experiments/686")
-    args.vendor_src = _safe_s3(args.vendor_src, "/d.strizhakov/ecup")
+    args.pair_src = _safe_s3(
+        args.pair_src, f"{approved_prefix}/experiments/686"
+    )
+    args.vendor_src = _safe_s3(args.vendor_src, approved_prefix)
     args.probe_artifact_src = _safe_s3(
-        args.probe_artifact_src, "/d.strizhakov/ecup/experiments/687/probe/fold3"
+        args.probe_artifact_src,
+        f"{approved_prefix}/experiments/687/probe/fold3",
     )
     args.output_dst = _safe_s3(
-        args.output_dst, "/d.strizhakov/ecup/experiments/688/technical_smoke/fold3"
+        args.output_dst,
+        f"{approved_prefix}/experiments/688/technical_smoke/fold3",
     )
     parent_code_acceptance = _validate_code_acceptance(
         args.parent_code_acceptance,
@@ -521,62 +479,26 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     if mismatch:
         raise ValueError(f"terminal selector/preset input mismatch: {mismatch}")
     selected_mode = selection["selected_candidate_mode"]
-    _require_sensitive_output_ignored(args.repo, args.s3_env_file)
-    credentials = _read_s3_credentials(args.s3_env_file)
-    _require_sensitive_output_ignored(args.repo, args.raw_output)
-    _require_sensitive_output_ignored(args.repo, args.overrides_output)
     command = _command(args, selected_mode)
-    raw_payload = _preset(args, command, credentials)
-    clean_payload = _preset(args, command, None)
-    overrides = {
-        "job": {
-            "input": [
-                {
-                    "name": f"exp688_{name}",
-                    "access_key": credentials[0],
-                    "secret_key": credentials[1],
-                }
-                for name in (
-                    "parent_code",
-                    "probe_code",
-                    "exp688_code",
-                    "pair",
-                    "vendor",
-                    "probe_artifact",
-                )
-            ],
-            "output": [
-                {
-                    "name": "exp688_output",
-                    "access_key": credentials[0],
-                    "secret_key": credentials[1],
-                }
-            ],
-        }
-    }
-    _write_new(args.raw_output, raw_payload)
+    clean_payload = _preset(args, command)
     _write_new(args.clean_output, clean_payload)
-    _write_new(args.overrides_output, json.dumps(overrides, indent=2) + "\n")
     return {
         "candidate_mode": selected_mode,
         "fold": 3,
         "flavor": "h100-1x",
         "optimizer_steps_per_arm": 1,
         "sequential_arms": [CONTROL_MODE, selected_mode],
-        "raw_preset_sha256": hashlib.sha256(raw_payload.encode()).hexdigest(),
         "clean_preset_sha256": hashlib.sha256(clean_payload.encode()).hexdigest(),
-        "overrides_sha256": hashlib.sha256(
-            (json.dumps(overrides, indent=2) + "\n").encode()
-        ).hexdigest(),
+        "contains_credentials": False,
     }
 
 
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
-    result.add_argument("--repo", type=Path, required=True)
     result.add_argument("--base-preset", type=Path, required=True)
+    result.add_argument("--expected-region", required=True)
     result.add_argument("--bucket", required=True)
-    result.add_argument("--s3-env-file", type=Path, required=True)
+    result.add_argument("--approved-prefix", required=True)
     for prefix in ("parent", "probe", "exp688"):
         result.add_argument(f"--{prefix}-bundle-src", required=True)
         result.add_argument(f"--{prefix}-bundle-file", required=True)
@@ -596,9 +518,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--probe-acceptance-file-sha256", required=True)
     result.add_argument("--model-input-line-file", type=Path, required=True)
     result.add_argument("--output-dst", required=True)
-    result.add_argument("--raw-output", type=Path, required=True)
     result.add_argument("--clean-output", type=Path, required=True)
-    result.add_argument("--overrides-output", type=Path, required=True)
     return result
 
 

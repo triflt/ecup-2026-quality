@@ -633,14 +633,54 @@ class GradientControlKDTests(unittest.TestCase):
         self.assertIn("verify_paired_smoke.py", command)
         self.assertNotIn("compute job submit", command)
 
+    def test_tracked_preset_builder_cannot_read_or_serialize_credentials(self):
+        source = inspect.getsource(PRESET)
+        for forbidden in (
+            "access_key",
+            "secret_key",
+            "SECRET_ACCESS_KEY",
+            "s3_env_file",
+            "raw_output",
+            "overrides_output",
+        ):
+            self.assertNotIn(forbidden, source)
+        destinations = {action.dest for action in PRESET.parser()._actions}
+        self.assertFalse(
+            destinations
+            & {
+                "s3_env_file",
+                "raw_output",
+                "overrides_output",
+                "access_key",
+                "secret_key",
+            }
+        )
+        generated = "\n".join(
+            [
+                *PRESET._input_spec(
+                    name="input",
+                    bucket="bucket",
+                    src="/approved/user/ecup/input",
+                    dst="/work/input",
+                ),
+                *PRESET._output_spec(
+                    name="output",
+                    bucket="bucket",
+                    dst="/approved/user/ecup/output",
+                ),
+            ]
+        )
+        self.assertNotIn("access_key", generated)
+        self.assertNotIn("secret_key", generated)
+
     def test_preset_builder_writes_nothing_before_terminal_selector_acceptance(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             args = SimpleNamespace(
                 repo=ROOT,
-                raw_output=root / "raw.yml",
                 clean_output=root / "clean.yml",
-                overrides_output=root / "overrides.yml",
+                expected_region="test-region",
+                approved_prefix="/approved/user/ecup",
                 parent_bundle_sha256="1" * 64,
                 probe_bundle_sha256="2" * 64,
                 exp688_bundle_sha256="3" * 64,
@@ -656,16 +696,16 @@ class GradientControlKDTests(unittest.TestCase):
                 parent_bundle_file="parent.tar.gz",
                 probe_bundle_file="probe.tar.gz",
                 exp688_bundle_file="exp688.tar.gz",
-                parent_bundle_src="/d.strizhakov/ecup/experiments/686/code/x",
-                probe_bundle_src="/d.strizhakov/ecup/experiments/687/code/x",
-                exp688_bundle_src="/d.strizhakov/ecup/experiments/688/code/x",
-                pair_src="/d.strizhakov/ecup/experiments/686/pair/x",
-                vendor_src="/d.strizhakov/ecup/vendor/x",
+                parent_bundle_src="/approved/user/ecup/experiments/686/code/x",
+                probe_bundle_src="/approved/user/ecup/experiments/687/code/x",
+                exp688_bundle_src="/approved/user/ecup/experiments/688/code/x",
+                pair_src="/approved/user/ecup/experiments/686/pair/x",
+                vendor_src="/approved/user/ecup/vendor/x",
                 probe_artifact_src=(
-                    "/d.strizhakov/ecup/experiments/687/probe/fold3/x"
+                    "/approved/user/ecup/experiments/687/probe/fold3/x"
                 ),
                 output_dst=(
-                    "/d.strizhakov/ecup/experiments/688/technical_smoke/fold3/x"
+                    "/approved/user/ecup/experiments/688/technical_smoke/fold3/x"
                 ),
                 parent_code_acceptance=root / "parent.json",
                 probe_code_acceptance=root / "probe-code.json",
@@ -691,9 +731,9 @@ class GradientControlKDTests(unittest.TestCase):
             root = Path(directory)
             args = SimpleNamespace(
                 repo=ROOT,
-                raw_output=root / "raw.yml",
                 clean_output=root / "clean.yml",
-                overrides_output=root / "overrides.yml",
+                expected_region="test-region",
+                approved_prefix="/approved/user/ecup",
                 parent_bundle_sha256="1" * 64,
                 probe_bundle_sha256="2" * 64,
                 exp688_bundle_sha256="3" * 64,
@@ -709,16 +749,16 @@ class GradientControlKDTests(unittest.TestCase):
                 parent_bundle_file="parent.tar.gz",
                 probe_bundle_file="probe.tar.gz",
                 exp688_bundle_file="exp688.tar.gz",
-                parent_bundle_src="/d.strizhakov/ecup/experiments/686/code/x",
-                probe_bundle_src="/d.strizhakov/ecup/experiments/687/code/x",
-                exp688_bundle_src="/d.strizhakov/ecup/experiments/688/code/x",
-                pair_src="/d.strizhakov/ecup/experiments/686/pair/x",
-                vendor_src="/d.strizhakov/ecup/vendor/x",
+                parent_bundle_src="/approved/user/ecup/experiments/686/code/x",
+                probe_bundle_src="/approved/user/ecup/experiments/687/code/x",
+                exp688_bundle_src="/approved/user/ecup/experiments/688/code/x",
+                pair_src="/approved/user/ecup/experiments/686/pair/x",
+                vendor_src="/approved/user/ecup/vendor/x",
                 probe_artifact_src=(
-                    "/d.strizhakov/ecup/experiments/687/probe/fold3/x"
+                    "/approved/user/ecup/experiments/687/probe/fold3/x"
                 ),
                 output_dst=(
-                    "/d.strizhakov/ecup/experiments/688/technical_smoke/fold3/x"
+                    "/approved/user/ecup/experiments/688/technical_smoke/fold3/x"
                 ),
                 parent_code_acceptance=root / "parent.json",
                 probe_code_acceptance=root / "probe-code.json",

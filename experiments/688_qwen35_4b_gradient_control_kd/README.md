@@ -98,9 +98,11 @@ gradient dominance, rather than negative alignment, destabilizes the boundary.
 
 `build_code_bundle.py` and `verify_code_bundle.py` create and accept the exact
 runtime whitelist. `build_remote_compute_preset.py` validates terminal exp687 and the
-parent/probe/exp688 code acceptances before writing a raw preset, secret-free
-clean preset and ignored credential override. `verify_paired_smoke.py` binds the
+parent/probe/exp688 code acceptances before writing only a secret-free clean
+preset; region, bucket and approved prefix come from ignored local configuration.
+Credentials never enter this tracked builder. `verify_paired_smoke.py` binds the
 two remote arms and rejects code/data/model/init/order/runtime or raw-gradient
 drift. `train_gradient_control.py --help` exposes the one-step
-`--technical-smoke` path. No preset instance is built by this packet; raw and
-override outputs must remain under ignored `.local/` paths.
+`--technical-smoke` path. No preset instance is built by this packet. The local
+submit path must inject credentials only in memory through stdin and must never
+persist, print or hash the secret-bearing payload.
