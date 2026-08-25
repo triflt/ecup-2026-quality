@@ -5,6 +5,7 @@ import importlib.util
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = ROOT / "experiments/685_qwen35_4b_structured_rank_distillation/build_remote_compute_preset.py"
@@ -54,6 +55,28 @@ class RemotePresetTests(unittest.TestCase):
             ),
         )
 
+    def test_direct_s3_credentials_are_loaded_only_from_explicit_env_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            env_file = Path(directory) / ".env.s3"
+            env_file.write_text(
+                "TEST_ACCESS_KEY=synthetic-access\n"
+                "TEST_SECRET_ACCESS_KEY=synthetic-secret\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                MODULE.s3_auth(argparse.Namespace(s3_env_file=env_file)),
+                (None, "synthetic-access", "synthetic-secret"),
+            )
+            with self.assertRaises(ValueError):
+                MODULE.s3_auth(
+                    argparse.Namespace(
+                        s3_env_file=env_file,
+                        vault_auth_role="role",
+                        s3_access_key_vault_ref="vault:team/data/s3#access_key",
+                        s3_secret_key_vault_ref="vault:team/data/s3#secret_key",
+                    )
+                )
+
     def test_path_scope_is_fail_closed(self):
         self.assertEqual(
             MODULE.safe_s3_path(
@@ -88,22 +111,33 @@ class RemotePresetTests(unittest.TestCase):
                 code_bundle_src="/approved/project/exp685/code",
                 code_bundle_file="code_abc.tar.gz",
                 code_bundle_sha256="a" * 64,
+                code_revision="e" * 40,
                 pair_src="/approved/project/exp685/pairs/f0/abc",
+                expected_pair_acceptance_sha256="b" * 64,
+                expected_pair_runtime_contract_sha256="c" * 64,
+                vendor_src="/approved/project/exp685/vendor/run1",
+                vendor_file="peft-0.20.0.zip",
+                vendor_sha256="d" * 64,
                 output_dst="/approved/project/exp685/train/f0/control/run1",
                 model_input_line_file=model,
                 fold=0,
                 mode="paired_hard_control",
                 technical_smoke=False,
             )
-            payload = MODULE.build_train(args)
+            model_sha = __import__("hashlib").sha256(
+                (model.read_text(encoding="utf-8").strip() + "\n").encode()
+            ).hexdigest()
+            with mock.patch.object(MODULE, "EXPECTED_MODEL_INPUT_LINE_SHA256", model_sha):
+                payload = MODULE.build_train(args)
         self.assertNotIn("type: files", payload)
-        self.assertEqual(payload.count("type: s3msk"), 3)
+        self.assertEqual(payload.count("type: s3msk"), 4)
         self.assertIn("when: on_job_status=succeeded", payload)
         self.assertIn("location: cluster", payload)
         self.assertIn("verify_training_artifact.py", payload)
         self.assertNotIn("adapter.zip", payload)
         self.assertNotIn("images/frozen", payload)
-        self.assertIn("mkdir -p /work/vendor /work/images /work/output", payload)
+        self.assertIn("stage_training_input.py", payload)
+        self.assertIn("/work/pair_clean", payload)
 
     def test_training_rejects_unbraced_model_registry_mapping(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -123,7 +157,13 @@ class RemotePresetTests(unittest.TestCase):
                 code_bundle_src="/approved/project/exp685/code",
                 code_bundle_file="code_abc.tar.gz",
                 code_bundle_sha256="a" * 64,
+                code_revision="e" * 40,
                 pair_src="/approved/project/exp685/pairs/f0/abc",
+                expected_pair_acceptance_sha256="b" * 64,
+                expected_pair_runtime_contract_sha256="c" * 64,
+                vendor_src="/approved/project/exp685/vendor/run1",
+                vendor_file="peft-0.20.0.zip",
+                vendor_sha256="d" * 64,
                 output_dst="/approved/project/exp685/train/f0/control/run1",
                 model_input_line_file=model,
                 fold=0,
@@ -145,6 +185,7 @@ class RemotePresetTests(unittest.TestCase):
                 code_bundle_src="/approved/project/exp685/code",
                 code_bundle_file="code_abc.tar.gz",
                 code_bundle_sha256="a" * 64,
+                code_revision="e" * 40,
                 artifact_src=["0=job0/output0", "3=job3/output3"],
                 expected_score_sha=["0=" + "b" * 64, "3=" + "c" * 64],
                 expected_archive_sha=["0=" + "d" * 64, "3=" + "e" * 64],
@@ -172,6 +213,7 @@ class RemotePresetTests(unittest.TestCase):
                 code_bundle_src="/approved/project/exp685/code",
                 code_bundle_file="code_abc.tar.gz",
                 code_bundle_sha256="a" * 64,
+                code_revision="e" * 40,
                 artifact_src=["0=job0/output0", "3=job3/output3"],
                 expected_score_sha=["0=" + "b" * 64, "3=" + "c" * 64],
                 expected_archive_sha=["0=" + "d" * 64, "3=" + "e" * 64],
@@ -196,6 +238,7 @@ class RemotePresetTests(unittest.TestCase):
                 code_bundle_src="/approved/project/exp685/code",
                 code_bundle_file="code_abc.tar.gz",
                 code_bundle_sha256="a" * 64,
+                code_revision="e" * 40,
                 source_bundle_src="/approved/project/exp680",
                 source_bundle_file="source.tar.gz",
                 source_bundle_sha256="b" * 64,

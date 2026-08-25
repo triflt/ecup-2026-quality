@@ -11,7 +11,6 @@ from pathlib import Path
 from statistics import NormalDist
 from typing import Any
 
-
 EXPERIMENT_ID = "685"
 TEACHER_EXPERIMENT_ID = "662"
 CONTROL_EXPERIMENT_ID = "680"
@@ -168,9 +167,7 @@ def build_pair_records(
             rows[negative]["semantic_component"]
         ):
             return False
-        if id_endpoint_counts[str(rows[negative]["id"])] >= max_endpoint_count:
-            return False
-        return True
+        return id_endpoint_counts[str(rows[negative]["id"])] < max_endpoint_count
 
     def append_pair(positive: int, negative: int, pair_kind: str) -> None:
         raw_target = 1.0 / (

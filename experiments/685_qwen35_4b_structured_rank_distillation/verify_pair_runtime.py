@@ -19,7 +19,9 @@ from build_pair_runtime import (
     TARGET_MAX,
     TARGET_MIN,
     UNIFORM_NEGATIVES,
+    build_pair_records,
     canonical_sha256,
+    normal_ranks,
     occurrence_key,
     sha256_bytes,
 )
@@ -84,6 +86,16 @@ def verify_payloads(
     lookup = {occurrence_key(row): row for row in train}
     if len(lookup) != len(train):
         raise ValueError("duplicate occurrence key in train runtime")
+
+    teacher_scores = [float(row["teacher_score"]) for row in train]
+    recomputed_ranks, recomputed_normal_ranks = normal_ranks(teacher_scores)
+    for row, rank, normal_rank in zip(
+        train, recomputed_ranks, recomputed_normal_ranks, strict=True
+    ):
+        if float(row["teacher_rank"]) != rank:
+            raise ValueError("teacher rank does not match the teacher-score payload")
+        if float(row["teacher_normal_rank"]) != normal_rank:
+            raise ValueError("teacher normal rank does not match the teacher-score payload")
 
     expected_pair_fields = {
         "pair_index",
@@ -215,6 +227,16 @@ def verify_payloads(
     }
     if audit.get("pair_summary") != recomputed:
         raise ValueError("pair summary does not match payload")
+    expected_pairs, expected_summary = build_pair_records(
+        train,
+        teacher_scores,
+        fold=int(audit["outer_fold"]),
+        max_endpoint_count=int(audit["pair_summary"]["item_endpoint_cap"]),
+    )
+    if pairs != expected_pairs:
+        raise ValueError("pair payload differs from the frozen deterministic sampler")
+    if recomputed != expected_summary:
+        raise ValueError("pair summary differs from the frozen deterministic sampler")
     acceptance = {
         "schema_version": 1,
         "experiment_id": EXPERIMENT_ID,

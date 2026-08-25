@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+import random
 from pathlib import Path
 from typing import Any
 
@@ -16,12 +18,19 @@ from train_pair_fold import (
     MODES,
     RANK_LOSS_WEIGHT,
     SEED,
+    load_code_acceptance,
     load_inputs,
+    load_transport_acceptance,
+    load_vendor_acceptance,
 )
-
 
 MODEL_REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
 EXPECTED_VALIDATION_ROWS = {0: 943, 1: 943, 2: 944, 3: 943, 4: 943}
+EXPECTED_RUNTIME_PACKAGES = {
+    "torch": "2.10.0+cu128",
+    "transformers": "5.14.1",
+    "peft": "0.20.0",
+}
 
 
 def verify_self_hash(value: dict[str, Any], field: str) -> str:
@@ -39,16 +48,29 @@ def verify(
     mode: str,
     source_runtime: Path,
     pair_runtime: Path,
+    transport_acceptance: Path,
+    code_acceptance: Path,
+    vendor_acceptance: Path,
+    vendor_archive: Path,
     technical_smoke: bool,
 ) -> dict[str, Any]:
     if fold not in EXPECTED_VALIDATION_ROWS or mode not in MODES:
         raise ValueError("invalid fold or mode")
-    train, validation, pairs, pair_acceptance, source_audit = load_inputs(
+    _train, validation, pairs, pair_acceptance, source_audit = load_inputs(
         source_runtime, pair_runtime, fold
     )
+    transport = load_transport_acceptance(
+        transport_acceptance,
+        fold=fold,
+        pair_acceptance=pair_acceptance,
+        source_audit=source_audit,
+    )
+    code = load_code_acceptance(code_acceptance)
+    vendor = load_vendor_acceptance(vendor_acceptance, vendor_archive)
     required = {
         "output_contract.json": output_dir / "output_contract.json",
         "predictions.jsonl": output_dir / "predictions.jsonl",
+        "adapter/README.md": output_dir / "adapter/README.md",
         "adapter/adapter_config.json": output_dir / "adapter/adapter_config.json",
         "adapter/adapter_model.safetensors": (
             output_dir / "adapter/adapter_model.safetensors"
@@ -56,12 +78,27 @@ def verify(
     }
     if not output_dir.is_dir() or any(not path.is_file() for path in required.values()):
         raise ValueError("training output directory schema is incomplete")
+    observed_files: set[str] = set()
+    for path in output_dir.rglob("*"):
+        if path.is_symlink():
+            raise ValueError("training output contains a symlink")
+        if path.is_file():
+            observed_files.add(path.relative_to(output_dir).as_posix())
+        elif not path.is_dir():
+            raise ValueError("training output contains a special filesystem entry")
+    final_acceptance = output_dir / "acceptance.json"
+    allowed_member_sets = (set(required), {*required, "acceptance.json"})
+    if observed_files not in allowed_member_sets:
+        raise ValueError(
+            f"training output member set mismatch: {sorted(observed_files)}"
+        )
     contract = json.loads(required["output_contract.json"].read_text(encoding="utf-8"))
     predictions_payload = required["predictions.jsonl"].read_bytes()
     predictions = [
         json.loads(line) for line in predictions_payload.decode().splitlines()
     ]
     adapter_config_payload = required["adapter/adapter_config.json"].read_bytes()
+    adapter_readme_payload = required["adapter/README.md"].read_bytes()
     adapter_model_payload = required[
         "adapter/adapter_model.safetensors"
     ].read_bytes()
@@ -82,7 +119,15 @@ def verify(
             "runtime_contract_sha256"
         ],
         "pair_runtime_acceptance_sha256": pair_acceptance["acceptance_sha256"],
+        "transport_acceptance_sha256": transport["transport_acceptance_sha256"],
         "source_641_runtime_contract_sha256": source_audit["contract_sha256"],
+        "code_bundle_sha256": code["bundle_sha256"],
+        "code_revision": code["git_revision"],
+        "code_manifest_sha256": code["manifest_sha256"],
+        "code_acceptance_sha256": code["acceptance_sha256"],
+        "vendor_zip_sha256": vendor["vendor_zip_sha256"],
+        "vendor_bridge_sha256": vendor["bridge_sha256"],
+        "vendor_source_bundle_sha256": vendor["source_bundle_sha256"],
         "seed": SEED,
         "epochs": 1,
         "learning_rate": LEARNING_RATE,
@@ -110,10 +155,26 @@ def verify(
     }
     if mismatch:
         raise ValueError(f"output contract mismatch: {mismatch}")
-    if not isinstance(contract.get("ordered_pair_index_sha256"), str) or len(
-        contract["ordered_pair_index_sha256"]
-    ) != 64:
-        raise ValueError("ordered pair schedule binding is missing")
+    pair_indices = list(range(expected_pairs))
+    random.Random(SEED).shuffle(pair_indices)
+    expected_order_sha = hashlib.sha256(
+        json.dumps(pair_indices, separators=(",", ":")).encode()
+    ).hexdigest()
+    if contract.get("ordered_pair_index_sha256") != expected_order_sha:
+        raise ValueError("ordered pair schedule binding mismatch")
+    for key in ("initial_trainable_state_sha256", "model_tree_sha256"):
+        value = contract.get(key)
+        if not isinstance(value, str) or len(value) != 64 or any(
+            character not in "0123456789abcdef" for character in value
+        ):
+            raise ValueError(f"{key} is not a frozen SHA-256")
+    if not isinstance(contract.get("model_tree_files"), int) or contract[
+        "model_tree_files"
+    ] <= 0:
+        raise ValueError("model tree file count is invalid")
+    runtime_packages = contract.get("runtime_packages")
+    if runtime_packages != EXPECTED_RUNTIME_PACKAGES:
+        raise ValueError("runtime package versions differ from frozen legacy 641")
     if contract.get("peak_cuda_bytes", 2**63) >= 75 * 1024**3:
         raise ValueError("measured peak memory exceeds one-H100 gate")
     if technical_smoke and (
@@ -123,6 +184,7 @@ def verify(
         raise ValueError("technical smoke save/reload parity failed")
     if contract.get("artifacts") != {
         "predictions.jsonl": sha256_bytes(predictions_payload),
+        "adapter/README.md": sha256_bytes(adapter_readme_payload),
         "adapter/adapter_config.json": sha256_bytes(adapter_config_payload),
         "adapter/adapter_model.safetensors": sha256_bytes(adapter_model_payload),
     }:
@@ -188,6 +250,9 @@ def verify(
         or int(adapter_config.get("lora_alpha", -1)) != 32
         or float(adapter_config.get("lora_dropout", -1)) != 0.05
         or adapter_config.get("use_rslora") is not True
+        or adapter_config.get("bias") != "none"
+        or adapter_config.get("task_type") != "CAUSAL_LM"
+        or adapter_config.get("inference_mode") is not True
     ):
         raise ValueError("LoRA configuration drifted")
     result = {
@@ -205,7 +270,35 @@ def verify(
         "pair_runtime_contract_sha256": pair_acceptance[
             "runtime_contract_sha256"
         ],
+        "pair_runtime_acceptance_sha256": pair_acceptance["acceptance_sha256"],
+        "transport_acceptance_sha256": transport["transport_acceptance_sha256"],
         "source_641_runtime_contract_sha256": source_audit["contract_sha256"],
+        "code_bundle_sha256": contract["code_bundle_sha256"],
+        "code_revision": contract["code_revision"],
+        "code_manifest_sha256": contract["code_manifest_sha256"],
+        "code_acceptance_sha256": contract["code_acceptance_sha256"],
+        "vendor_zip_sha256": contract["vendor_zip_sha256"],
+        "vendor_bridge_sha256": contract["vendor_bridge_sha256"],
+        "vendor_source_bundle_sha256": contract["vendor_source_bundle_sha256"],
+        "model_id": contract["model_id"],
+        "model_revision": contract["model_revision"],
+        "model_tree_sha256": contract["model_tree_sha256"],
+        "model_tree_files": contract["model_tree_files"],
+        "initial_trainable_state_sha256": contract[
+            "initial_trainable_state_sha256"
+        ],
+        "ordered_pair_index_sha256": expected_order_sha,
+        "seed": contract["seed"],
+        "epochs": contract["epochs"],
+        "learning_rate": contract["learning_rate"],
+        "micro_batch_pairs": contract["micro_batch_pairs"],
+        "micro_batch_rows": contract["micro_batch_rows"],
+        "gradient_accumulation_pairs": contract["gradient_accumulation_pairs"],
+        "effective_batch_rows": contract["effective_batch_rows"],
+        "optimizer_steps_executed": contract["optimizer_steps_executed"],
+        "rank_loss_weight": contract["rank_loss_weight"],
+        "runtime_backend": contract["runtime_backend"],
+        "runtime_packages": runtime_packages,
         "exact_runtime_binding": True,
         "save_reload_parity": bool(technical_smoke),
         "deployable_4b_only": True,
@@ -216,6 +309,9 @@ def verify(
         "decision": "ACCEPT",
     }
     result["acceptance_sha256"] = canonical_sha256(result)
+    payload = json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    if final_acceptance.exists() and final_acceptance.read_text(encoding="utf-8") != payload:
+        raise ValueError("existing final acceptance differs from independent replay")
     return result
 
 
@@ -226,6 +322,10 @@ if __name__ == "__main__":
     parser.add_argument("--mode", choices=MODES, required=True)
     parser.add_argument("--source-runtime", type=Path, required=True)
     parser.add_argument("--pair-runtime", type=Path, required=True)
+    parser.add_argument("--transport-acceptance", type=Path, required=True)
+    parser.add_argument("--code-acceptance", type=Path, required=True)
+    parser.add_argument("--vendor-acceptance", type=Path, required=True)
+    parser.add_argument("--vendor-archive", type=Path, required=True)
     parser.add_argument("--technical-smoke", action="store_true")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
@@ -235,12 +335,18 @@ if __name__ == "__main__":
         mode=args.mode,
         source_runtime=args.source_runtime,
         pair_runtime=args.pair_runtime,
+        transport_acceptance=args.transport_acceptance,
+        code_acceptance=args.code_acceptance,
+        vendor_acceptance=args.vendor_acceptance,
+        vendor_archive=args.vendor_archive,
         technical_smoke=args.technical_smoke,
     )
     payload = json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     if args.output:
         if args.output.exists():
-            raise FileExistsError("refusing to overwrite acceptance report")
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(payload, encoding="utf-8")
+            if args.output.read_text(encoding="utf-8") != payload:
+                raise FileExistsError("refusing to overwrite different acceptance report")
+        else:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(payload, encoding="utf-8")
     print(payload, end="")

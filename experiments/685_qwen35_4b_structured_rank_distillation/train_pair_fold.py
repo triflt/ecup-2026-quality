@@ -11,7 +11,6 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
-
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
@@ -20,10 +19,8 @@ if str(SHARED) not in sys.path:
     sys.path.insert(0, str(SHARED))
 
 import train_lora as control
-
 from build_pair_runtime import canonical_sha256, occurrence_key, read_jsonl
 from verify_pair_runtime import verify as verify_pair_runtime
-
 
 EXPERIMENT_ID = "685"
 SOURCE_EXPERIMENT_ID = "641"
@@ -37,6 +34,162 @@ GRADIENT_ACCUMULATION_PAIRS = 8
 EFFECTIVE_BATCH_ROWS = 16
 RANK_LOSS_WEIGHT = 0.5
 MODES = ("paired_hard_control", "rank_candidate")
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def model_tree_sha256(root: Path) -> tuple[str, int]:
+    resolved_root = root.resolve()
+    files: list[tuple[str, Path]] = []
+    for path in sorted(root.rglob("*")):
+        relative = path.relative_to(root).as_posix()
+        if any(
+            part == "__MACOSX" or part == ".DS_Store" or part.startswith("._")
+            for part in Path(relative).parts
+        ):
+            raise ValueError("model registry input contains transport metadata")
+        resolved = path.resolve()
+        if not resolved.is_relative_to(resolved_root):
+            raise ValueError("model registry input escapes its delivery root")
+        if path.is_file():
+            files.append((relative, path))
+        elif not path.is_dir():
+            raise ValueError("model registry input contains a special filesystem entry")
+    if not files:
+        raise ValueError("model registry input is empty")
+    digest = hashlib.sha256()
+    for relative, path in files:
+        payload_sha = sha256_file(path)
+        digest.update(
+            json.dumps(
+                [relative, path.stat().st_size, payload_sha],
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ).encode()
+        )
+        digest.update(b"\n")
+    return digest.hexdigest(), len(files)
+
+
+def trainable_state_sha256(model: Any) -> str:
+    import torch
+
+    digest = hashlib.sha256()
+    named = [(name, parameter) for name, parameter in model.named_parameters() if parameter.requires_grad]
+    if not named:
+        raise ValueError("model has no trainable parameters")
+    for name, parameter in named:
+        tensor = parameter.detach().contiguous().view(torch.uint8).cpu()
+        digest.update(
+            json.dumps(
+                [name, list(parameter.shape), str(parameter.dtype)],
+                separators=(",", ":"),
+            ).encode()
+        )
+        digest.update(b"\0")
+        digest.update(tensor.numpy().tobytes())
+        digest.update(b"\n")
+    return digest.hexdigest()
+
+
+def load_code_acceptance(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    body = dict(value)
+    digest = body.pop("acceptance_sha256", None)
+    if digest != canonical_sha256(body):
+        raise ValueError("code-bundle acceptance self-hash mismatch")
+    if (
+        value.get("experiment_id") != EXPERIMENT_ID
+        or value.get("decision") != "ACCEPT_CODE_BUNDLE"
+        or not isinstance(value.get("files"), int)
+        or int(value["files"]) <= 0
+        or not isinstance(value.get("directories"), int)
+        or int(value["directories"]) <= 0
+    ):
+        raise ValueError("code-bundle acceptance is invalid")
+    for field in ("bundle_sha256", "manifest_sha256"):
+        candidate = value.get(field)
+        if not isinstance(candidate, str) or len(candidate) != 64 or any(
+            character not in "0123456789abcdef" for character in candidate
+        ):
+            raise ValueError(f"code-bundle {field} is invalid")
+    revision = value.get("git_revision")
+    if not isinstance(revision, str) or len(revision) != 40 or any(
+        character not in "0123456789abcdef" for character in revision
+    ):
+        raise ValueError("code-bundle revision is invalid")
+    return value
+
+
+def load_vendor_acceptance(path: Path, archive: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    body = dict(value)
+    digest = body.pop("bridge_sha256", None)
+    if digest != canonical_sha256(body):
+        raise ValueError("PEFT vendor acceptance self-hash mismatch")
+    if (
+        value.get("experiment_id") != EXPERIMENT_ID
+        or value.get("stage") != "PEFT_VENDOR_REMOTE_BRIDGE"
+        or value.get("metadata_version") != "0.20.0"
+        or value.get("decision") != "ACCEPT_PEFT_VENDOR_BRIDGE"
+        or int(value.get("labels_read", -1)) != 0
+        or int(value.get("sealed_rows_used", -1)) != 0
+        or value.get("public_used") is not False
+        or value.get("vendor_zip_sha256") != sha256_file(archive)
+        or int(value.get("vendor_zip_size", -1)) != archive.stat().st_size
+    ):
+        raise ValueError("PEFT vendor acceptance or archive binding is invalid")
+    return value
+
+
+def load_transport_acceptance(
+    path: Path,
+    *,
+    fold: int,
+    pair_acceptance: dict[str, Any],
+    source_audit: dict[str, Any],
+) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    body = dict(value)
+    digest = body.pop("transport_acceptance_sha256", None)
+    if digest != canonical_sha256(body):
+        raise ValueError("training-input transport self-hash mismatch")
+    expected = {
+        "experiment_id": EXPERIMENT_ID,
+        "stage": "TRAINING_INPUT_EXACT_WHITELIST",
+        "outer_fold": fold,
+        "pair_runtime_contract_sha256": pair_acceptance["runtime_contract_sha256"],
+        "pair_runtime_acceptance_sha256": pair_acceptance["acceptance_sha256"],
+        "validation_labels_read": 0,
+        "sealed_rows_used": 0,
+        "public_used": False,
+        "decision": "ACCEPT_TRAINING_INPUT",
+    }
+    mismatch = {
+        key: {"expected": expected_value, "actual": value.get(key)}
+        for key, expected_value in expected.items()
+        if value.get(key) != expected_value
+    }
+    if mismatch:
+        raise ValueError(f"training-input transport mismatch: {mismatch}")
+    source_files = value.get("accepted_files", {})
+    expected_source = {
+        "source_runtime/runtime_audit.json": sha256_file(path.parent / "source_runtime/runtime_audit.json"),
+        "source_runtime/train.jsonl": sha256_file(path.parent / "source_runtime/train.jsonl"),
+        "source_runtime/validation.jsonl": sha256_file(path.parent / "source_runtime/validation.jsonl"),
+    }
+    if any(
+        source_files.get(relative, {}).get("sha256") != payload_sha
+        for relative, payload_sha in expected_source.items()
+    ):
+        raise ValueError("staged source-runtime bytes differ from transport acceptance")
+    return value
 
 
 def pair_loss(
@@ -148,6 +301,16 @@ def run(args: Any) -> dict[str, Any]:
     train, validation, pairs, pair_acceptance, source_audit = load_inputs(
         args.runtime_dir, args.pair_runtime, args.fold
     )
+    transport_acceptance = load_transport_acceptance(
+        args.transport_acceptance,
+        fold=args.fold,
+        pair_acceptance=pair_acceptance,
+        source_audit=source_audit,
+    )
+    code_acceptance = load_code_acceptance(args.code_acceptance)
+    vendor_acceptance = load_vendor_acceptance(
+        args.vendor_acceptance, args.vendor_archive
+    )
     pair_lookup = {occurrence_key(row): row for row in train}
     if len(pair_lookup) != len(train):
         raise ValueError("duplicate occurrence key in source train runtime")
@@ -171,7 +334,18 @@ def run(args: Any) -> dict[str, Any]:
     from peft import LoraConfig, PeftModel, TaskType, get_peft_model
     from transformers import AutoModelForMultimodalLM, AutoProcessor
 
-    print(json.dumps({"phase": "model_load_start", "mode": args.mode}), flush=True)
+    model_tree_digest, model_tree_files = model_tree_sha256(args.model_root)
+    print(
+        json.dumps(
+            {
+                "phase": "model_load_start",
+                "mode": args.mode,
+                "model_tree_sha256": model_tree_digest,
+                "model_tree_files": model_tree_files,
+            }
+        ),
+        flush=True,
+    )
     processor = AutoProcessor.from_pretrained(
         args.model_root.resolve(), local_files_only=True, trust_remote_code=True
     )
@@ -203,6 +377,7 @@ def run(args: Any) -> dict[str, Any]:
     model.enable_input_require_grads()
     model.gradient_checkpointing_enable()
     trainable = [parameter for parameter in model.parameters() if parameter.requires_grad]
+    initial_trainable_state_sha256 = trainable_state_sha256(model)
     optimizer = torch.optim.AdamW(trainable, lr=LEARNING_RATE, weight_decay=0.01)
     updates = len(pairs) // GRADIENT_ACCUMULATION_PAIRS
     warmup = max(1, int(updates * 0.05))
@@ -255,11 +430,10 @@ def run(args: Any) -> dict[str, Any]:
                 float(pair["pair_target"]),
                 args.mode,
             )
-            if position <= 8 or position % 100 == 0:
-                if not all(
-                    torch.isfinite(value).item() for value in (loss, hard, rank)
-                ):
-                    raise FloatingPointError("non-finite pair loss")
+            if (position <= 8 or position % 100 == 0) and not all(
+                torch.isfinite(value).item() for value in (loss, hard, rank)
+            ):
+                raise FloatingPointError("non-finite pair loss")
             (loss / GRADIENT_ACCUMULATION_PAIRS).backward()
         finally:
             for image in images:
@@ -328,6 +502,7 @@ def run(args: Any) -> dict[str, Any]:
 
     artifacts = {
         "predictions.jsonl": control.sha256_file(predictions_path),
+        "adapter/README.md": control.sha256_file(adapter_dir / "README.md"),
         "adapter/adapter_config.json": control.sha256_file(
             adapter_dir / "adapter_config.json"
         ),
@@ -353,11 +528,26 @@ def run(args: Any) -> dict[str, Any]:
             "runtime_contract_sha256"
         ],
         "pair_runtime_acceptance_sha256": pair_acceptance["acceptance_sha256"],
+        "transport_acceptance_sha256": transport_acceptance[
+            "transport_acceptance_sha256"
+        ],
         "source_641_runtime_contract_sha256": source_audit["contract_sha256"],
         "derived_680_runtime_contract_sha256": json.loads(
             (args.pair_runtime / "runtime_audit.json").read_text()
         )["derived_680_runtime_contract_sha256"],
+        "code_bundle_sha256": code_acceptance["bundle_sha256"],
+        "code_revision": code_acceptance["git_revision"],
+        "code_manifest_sha256": code_acceptance["manifest_sha256"],
+        "code_acceptance_sha256": code_acceptance["acceptance_sha256"],
+        "vendor_zip_sha256": vendor_acceptance["vendor_zip_sha256"],
+        "vendor_bridge_sha256": vendor_acceptance["bridge_sha256"],
+        "vendor_source_bundle_sha256": vendor_acceptance[
+            "source_bundle_sha256"
+        ],
         "ordered_pair_index_sha256": ordered_pair_index_sha256,
+        "initial_trainable_state_sha256": initial_trainable_state_sha256,
+        "model_tree_sha256": model_tree_digest,
+        "model_tree_files": model_tree_files,
         "seed": SEED,
         "epochs": EPOCHS,
         "learning_rate": LEARNING_RATE,
@@ -402,6 +592,10 @@ def run(args: Any) -> dict[str, Any]:
 def parser():
     result = control.parser_for(SOURCE_EXPERIMENT_ID)
     result.add_argument("--pair-runtime", type=Path, required=True)
+    result.add_argument("--transport-acceptance", type=Path, required=True)
+    result.add_argument("--code-acceptance", type=Path, required=True)
+    result.add_argument("--vendor-acceptance", type=Path, required=True)
+    result.add_argument("--vendor-archive", type=Path, required=True)
     result.add_argument("--mode", choices=MODES, required=True)
     return result
 

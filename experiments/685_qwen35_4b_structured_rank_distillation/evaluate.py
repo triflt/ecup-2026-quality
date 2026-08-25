@@ -10,9 +10,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-
 from build_pair_runtime import canonical_sha256
-
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -75,6 +73,7 @@ def load_acceptances(
             "public_used": False,
             "decision": "ACCEPT",
             "predictions_sha256": sha256_file(score),
+            "rank_loss_weight": 0.5 if mode == "rank_candidate" else 0.0,
         }
         if any(acceptance.get(key) != value for key, value in expected.items()):
             raise ValueError("prediction provenance or training mode mismatch")
@@ -97,11 +96,39 @@ def verify_paired_contracts(
         "rows",
         "pairs",
         "pair_runtime_contract_sha256",
+        "pair_runtime_acceptance_sha256",
+        "transport_acceptance_sha256",
         "source_641_runtime_contract_sha256",
+        "code_bundle_sha256",
+        "code_revision",
+        "code_manifest_sha256",
+        "code_acceptance_sha256",
+        "vendor_zip_sha256",
+        "vendor_bridge_sha256",
+        "vendor_source_bundle_sha256",
         "exact_runtime_binding",
+        "model_id",
+        "model_revision",
+        "model_tree_sha256",
+        "model_tree_files",
+        "initial_trainable_state_sha256",
+        "ordered_pair_index_sha256",
+        "seed",
+        "epochs",
+        "learning_rate",
+        "micro_batch_pairs",
+        "micro_batch_rows",
+        "gradient_accumulation_pairs",
+        "effective_batch_rows",
+        "optimizer_steps_executed",
+        "runtime_backend",
+        "runtime_packages",
     )
-    for fold in control:
-        if any(control[fold].get(key) != candidate[fold].get(key) for key in parity_fields):
+    for fold, control_acceptance in control.items():
+        if any(
+            control_acceptance.get(key) != candidate[fold].get(key)
+            for key in parity_fields
+        ):
             raise ValueError("control/candidate runtime parity mismatch")
 
 

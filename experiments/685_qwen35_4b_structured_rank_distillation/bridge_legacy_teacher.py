@@ -5,11 +5,17 @@ import hashlib
 import json
 import shutil
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
-
 EXPERIMENT_ID = "685"
+EXPECTED_LEGACY_FILES = {
+    "delivery.json",
+    "report.json",
+    "teacher_outer_train_scores.zip",
+    "teacher_scores.jsonl",
+}
+EXPECTED_INNER_FILES = {"report.json", "teacher_scores.jsonl"}
 
 
 def sha256_bytes(payload: bytes) -> str:
@@ -44,27 +50,33 @@ def parse_fold_map(values: list[str], label: str) -> dict[int, str]:
     return output
 
 
-def safe_files(root: Path) -> list[Path]:
+def safe_files(root: Path) -> dict[str, Path]:
     if not root.is_dir():
         raise FileNotFoundError(f"legacy artifact input is not a directory: {root}")
-    files: list[Path] = []
+    files: dict[str, Path] = {}
     for path in sorted(root.rglob("*")):
+        relative = path.relative_to(root)
         if path.is_symlink():
             raise ValueError("legacy artifact contains a symlink")
         if path.is_file():
-            files.append(path)
-    if not files:
-        raise ValueError("legacy artifact input is empty")
+            name = relative.as_posix()
+            if any(
+                part == "__MACOSX" or part == ".DS_Store" or part.startswith("._")
+                for part in relative.parts
+            ):
+                raise ValueError("legacy artifact contains transport metadata")
+            files[name] = path
+        elif not path.is_dir():
+            raise ValueError("legacy artifact contains a special filesystem entry")
+    if set(files) != EXPECTED_LEGACY_FILES:
+        raise ValueError(f"legacy artifact member set mismatch: {sorted(files)}")
     return files
 
 
 def teacher_score_payload(
-    files: list[Path], expected_archive_sha256: str
-) -> tuple[str, str, bytes]:
-    inner = [path for path in files if path.name == "teacher_outer_train_scores.zip"]
-    if len(inner) != 1:
-        raise ValueError("legacy artifact must contain one canonical inner archive")
-    archive_path = inner[0]
+    files: dict[str, Path], expected_archive_sha256: str
+) -> tuple[Path, str, bytes]:
+    archive_path = files["teacher_outer_train_scores.zip"]
     archive_sha = sha256_file(archive_path)
     if archive_sha != expected_archive_sha256:
         raise ValueError("legacy canonical inner archive SHA mismatch")
@@ -72,13 +84,22 @@ def teacher_score_payload(
         if archive.testzip() is not None:
             raise ValueError("legacy teacher archive is corrupt")
         names = archive.namelist()
-        if any(name.startswith("/") or ".." in Path(name).parts for name in names):
+        normalized = [PurePosixPath(name).as_posix() for name in names]
+        if len(normalized) != len(set(normalized)):
+            raise ValueError("legacy teacher archive contains duplicate members")
+        if any(
+            PurePosixPath(name).is_absolute()
+            or ".." in PurePosixPath(name).parts
+            or any(
+                part == "__MACOSX" or part == ".DS_Store" or part.startswith("._")
+                for part in PurePosixPath(name).parts
+            )
+            for name in normalized
+        ):
             raise ValueError("legacy teacher archive contains an unsafe member")
-        score_names = [name for name in names if Path(name).name == "teacher_scores.jsonl"]
-        if len(score_names) != 1:
-            raise ValueError("canonical inner archive must contain one teacher-score payload")
-        score_name = score_names[0]
-        return archive_path.name, archive_sha, archive.read(score_name)
+        if set(normalized) != EXPECTED_INNER_FILES:
+            raise ValueError("canonical inner archive member set mismatch")
+        return archive_path, archive_sha, archive.read("teacher_scores.jsonl")
 
 
 def bridge(
@@ -102,21 +123,26 @@ def bridge(
         if score_sha != expected_score_sha256[fold]:
             raise ValueError(f"fold {fold} teacher-score SHA mismatch")
         verified[fold] = {
-            "teacher_score_source": score_source,
+            "teacher_score_source": score_source.name,
             "teacher_inner_archive_sha256": archive_sha,
             "teacher_scores_sha256": score_sha,
             "source_files": [
                 {
-                    "path": path.relative_to(root).as_posix(),
+                    "path": relative,
                     "size": path.stat().st_size,
                     "sha256": sha256_file(path),
                 }
-                for path in files
+                for relative, path in sorted(files.items())
             ],
         }
     output.mkdir(parents=True)
     for fold in sorted(fold_inputs):
-        shutil.copytree(fold_inputs[fold], output / f"fold{fold}")
+        destination = output / f"fold{fold}"
+        destination.mkdir()
+        shutil.copy2(
+            fold_inputs[fold] / "teacher_outer_train_scores.zip",
+            destination / "teacher_outer_train_scores.zip",
+        )
     report = {
         "schema_version": 1,
         "experiment_id": EXPERIMENT_ID,

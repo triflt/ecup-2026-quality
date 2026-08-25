@@ -1,6 +1,6 @@
 # Experiment 685 — rank-first distillation into Qwen3.5-4B LoRA
 
-Status: `DESIGN_ONLY_685A_FROZEN_TEACHER_RANK_KD`. GPU jobs: `0`. Public: `0`.
+Status: `P0_HARDENED_CPU_VENDOR_BRIDGE_PENDING`. GPU jobs: `0`. Public: `0`.
 
 The first experiment transfers the already proven Qwen3.6-27B flammable
 ranking into a deployable Qwen3.5-4B LoRA. A larger teacher is not required for
@@ -93,3 +93,16 @@ The only legacy-input exception is a one-time, label-free remote compute bridge 
 accepted 662 folds0/3. It verifies the canonical inner archive and score SHA,
 then writes to an immutable S3 prefix. No legacy output is downloaded locally,
 and all later stages read the S3 copy.
+
+Training additionally consumes the proven PEFT 0.20.0 ZIP through a one-time
+label-free CPU bridge. The bridge binds the historical source bundle SHA,
+checks required modules and package metadata, imports the required PEFT symbols
+from that exact ZIP, and publishes the ZIP plus a self-hashed acceptance to a
+new immutable prefix. Code, pair input, base-model tree, initial LoRA state,
+training order, runtime versions and vendor bytes are all carried into the
+control/candidate acceptance and checked for exact parity.
+
+The only approved object namespace is
+`s3://biglm-alignment-pipeline/d.strizhakov/ecup/`. Direct S3 credentials may be
+read only from the ignored `.env.s3` when generating ignored remote compute presets;
+their values are never printed or committed.

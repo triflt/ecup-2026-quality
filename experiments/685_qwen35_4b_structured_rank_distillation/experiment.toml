@@ -2,7 +2,7 @@
 id = 685
 slug = "qwen35_4b_structured_rank_distillation"
 title = "Leakage-safe structured/ranking distillation into deployable 4B LoRA"
-status = "DESIGN_ONLY_685A_FROZEN_TEACHER_RANK_KD"
+status = "P0_HARDENED_CPU_VENDOR_BRIDGE_PENDING"
 parent_experiment = 681
 initial_teacher_experiment = 654
 teacher_score_experiment = 662
