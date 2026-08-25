@@ -2,7 +2,7 @@
 id = 685
 slug = "qwen35_4b_structured_rank_distillation"
 title = "Leakage-safe structured/ranking distillation into deployable 4B LoRA"
-status = "P0_HARDENED_CPU_VENDOR_BRIDGE_PENDING"
+status = "TERMINAL_REJECT_AT_OUTER0"
 parent_experiment = 681
 initial_teacher_experiment = 654
 teacher_score_experiment = 662
@@ -33,6 +33,8 @@ causal_attributes_required_in_first_stage = false
 grounded_evidence_required_in_first_stage = false
 ranking_loss_required = true
 outer_fold_loss_tuning = false
+rank_transfer_detected = true
+decision_boundary_preserved = false
 
 [validation]
 version = "semantic_family_v3"
@@ -63,3 +65,4 @@ cheap_eval_in_training_job = true
 independent_eval_in_remote_compute = true
 s3_keys_immutable = true
 submission_zip_requires_fresh_user_approval = true
+sealed_fold3_outputs_used = false

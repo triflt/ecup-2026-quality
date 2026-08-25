@@ -1,6 +1,34 @@
 # Experiment 685 — rank-first distillation into Qwen3.5-4B LoRA
 
-Status: `P0_HARDENED_CPU_VENDOR_BRIDGE_PENDING`. GPU jobs: `0`. Public: `0`.
+Status: `TERMINAL_REJECT_AT_OUTER0`. GPU jobs: `0`. Public: `0`.
+
+## Terminal result
+
+The frozen outer0 gate rejected 685A. The candidate transferred useful ranking
+signal but did not preserve the decision boundary:
+
+- flammable AP: `0.8681151 -> 0.8864609` (`+0.0183458`);
+- flammable F1: `0.8253968 -> 0.8064516` (`-0.0189452`);
+- direct routed Macro delta with BAD byte-identical: `-0.0094726`;
+- FN: `8 -> 9`; FP: `3 -> 3`;
+- corrections/regressions: `1/2` (`0.5`);
+- all non-ranking promotion gates failed; Public remained unused.
+
+Both fold0 artifacts passed exact control/candidate provenance and parity. The
+only training-contract difference was `rank_loss_weight = 0.0` versus `0.5`.
+The accepted remote evaluator bound all 943 flammable validation rows to an
+immutable packet derived from the frozen semantic-v3 registry. Its report SHA
+is `c29ee49bcdfc9dfe6f6c15d9d69222fda1e80648585b5882ed07204bb96dde38`.
+
+The preregistered fold3 jobs were cancelled after the outer0 rejection. Their
+predictions, acceptances and quality outputs remain sealed, unread and unused.
+Folds 1/2/4, refit, packaging and Public are forbidden for this recipe.
+
+Interpretation: pairwise supervision improved ordering, but the convex loss
+`0.5 * hard + 0.5 * rank` simultaneously halved hard-label supervision. The
+next experiment must preserve the full hard-BCE term and add a bounded rank
+regularizer; because outer0 informed that design, the next blind screen starts
+from outer3 rather than reusing outer0 as confirmation.
 
 The first experiment transfers the already proven Qwen3.6-27B flammable
 ranking into a deployable Qwen3.5-4B LoRA. A larger teacher is not required for
