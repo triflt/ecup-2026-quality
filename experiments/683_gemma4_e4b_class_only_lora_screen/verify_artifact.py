@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import math
 import re
@@ -23,7 +24,6 @@ from contract import (
     MODEL_REVISION,
     SCREEN_FOLDS,
     canonical_sha256,
-    sha256_file,
     verify_self_hash,
 )
 
@@ -31,7 +31,12 @@ from contract import (
 def verify(archive_path: Path, runtime_dir: Path, fold: int, technical_smoke: bool) -> dict:
     runtime = json.loads((runtime_dir / "runtime_audit.json").read_text(encoding="utf-8"))
     runtime_contract = verify_self_hash(runtime)
-    with zipfile.ZipFile(archive_path) as archive:
+    # Read the delivery exactly once so CRC, members and the recorded archive
+    # digest are all bound to the same immutable byte payload.  Besides being
+    # stricter, this avoids macOS provenance guards that can deny a second
+    # open of a freshly downloaded large archive.
+    archive_payload = archive_path.read_bytes()
+    with zipfile.ZipFile(io.BytesIO(archive_payload)) as archive:
         if archive.testzip() is not None:
             raise ValueError("corrupt ZIP")
         names = archive.namelist()
@@ -130,7 +135,7 @@ def verify(archive_path: Path, runtime_dir: Path, fold: int, technical_smoke: bo
         "experiment_id": EXPERIMENT_ID,
         "fold": fold,
         "technical_smoke": technical_smoke,
-        "archive_sha256": sha256_file(archive_path),
+        "archive_sha256": sha256_bytes(archive_payload),
         "predictions_sha256": sha256_bytes(predictions_payload),
         "runtime_contract_sha256": runtime_contract,
         "rows": len(predictions),

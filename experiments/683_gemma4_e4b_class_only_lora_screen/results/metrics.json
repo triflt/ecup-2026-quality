@@ -1,21 +1,35 @@
 {
   "experiment_id": "683",
-  "status": "technical_smoke_prepared",
+  "status": "rejected_at_screen",
   "data_version": "competition_train_v1",
   "evaluation_version": "semantic_family_v3",
   "seed": 42,
   "validation": {
     "protocol": "frozen folds 0/3, then 1/2/4 only after screen",
-    "bad_f1": null,
-    "flammable_f1": null,
-    "flammable_average_precision": null,
-    "macro_f1": null,
-    "fold_scores": []
+    "bad_f1": 0.9532563025210085,
+    "flammable_f1": 0.8936170212765957,
+    "flammable_average_precision_mean_delta": 0.04986286586788807,
+    "macro_f1": 0.9234366618988021,
+    "fold_scores": [
+      {"fold": 0, "macro_delta": 0.0, "flammable_average_precision_delta": 0.08623333368699848},
+      {"fold": 3, "macro_delta": 0.006455399061032874, "flammable_average_precision_delta": 0.013492398048777665}
+    ],
+    "corrected": 6,
+    "regressed": 5,
+    "flammable_false_negatives": {"baseline": 5, "candidate": 5},
+    "flammable_false_positives": {"baseline": 11, "candidate": 10},
+    "singleton_families": {"corrected": 6, "regressed": 2, "net": 4}
   },
   "runtime": {
     "technical_smoke_required": true,
-    "gpu_jobs_launched": 0
+    "technical_smoke_accepted": true,
+    "gpu_jobs_launched": 3,
+    "screen_artifacts_accepted": 2,
+    "max_peak_cuda_memory_bytes": 18058092544
   },
-  "artifacts": [],
-  "decision": "OPEN_TECHNICAL_SMOKE_ONLY"
+  "artifacts": [
+    {"fold": 0, "archive_sha256": "c54dd8e7b6ef5097afede9bbc5004d2a31f808d3690c5f77babe9a71af3dbcb7", "predictions_sha256": "cf9089db6a1c62ccf89a024e32a2c948eb832494b09d4ac1ea4f660026508c3e"},
+    {"fold": 3, "archive_sha256": "51029ebaa40732a9798660c63255ea5c447bf1d771eed6063fd7dfbb2055c64c", "predictions_sha256": "1dff751173bd36a9addac6c6583fae695b13949a7c6dfb6eaf8862c08df67156"}
+  ],
+  "decision": "REJECT_AT_SCREEN"
 }
