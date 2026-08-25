@@ -57,7 +57,11 @@ def bind_outer0_labels(
     for row in donor_train:
         global_index = int(row["global_index"])
         if global_index in donor_by_index:
-            raise ValueError("duplicate global_index in label-donor train runtime")
+            existing = donor_by_index[global_index]
+            identity = ("global_index", "id", "fold", "category", "label", "semantic_component")
+            if any(existing.get(field) != row.get(field) for field in identity):
+                raise ValueError("conflicting duplicate in label-donor train runtime")
+            continue
         donor_by_index[global_index] = row
     labels: list[int] = []
     components: list[str] = []

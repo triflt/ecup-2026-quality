@@ -34,6 +34,26 @@ class FastOuter0EvalTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "binding mismatch"):
             MODULE.bind_outer0_labels(validation, donor)
 
+    def test_consistent_donor_occurrence_duplicates_are_collapsed(self):
+        validation = [
+            {"global_index": 10, "id": "a", "fold": 0, "category": MODULE.FLAMMABLE}
+        ]
+        original = {
+            **validation[0],
+            "label": 1,
+            "semantic_component": "x",
+            "occurrence_index": 0,
+        }
+        repeated = {**original, "occurrence_index": 7}
+        labels, components = MODULE.bind_outer0_labels(
+            validation, [original, repeated]
+        )
+        np.testing.assert_array_equal(labels, np.asarray([1], dtype=np.int8))
+        self.assertEqual(components, ["x"])
+        conflicting = {**repeated, "label": 0}
+        with self.assertRaisesRegex(ValueError, "conflicting duplicate"):
+            MODULE.bind_outer0_labels(validation, [original, conflicting])
+
     def test_positive_class_metrics_and_correction_gate(self):
         labels = np.asarray([1, 1, 0, 0], dtype=np.int8)
         control = np.asarray([1, 0, 1, 0], dtype=np.int8)
