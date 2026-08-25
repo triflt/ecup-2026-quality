@@ -549,7 +549,9 @@ def build_train(args: argparse.Namespace) -> str:
         f"--source /work/pair_raw --output /work/pair_clean --fold {args.fold} "
         f"--expected-pair-acceptance-sha256 {args.expected_pair_acceptance_sha256} "
         f"--expected-pair-runtime-contract-sha256 "
-        f"{args.expected_pair_runtime_contract_sha256} && "
+        f"{args.expected_pair_runtime_contract_sha256} "
+        f"--expected-r0-code-acceptance-sha256 "
+        f"{args.expected_r0_code_acceptance_sha256} && "
         f"PYTHONPATH=/work/code/{EXPERIMENT_DIR}:/work/code/experiments/645_qwen_scale_2x3_gate:/work/vendor "
         f"python3 -u /work/code/{EXPERIMENT_DIR}/train_pair_fold.py "
         f"--fold {args.fold} --runtime-dir /work/pair_clean/source_runtime "
@@ -815,6 +817,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--pair-src")
     result.add_argument("--expected-pair-acceptance-sha256")
     result.add_argument("--expected-pair-runtime-contract-sha256")
+    result.add_argument("--expected-r0-code-acceptance-sha256")
     result.add_argument("--vendor-source-src")
     result.add_argument("--vendor-source-file")
     result.add_argument("--vendor-source-sha256")
@@ -865,6 +868,7 @@ if __name__ == "__main__":
                 "pair_src",
                 "expected_pair_acceptance_sha256",
                 "expected_pair_runtime_contract_sha256",
+                "expected_r0_code_acceptance_sha256",
                 "vendor_src",
                 "vendor_sha256",
                 "mode",
@@ -875,6 +879,7 @@ if __name__ == "__main__":
         args.vendor_src = safe_s3_path(args.vendor_src, args.allowed_prefix)
         sha256_value(args.expected_pair_acceptance_sha256)
         sha256_value(args.expected_pair_runtime_contract_sha256)
+        sha256_value(args.expected_r0_code_acceptance_sha256)
         sha256_value(args.vendor_sha256)
         if args.promotion_src is not None:
             args.promotion_src = safe_s3_path(

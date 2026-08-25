@@ -12,6 +12,7 @@ from verify_pair_runtime import verify as verify_pair_runtime
 EXPERIMENT_ID = "685"
 REQUIRED_FILES = (
     "r0_acceptance.json",
+    "r0_code_acceptance.json",
     "runtime/pairs.jsonl",
     "runtime/runtime_audit.json",
     "runtime/train_targets.jsonl",
@@ -74,6 +75,24 @@ def verify_self_hash(value: dict[str, Any], field: str) -> str:
     return str(digest)
 
 
+def verify_r0_code_acceptance(
+    payload: bytes, *, expected_acceptance_sha256: str
+) -> dict[str, Any]:
+    value = json.loads(payload)
+    acceptance_sha256 = verify_self_hash(value, "acceptance_sha256")
+    if acceptance_sha256 != expected_acceptance_sha256:
+        raise ValueError("R0 code acceptance differs from the frozen consumer contract")
+    expected = {
+        "schema_version": 1,
+        "experiment_id": "686",
+        "scope": "r0_prepare",
+        "decision": "ACCEPT_R0_CODE_BUNDLE",
+    }
+    if any(value.get(key) != expected_value for key, expected_value in expected.items()):
+        raise ValueError("R0 code acceptance has an invalid frozen header")
+    return value
+
+
 def stage(
     source: Path,
     output: Path,
@@ -81,10 +100,15 @@ def stage(
     fold: int,
     expected_pair_acceptance_sha256: str,
     expected_pair_runtime_contract_sha256: str,
+    expected_r0_code_acceptance_sha256: str,
 ) -> dict[str, Any]:
     if output.exists():
         raise FileExistsError("refusing to overwrite staged training input")
     payloads, ignored = inventory(source)
+    r0_code_acceptance = verify_r0_code_acceptance(
+        payloads["r0_code_acceptance.json"],
+        expected_acceptance_sha256=expected_r0_code_acceptance_sha256,
+    )
     r0_acceptance = json.loads(payloads["r0_acceptance.json"])
     acceptance_sha = verify_self_hash(r0_acceptance, "acceptance_sha256")
     if acceptance_sha != expected_pair_acceptance_sha256:
@@ -127,6 +151,7 @@ def stage(
         "ignored_transport_metadata": ignored,
         "pair_runtime_contract_sha256": expected_pair_runtime_contract_sha256,
         "pair_runtime_acceptance_sha256": expected_pair_acceptance_sha256,
+        "r0_code_acceptance_sha256": r0_code_acceptance["acceptance_sha256"],
         "validation_labels_read": 0,
         "sealed_rows_used": 0,
         "public_used": False,
@@ -147,10 +172,12 @@ if __name__ == "__main__":
     parser.add_argument("--fold", type=int, choices=range(5), required=True)
     parser.add_argument("--expected-pair-acceptance-sha256", required=True)
     parser.add_argument("--expected-pair-runtime-contract-sha256", required=True)
+    parser.add_argument("--expected-r0-code-acceptance-sha256", required=True)
     args = parser.parse_args()
     for value in (
         args.expected_pair_acceptance_sha256,
         args.expected_pair_runtime_contract_sha256,
+        args.expected_r0_code_acceptance_sha256,
     ):
         if len(value) != 64 or any(character not in "0123456789abcdef" for character in value):
             raise ValueError("frozen digest must be 64 lowercase hexadecimal characters")
@@ -163,6 +190,9 @@ if __name__ == "__main__":
                 expected_pair_acceptance_sha256=args.expected_pair_acceptance_sha256,
                 expected_pair_runtime_contract_sha256=(
                     args.expected_pair_runtime_contract_sha256
+                ),
+                expected_r0_code_acceptance_sha256=(
+                    args.expected_r0_code_acceptance_sha256
                 ),
             ),
             ensure_ascii=False,

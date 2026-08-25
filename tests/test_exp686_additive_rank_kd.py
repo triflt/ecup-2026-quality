@@ -38,6 +38,7 @@ BUILD_CODE = load("build_code_bundle")
 VERIFY_CODE = load("verify_code_bundle")
 PRESET = load("build_remote_compute_preset")
 EVALUATE = load("evaluate")
+STAGE_INPUT = load("stage_training_input")
 
 
 def write_code_acceptance(
@@ -139,6 +140,47 @@ def write_promotion_receipt(
 
 
 class AdditiveRankKDTests(unittest.TestCase):
+    def test_r0_code_acceptance_is_exactly_bound(self):
+        payload = {
+            "schema_version": 1,
+            "experiment_id": "686",
+            "scope": "r0_prepare",
+            "git_revision": "a" * 40,
+            "bundle_sha256": "b" * 64,
+            "manifest_sha256": "c" * 64,
+            "files": 6,
+            "directories": 7,
+            "source_paths": ["frozen.py"],
+            "decision": "ACCEPT_R0_CODE_BUNDLE",
+        }
+        payload["acceptance_sha256"] = STAGE_INPUT.canonical_sha256(payload)
+        encoded = json.dumps(payload, ensure_ascii=False).encode()
+        accepted = STAGE_INPUT.verify_r0_code_acceptance(
+            encoded,
+            expected_acceptance_sha256=payload["acceptance_sha256"],
+        )
+        self.assertEqual(accepted["acceptance_sha256"], payload["acceptance_sha256"])
+        with self.assertRaisesRegex(ValueError, "frozen consumer contract"):
+            STAGE_INPUT.verify_r0_code_acceptance(
+                encoded,
+                expected_acceptance_sha256="d" * 64,
+            )
+
+    def test_training_input_whitelist_allows_only_bound_r0_code_acceptance(self):
+        self.assertIn("r0_code_acceptance.json", STAGE_INPUT.REQUIRED_FILES)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in STAGE_INPUT.REQUIRED_FILES:
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("{}", encoding="utf-8")
+            payloads, ignored = STAGE_INPUT.inventory(root)
+            self.assertEqual(set(payloads), set(STAGE_INPUT.REQUIRED_FILES))
+            self.assertEqual(ignored, [])
+            (root / "unexpected.json").write_text("{}", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "unexpected remote pair input member"):
+                STAGE_INPUT.inventory(root)
+
     def test_promotion_hash_matches_evaluator_for_unicode_fields(self):
         payload = {
             "category": "Легковоспламеняющиеся",
@@ -311,6 +353,7 @@ class AdditiveRankKDTests(unittest.TestCase):
                 pair_src="/approved/project/exp685/pair/f3",
                 expected_pair_acceptance_sha256="d" * 64,
                 expected_pair_runtime_contract_sha256="e" * 64,
+                expected_r0_code_acceptance_sha256="1" * 64,
                 vendor_src="/approved/project/exp685/vendor",
                 vendor_sha256="f" * 64,
                 output_dst="/approved/project/exp686/train/f3/control",
