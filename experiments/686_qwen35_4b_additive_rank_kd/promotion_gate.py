@@ -52,7 +52,12 @@ REQUIRED_FIELDS = {
 
 
 def canonical_sha256(value: Any) -> str:
-    payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
+    payload = json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
     return hashlib.sha256(payload).hexdigest()
 
 

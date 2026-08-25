@@ -33,6 +33,7 @@ def load(name: str):
 
 
 TRAIN = load("train_pair_fold")
+PROMOTION = load("promotion_gate")
 BUILD_CODE = load("build_code_bundle")
 VERIFY_CODE = load("verify_code_bundle")
 PRESET = load("build_remote_compute_preset")
@@ -138,6 +139,16 @@ def write_promotion_receipt(
 
 
 class AdditiveRankKDTests(unittest.TestCase):
+    def test_promotion_hash_matches_evaluator_for_unicode_fields(self):
+        payload = {
+            "category": "Легковоспламеняющиеся",
+            "metrics": {"БАД": 0.95},
+        }
+        self.assertEqual(
+            PROMOTION.canonical_sha256(payload),
+            TRAIN.canonical_sha256(payload),
+        )
+
     def test_bad_route_gate_requires_exact_prediction_identity(self):
         categories = np.array(["БАД", "БАД", "Легковоспламеняющиеся"])
         folds = np.array([3, 3, 3])
