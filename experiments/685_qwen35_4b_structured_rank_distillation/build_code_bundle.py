@@ -13,6 +13,24 @@ from typing import Any
 
 from verify_code_bundle import MANIFEST_NAME, canonical_sha256
 
+BUNDLE_PATHS = (
+    "experiments/685_qwen35_4b_structured_rank_distillation",
+    "experiments/645_qwen_scale_2x3_gate/grid_contract.py",
+    "experiments/645_qwen_scale_2x3_gate/train_lora.py",
+    "experiments/680_qwen35_4b_flammable_only_hard_bce/evaluate.py",
+    "experiments/635_span_head_full140_integration/evaluate.py",
+    "experiments/635_span_head_full140_integration/frozen_spec.json",
+    "experiments/140_dual_lora_fusion/submission/run.py",
+    "experiments/632_span_head_seed_repeat/run_fold.py",
+    "experiments/632_span_head_seed_repeat/evaluate_screen.py",
+    "experiments/632_span_head_seed_repeat/evaluate_full.py",
+    "experiments/623_semantic_v3_multitask_span_head/frozen_spec.json",
+    "experiments/623_semantic_v3_multitask_span_head/renderer.py",
+    "experiments/623_semantic_v3_multitask_span_head/protocol.py",
+    "experiments/662_qwen36_27b_outer_train_scoring/results/full_target_set_acceptance.json",
+    "validation/semantic_family_v3/folds.csv",
+)
+
 
 def sha256_bytes(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
@@ -37,7 +55,9 @@ def normalized_info(source: tarfile.TarInfo) -> tarfile.TarInfo:
     return info
 
 
-def build(repo: Path, output: Path) -> dict[str, Any]:
+def build(
+    repo: Path, output: Path, *, source_paths: tuple[str, ...] = BUNDLE_PATHS
+) -> dict[str, Any]:
     if output.exists():
         raise FileExistsError("refusing to overwrite code bundle")
     if git(repo, "status", "--porcelain"):
@@ -46,7 +66,17 @@ def build(repo: Path, output: Path) -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="exp685_code_bundle_") as directory:
         source_tar = Path(directory) / "source.tar"
         subprocess.run(
-            ["git", "-C", str(repo), "archive", "--format=tar", "-o", str(source_tar), "HEAD"],
+            [
+                "git",
+                "-C",
+                str(repo),
+                "archive",
+                "--format=tar",
+                "-o",
+                str(source_tar),
+                "HEAD",
+                *source_paths,
+            ],
             check=True,
         )
         members: list[tuple[tarfile.TarInfo, bytes | None]] = []
@@ -91,6 +121,7 @@ def build(repo: Path, output: Path) -> dict[str, Any]:
             "schema_version": 1,
             "experiment_id": "685",
             "git_revision": revision,
+            "source_paths": list(source_paths),
             "files": files,
             "directories": sorted(directories),
         }
@@ -116,6 +147,7 @@ def build(repo: Path, output: Path) -> dict[str, Any]:
             destination.addfile(manifest_info, io.BytesIO(manifest_payload))
     return {
         "git_revision": revision,
+        "source_paths": list(source_paths),
         "files": len(files),
         "directories": len(directories),
         "manifest_sha256": manifest["manifest_sha256"],

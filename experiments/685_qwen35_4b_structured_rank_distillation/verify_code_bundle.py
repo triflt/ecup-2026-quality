@@ -46,6 +46,11 @@ def verify(
     expected_files = manifest.get("files")
     if not isinstance(expected_files, dict) or not expected_files:
         raise ValueError("code-bundle file manifest is empty")
+    source_paths = manifest.get("source_paths")
+    if not isinstance(source_paths, list) or any(
+        not isinstance(value, str) or not value for value in source_paths
+    ):
+        raise ValueError("code-bundle source-path whitelist is invalid")
     expected_directories = manifest.get("directories")
     if not isinstance(expected_directories, list) or any(
         not isinstance(value, str) or not value for value in expected_directories
@@ -87,6 +92,7 @@ def verify(
         "manifest_sha256": digest,
         "files": len(observed),
         "directories": len(observed_directories),
+        "source_paths": source_paths,
         "decision": "ACCEPT_CODE_BUNDLE",
     }
     result["acceptance_sha256"] = canonical_sha256(result)

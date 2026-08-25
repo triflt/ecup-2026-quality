@@ -142,7 +142,7 @@ class RemoteHardeningTests(unittest.TestCase):
                 ["git", "-C", str(repo), "rev-parse", "HEAD"], text=True
             ).strip()
             bundle = root / "code.tar.gz"
-            result = BUILD_CODE.build(repo, bundle)
+            result = BUILD_CODE.build(repo, bundle, source_paths=("payload.py",))
             self.assertEqual(result["git_revision"], revision)
             extracted = root / "extracted"
             extracted.mkdir()
