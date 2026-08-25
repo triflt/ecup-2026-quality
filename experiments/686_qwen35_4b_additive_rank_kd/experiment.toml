@@ -1,0 +1,24 @@
+id = 686
+name = "qwen35_4b_additive_rank_kd"
+status = "TERMINAL_REJECT_CONFIRMATION"
+owner = "causal-rank-kd"
+parent = 685
+
+[hypothesis]
+changed_factor = "candidate hard_BCE + 0.5*pair_rank_BCE; control hard_BCE"
+teacher = "accepted Qwen3.6-27B outer-train raw-logit ranks from experiment 662"
+student = "Qwen3.5-4B class-only LoRA"
+deployment = "4B_only"
+
+[validation]
+development_fold = 0
+blind_screen_fold = 3
+confirmation_folds = [1, 2, 4]
+threshold = 0.0
+threshold_tuned = false
+public_used = false
+
+[resources]
+screen_jobs = 2
+gpu_per_job = 1
+gpu_type = "H100"
