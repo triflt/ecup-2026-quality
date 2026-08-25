@@ -1,14 +1,20 @@
 # Experiment 684 — stronger flammable teacher LoRA
 
-Status: `DESIGN_ONLY_TEACHER_QUALIFICATION`. GPU jobs: `0`. Public: `0`.
+Status: `BLOCKED_PENDING_685A_RANK_MECHANISM`. GPU jobs: `0`. Public: `0`.
 
 ## Objective
 
-Train and qualify a multimodal Qwen-family LoRA teacher that is demonstrably
+After the cheap 685A rank-transfer test, train and qualify a multimodal Qwen-family LoRA teacher that is demonstrably
 stronger than the accepted Qwen3.6-27B flammable probe. The teacher is offline
 only: its base model, adapter and runtime are forbidden from the competition
 submission. A passed teacher supplies targets to the deployable 4B student in
 experiment 685.
+
+Teacher scale is deliberately not the first new factor. Experiment 681 failed
+because saturated in-sample logits were transferred as absolute binary targets;
+it did not show that the current teacher lacks useful knowledge. Experiment
+685A first reuses the already accepted teacher scores with a magnitude-invariant
+pairwise objective. This experiment opens only after that mechanism test.
 
 The current Qwen3.6-27B signal is the frozen control: five-fold routed
 flammable F1 `0.9075144509`, tie-aware pooled AP `0.9195422257` for the 27B
@@ -80,4 +86,3 @@ validation into student training targets.
 - Stop immediately if the model cannot produce finite, occurrence-bound raw
   logits or if projected target generation cannot finish within the available
   competition research window.
-

@@ -1,102 +1,77 @@
-# Experiment 685 — structured/ranking distillation into Qwen3.5-4B LoRA
+# Experiment 685 — rank-first distillation into Qwen3.5-4B LoRA
 
-Status: `BLOCKED_PENDING_ACCEPTED_684_TEACHER`. GPU jobs: `0`. Public: `0`.
+Status: `DESIGN_ONLY_685A_FROZEN_TEACHER_RANK_KD`. GPU jobs: `0`. Public: `0`.
 
-## Objective
+The first experiment transfers the already proven Qwen3.6-27B flammable
+ranking into a deployable Qwen3.5-4B LoRA. A larger teacher is not required for
+685A: experiment 681 failed because absolute in-sample logits were saturated,
+not because the current teacher lacked outer-fold signal.
 
-Transfer the flammable ranking and rule-understanding signal of an accepted
-experiment-684 teacher into a deployable `Qwen/Qwen3.5-4B` LoRA. BAD stays
-byte-identical to the production BAD route. The student is used only on
-flammable rows and the large teacher is absent at inference.
+BAD remains byte-identical. The large teacher is offline only and never enters
+the submission.
 
-Experiment 681 permanently rejects naive raw-logit KD. This experiment must
-not reopen its temperature/lambda grid. The new mechanism is grounded
-distillation of information that the raw saturated logits did not contain:
+## 685A — cheapest valid mechanism test
 
-- cross-fitted teacher rank/margin;
-- `sold_object`;
-- `regulated_substance`;
-- relation of the substance to the sold object (`sold`, `included`,
-  `compatible`, `mentioned_only`, `container_or_device`);
-- evidence span/image reference;
-- final teacher verdict and confidence.
+Reuse the accepted fold-matched teacher scores from experiment 662. Teacher
+`k` trained only on student outer-`k` train and scored those same training
+rows. This is outer-validation safe because fold `k` labels never enter teacher
+or student training, but it is explicitly in-sample and may have weak hard-pair
+diversity.
 
-The exact schema is frozen after a 300-component teacher/evidence audit and
-before any student GPU training.
-
-## Why this differs from experiment 681
-
-The old teacher scored its own outer-training rows. Its median absolute logit
-was `8.25--8.75`; at temperature 2 the average soft target was approximately
-`0.016--0.023` for negatives and `0.948--0.962` for positives. Teacher train
-AP was `0.997--1.000`. Thus the soft term was nearly another hard label and
-carried little dark knowledge about difficult ordering or sold-object scope.
-
-New targets are nested cross-fitted inside each student outer-train split and
-contain explicit decision structure. No teacher used for student outer `k`
-may train on outer `k` labels. Outer validation remains unread until the
-student artifact is frozen.
-
-## Student control and changed factor
-
-- backbone/revision: exact deployable Qwen3.5-4B;
-- same flammable selector, prompt/image view, LoRA rank 16, alpha 32, dropout
-  0.05, q/k/v/o targets, seed 42, one epoch, effective batch 16 and LR `2e-4`;
-- same threshold and production routing as the hard-BCE control;
-- only changed factor: hard-BCE objective becomes the preregistered
-  structured/ranking distillation objective.
-
-The loss weights are not selected on outer folds. Before GPU, one fixed loss
-is chosen on teacher-only/inner-development evidence:
+Convert teacher logits to empirical normal ranks within each target block:
 
 ```text
-L = L_hard_verdict
-    + lambda_rank * L_pairwise_teacher_rank
-    + lambda_attr * L_causal_attributes
-    + lambda_evidence * L_grounded_evidence
+r_i = clip(Phi^-1((rank(t_i) - 0.5) / n), -2.5, 2.5)
+q_ij = clip(sigmoid((r_i - r_j) / 0.5), 0.05, 0.95)
 ```
 
-Absolute raw-logit BCE is not included by default. It may be a separate later
-ablation only if teacher logits are demonstrably non-saturated and calibrated
-on leakage-safe inner data. Pairwise/listwise ranking is primary because the
-competition author explicitly identified PR-AUC as the appropriate diagnostic
-for the rare class.
+For each positive item, deterministically select eight negatives from the same
+block: four closest by teacher rank and four hash-seeded uniform negatives.
+Normalize loss per positive.
 
-## Cheapest gates
+```text
+L_hard = mean_pairs 0.5 * [BCEWithLogits(s_i, 1) + BCEWithLogits(s_j, 0)]
+L_rank = mean_pairs BCEWithLogits(s_i - s_j, q_ij)
+L_candidate = 0.5 * L_hard + 0.5 * L_rank
+```
 
-1. Accepted 684 teacher beats the current teacher qualification gate.
-2. Manual audit: at least `282/300` correct verdict+evidence records,
-   `>=95/100` correct sold-object/relation cases, unsupported evidence
-   `<=3/300`.
-3. Target audit: exact occurrence binding, labels/Public/sealed violations 0,
-   non-saturated rank coverage and positive teacher AP on all screen folds.
-4. One 8-row forward/backward/save/reload technical smoke.
-5. Student folds 0/3 only. Folds 1/2/4 remain closed until screen acceptance.
+A shadow control uses the exact same pair manifest, batches, steps and model
+recipe but `L_control = L_hard`. Candidate versus shadow control therefore
+changes only the ranking term. Absolute raw-logit BCE is forbidden.
 
-## Student screen gate
+Frozen student recipe: Qwen3.5-4B, LoRA rank 16/alpha 32/dropout 0.05 on
+q/k/v/o, seed 42, LR `2e-4`, one epoch, effective batch 16 and threshold 0.
+No hyperparameter is selected on outer folds.
 
-Against both the hard-BCE specialist and the production flammable route:
+Run paired control/candidate on outer0 first. Outer3 opens only if outer0 has
+AP delta `>0`, Macro delta `>=0`, no FN increase and corrections/regressions
+`>=1.2`. The complete folds0/3 gate is mean AP `>=+0.010`, Macro positive on
+both with mean `>=+0.003`, flammable F1 delta `>=+0.010`, no FN increase,
+corrections/regressions `>=1.5`, positive singleton net and BAD byte-identical.
 
-- flammable AP delta positive on folds 0 and 3, mean at least `+0.010`;
-- routed Macro delta positive on both, mean at least `+0.003`;
-- flammable F1 non-negative on both and pooled delta at least `+0.008`;
-- FN do not increase;
-- corrections/regressions at least `1.5`;
-- singleton-family net corrections positive;
-- BAD byte-identical.
+## 685B — nested targets only if warranted
 
-Any sign failure is terminal for the frozen objective. No outer-fold tuning of
-loss weights, temperature, threshold, route weight or stop step is allowed.
+Open 685B only if 685A is positive-but-limited or the CPU audit proves that
+train-perfect ranks remove useful hard-pair diversity. Within student outer
+fold `k`, split outer-train by semantic family into inner folds `h`; teacher
+`T_{k,h}` trains without `h` and scores only `h`. Family duplicates never
+split. The student loss and all constants stay identical to 685A.
 
-## Full acceptance and deployment
+Ordinary global five-fold OOF teacher merging is forbidden because another
+outer teacher may carry labels from the current student validation fold.
 
-Full CV requires AP/Macro wins on at least 4/5 folds, folds 1/2/4 Macro
-positive, mean Macro delta at least `+0.006`, pooled flammable F1 delta at
-least `+0.012`, no FN increase, corrections/regressions at least `1.5`,
-positive singleton delta and bootstrap `P(gain > 0) >= 0.90`.
+Estimated nested-teacher cost is `80--128 H100-hours` for outer0/3 and
+`200--320 H100-hours` for all five outer folds. This cost is not authorized
+until 685A supplies evidence.
 
-Only after full acceptance may a full-data target policy be registered. The
-submission then packages only the 4B adapter, passes null-route parity,
-mixed-category 600-row runtime smoke and the 20/40-minute limits. The teacher
-base/adapter and target artifacts are never packaged.
+## Later one-factor extensions
 
+- Experiment 684 substitutes a better Qwen teacher into the exact accepted
+  rank-KD recipe.
+- Structured causal/evidence supervision is separate: sold object, regulated
+  substance, relation and extractive evidence pointer. Free-form chain of
+  thought is never treated as truth.
+- Feature/relational KD and Gemma-to-Gemma are independent later lanes.
+
+Full program and literature mapping:
+[DISTILLATION_RESEARCH_PLAN.md](DISTILLATION_RESEARCH_PLAN.md).
