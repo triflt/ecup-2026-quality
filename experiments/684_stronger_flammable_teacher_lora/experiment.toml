@@ -2,9 +2,10 @@
 id = 684
 slug = "stronger_flammable_teacher_lora"
 title = "Qualify a stronger offline flammable teacher LoRA"
-status = "DESIGN_ONLY_TEACHER_QUALIFICATION"
+status = "BLOCKED_PENDING_685A_RANK_MECHANISM"
 parent_experiment = 659
 student_experiment = 685
+mechanism_gate_experiment = 685
 public_submissions = 0
 gpu_jobs = 0
 
@@ -37,4 +38,3 @@ public_used = false
 teacher_in_submission = false
 teacher_adapter_in_submission = false
 teacher_runtime_in_submission = false
-
