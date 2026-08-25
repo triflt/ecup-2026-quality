@@ -193,30 +193,36 @@ def build(args: argparse.Namespace) -> dict:
     os.chmod(args.output, 0o600)
     if args.clean_output is not None:
         clean = copy.deepcopy(payload)
-        clean_inputs = clean["job"]["input"]
-        overrides_inputs: list[dict[str, str]] = []
-        for spec in clean_inputs:
-            if "access_key" not in spec and "secret_key" not in spec:
-                continue
-            if not isinstance(spec.get("name"), str) or not spec["name"]:
-                raise ValueError("credential-bearing input lacks a stable name")
-            if "access_key" not in spec or "secret_key" not in spec:
-                raise ValueError("S3 credential pair is incomplete")
-            overrides_inputs.append(
-                {
-                    "name": spec["name"],
-                    "access_key": spec.pop("access_key"),
-                    "secret_key": spec.pop("secret_key"),
-                }
-            )
-        if not overrides_inputs:
+        overrides_job: dict[str, list[dict[str, str]]] = {}
+        credential_pairs = 0
+        for section in ("input", "output"):
+            specs = clean["job"].get(section)
+            if not isinstance(specs, list) or not specs:
+                raise ValueError(f"clean preset lacks {section} specs")
+            override_specs: list[dict[str, str]] = []
+            for index, spec in enumerate(specs):
+                if "name" in spec:
+                    raise ValueError(f"unexpected pre-existing {section} name")
+                name = f"exp687_{section}_{index}"
+                spec["name"] = name
+                access = spec.pop("access_key", None)
+                secret = spec.pop("secret_key", None)
+                if (access is None) != (secret is None):
+                    raise ValueError("S3 credential pair is incomplete")
+                if access is not None:
+                    override_specs.append(
+                        {"name": name, "access_key": access, "secret_key": secret}
+                    )
+                    credential_pairs += 1
+            overrides_job[section] = override_specs
+        if credential_pairs == 0:
             raise ValueError("raw preset contains no ignored credential inputs")
         args.clean_output.parent.mkdir(parents=True, exist_ok=True)
         args.clean_output.write_text(
             yaml.safe_dump(clean, sort_keys=False), encoding="utf-8"
         )
         args.overrides_output.write_text(
-            yaml.safe_dump({"job": {"input": overrides_inputs}}, sort_keys=False),
+            yaml.safe_dump({"job": overrides_job}, sort_keys=False),
             encoding="utf-8",
         )
         os.chmod(args.clean_output, 0o600)
