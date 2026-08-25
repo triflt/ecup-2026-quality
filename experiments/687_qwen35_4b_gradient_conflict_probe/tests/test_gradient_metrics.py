@@ -15,7 +15,7 @@ from gradient_metrics import (
     wilson_interval,
 )
 from sanitize_probe_source import canonical_sha256, sanitize
-from verify_probe_artifact import verify_measurement_schema
+from verify_probe_artifact import verify_measurement_schema, verify_overall_coverage
 
 
 def test_orthogonal_gradients_preserve_rank_signal() -> None:
@@ -189,6 +189,18 @@ def test_measurement_schema_rejects_extra_fields_and_bool_indices() -> None:
         verify_measurement_schema({**row, "extra": 1.0}, grouped=False)
     with pytest.raises(TypeError, match="key types"):
         verify_measurement_schema({**row, "batch_index": False}, grouped=False)
+
+
+def test_overall_coverage_rejects_duplicate_and_missing_batch() -> None:
+    rows = [
+        {"checkpoint_step": step, "batch_index": batch}
+        for step in CHECKPOINT_STEPS
+        for batch in range(DIAGNOSTIC_EFFECTIVE_BATCHES)
+    ]
+    verify_overall_coverage(rows)
+    invalid = [*rows[:-1], dict(rows[0])]
+    with pytest.raises(ValueError, match="overall-measurement keys"):
+        verify_overall_coverage(invalid)
 
 
 def test_preset_rejects_shell_unsafe_bundle_basename_before_reading_inputs(

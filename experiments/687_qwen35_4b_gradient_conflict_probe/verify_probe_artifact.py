@@ -64,6 +64,19 @@ def verify_measurement_schema(row: Any, *, grouped: bool) -> None:
         raise TypeError("probe measurement numeric fields mismatch")
 
 
+def verify_overall_coverage(rows: list[dict[str, Any]]) -> None:
+    coverage = {
+        (int(row["checkpoint_step"]), int(row["batch_index"])) for row in rows
+    }
+    expected = {
+        (step, batch_index)
+        for step in CHECKPOINT_STEPS
+        for batch_index in range(DIAGNOSTIC_EFFECTIVE_BATCHES)
+    }
+    if coverage != expected or len(coverage) != len(rows):
+        raise ValueError("probe overall-measurement keys mismatch")
+
+
 def verify(report_path: Path) -> dict[str, Any]:
     if report_path.is_symlink() or not report_path.is_file():
         raise ValueError("probe report must be a regular non-symlink file")
@@ -108,6 +121,7 @@ def verify(report_path: Path) -> dict[str, Any]:
         raise ValueError("probe measurement coverage mismatch")
     for row in rows:
         verify_measurement_schema(row, grouped=False)
+    verify_overall_coverage(rows)
     group_rows = report.get("group_measurements")
     expected_groups = {"q_proj", "k_proj", "v_proj", "o_proj"}
     if not isinstance(group_rows, list) or len(group_rows) != len(rows) * len(
