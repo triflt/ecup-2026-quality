@@ -82,6 +82,7 @@ DIAGNOSTIC_FIELDS = {
     "selected_rank_retention",
     "selected_rank_grad_norm",
     "combined_grad_norm_preclip",
+    "clip_grad_norm_return",
     "clip_max_norm",
 }
 
@@ -224,6 +225,7 @@ def combine_gradients(
         "selected_rank_retention": selected_rank_retention,
         "selected_rank_grad_norm": selected_rank_norm,
         "combined_grad_norm_preclip": combined_norm,
+        "clip_grad_norm_return": combined_norm,
         "clip_max_norm": GRADIENT_CLIP_NORM,
     }
     return combined, diagnostic
@@ -335,6 +337,13 @@ def verify_diagnostic_row(
         math.sqrt(max(0.0, combined_sq)),
         "combined_grad_norm_preclip",
     )
+    if not math.isclose(
+        float(row["clip_grad_norm_return"]),
+        float(row["combined_grad_norm_preclip"]),
+        rel_tol=5e-3,
+        abs_tol=5e-5,
+    ):
+        raise ValueError("gradient diagnostic formula mismatch: clip_grad_norm_return")
     expected_flags = {
         "conflict": conflict,
         "projection_applied": mode == PCGRAD_MODE and conflict,
@@ -497,7 +506,63 @@ def load_terminal_probe_selection(
         "probe_acceptance_sha256": acceptance_sha,
         "probe_report_file_sha256": sha256_file(report_path),
         "probe_acceptance_file_sha256": sha256_file(acceptance_path),
+        "pair_runtime_contract_sha256": report["pair_runtime_contract_sha256"],
+        "pair_runtime_acceptance_sha256": report[
+            "pair_runtime_acceptance_sha256"
+        ],
+        "source_runtime_contract_sha256": report["source_runtime_contract_sha256"],
+        "parent_code_bundle_sha256": report["parent_code_bundle_sha256"],
+        "parent_code_revision": report["parent_code_revision"],
+        "parent_code_acceptance_sha256": report[
+            "parent_code_acceptance_sha256"
+        ],
+        "probe_code_bundle_sha256": report["probe_code_bundle_sha256"],
+        "probe_code_revision": report["probe_code_revision"],
+        "probe_code_acceptance_sha256": report[
+            "probe_code_acceptance_sha256"
+        ],
+        "vendor_zip_sha256": report["vendor_zip_sha256"],
+        "vendor_bridge_sha256": report["vendor_bridge_sha256"],
+        "model_tree_sha256": report["model_tree_sha256"],
+        "initial_trainable_state_sha256": report[
+            "initial_trainable_state_sha256"
+        ],
+        "ordered_pair_index_sha256": report["ordered_pair_index_sha256"],
     }
+
+
+def load_probe_code_acceptance(path: Path) -> dict[str, Any]:
+    if not path.is_file() or path.is_symlink():
+        raise ValueError("probe-code acceptance must be a regular file")
+    value = json.loads(path.read_text(encoding="utf-8"))
+    expected_fields = {
+        "schema_version",
+        "experiment_id",
+        "git_revision",
+        "bundle_sha256",
+        "manifest_sha256",
+        "files",
+        "decision",
+        "acceptance_sha256",
+    }
+    if set(value) != expected_fields:
+        raise ValueError("probe-code acceptance schema mismatch")
+    body = dict(value)
+    digest = body.pop("acceptance_sha256", None)
+    if digest != canonical_sha256(body):
+        raise ValueError("probe-code acceptance self-hash mismatch")
+    if (
+        value.get("schema_version") != 1
+        or value.get("experiment_id") != SELECTOR_EXPERIMENT_ID
+        or value.get("decision") != "ACCEPT_PROBE_CODE_BUNDLE"
+        or not _is_lower_hex(value.get("git_revision"), 40)
+        or not _is_lower_hex(value.get("bundle_sha256"), 64)
+        or not _is_lower_hex(value.get("manifest_sha256"), 64)
+        or not isinstance(value.get("files"), int)
+        or value["files"] <= 0
+    ):
+        raise ValueError("probe-code acceptance identity mismatch")
+    return value
 
 
 def pair_losses(
@@ -619,6 +684,7 @@ def summarize_diagnostics(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
         "norm_cap_scale",
         "selected_rank_retention",
         "combined_grad_norm_preclip",
+        "clip_grad_norm_return",
     )
     return {
         "optimizer_steps": len(rows),
@@ -640,6 +706,8 @@ def summarize_diagnostics(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
 
 
 def _load_frozen_inputs(args: argparse.Namespace) -> dict[str, Any]:
+    if args.fold != 3:
+        raise ValueError("exp688 selector lineage currently authorizes fold3 only")
     if args.runtime_backend != "legacy_eager" or args.micro_batch_size_override != 2:
         raise ValueError("exp688 requires the frozen exp686 legacy-eager micro2 runtime")
     if args.model_revision != MODEL_REVISION:
@@ -667,7 +735,28 @@ def _load_frozen_inputs(args: argparse.Namespace) -> dict[str, Any]:
         source_audit=source_audit,
     )
     parent_code = parent.load_code_acceptance(args.parent_code_acceptance)
+    probe_code = load_probe_code_acceptance(args.probe_code_acceptance)
     vendor = parent.load_vendor_acceptance(args.vendor_acceptance, args.vendor_archive)
+    lineage = {
+        "pair_runtime_contract_sha256": pair_acceptance["runtime_contract_sha256"],
+        "pair_runtime_acceptance_sha256": pair_acceptance["acceptance_sha256"],
+        "source_runtime_contract_sha256": source_audit["contract_sha256"],
+        "parent_code_bundle_sha256": parent_code["bundle_sha256"],
+        "parent_code_revision": parent_code["git_revision"],
+        "parent_code_acceptance_sha256": parent_code["acceptance_sha256"],
+        "probe_code_bundle_sha256": probe_code["bundle_sha256"],
+        "probe_code_revision": probe_code["git_revision"],
+        "probe_code_acceptance_sha256": probe_code["acceptance_sha256"],
+        "vendor_zip_sha256": vendor["vendor_zip_sha256"],
+        "vendor_bridge_sha256": vendor["bridge_sha256"],
+    }
+    mismatch = {
+        key: {"selector": selection.get(key), "current": value}
+        for key, value in lineage.items()
+        if selection.get(key) != value
+    }
+    if mismatch:
+        raise ValueError(f"experiment-687/current-input lineage mismatch: {mismatch}")
     return {
         "train": train,
         "validation": validation,
@@ -676,6 +765,7 @@ def _load_frozen_inputs(args: argparse.Namespace) -> dict[str, Any]:
         "source_audit": source_audit,
         "transport": transport,
         "parent_code": parent_code,
+        "probe_code": probe_code,
         "vendor": vendor,
         "selection": selection,
         "code_bundle_sha256": code_bundle_sha,
@@ -694,7 +784,6 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     validation = frozen["validation"]
     pairs = frozen["pairs"]
     if args.technical_smoke:
-        pairs = pairs[:GRADIENT_ACCUMULATION_PAIRS]
         validation = validation[:2]
     if len(pairs) % GRADIENT_ACCUMULATION_PAIRS:
         raise ValueError("pair count must divide the frozen accumulation exactly")
@@ -756,16 +845,28 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("model has no trainable LoRA parameters")
     parameters = [parameter for _, parameter in named_trainable]
     initial_state_sha = parent.trainable_state_sha256(model)
+    model_lineage = {
+        "model_tree_sha256": model_tree_sha,
+        "initial_trainable_state_sha256": initial_state_sha,
+    }
+    mismatch = {
+        key: {"selector": frozen["selection"].get(key), "current": value}
+        for key, value in model_lineage.items()
+        if frozen["selection"].get(key) != value
+    }
+    if mismatch:
+        raise ValueError(f"experiment-687/current model-init lineage mismatch: {mismatch}")
     optimizer = torch.optim.AdamW(
         parameters, lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY
     )
-    updates = len(pairs) // GRADIENT_ACCUMULATION_PAIRS
-    warmup_steps = max(1, int(updates * WARMUP_RATIO))
+    updates = 1 if args.technical_smoke else len(pairs) // GRADIENT_ACCUMULATION_PAIRS
+    schedule_updates = EXPECTED_UPDATES
+    warmup_steps = max(1, int(schedule_updates * WARMUP_RATIO))
 
     def schedule(step: int) -> float:
         if step < warmup_steps:
             return (step + 1) / warmup_steps
-        progress = (step - warmup_steps) / max(1, updates - warmup_steps)
+        progress = (step - warmup_steps) / max(1, schedule_updates - warmup_steps)
         return 0.5 * (1 + math.cos(math.pi * min(progress, 1.0)))
 
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, schedule)
@@ -774,6 +875,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     ordered_pair_index_sha = hashlib.sha256(
         json.dumps(pair_indices, separators=(",", ":")).encode()
     ).hexdigest()
+    if ordered_pair_index_sha != frozen["selection"]["ordered_pair_index_sha256"]:
+        raise ValueError("experiment-687/current pair-order lineage mismatch")
+    if args.technical_smoke:
+        pair_indices = pair_indices[:GRADIENT_ACCUMULATION_PAIRS]
     pair_lookup = {occurrence_key(row): row for row in train}
     if len(pair_lookup) != len(train):
         raise ValueError("duplicate occurrence key in parent train runtime")
@@ -811,17 +916,18 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         )
         step = len(diagnostics) + 1
         diagnostic["optimizer_step"] = step
+        for parameter, gradient in zip(parameters, combined, strict=True):
+            parameter.grad = gradient.to(device=parameter.device, dtype=parameter.dtype)
+        preclip_norm = torch.nn.utils.clip_grad_norm_(parameters, GRADIENT_CLIP_NORM)
+        if not torch.isfinite(preclip_norm).item():
+            raise FloatingPointError("non-finite combined gradient norm")
+        diagnostic["clip_grad_norm_return"] = float(preclip_norm.item())
         verify_diagnostic_row(
             diagnostic,
             optimizer_step=step,
             mode=args.mode,
             selected_candidate_mode=frozen["selection"]["selected_candidate_mode"],
         )
-        for parameter, gradient in zip(parameters, combined, strict=True):
-            parameter.grad = gradient.to(device=parameter.device, dtype=parameter.dtype)
-        preclip_norm = torch.nn.utils.clip_grad_norm_(parameters, GRADIENT_CLIP_NORM)
-        if not torch.isfinite(preclip_norm).item():
-            raise FloatingPointError("non-finite combined gradient norm")
         optimizer.step()
         scheduler.step()
         optimizer.zero_grad(set_to_none=True)
@@ -923,6 +1029,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "parent_code_bundle_sha256": frozen["parent_code"]["bundle_sha256"],
         "parent_code_revision": frozen["parent_code"]["git_revision"],
         "parent_code_acceptance_sha256": frozen["parent_code"]["acceptance_sha256"],
+        "probe_code_bundle_sha256": frozen["probe_code"]["bundle_sha256"],
+        "probe_code_revision": frozen["probe_code"]["git_revision"],
+        "probe_code_acceptance_sha256": frozen["probe_code"]["acceptance_sha256"],
         "code_bundle_sha256": frozen["code_bundle_sha256"],
         "code_revision": args.code_revision,
         "vendor_zip_sha256": frozen["vendor"]["vendor_zip_sha256"],
@@ -948,7 +1057,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "micro_batch_rows": MICRO_BATCH_ROWS,
         "gradient_accumulation_pairs": GRADIENT_ACCUMULATION_PAIRS,
         "effective_batch_rows": EFFECTIVE_BATCH_ROWS,
-        "pairs": len(pairs),
+        "pairs": len(pair_indices),
         "train_rows": len(train),
         "optimizer_steps_executed": updates,
         "hard_loss_weight": 1.0,
@@ -958,8 +1067,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "gradient_clip_norm": GRADIENT_CLIP_NORM,
         "mode_independent_autograd_paths": {"hard": 1, "rank": 1},
         "training_loss_mean": {
-            "hard": hard_loss_sum / len(pairs),
-            "rank_unweighted": rank_loss_sum / len(pairs),
+            "hard": hard_loss_sum / len(pair_indices),
+            "rank_unweighted": rank_loss_sum / len(pair_indices),
         },
         "gradient_diagnostics_schema_version": DIAGNOSTIC_SCHEMA_VERSION,
         "gradient_diagnostics": summarize_diagnostics(diagnostics),
@@ -1063,7 +1172,7 @@ def verify_training_artifact(args: argparse.Namespace) -> dict[str, Any]:
     expected_pairs = GRADIENT_ACCUMULATION_PAIRS if args.technical_smoke else EXPECTED_PAIRS
     expected_updates = expected_pairs // GRADIENT_ACCUMULATION_PAIRS
     expected_validation_rows = 2 if args.technical_smoke else len(frozen["validation"])
-    pair_indices = list(range(expected_pairs))
+    pair_indices = list(range(EXPECTED_PAIRS))
     random.Random(SEED).shuffle(pair_indices)
     expected_order_sha = hashlib.sha256(
         json.dumps(pair_indices, separators=(",", ":")).encode()
@@ -1081,6 +1190,10 @@ def verify_training_artifact(args: argparse.Namespace) -> dict[str, Any]:
         "objective": "hard_primary_gradient_control_rank_distillation",
         "model_id": MODEL_ID,
         "model_revision": MODEL_REVISION,
+        "model_tree_sha256": frozen["selection"]["model_tree_sha256"],
+        "initial_trainable_state_sha256": frozen["selection"][
+            "initial_trainable_state_sha256"
+        ],
         "pair_runtime_contract_sha256": frozen["pair_acceptance"][
             "runtime_contract_sha256"
         ],
@@ -1096,6 +1209,9 @@ def verify_training_artifact(args: argparse.Namespace) -> dict[str, Any]:
         "parent_code_bundle_sha256": frozen["parent_code"]["bundle_sha256"],
         "parent_code_revision": frozen["parent_code"]["git_revision"],
         "parent_code_acceptance_sha256": frozen["parent_code"]["acceptance_sha256"],
+        "probe_code_bundle_sha256": frozen["probe_code"]["bundle_sha256"],
+        "probe_code_revision": frozen["probe_code"]["git_revision"],
+        "probe_code_acceptance_sha256": frozen["probe_code"]["acceptance_sha256"],
         "code_bundle_sha256": frozen["code_bundle_sha256"],
         "code_revision": args.code_revision,
         "vendor_zip_sha256": frozen["vendor"]["vendor_zip_sha256"],
@@ -1115,7 +1231,7 @@ def verify_training_artifact(args: argparse.Namespace) -> dict[str, Any]:
         "scheduler": {
             "name": "linear_warmup_cosine_decay",
             "warmup_ratio": WARMUP_RATIO,
-            "warmup_steps": max(1, int(expected_updates * WARMUP_RATIO)),
+            "warmup_steps": max(1, int(EXPECTED_UPDATES * WARMUP_RATIO)),
         },
         "micro_batch_pairs": MICRO_BATCH_PAIRS,
         "micro_batch_rows": MICRO_BATCH_ROWS,
@@ -1305,6 +1421,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--pair-runtime", type=Path, required=True)
     result.add_argument("--transport-acceptance", type=Path, required=True)
     result.add_argument("--parent-code-acceptance", type=Path, required=True)
+    result.add_argument("--probe-code-acceptance", type=Path, required=True)
     result.add_argument("--probe-report", type=Path, required=True)
     result.add_argument("--probe-acceptance", type=Path, required=True)
     result.add_argument("--code-bundle", type=Path, required=True)

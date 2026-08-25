@@ -25,4 +25,3 @@ gpu_per_job = 1
 gpu_type = "H100"
 preset_built = false
 jobs_launched = 0
-

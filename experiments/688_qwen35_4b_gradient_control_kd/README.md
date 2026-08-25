@@ -2,9 +2,9 @@
 
 Status: `PREREGISTERED_AWAITING_TERMINAL_EXP687`. Parent: experiment 686.
 
-No preset, upload or job is authorized or present. A terminal, independently
-accepted experiment-687 artifact must select exactly one candidate before even a
-technical smoke can be assembled.
+No generated preset, upload or job is authorized or present. Infrastructure-only
+builders are available, but they fail closed until a terminal, independently
+accepted experiment-687 artifact selects exactly one candidate.
 
 ## Hypothesis and one changed factor
 
@@ -15,18 +15,20 @@ pairs, model, LoRA, initialization, order, seed, optimizer, learning rate,
 scheduler, number of steps, preprocessing or decision threshold.
 
 For every exact effective batch of eight ordered pairs (16 rows), the runtime
-uses one shared forward graph per pair and the same two `autograd.grad` calls in
+uses one shared forward graph per pair and the same two-backward accumulator in
 all arms. It accumulates the mean hard gradient `h` and the mean *unweighted*
 rank gradient `r` separately. The paired control discards `r` only after both
-gradients have been computed, so its applied update is exactly `h` through the
-same autograd path.
+gradients have been computed, so its pre-clip applied gradient is exactly `h`
+through the same autograd path.
 
 There are exactly two preregisterable candidate modes:
 
 1. `asymmetric_hard_primary_pcgrad` is selected only by terminal experiment-687
    decision `OPEN_ASYMMETRIC_PCGRAD_SCREEN`. If `h·r < 0`, only the rank gradient
    is projected: `r' = r - (h·r / ||h||²) h`; otherwise `r' = r`. The applied
-   pre-clip update is `h + 0.5 r'`. The hard gradient is never projected.
+   pre-clip update is `h + 0.5 r'`. The hard gradient is never projected before
+   the common global-norm clip; no claim is made that the clip preserves its
+   absolute magnitude.
 2. `hard_anchored_norm_cap` is selected only by terminal experiment-687 decision
    `ROUTE_MAGNITUDE_CONTROL`. Let `u = 0.5 r`; scale `u` by
    `min(1, 0.5||h|| / ||u||)`, then apply `h + u`. Thus the rank contribution
@@ -57,9 +59,11 @@ Any drift in those fields is a stop condition, not a new exp688 run.
 Every optimizer step emits one `gradient_diagnostics.jsonl` record with exact
 schema and finite values for the hard/rank dot product, cosine, both norms,
 weighted rank norm, conflict flag, hypothetical asymmetric-projection retention,
-norm-cap limit/scale/application, selected rank retention and combined pre-clip
-norm. Hard or rank norm zero, NaN/Inf, missing parameter gradients, a batch other
-than eight pairs, or a diagnostic formula mismatch fails closed.
+norm-cap limit/scale/application, selected rank retention, theoretical combined
+pre-clip norm and the actual value returned by `clip_grad_norm_`. The verifier
+requires the actual and theoretical pre-clip norms to agree. Hard or rank norm
+zero, NaN/Inf, missing parameter gradients, a batch other than eight pairs, or a
+diagnostic formula mismatch fails closed.
 
 The output inventory is exactly the self-hashed `output_contract.json`, the
 diagnostic JSONL, label-free validation predictions and the standard PEFT adapter
@@ -73,9 +77,11 @@ counters before emitting acceptance.
 1. Wait for terminal exp687 plus its independent `ACCEPT_GRADIENT_CONFLICT_PROBE`.
 2. Select exactly the mapped candidate above; no human override or fallback mode.
 3. Independently review this source and freeze a code bundle/revision. Only then
-   may a paired control/candidate technical smoke be proposed. Smoke uses exactly
-   the first shuffled eight pairs, one optimizer step, two label-free validation
-   rows, adapter save/reload, finite diagnostics and one H100 per arm.
+   may a paired control/candidate technical smoke be proposed. The sole current
+   selector lineage is fold3. Smoke runs control then the selected candidate in
+   fresh sequential processes on one H100, using the same first eight positions
+   of the full seed-42 shuffled pair order, one optimizer step per arm, two
+   label-free validation rows and two separate output directories.
 4. A live scientific fold requires a fresh explicit GO after smoke acceptance.
    Candidate and control must share exact source/pair/model/code/runtime bindings.
 5. Evaluation, refit, packaging and Public remain closed until a separately
@@ -90,6 +96,11 @@ gradient dominance, rather than negative alignment, destabilizes the boundary.
 
 ## Entrypoints
 
-`train_gradient_control.py --help` exposes the train and `--technical-smoke`
-path. `verify_training_artifact.py --help` exposes independent artifact replay.
-No remote compute preset is built until terminal exp687 selects one candidate.
+`build_code_bundle.py` and `verify_code_bundle.py` create and accept the exact
+runtime whitelist. `build_remote_compute_preset.py` validates terminal exp687 and the
+parent/probe/exp688 code acceptances before writing a raw preset, secret-free
+clean preset and ignored credential override. `verify_paired_smoke.py` binds the
+two remote arms and rejects code/data/model/init/order/runtime or raw-gradient
+drift. `train_gradient_control.py --help` exposes the one-step
+`--technical-smoke` path. No preset instance is built by this packet; raw and
+override outputs must remain under ignored `.local/` paths.
