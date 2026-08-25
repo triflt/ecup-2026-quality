@@ -58,6 +58,15 @@ labels, BAD is unchanged by construction, and the fast report is authorized
 only to open fold3. Screen/full acceptance still requires the complete frozen
 replay evaluator.
 
+To reduce wall-clock time, the already preregistered fold3 control/candidate
+pair may be trained speculatively after both fold0 jobs have started, provided
+its code, runtimes, presets and output keys are frozen before any outer0
+quality result exists. Speculative execution does **not** open fold3: only job
+state and transport failures may be observed. Predictions, acceptance payloads
+and quality metrics remain sealed in S3 until outer0 returns
+`OPEN_SCREEN_FOLD3`; an outer0 rejection permanently freezes the unread fold3
+outputs as unused. Folds1/2/4 are not eligible for speculative execution.
+
 ## 685B — nested targets only if warranted
 
 Open 685B only if 685A is positive-but-limited or the CPU audit proves that

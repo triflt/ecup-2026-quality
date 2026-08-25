@@ -80,6 +80,12 @@ outer validation fold. Frozen threshold zero remains unchanged in 685A.
   inference genuinely requires it.
 - Control and candidate are submitted in the same wave. With the current
   project cap of 8 GPUs, at most 6 are working and 2 remain reserved.
+- Fold3 control/candidate may use two otherwise idle GPUs as sealed speculative
+  compute only when their immutable presets and output keys were frozen before
+  any outer0 quality result. Until outer0 promotion, monitoring is state-only;
+  fold3 predictions, acceptance reports and metrics are unread. Outer0 reject
+  makes those outputs permanently unused. This exception never applies to
+  folds1/2/4.
 - Polling is event-driven with a 25-minute minimum interval. ETA comes from
   observed rows/second and p90 batch time, not calendar estimates.
 
