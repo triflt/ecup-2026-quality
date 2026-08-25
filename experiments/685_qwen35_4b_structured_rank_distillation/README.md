@@ -75,3 +75,11 @@ until 685A supplies evidence.
 
 Full program and literature mapping:
 [DISTILLATION_RESEARCH_PLAN.md](DISTILLATION_RESEARCH_PLAN.md).
+
+All preparation, training and evaluation artifacts remain in remote compute/S3; the
+workstation holds only code, immutable manifests and compact terminal reports.
+See [REMOTE_EXECUTION_CONTRACT.md](REMOTE_EXECUTION_CONTRACT.md). Local archive
+workarounds are forbidden, and a submission ZIP is downloaded only after all
+scientific/package/runtime gates pass and the user gives fresh approval.
+Team ownership, messaging and GPU rules are frozen in
+[TEAM_OPERATING_PROMPT.md](TEAM_OPERATING_PROMPT.md).

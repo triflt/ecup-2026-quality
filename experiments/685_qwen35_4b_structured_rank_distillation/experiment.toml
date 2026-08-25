@@ -9,6 +9,9 @@ teacher_score_experiment = 662
 stronger_teacher_experiment = 684
 public_submissions = 0
 gpu_jobs = 0
+artifact_execution = "remote_compute_s3_only"
+local_full_artifact_download = false
+local_job_artifact_download = false
 
 [student]
 model = "Qwen/Qwen3.5-4B"
@@ -51,3 +54,12 @@ teacher_packaged = false
 bad_route_byte_identical = true
 runtime_public_minutes_max = 20
 runtime_private_minutes_max = 40
+
+[operations]
+project_gpu_cap = 8
+working_gpu_cap = 6
+reserved_gpus = 2
+cheap_eval_in_training_job = true
+independent_eval_in_remote_compute = true
+s3_keys_immutable = true
+submission_zip_requires_fresh_user_approval = true

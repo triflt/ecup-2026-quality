@@ -1,0 +1,88 @@
+# remote compute / S3 execution contract
+
+Status: frozen before the first 685 live job.
+
+## Purpose
+
+Corporate datasets, predictions, teacher scores, pair packets, adapters and
+model outputs and terminal reports stay in approved remote compute/S3 storage. The
+local workstation is a control plane for reviewed code, immutable remote
+references, job receipts, URIs/SHA and concise human-readable summaries. It is
+not an artifact-processing environment.
+
+## Data flow
+
+1. Each input is addressed by a unique S3 key plus SHA-256. Existing keys are
+   immutable and are never overwritten.
+2. An remote compute preparation job reads accepted source artifacts from approved
+   S3, builds the fold-specific 685 pair runtime, verifies it in the same job
+   and writes the runtime plus acceptance report to a new S3 prefix.
+3. Training jobs read only an accepted pair-runtime key and its frozen SHA.
+   Control and candidate use the same runtime, model revision, seed, batches,
+   steps and validation rows. The sole changed factor is the rank term.
+4. Every training job computes label-free structural/runtime checks before exit
+   and writes predictions, adapter and a self-hashed result contract to S3.
+5. Performance checks run as separate minimal remote compute eval jobs. They alone
+   receive the frozen label packet, read predictions by S3 key and emit a
+   compact self-hashed metrics JSON. Training code cannot read validation
+   labels.
+6. No job output artifact, including compact metrics JSON, is downloaded to the
+   workstation. Terminal values may be inspected through logs/API and recorded
+   as a summary plus remote URI/SHA. A full ZIP is downloaded only for a
+   candidate that passed scientific, package and runtime gates and is ready for
+   submission, after fresh explicit user approval.
+
+## Eval placement
+
+Run inside every training job without validation labels:
+
+- finite/output-schema and exact row-binding checks;
+- peak GPU memory, throughput and ETA telemetry;
+- adapter save/reload parity and provenance hashes.
+
+Run as a separate CPU eval job for each accepted prediction set:
+
+- flammable AP, F1, FP/FN and calibration diagnostics;
+- routed Macro F1 with byte-identical BAD predictions;
+- corrections/regressions and semantic-singleton slices;
+- paired control-versus-candidate bootstrap;
+- five-fold aggregate and stability gates;
+- error-component attribution or large slice joins;
+- cross-check using an evaluator not packaged with the trainer;
+
+Use a separate minimal-GPU job only for production package/runtime rehearsal
+or an evaluator that genuinely performs model inference.
+
+The evaluator never selects thresholds, weights or hyperparameters using an
+outer validation fold. Frozen threshold zero remains unchanged in 685A.
+
+## Latency controls
+
+- Preparation, training and evaluation use content-addressed inputs, so an
+  accepted pair packet or prediction set is reused without regeneration.
+- Label-free checks are fused into training. Performance eval jobs default to
+  CPU; one GPU is allowed only when evaluator
+  inference genuinely requires it.
+- Control and candidate are submitted in the same wave. With the current
+  project cap of 8 GPUs, at most 6 are working and 2 remain reserved.
+- Polling is event-driven with a 25-minute minimum interval. ETA comes from
+  observed rows/second and p90 batch time, not calendar estimates.
+
+Expected overhead is one small S3 read/write per stage plus remote compute queue time.
+For multi-minute training this is minor; it is smaller than the time lost to
+local downloads, DLP failures and repeated verification.
+
+## Security and failure policy
+
+Corporate DLP/EDR/quarantine/provenance controls are never bypassed. On
+`Operation not permitted`, `Permission denied` or any sign of a protection
+block, stop accessing and transforming that object, preserve it and its
+metadata, and report the event. Do not remove provenance/quarantine metadata,
+change permissions or flags, copy, rename, repack, or retry with another tool.
+
+Before any local download of a corporate archive containing data,
+predictions/model outputs, or larger than 50 MB, obtain fresh explicit user
+approval. Corporate artifacts may be written only to the approved project
+storage. Transport and scientific failures are classified separately; an
+exact retry is allowed only for a proven transport-only failure with unchanged
+scientific inputs and contracts.
