@@ -6,12 +6,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
-MODULE_PATH = (
-    ROOT
-    / "experiments/685_qwen35_4b_structured_rank_distillation/build_remote_compute_preset.py"
-)
+MODULE_PATH = ROOT / "experiments/685_qwen35_4b_structured_rank_distillation/build_remote_compute_preset.py"
 SPEC = importlib.util.spec_from_file_location("exp685_remote_compute_preset", MODULE_PATH)
 if SPEC is None or SPEC.loader is None:
     raise ImportError(MODULE_PATH)
@@ -33,6 +29,31 @@ BASE = """job:
 
 
 class RemotePresetTests(unittest.TestCase):
+    def test_vault_s3_auth_is_all_or_nothing_and_never_literal(self):
+        empty = argparse.Namespace()
+        self.assertEqual(MODULE.s3_auth(empty), (None, None, None))
+        incomplete = argparse.Namespace(
+            vault_auth_role="team__ds_data_plane-ro",
+            s3_access_key_vault_ref="vault:team/data/s3#access_key",
+            s3_secret_key_vault_ref=None,
+        )
+        with self.assertRaises(ValueError):
+            MODULE.s3_auth(incomplete)
+
+        configured = argparse.Namespace(
+            vault_auth_role="team__ds_data_plane-ro",
+            s3_access_key_vault_ref="vault:team/data/s3#access_key",
+            s3_secret_key_vault_ref="vault:team/data/s3#secret_key",
+        )
+        self.assertEqual(
+            MODULE.s3_auth(configured),
+            (
+                "team__ds_data_plane-ro",
+                "vault:team/data/s3#access_key",
+                "vault:team/data/s3#secret_key",
+            ),
+        )
+
     def test_path_scope_is_fail_closed(self):
         self.assertEqual(
             MODULE.safe_s3_path(
@@ -107,6 +128,33 @@ class RemotePresetTests(unittest.TestCase):
         self.assertNotIn("type: files", payload)
         self.assertIn("bridge_legacy_teacher.py", payload)
         self.assertIn("when: on_job_status=succeeded", payload)
+
+    def test_legacy_bridge_supports_vault_references(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory) / "base.yaml"
+            base.write_text(BASE, encoding="utf-8")
+            args = argparse.Namespace(
+                base_preset=base,
+                time_limit="20m",
+                flavor="8cpu-128ram",
+                bucket="approved-bucket",
+                vault_auth_role="team__ds_data_plane-ro",
+                s3_access_key_vault_ref="vault:team/data/s3#access_key",
+                s3_secret_key_vault_ref="vault:team/data/s3#secret_key",
+                code_bundle_src="/approved/project/exp685/code",
+                code_bundle_file="code_abc.tar.gz",
+                code_bundle_sha256="a" * 64,
+                artifact_src=["0=job0/output0", "3=job3/output3"],
+                expected_score_sha=["0=" + "b" * 64, "3=" + "c" * 64],
+                expected_archive_sha=["0=" + "d" * 64, "3=" + "e" * 64],
+                output_dst="/approved/project/exp685/bridge/run1",
+            )
+            payload = MODULE.build_bridge(args)
+        self.assertIn('auth_role: "team__ds_data_plane-ro"', payload)
+        self.assertEqual(payload.count("access_key: vault:"), 0)
+        self.assertEqual(payload.count('access_key: "vault:'), 2)
+        self.assertEqual(payload.count('secret_key: "vault:'), 2)
+        self.assertNotIn("type: files", payload)
 
     def test_prepare_uses_frozen_remote_bundles(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -80,6 +80,22 @@ Expected overhead is one small S3 read/write per stage plus remote compute queue
 For multi-minute training this is minor; it is smaller than the time lost to
 local downloads, DLP failures and repeated verification.
 
+## S3 authorization gate
+
+Every preset uses exactly one of two approved modes:
+
+1. a bucket with native remote compute integration in the job tenant; or
+2. cross-tenant S3 credentials referenced from Vault with an exact
+   `vault.auth_role`, access-key reference and secret-key reference.
+
+The three Vault settings are all-or-nothing. Literal credentials are forbidden
+in source, git, shell history, presets and chat. A missing native integration or
+an incomplete Vault configuration is a pre-submit transport failure and must
+not fall back to local downloads, managed artifact outputs or guessed storage
+names. The current approved external bucket failed the native-integration
+precondition before job creation; no 685 scientific job may start until one of
+the two modes above is proven by a dry-run and a minimal remote-only bridge.
+
 ## Security and failure policy
 
 Corporate DLP/EDR/quarantine/provenance controls are never bypassed. On

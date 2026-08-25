@@ -4,22 +4,18 @@ import argparse
 import json
 import re
 import shlex
-from pathlib import PurePosixPath, Path
-
+from pathlib import Path, PurePosixPath
 
 EXPERIMENT_DIR = "experiments/685_qwen35_4b_structured_rank_distillation"
 MODEL_REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
 STAGE_FOLDS = {"outer0": (0,), "screen": (0, 3), "full": (0, 1, 2, 3, 4)}
 TEACHER_AGGREGATE = (
-    "experiments/662_qwen36_27b_outer_train_scoring/"
-    "results/full_target_set_acceptance.json"
+    "experiments/662_qwen36_27b_outer_train_scoring/results/full_target_set_acceptance.json"
 )
 
 
 def scalar(text: str, key: str, indent: int = 2) -> str:
-    match = re.search(
-        rf"^{' ' * indent}{re.escape(key)}:\s*(.+?)\s*$", text, re.MULTILINE
-    )
+    match = re.search(rf"^{' ' * indent}{re.escape(key)}:\s*(.+?)\s*$", text, re.MULTILINE)
     if match is None:
         raise ValueError(f"missing base-preset key: {key}")
     return match.group(1)
@@ -50,6 +46,27 @@ def sha256_value(value: str) -> str:
     return value
 
 
+def s3_auth(args: argparse.Namespace) -> tuple[str | None, str | None, str | None]:
+    auth_role = getattr(args, "vault_auth_role", None)
+    access_ref = getattr(args, "s3_access_key_vault_ref", None)
+    secret_ref = getattr(args, "s3_secret_key_vault_ref", None)
+    configured = [value is not None for value in (auth_role, access_ref, secret_ref)]
+    if any(configured) and not all(configured):
+        raise ValueError("vault auth role and both S3 Vault references must be configured together")
+    if not any(configured):
+        return None, None, None
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+", auth_role):
+        raise ValueError("unsafe Vault auth role")
+    vault_pattern = re.compile(r"vault:[A-Za-z0-9_.-]+/data/[A-Za-z0-9_./-]+#[A-Za-z0-9_.-]+")
+    for reference in (access_ref, secret_ref):
+        if not vault_pattern.fullmatch(reference):
+            raise ValueError("unsafe Vault secret reference")
+        secret_path = reference.removeprefix("vault:").partition("#")[0]
+        if ".." in PurePosixPath(secret_path).parts:
+            raise ValueError("unsafe Vault secret path")
+    return auth_role, access_ref, secret_ref
+
+
 def input_spec(
     *,
     bucket: str,
@@ -57,6 +74,8 @@ def input_spec(
     dst: str,
     file: str | None = None,
     cluster_cache: bool = False,
+    access_key_ref: str | None = None,
+    secret_key_ref: str | None = None,
 ) -> list[str]:
     lines = [
         "    - type: s3msk",
@@ -64,6 +83,15 @@ def input_spec(
         f"      dst: {json.dumps(dst)}",
         f"      bucket: {json.dumps(bucket)}",
     ]
+    if (access_key_ref is None) != (secret_key_ref is None):
+        raise ValueError("both S3 Vault references are required together")
+    if access_key_ref is not None:
+        lines.extend(
+            [
+                f"      access_key: {json.dumps(access_key_ref)}",
+                f"      secret_key: {json.dumps(secret_key_ref)}",
+            ]
+        )
     if file:
         if PurePosixPath(file).name != file or file in {".", ".."}:
             raise ValueError("S3 file must be one safe basename")
@@ -79,15 +107,35 @@ def input_spec(
     return lines
 
 
-def output_spec(*, bucket: str, dst: str) -> list[str]:
-    return [
+def output_spec(
+    *,
+    bucket: str,
+    dst: str,
+    access_key_ref: str | None = None,
+    secret_key_ref: str | None = None,
+) -> list[str]:
+    if (access_key_ref is None) != (secret_key_ref is None):
+        raise ValueError("both S3 Vault references are required together")
+    lines = [
         "    - type: s3msk",
         "      src: /work/output",
         f"      dst: {json.dumps(dst)}",
         f"      bucket: {json.dumps(bucket)}",
-        "      upload_policies:",
-        "        - when: on_job_status=succeeded",
     ]
+    if access_key_ref is not None:
+        lines.extend(
+            [
+                f"      access_key: {json.dumps(access_key_ref)}",
+                f"      secret_key: {json.dumps(secret_key_ref)}",
+            ]
+        )
+    lines.extend(
+        [
+            "      upload_policies:",
+            "        - when: on_job_status=succeeded",
+        ]
+    )
+    return lines
 
 
 def artifact_input_spec(*, src: str, dst: str) -> list[str]:
@@ -113,7 +161,7 @@ def extract_segment(archive: str, destination: str, expected_sha256: str) -> str
     )
     return (
         f"test \"$(sha256sum {shlex.quote(archive)} | cut -d' ' -f1)\" = "
-        f"\"{expected_sha256}\" && mkdir -p {shlex.quote(destination)} && "
+        f'"{expected_sha256}" && mkdir -p {shlex.quote(destination)} && '
         f"python3 -c {shlex.quote(python)} {shlex.quote(archive)} "
         f"{shlex.quote(destination)}"
     )
@@ -125,12 +173,15 @@ def code_bootstrap(args: argparse.Namespace) -> str:
 
 
 def code_input(args: argparse.Namespace) -> list[str]:
+    _, access_ref, secret_ref = s3_auth(args)
     return input_spec(
         bucket=args.bucket,
         src=args.code_bundle_src,
         file=args.code_bundle_file,
         dst=f"/work/input/code/{args.code_bundle_file}",
         cluster_cache=True,
+        access_key_ref=access_ref,
+        secret_key_ref=secret_ref,
     )
 
 
@@ -165,7 +216,8 @@ def base_values(args: argparse.Namespace) -> dict[str, str]:
 
 def header(args: argparse.Namespace, *, name: str, command: str) -> list[str]:
     values = base_values(args)
-    return [
+    auth_role, _, _ = s3_auth(args)
+    lines = [
         "job:",
         f"  generate_name: {name}",
         f"  time_limit: {values['time_limit']}",
@@ -174,18 +226,31 @@ def header(args: argparse.Namespace, *, name: str, command: str) -> list[str]:
         f"  image: {values['image']}",
         f"  preemption: {values['preemption']}",
         f"  work_dir: {values['work_dir']}",
-        "  env:",
-        f"    TOKENIZERS_PARALLELISM: {values['tokenizers']}",
-        f"    PYTORCH_ALLOC_CONF: {values['allocator']}",
-        "  entrypoint: /bin/bash",
-        "  args:",
-        "    - -lc",
-        "    - >-",
-        f"      {command}",
     ]
+    if auth_role is not None:
+        lines.extend(
+            [
+                "  vault:",
+                f"    auth_role: {json.dumps(auth_role)}",
+            ]
+        )
+    lines.extend(
+        [
+            "  env:",
+            f"    TOKENIZERS_PARALLELISM: {values['tokenizers']}",
+            f"    PYTORCH_ALLOC_CONF: {values['allocator']}",
+            "  entrypoint: /bin/bash",
+            "  args:",
+            "    - -lc",
+            "    - >-",
+            f"      {command}",
+        ]
+    )
+    return lines
 
 
 def build_bridge(args: argparse.Namespace) -> str:
+    _, access_ref, secret_ref = s3_auth(args)
     folds = (0, 3)
     artifacts = parse_fold_sources(args.artifact_src, folds, "legacy artifact")
     score_sha = parse_fold_sources(args.expected_score_sha, folds, "score SHA")
@@ -208,20 +273,24 @@ def build_bridge(args: argparse.Namespace) -> str:
     lines.append("  input:")
     lines.extend(code_input(args))
     for fold in folds:
-        lines.extend(
-            artifact_input_spec(src=artifacts[fold], dst=f"/work/legacy/fold{fold}")
-        )
+        lines.extend(artifact_input_spec(src=artifacts[fold], dst=f"/work/legacy/fold{fold}"))
     lines.append("  output:")
-    lines.extend(output_spec(bucket=args.bucket, dst=args.output_dst))
+    lines.extend(
+        output_spec(
+            bucket=args.bucket,
+            dst=args.output_dst,
+            access_key_ref=access_ref,
+            secret_key_ref=secret_ref,
+        )
+    )
     return "\n".join(lines) + "\n"
 
 
 def build_prepare(args: argparse.Namespace) -> str:
+    _, access_ref, secret_ref = s3_auth(args)
     source_runtime = f"/work/source/{safe_relative(args.source_runtime_rel)}"
     teacher_runtime = f"/work/teacher/{safe_relative(args.teacher_runtime_rel)}"
-    teacher_artifact = (
-        f"/work/teacher_scores/{safe_relative(args.teacher_artifact_rel)}"
-    )
+    teacher_artifact = f"/work/teacher_scores/{safe_relative(args.teacher_artifact_rel)}"
     source_archive = f"/work/input/source/{args.source_bundle_file}"
     teacher_archive = f"/work/input/teacher/{args.teacher_bundle_file}"
     command = (
@@ -251,6 +320,8 @@ def build_prepare(args: argparse.Namespace) -> str:
             file=args.source_bundle_file,
             dst=source_archive,
             cluster_cache=True,
+            access_key_ref=access_ref,
+            secret_key_ref=secret_ref,
         ),
         input_spec(
             bucket=args.bucket,
@@ -258,20 +329,32 @@ def build_prepare(args: argparse.Namespace) -> str:
             file=args.teacher_bundle_file,
             dst=teacher_archive,
             cluster_cache=True,
+            access_key_ref=access_ref,
+            secret_key_ref=secret_ref,
         ),
         input_spec(
             bucket=args.bucket,
             src=args.teacher_scores_src,
             dst="/work/teacher_scores",
+            access_key_ref=access_ref,
+            secret_key_ref=secret_ref,
         ),
     ):
         lines.extend(spec)
     lines.append("  output:")
-    lines.extend(output_spec(bucket=args.bucket, dst=args.output_dst))
+    lines.extend(
+        output_spec(
+            bucket=args.bucket,
+            dst=args.output_dst,
+            access_key_ref=access_ref,
+            secret_key_ref=secret_ref,
+        )
+    )
     return "\n".join(lines) + "\n"
 
 
 def build_train(args: argparse.Namespace) -> str:
+    _, access_ref, secret_ref = s3_auth(args)
     smoke = " --technical-smoke" if args.technical_smoke else ""
     command = (
         f"{code_bootstrap(args)} && "
@@ -296,7 +379,13 @@ def build_train(args: argparse.Namespace) -> str:
     lines.append("  input:")
     for spec in (
         code_input(args),
-        input_spec(bucket=args.bucket, src=args.pair_src, dst="/work/pair"),
+        input_spec(
+            bucket=args.bucket,
+            src=args.pair_src,
+            dst="/work/pair",
+            access_key_ref=access_ref,
+            secret_key_ref=secret_ref,
+        ),
     ):
         lines.extend(spec)
     model_input = args.model_input_line_file.read_text(encoding="utf-8").strip()
@@ -304,11 +393,19 @@ def build_train(args: argparse.Namespace) -> str:
         raise ValueError("model registry input line is invalid")
     lines.append(f"    - {model_input}")
     lines.append("  output:")
-    lines.extend(output_spec(bucket=args.bucket, dst=args.output_dst))
+    lines.extend(
+        output_spec(
+            bucket=args.bucket,
+            dst=args.output_dst,
+            access_key_ref=access_ref,
+            secret_key_ref=secret_ref,
+        )
+    )
     return "\n".join(lines) + "\n"
 
 
 def build_eval(args: argparse.Namespace) -> str:
+    _, access_ref, secret_ref = s3_auth(args)
     folds = STAGE_FOLDS[args.eval_stage]
     candidates = parse_fold_sources(args.candidate_src, folds, "candidate")
     controls = parse_fold_sources(args.control_src, folds, "control")
@@ -334,13 +431,23 @@ def build_eval(args: argparse.Namespace) -> str:
     lines = header(args, name=f"kd-eval-{args.eval_stage}", command=command)
     lines.append("  input:")
     lines.extend(code_input(args))
-    lines.extend(input_spec(bucket=args.bucket, src=args.replay_src, dst="/work/replay"))
+    lines.extend(
+        input_spec(
+            bucket=args.bucket,
+            src=args.replay_src,
+            dst="/work/replay",
+            access_key_ref=access_ref,
+            secret_key_ref=secret_ref,
+        )
+    )
     for fold in folds:
         lines.extend(
             input_spec(
                 bucket=args.bucket,
                 src=candidates[fold],
                 dst=f"/work/candidate/fold{fold}",
+                access_key_ref=access_ref,
+                secret_key_ref=secret_ref,
             )
         )
         lines.extend(
@@ -348,20 +455,30 @@ def build_eval(args: argparse.Namespace) -> str:
                 bucket=args.bucket,
                 src=controls[fold],
                 dst=f"/work/control/fold{fold}",
+                access_key_ref=access_ref,
+                secret_key_ref=secret_ref,
             )
         )
     lines.append("  output:")
-    lines.extend(output_spec(bucket=args.bucket, dst=args.output_dst))
+    lines.extend(
+        output_spec(
+            bucket=args.bucket,
+            dst=args.output_dst,
+            access_key_ref=access_ref,
+            secret_key_ref=secret_ref,
+        )
+    )
     return "\n".join(lines) + "\n"
 
 
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
-    result.add_argument(
-        "--stage", choices=("bridge", "prepare", "train", "eval"), required=True
-    )
+    result.add_argument("--stage", choices=("bridge", "prepare", "train", "eval"), required=True)
     result.add_argument("--base-preset", type=Path, required=True)
     result.add_argument("--bucket", required=True)
+    result.add_argument("--vault-auth-role")
+    result.add_argument("--s3-access-key-vault-ref")
+    result.add_argument("--s3-secret-key-vault-ref")
     result.add_argument("--allowed-prefix", required=True)
     result.add_argument("--code-bundle-src", required=True)
     result.add_argument("--code-bundle-file", required=True)
