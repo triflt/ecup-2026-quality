@@ -1,6 +1,24 @@
 # Experiment 686 — additive pairwise rank distillation
 
-Status: `PREREGISTERED_PRE_GPU`.
+Status: `TERMINAL_REJECT_CONFIRMATION`.
+
+## Terminal result
+
+The blind fold-3 screen passed, but the preregistered folds 1/2/4 confirmation
+failed. The additive rank term retained a useful ranking signal: mean flammable
+AP increased by `+0.014763712`. That gain did not transfer stably to the frozen
+decision boundary. Direct Macro-F1 improved by only `+0.003490358` pooled and
+`+0.002687758` as the mean fold delta; fold 2 was negative, flammable F1 rose by
+only `+0.006980716`, false negatives increased from 16 to 17, and the
+correction/regression ratio was `10/8 = 1.25`.
+
+The frozen production comparison was weaker: Macro-F1 changed by
+`+0.000665090`, flammable F1 by `+0.001330180`, and false negatives increased
+from 15 to 17. BAD predictions remained byte-identical. The terminal decision
+is therefore `REJECT_CONFIRMATION`; fold 0, full replay, refit, packaging and
+Public submission are closed. No lambda or threshold sweep is permitted. The
+result supports the next preregistered mechanism: preserve the teacher ranking
+signal while controlling rank-gradient conflict or dominance.
 
 ## Motivation
 
