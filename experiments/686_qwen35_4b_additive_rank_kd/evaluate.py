@@ -296,6 +296,36 @@ def verify_promotion_lineage(
             raise ValueError("training artifact promotion lineage mismatch")
 
 
+def verify_parent_artifact_evidence(
+    *,
+    stage: str,
+    promotion: dict[str, Any] | None,
+    control: dict[int, dict[str, Any]],
+    candidate: dict[int, dict[str, Any]],
+) -> None:
+    if stage != "full":
+        return
+    if promotion is None:
+        raise ValueError("full evaluation lacks confirmation evidence")
+    confirmation_folds = (1, 2, 4)
+    expected = {
+        "candidate_acceptance_sha256": [
+            candidate[fold]["acceptance_sha256"] for fold in confirmation_folds
+        ],
+        "control_acceptance_sha256": [
+            control[fold]["acceptance_sha256"] for fold in confirmation_folds
+        ],
+        "candidate_prediction_sha256": [
+            candidate[fold]["predictions_sha256"] for fold in confirmation_folds
+        ],
+        "control_prediction_sha256": [
+            control[fold]["predictions_sha256"] for fold in confirmation_folds
+        ],
+    }
+    if any(promotion.get(key) != value for key, value in expected.items()):
+        raise ValueError("full-stage artifacts differ from confirmation evidence")
+
+
 def evaluate(args: argparse.Namespace) -> dict[str, Any]:
     if args.output.exists():
         raise FileExistsError("refusing to overwrite evaluation")
@@ -345,6 +375,12 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
         promotion_file_sha256=promotion_file_sha256,
         promotion_evaluation_file_sha256=promotion_evaluation_file_sha256,
         promotion_source=args.promotion_receipt_source,
+    )
+    verify_parent_artifact_evidence(
+        stage=args.stage,
+        promotion=promotion,
+        control=control_acceptances,
+        candidate=candidate_acceptances,
     )
     if (
         sha256_file(args.bundle) != BASE.FROZEN_BUNDLE_SHA256
@@ -486,7 +522,7 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
             "semantic_singleton_net_positive": (
                 singleton_corrected - singleton_regressed > 0
             ),
-            "production_macro_nonnegative": production_metrics["mean_fold_delta"] >= 0.0,
+            "production_macro_nonnegative": production_metrics["macro_delta"] >= 0.0,
         }
         decision = "OPEN_FULL_REPLAY" if all(gates.values()) else "REJECT_CONFIRMATION"
     else:
@@ -635,7 +671,7 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
         "replay_contract_sha256": sha256_file(args.replay_contract),
         "registry_sha256": sha256_file(args.registry),
         "validation_labels_read_by_training": 0,
-        "validation_labels_read_by_evaluator": int(selected.sum()),
+        "validation_labels_read_by_evaluator": len(labels),
         "sealed_rows": 0,
         "public_used": False,
         "threshold_tuned": False,

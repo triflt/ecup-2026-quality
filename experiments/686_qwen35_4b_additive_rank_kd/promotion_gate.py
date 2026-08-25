@@ -111,6 +111,19 @@ def verify_promotion_gate(
     evaluation_digest = evaluation_body.pop("evaluation_sha256", None)
     if evaluation_digest != canonical_sha256(evaluation_body):
         raise ValueError("scientific evaluation self-hash mismatch")
+    raw_expected = {
+        "schema_version": 1,
+        "experiment_id": EXPERIMENT_ID,
+        "stage": expected_stage,
+        "folds": expected_folds,
+        "passed": True,
+        "decision": expected_decision,
+        "validation_labels_read_by_training": 0,
+        "sealed_rows": 0,
+        "public_used": False,
+    }
+    if any(evaluation.get(key) != value for key, value in raw_expected.items()):
+        raise ValueError("raw scientific evaluation does not authorize this stage")
     expected = {
         "schema_version": 1,
         "experiment_id": EXPERIMENT_ID,
@@ -186,4 +199,15 @@ def verify_promotion_gate(
             raise ValueError("promotion gate lacks parent-stage lineage")
     if expected_stage == "blind3" and expected_parent != (None, None, None, None):
         raise ValueError("blind3 promotion gate must not have a parent")
+    evaluation_parent = tuple(
+        evaluation.get(field)
+        for field in (
+            "promotion_receipt_sha256",
+            "promotion_receipt_file_sha256",
+            "promotion_evaluation_file_sha256",
+            "promotion_receipt_source",
+        )
+    )
+    if evaluation_parent != expected_parent:
+        raise ValueError("promotion parent differs from raw scientific evaluation")
     return gate

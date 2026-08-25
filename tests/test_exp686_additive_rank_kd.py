@@ -80,6 +80,12 @@ def write_promotion_receipt(
             "parent_promotion_evaluation_file_sha256": None,
             "parent_promotion_source": None,
         }
+        evaluation_parent = {
+            "promotion_receipt_sha256": None,
+            "promotion_receipt_file_sha256": None,
+            "promotion_evaluation_file_sha256": None,
+            "promotion_receipt_source": None,
+        }
     elif stage == "confirmation":
         folds = [1, 2, 4]
         decision = "OPEN_FULL_REPLAY"
@@ -89,6 +95,12 @@ def write_promotion_receipt(
             "parent_promotion_gate_file_sha256": "e" * 64,
             "parent_promotion_evaluation_file_sha256": "f" * 64,
             "parent_promotion_source": "/approved/project/exp686/eval/f3",
+        }
+        evaluation_parent = {
+            "promotion_receipt_sha256": "d" * 64,
+            "promotion_receipt_file_sha256": "e" * 64,
+            "promotion_evaluation_file_sha256": "f" * 64,
+            "promotion_receipt_source": "/approved/project/exp686/eval/f3",
         }
     else:
         raise ValueError(stage)
@@ -113,6 +125,7 @@ def write_promotion_receipt(
         "replay_bundle_sha256": "5" * 64,
         "replay_contract_sha256": "6" * 64,
         "registry_sha256": "7" * 64,
+        **evaluation_parent,
     }
     evaluation["evaluation_sha256"] = PRESET.canonical_sha256(evaluation)
     evaluation_path = root / f"{stage}_evaluation.json"
@@ -131,6 +144,8 @@ def write_promotion_receipt(
         "gate_main_revision": "9" * 40,
         **parent,
     }
+    for field in evaluation_parent:
+        gate.pop(field, None)
     gate.pop("validation_labels_read_by_evaluator", None)
     gate["promotion_gate_sha256"] = PRESET.canonical_sha256(gate)
     gate_path = root / f"{stage}_promotion_gate.json"
@@ -140,6 +155,11 @@ def write_promotion_receipt(
 
 
 class AdditiveRankKDTests(unittest.TestCase):
+    def test_average_precision_is_tie_aware(self):
+        labels = np.array([1, 0, 1, 0], dtype=np.int8)
+        scores = np.array([0.5, 0.5, 0.2, 0.1], dtype=np.float64)
+        self.assertAlmostEqual(EVALUATE.BASE.average_precision(labels, scores), 7.0 / 12.0)
+
     def test_r0_code_acceptance_is_exactly_bound(self):
         payload = {
             "schema_version": 1,
@@ -380,6 +400,103 @@ class AdditiveRankKDTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "requires a frozen promotion"):
             PRESET.validate_promotion_receipt(args, fold=1)
+
+    def test_promotion_gate_binds_raw_stage_and_parent_lineage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            gate_path, _, evaluation_path, _ = write_promotion_receipt(
+                root, stage="confirmation"
+            )
+            PROMOTION.verify_promotion_gate(
+                gate_path,
+                evaluation_path,
+                expected_stage="confirmation",
+                expected_folds=[1, 2, 4],
+                expected_decision="OPEN_FULL_REPLAY",
+                expected_source="approved/project/exp686/eval/confirmation",
+            )
+
+            evaluation = json.loads(evaluation_path.read_text(encoding="utf-8"))
+            evaluation["stage"] = "blind3"
+            evaluation_body = dict(evaluation)
+            evaluation_body.pop("evaluation_sha256")
+            evaluation["evaluation_sha256"] = PRESET.canonical_sha256(evaluation_body)
+            evaluation_path.write_text(json.dumps(evaluation), encoding="utf-8")
+            gate = json.loads(gate_path.read_text(encoding="utf-8"))
+            gate["evaluation_sha256"] = evaluation["evaluation_sha256"]
+            gate["evaluation_file_sha256"] = PROMOTION.sha256_file(evaluation_path)
+            gate_body = dict(gate)
+            gate_body.pop("promotion_gate_sha256")
+            gate["promotion_gate_sha256"] = PRESET.canonical_sha256(gate_body)
+            gate_path.write_text(json.dumps(gate), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "raw scientific evaluation"):
+                PROMOTION.verify_promotion_gate(
+                    gate_path,
+                    evaluation_path,
+                    expected_stage="confirmation",
+                    expected_folds=[1, 2, 4],
+                    expected_decision="OPEN_FULL_REPLAY",
+                )
+
+            evaluation["stage"] = "confirmation"
+            evaluation["promotion_receipt_sha256"] = "0" * 64
+            evaluation_body = dict(evaluation)
+            evaluation_body.pop("evaluation_sha256")
+            evaluation["evaluation_sha256"] = PRESET.canonical_sha256(evaluation_body)
+            evaluation_path.write_text(json.dumps(evaluation), encoding="utf-8")
+            gate["evaluation_sha256"] = evaluation["evaluation_sha256"]
+            gate["evaluation_file_sha256"] = PROMOTION.sha256_file(evaluation_path)
+            gate_body = dict(gate)
+            gate_body.pop("promotion_gate_sha256")
+            gate["promotion_gate_sha256"] = PRESET.canonical_sha256(gate_body)
+            gate_path.write_text(json.dumps(gate), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "parent differs"):
+                PROMOTION.verify_promotion_gate(
+                    gate_path,
+                    evaluation_path,
+                    expected_stage="confirmation",
+                    expected_folds=[1, 2, 4],
+                    expected_decision="OPEN_FULL_REPLAY",
+                )
+
+    def test_full_stage_reuses_exact_confirmation_artifacts(self):
+        folds = (1, 2, 4)
+        control = {
+            fold: {
+                "acceptance_sha256": str(fold) * 64,
+                "predictions_sha256": str(fold + 1) * 64,
+            }
+            for fold in folds
+        }
+        candidate = {
+            fold: {
+                "acceptance_sha256": str(fold + 2) * 64,
+                "predictions_sha256": str(fold + 3) * 64,
+            }
+            for fold in folds
+        }
+        promotion = {
+            "candidate_acceptance_sha256": [
+                candidate[fold]["acceptance_sha256"] for fold in folds
+            ],
+            "control_acceptance_sha256": [
+                control[fold]["acceptance_sha256"] for fold in folds
+            ],
+            "candidate_prediction_sha256": [
+                candidate[fold]["predictions_sha256"] for fold in folds
+            ],
+            "control_prediction_sha256": [
+                control[fold]["predictions_sha256"] for fold in folds
+            ],
+        }
+        EVALUATE.verify_parent_artifact_evidence(
+            stage="full", promotion=promotion, control=control, candidate=candidate
+        )
+        promotion["candidate_prediction_sha256"][1] = "f" * 64
+        with self.assertRaisesRegex(ValueError, "confirmation evidence"):
+            EVALUATE.verify_parent_artifact_evidence(
+                stage="full", promotion=promotion, control=control, candidate=candidate
+            )
 
     def test_evaluator_binds_artifacts_to_exact_stage_receipt(self):
         receipt = {"promotion_gate_sha256": "a" * 64}
