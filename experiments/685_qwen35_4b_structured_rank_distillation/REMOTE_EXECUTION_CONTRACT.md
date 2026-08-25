@@ -34,6 +34,13 @@ not an artifact-processing environment.
    receive the frozen label packet, read predictions by S3 key and emit a
    compact self-hashed metrics JSON. Training code cannot read validation
    labels.
+   For the outer0 promotion decision, a prebuilt CPU fast evaluator reconstructs
+   fold0 labels only inside remote compute from the accepted fold3 outer-train runtime,
+   joins them by exact `global_index/id/fold/category`, and compares the paired
+   control and rank candidate directly. Because BAD is frozen byte-identical,
+   its exact routed Macro delta is one half of the flammable F1 delta. This fast
+   report is authoritative only for `OPEN_SCREEN_FOLD3`; later screen/full gates
+   still require the complete frozen replay evaluator.
 6. No job output artifact, including compact metrics JSON, is downloaded to the
    workstation. Terminal values may be inspected through logs/API and recorded
    as a summary plus remote URI/SHA. A full ZIP is downloaded only for a

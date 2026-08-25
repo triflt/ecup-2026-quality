@@ -582,11 +582,57 @@ def build_eval(args: argparse.Namespace) -> str:
     return "\n".join(lines) + "\n"
 
 
+def build_fast_outer0_eval(args: argparse.Namespace) -> str:
+    _, access_ref, secret_ref = s3_auth(args)
+    command = (
+        f"{code_bootstrap(args)} && mkdir -p /work/output && "
+        f"PYTHONPATH=/work/code/{EXPERIMENT_DIR} python3 -u "
+        f"/work/code/{EXPERIMENT_DIR}/evaluate_outer0_fast.py "
+        "--candidate-score /work/candidate/predictions.jsonl "
+        "--candidate-acceptance /work/candidate/acceptance.json "
+        "--control-score /work/control/predictions.jsonl "
+        "--control-acceptance /work/control/acceptance.json "
+        "--source-fold0-runtime /work/source_fold0/source_runtime "
+        "--label-donor-runtime /work/label_donor/source_runtime "
+        f"--expected-source-fold0-contract {args.expected_source_fold0_contract} "
+        f"--expected-label-donor-contract {args.expected_label_donor_contract} "
+        "--output /work/output/evaluation.json"
+    )
+    lines = header(args, name="kd-eval-outer0-fast", command=command)
+    lines.append("  input:")
+    lines.extend(code_input(args))
+    for src, dst in (
+        (args.candidate_output_src, "/work/candidate"),
+        (args.control_output_src, "/work/control"),
+        (args.source_fold0_src, "/work/source_fold0"),
+        (args.label_donor_src, "/work/label_donor"),
+    ):
+        lines.extend(
+            input_spec(
+                bucket=args.bucket,
+                src=src,
+                dst=dst,
+                access_key_ref=access_ref,
+                secret_key_ref=secret_ref,
+            )
+        )
+    lines.append("  output:")
+    lines.extend(
+        output_spec(
+            bucket=args.bucket,
+            dst=args.output_dst,
+            access_key_ref=access_ref,
+            secret_key_ref=secret_ref,
+        )
+    )
+    return "\n".join(lines) + "\n"
+
+
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
     result.add_argument(
         "--stage",
-        choices=("bridge", "vendor_bridge", "prepare", "train", "eval"),
+        choices=("bridge", "vendor_bridge", "prepare", "train", "eval", "eval_fast_outer0"),
         required=True,
     )
     result.add_argument("--base-preset", type=Path, required=True)
@@ -635,6 +681,12 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--registry-file")
     result.add_argument("--candidate-src", action="append", default=[])
     result.add_argument("--control-src", action="append", default=[])
+    result.add_argument("--candidate-output-src")
+    result.add_argument("--control-output-src")
+    result.add_argument("--source-fold0-src")
+    result.add_argument("--label-donor-src")
+    result.add_argument("--expected-source-fold0-contract")
+    result.add_argument("--expected-label-donor-contract")
     result.add_argument("--output", type=Path, required=True)
     return result
 
@@ -705,7 +757,7 @@ if __name__ == "__main__":
         sha256_value(args.expected_pair_runtime_contract_sha256)
         sha256_value(args.vendor_sha256)
         payload = build_train(args)
-    else:
+    elif args.stage == "eval":
         require(
             args,
             (
@@ -728,6 +780,28 @@ if __name__ == "__main__":
             for value in args.control_src
         ]
         payload = build_eval(args)
+    else:
+        require(
+            args,
+            (
+                "candidate_output_src",
+                "control_output_src",
+                "source_fold0_src",
+                "label_donor_src",
+                "expected_source_fold0_contract",
+                "expected_label_donor_contract",
+            ),
+        )
+        for name in (
+            "candidate_output_src",
+            "control_output_src",
+            "source_fold0_src",
+            "label_donor_src",
+        ):
+            setattr(args, name, safe_s3_path(getattr(args, name), args.allowed_prefix))
+        sha256_value(args.expected_source_fold0_contract)
+        sha256_value(args.expected_label_donor_contract)
+        payload = build_fast_outer0_eval(args)
     if args.output.exists():
         raise FileExistsError("refusing to overwrite preset")
     args.output.parent.mkdir(parents=True, exist_ok=True)

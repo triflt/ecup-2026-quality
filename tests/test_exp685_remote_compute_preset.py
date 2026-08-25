@@ -262,6 +262,38 @@ class RemotePresetTests(unittest.TestCase):
         self.assertIn("mkdir -p /work/output &&", payload)
         self.assertNotIn("mkdir -p /work/output/runtime", payload)
 
+    def test_fast_outer0_eval_is_cpu_remote_only_and_prebinds_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory) / "base.yaml"
+            base.write_text(BASE, encoding="utf-8")
+            args = argparse.Namespace(
+                base_preset=base,
+                time_limit="20m",
+                flavor="8cpu-128ram",
+                bucket="approved-bucket",
+                code_bundle_src="/approved/project/exp685/code",
+                code_bundle_file="code_eval.tar.gz",
+                code_bundle_sha256="a" * 64,
+                code_revision="e" * 40,
+                candidate_output_src="/approved/project/exp685/train/f0/rank",
+                control_output_src="/approved/project/exp685/train/f0/control",
+                source_fold0_src="/approved/project/exp685/r0/fold0",
+                label_donor_src="/approved/project/exp685/r0/fold3",
+                expected_source_fold0_contract="b" * 64,
+                expected_label_donor_contract="c" * 64,
+                output_dst="/approved/project/exp685/eval/outer0/run1",
+            )
+            payload = MODULE.build_fast_outer0_eval(args)
+        self.assertIn("flavor: 8cpu-128ram", payload)
+        self.assertEqual(payload.count("type: s3msk"), 6)
+        self.assertIn("evaluate_outer0_fast.py", payload)
+        self.assertIn("/work/candidate/predictions.jsonl", payload)
+        self.assertIn("/work/control/acceptance.json", payload)
+        self.assertIn("/work/source_fold0/source_runtime", payload)
+        self.assertIn("/work/label_donor/source_runtime", payload)
+        self.assertNotIn("type: files", payload)
+        self.assertNotIn("type: model_registry", payload)
+
 
 if __name__ == "__main__":
     unittest.main()

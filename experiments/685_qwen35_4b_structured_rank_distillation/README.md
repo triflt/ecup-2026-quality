@@ -49,6 +49,15 @@ AP delta `>0`, Macro delta `>=0`, no FN increase and corrections/regressions
 both with mean `>=+0.003`, flammable F1 delta `>=+0.010`, no FN increase,
 corrections/regressions `>=1.5`, positive singleton net and BAD byte-identical.
 
+The outer0 decision has a prebuilt CPU-only remote fast path. It consumes the
+two accepted S3 training outputs, binds fold0 validation rows to labels held in
+the accepted fold3 outer-train runtime by exact
+`global_index/id/fold/category`, and emits a self-hashed gate report. This is
+not a shortcut around validation: the training jobs still read zero validation
+labels, BAD is unchanged by construction, and the fast report is authorized
+only to open fold3. Screen/full acceptance still requires the complete frozen
+replay evaluator.
+
 ## 685B — nested targets only if warranted
 
 Open 685B only if 685A is positive-but-limited or the CPU audit proves that
