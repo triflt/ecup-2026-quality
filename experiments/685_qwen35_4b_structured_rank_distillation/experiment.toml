@@ -1,0 +1,51 @@
+[experiment]
+id = 685
+slug = "qwen35_4b_structured_rank_distillation"
+title = "Leakage-safe structured/ranking distillation into deployable 4B LoRA"
+status = "BLOCKED_PENDING_ACCEPTED_684_TEACHER"
+parent_experiment = 681
+teacher_experiment = 684
+public_submissions = 0
+gpu_jobs = 0
+
+[student]
+model = "Qwen/Qwen3.5-4B"
+category_scope = "flammable_only"
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+seed = 42
+epochs = 1
+effective_batch_size = 16
+learning_rate = 0.0002
+
+[distillation]
+raw_logit_bce_reused = false
+nested_cross_fitted_targets_required = true
+causal_attributes_required = true
+grounded_evidence_required = true
+ranking_loss_required = true
+outer_fold_loss_tuning = false
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+confirmation_folds = [1, 2, 4]
+primary_metric = "tie_aware_average_precision_flammable"
+minimum_screen_mean_ap_delta = 0.01
+minimum_screen_mean_macro_delta = 0.003
+minimum_full_mean_macro_delta = 0.006
+minimum_full_flammable_f1_delta = 0.012
+minimum_corrections_to_regressions = 1.5
+minimum_bootstrap_probability = 0.9
+threshold_tuned = false
+public_used = false
+
+[deployment]
+base_model = "Qwen/Qwen3.5-4B"
+teacher_packaged = false
+bad_route_byte_identical = true
+runtime_public_minutes_max = 20
+runtime_private_minutes_max = 40
+
