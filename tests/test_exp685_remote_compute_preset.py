@@ -77,7 +77,7 @@ class RemotePresetTests(unittest.TestCase):
             base.write_text(BASE, encoding="utf-8")
             model = root / "model.txt"
             model.write_text(
-                "type: model_registry, name: qwen, dst: /hf_models/",
+                "{type: model_registry, mrid: qwen/revision, dst: /hf_models/}",
                 encoding="utf-8",
             )
             args = argparse.Namespace(
@@ -104,6 +104,34 @@ class RemotePresetTests(unittest.TestCase):
         self.assertNotIn("adapter.zip", payload)
         self.assertNotIn("images/frozen", payload)
         self.assertIn("mkdir -p /work/vendor /work/images /work/output", payload)
+
+    def test_training_rejects_unbraced_model_registry_mapping(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            base = root / "base.yaml"
+            base.write_text(BASE, encoding="utf-8")
+            model = root / "model.txt"
+            model.write_text(
+                "type: model_registry, mrid: qwen/revision, dst: /hf_models/",
+                encoding="utf-8",
+            )
+            args = argparse.Namespace(
+                base_preset=base,
+                time_limit=None,
+                flavor=None,
+                bucket="approved-bucket",
+                code_bundle_src="/approved/project/exp685/code",
+                code_bundle_file="code_abc.tar.gz",
+                code_bundle_sha256="a" * 64,
+                pair_src="/approved/project/exp685/pairs/f0/abc",
+                output_dst="/approved/project/exp685/train/f0/control/run1",
+                model_input_line_file=model,
+                fold=0,
+                mode="paired_hard_control",
+                technical_smoke=False,
+            )
+            with self.assertRaises(ValueError):
+                MODULE.build_train(args)
 
     def test_legacy_bridge_has_s3_only_output(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -188,6 +216,8 @@ class RemotePresetTests(unittest.TestCase):
         self.assertIn("verify_pair_runtime.py", payload)
         self.assertIn("cp -a", payload)
         self.assertIn("source_runtime", payload)
+        self.assertIn("mkdir -p /work/output &&", payload)
+        self.assertNotIn("mkdir -p /work/output/runtime", payload)
 
 
 if __name__ == "__main__":

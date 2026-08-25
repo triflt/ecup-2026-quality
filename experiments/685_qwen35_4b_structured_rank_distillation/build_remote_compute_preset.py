@@ -297,7 +297,7 @@ def build_prepare(args: argparse.Namespace) -> str:
         f"{code_bootstrap(args)} && "
         f"{extract_segment(source_archive, '/work/source', args.source_bundle_sha256)} && "
         f"{extract_segment(teacher_archive, '/work/teacher', args.teacher_bundle_sha256)} && "
-        "mkdir -p /work/output/runtime && "
+        "mkdir -p /work/output && "
         f"PYTHONPATH=/work/code/{EXPERIMENT_DIR} python3 -u "
         f"/work/code/{EXPERIMENT_DIR}/build_pair_runtime.py "
         f"--source-runtime {shlex.quote(source_runtime)} "
@@ -389,7 +389,13 @@ def build_train(args: argparse.Namespace) -> str:
     ):
         lines.extend(spec)
     model_input = args.model_input_line_file.read_text(encoding="utf-8").strip()
-    if "type: model_registry" not in model_input or "/hf_models/" not in model_input:
+    if (
+        not model_input.startswith("{")
+        or not model_input.endswith("}")
+        or "type: model_registry" not in model_input
+        or "mrid:" not in model_input
+        or "/hf_models/" not in model_input
+    ):
         raise ValueError("model registry input line is invalid")
     lines.append(f"    - {model_input}")
     lines.append("  output:")
