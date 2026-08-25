@@ -593,9 +593,8 @@ def build_fast_outer0_eval(args: argparse.Namespace) -> str:
         "--control-score /work/control/predictions.jsonl "
         "--control-acceptance /work/control/acceptance.json "
         "--source-fold0-runtime /work/source_fold0/source_runtime "
-        "--label-donor-runtime /work/label_donor/source_runtime "
+        f"--registry /work/code/validation/semantic_family_v3/folds.csv "
         f"--expected-source-fold0-contract {args.expected_source_fold0_contract} "
-        f"--expected-label-donor-contract {args.expected_label_donor_contract} "
         f"{'--technical-smoke ' if args.eval_technical_smoke else ''}"
         "--output /work/output/evaluation.json"
     )
@@ -606,7 +605,6 @@ def build_fast_outer0_eval(args: argparse.Namespace) -> str:
         (args.candidate_output_src, "/work/candidate"),
         (args.control_output_src, "/work/control"),
         (args.source_fold0_src, "/work/source_fold0"),
-        (args.label_donor_src, "/work/label_donor"),
     ):
         lines.extend(
             input_spec(
@@ -685,9 +683,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--candidate-output-src")
     result.add_argument("--control-output-src")
     result.add_argument("--source-fold0-src")
-    result.add_argument("--label-donor-src")
     result.add_argument("--expected-source-fold0-contract")
-    result.add_argument("--expected-label-donor-contract")
     result.add_argument("--eval-technical-smoke", action="store_true")
     result.add_argument("--output", type=Path, required=True)
     return result
@@ -789,20 +785,16 @@ if __name__ == "__main__":
                 "candidate_output_src",
                 "control_output_src",
                 "source_fold0_src",
-                "label_donor_src",
                 "expected_source_fold0_contract",
-                "expected_label_donor_contract",
             ),
         )
         for name in (
             "candidate_output_src",
             "control_output_src",
             "source_fold0_src",
-            "label_donor_src",
         ):
             setattr(args, name, safe_s3_path(getattr(args, name), args.allowed_prefix))
         sha256_value(args.expected_source_fold0_contract)
-        sha256_value(args.expected_label_donor_contract)
         payload = build_fast_outer0_eval(args)
     if args.output.exists():
         raise FileExistsError("refusing to overwrite preset")

@@ -50,9 +50,11 @@ both with mean `>=+0.003`, flammable F1 delta `>=+0.010`, no FN increase,
 corrections/regressions `>=1.5`, positive singleton net and BAD byte-identical.
 
 The outer0 decision has a prebuilt CPU-only remote fast path. It consumes the
-two accepted S3 training outputs, binds fold0 validation rows to labels held in
-the accepted fold3 outer-train runtime by exact
-`global_index/id/fold/category`, and emits a self-hashed gate report. This is
+two accepted S3 training outputs, constructs a complete immutable label packet
+from the frozen semantic-v3 registry only after training has finished, binds
+all 943 fold0 flammable rows by exact ordered
+`global_index/id/fold/category`, and emits a self-hashed gate report. A sampled
+training runtime is never used as a label donor. This is
 not a shortcut around validation: the training jobs still read zero validation
 labels, BAD is unchanged by construction, and the fast report is authorized
 only to open fold3. Screen/full acceptance still requires the complete frozen

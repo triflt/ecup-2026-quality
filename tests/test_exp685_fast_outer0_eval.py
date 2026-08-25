@@ -18,41 +18,58 @@ SPEC.loader.exec_module(MODULE)
 
 
 class FastOuter0EvalTests(unittest.TestCase):
-    def test_label_donor_is_bound_by_exact_global_index_and_identity(self):
+    def test_registry_packet_is_bound_by_exact_ordered_identity(self):
+        development = [
+            {
+                "id": "a",
+                "category": MODULE.FLAMMABLE,
+                "label": "1",
+                "semantic_component": "x",
+                "development_fold": "0",
+            },
+            {
+                "id": "b",
+                "category": "other",
+                "label": "0",
+                "semantic_component": "z",
+                "development_fold": "2",
+            },
+            {
+                "id": "c",
+                "category": MODULE.FLAMMABLE,
+                "label": "0",
+                "semantic_component": "y",
+                "development_fold": "0",
+            },
+        ]
         validation = [
-            {"global_index": 10, "id": "a", "fold": 0, "category": MODULE.FLAMMABLE},
-            {"global_index": 11, "id": "b", "fold": 0, "category": MODULE.FLAMMABLE},
+            {"global_index": 0, "id": "a", "fold": 0, "category": MODULE.FLAMMABLE},
+            {"global_index": 2, "id": "c", "fold": 0, "category": MODULE.FLAMMABLE},
         ]
-        donor = [
-            {**validation[0], "label": 1, "semantic_component": "x"},
-            {**validation[1], "label": 0, "semantic_component": "y"},
-        ]
-        labels, components = MODULE.bind_outer0_labels(validation, donor)
+        labels, components, packet_sha = MODULE.bind_registry_rows(
+            validation, development, expected_selected_rows=2
+        )
         np.testing.assert_array_equal(labels, np.asarray([1, 0], dtype=np.int8))
         self.assertEqual(components, ["x", "y"])
-        donor[1]["id"] = "wrong"
-        with self.assertRaisesRegex(ValueError, "binding mismatch"):
-            MODULE.bind_outer0_labels(validation, donor)
+        self.assertEqual(len(packet_sha), 64)
+        validation[1]["global_index"] = 1
+        with self.assertRaisesRegex(ValueError, "differs from frozen registry"):
+            MODULE.bind_registry_rows(
+                validation, development, expected_selected_rows=2
+            )
 
-    def test_consistent_donor_occurrence_duplicates_are_collapsed(self):
-        validation = [
-            {"global_index": 10, "id": "a", "fold": 0, "category": MODULE.FLAMMABLE}
+    def test_registry_duplicate_ids_are_rejected(self):
+        development = [
+            {
+                "id": "a",
+                "category": MODULE.FLAMMABLE,
+                "label": "1",
+                "semantic_component": "x",
+                "development_fold": "0",
+            }
         ]
-        original = {
-            **validation[0],
-            "label": 1,
-            "semantic_component": "x",
-            "occurrence_index": 0,
-        }
-        repeated = {**original, "occurrence_index": 7}
-        labels, components = MODULE.bind_outer0_labels(
-            validation, [original, repeated]
-        )
-        np.testing.assert_array_equal(labels, np.asarray([1], dtype=np.int8))
-        self.assertEqual(components, ["x"])
-        conflicting = {**repeated, "label": 0}
-        with self.assertRaisesRegex(ValueError, "conflicting duplicate"):
-            MODULE.bind_outer0_labels(validation, [original, conflicting])
+        with self.assertRaisesRegex(ValueError, "duplicate development ID"):
+            MODULE.bind_registry_rows([], development * 2, expected_selected_rows=0)
 
     def test_positive_class_metrics_and_correction_gate(self):
         labels = np.asarray([1, 1, 0, 0], dtype=np.int8)

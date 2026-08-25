@@ -278,9 +278,7 @@ class RemotePresetTests(unittest.TestCase):
                 candidate_output_src="/approved/project/exp685/train/f0/rank",
                 control_output_src="/approved/project/exp685/train/f0/control",
                 source_fold0_src="/approved/project/exp685/r0/fold0",
-                label_donor_src="/approved/project/exp685/r0/fold3",
                 expected_source_fold0_contract="b" * 64,
-                expected_label_donor_contract="c" * 64,
                 eval_technical_smoke=False,
                 output_dst="/approved/project/exp685/eval/outer0/run1",
             )
@@ -288,12 +286,13 @@ class RemotePresetTests(unittest.TestCase):
             args.eval_technical_smoke = True
             smoke_payload = MODULE.build_fast_outer0_eval(args)
         self.assertIn("flavor: 8cpu-128ram", payload)
-        self.assertEqual(payload.count("type: s3msk"), 6)
+        self.assertEqual(payload.count("type: s3msk"), 5)
         self.assertIn("evaluate_outer0_fast.py", payload)
         self.assertIn("/work/candidate/predictions.jsonl", payload)
         self.assertIn("/work/control/acceptance.json", payload)
         self.assertIn("/work/source_fold0/source_runtime", payload)
-        self.assertIn("/work/label_donor/source_runtime", payload)
+        self.assertIn("/work/code/validation/semantic_family_v3/folds.csv", payload)
+        self.assertNotIn("/work/label_donor", payload)
         self.assertNotIn("type: files", payload)
         self.assertNotIn("type: model_registry", payload)
 

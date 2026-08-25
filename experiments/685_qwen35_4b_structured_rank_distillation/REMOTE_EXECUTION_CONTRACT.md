@@ -34,10 +34,15 @@ not an artifact-processing environment.
    receive the frozen label packet, read predictions by S3 key and emit a
    compact self-hashed metrics JSON. Training code cannot read validation
    labels.
-   For the outer0 promotion decision, a prebuilt CPU fast evaluator reconstructs
-   fold0 labels only inside remote compute from the accepted fold3 outer-train runtime,
-   joins them by exact `global_index/id/fold/category`, and compares the paired
-   control and rank candidate directly. Because BAD is frozen byte-identical,
+   For the outer0 promotion decision, a prebuilt CPU fast evaluator constructs
+   a full 943-row immutable label packet only inside remote compute from the frozen
+   semantic-v3 registry (SHA-256
+   `16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae`).
+   It binds the packet to fold0 validation by exact ordered
+   `global_index/id/fold/category` and compares the paired control and rank
+   candidate directly. The sampled fold3 training runtime is explicitly
+   forbidden as a label donor because it does not cover every validation row.
+   Because BAD is frozen byte-identical,
    its exact routed Macro delta is one half of the flammable F1 delta. This fast
    report is authoritative only for `OPEN_SCREEN_FOLD3`; later screen/full gates
    still require the complete frozen replay evaluator.

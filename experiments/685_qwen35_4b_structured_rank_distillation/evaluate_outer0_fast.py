@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import math
 from pathlib import Path
@@ -14,7 +15,20 @@ from build_pair_runtime import canonical_sha256
 EXPERIMENT_ID = "685"
 FLAMMABLE = trainer.FLAMMABLE
 OUTER_FOLD = 0
-LABEL_DONOR_FOLD = 3
+EXPECTED_REGISTRY_SHA256 = (
+    "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae"
+)
+EXPECTED_DEVELOPMENT_ROWS = 11118
+EXPECTED_OUTER0_FLAMMABLE_ROWS = 943
+REGISTRY_COLUMNS = (
+    "id",
+    "category",
+    "label",
+    "semantic_component",
+    "component_size",
+    "split",
+    "development_fold",
+)
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -50,34 +64,86 @@ def load_prediction_rows(
     return np.asarray(scores, dtype=np.float64), np.asarray(predictions, dtype=np.int8)
 
 
-def bind_outer0_labels(
-    validation: list[dict[str, Any]], donor_train: list[dict[str, Any]]
-) -> tuple[np.ndarray, list[str]]:
-    donor_by_index: dict[int, dict[str, Any]] = {}
-    for row in donor_train:
-        global_index = int(row["global_index"])
-        if global_index in donor_by_index:
-            existing = donor_by_index[global_index]
-            identity = ("global_index", "id", "fold", "category", "label", "semantic_component")
-            if any(existing.get(field) != row.get(field) for field in identity):
-                raise ValueError("conflicting duplicate in label-donor train runtime")
-            continue
-        donor_by_index[global_index] = row
+def bind_registry_rows(
+    validation: list[dict[str, Any]],
+    development: list[dict[str, Any]],
+    *,
+    expected_selected_rows: int,
+) -> tuple[np.ndarray, list[str], str]:
+    if len(development) != len({str(row["id"]) for row in development}):
+        raise ValueError("duplicate development ID in semantic registry")
+    ordered = sorted(development, key=lambda row: str(row["id"]))
+    selected: list[dict[str, Any]] = []
+    for global_index, row in enumerate(ordered):
+        fold = int(row["development_fold"])
+        label = int(row["label"])
+        if fold not in range(5) or label not in (0, 1):
+            raise ValueError("invalid fold or label in semantic registry")
+        if fold == OUTER_FOLD and str(row["category"]) == FLAMMABLE:
+            selected.append(
+                {
+                    "global_index": global_index,
+                    "id": str(row["id"]),
+                    "fold": fold,
+                    "category": str(row["category"]),
+                    "label": label,
+                    "semantic_component": str(row["semantic_component"]),
+                }
+            )
+    if len(selected) != expected_selected_rows:
+        raise ValueError("outer0 flammable registry coverage mismatch")
+    runtime_keys = [
+        (
+            int(row["global_index"]),
+            str(row["id"]),
+            int(row["fold"]),
+            str(row["category"]),
+        )
+        for row in validation
+    ]
+    registry_keys = [
+        (
+            int(row["global_index"]),
+            str(row["id"]),
+            int(row["fold"]),
+            str(row["category"]),
+        )
+        for row in selected
+    ]
+    if runtime_keys != registry_keys:
+        raise ValueError("outer0 validation differs from frozen registry packet")
     labels: list[int] = []
     components: list[str] = []
-    for row in validation:
-        donor = donor_by_index.get(int(row["global_index"]))
-        if donor is None:
-            raise ValueError("outer0 validation row is absent from fold3 train donor")
-        for field in ("global_index", "id", "fold", "category"):
-            if donor.get(field) != row.get(field):
-                raise ValueError("label donor/runtime binding mismatch")
-        label = int(donor["label"])
-        if label not in (0, 1):
-            raise ValueError("invalid donor label")
-        labels.append(label)
-        components.append(str(donor["semantic_component"]))
-    return np.asarray(labels, dtype=np.int8), components
+    packet: list[dict[str, Any]] = []
+    for row in selected:
+        labels.append(int(row["label"]))
+        components.append(str(row["semantic_component"]))
+        packet.append(dict(row))
+    return (
+        np.asarray(labels, dtype=np.int8),
+        components,
+        canonical_sha256(packet),
+    )
+
+
+def bind_outer0_labels(
+    validation: list[dict[str, Any]], registry_path: Path
+) -> tuple[np.ndarray, list[str], str]:
+    if frozen.sha256_file(registry_path) != EXPECTED_REGISTRY_SHA256:
+        raise ValueError("semantic-v3 registry checksum mismatch")
+    with registry_path.open(encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(stream)
+        if tuple(reader.fieldnames or ()) != REGISTRY_COLUMNS:
+            raise ValueError("semantic-v3 registry schema mismatch")
+        rows = list(reader)
+    development = [row for row in rows if row["split"] == "development"]
+    if len(development) != EXPECTED_DEVELOPMENT_ROWS:
+        raise ValueError("semantic-v3 development row count mismatch")
+    return bind_registry_rows(
+        validation,
+        development,
+        expected_selected_rows=EXPECTED_OUTER0_FLAMMABLE_ROWS,
+    )
 
 
 def positive_class_metrics(labels: np.ndarray, predictions: np.ndarray) -> dict[str, Any]:
@@ -135,27 +201,28 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
     _, source0_validation, source0_audit = trainer.control.load_runtime(
         args.source_fold0_runtime, trainer.SOURCE_EXPERIMENT_ID, OUTER_FOLD
     )
-    donor_train, _, donor_audit = trainer.control.load_runtime(
-        args.label_donor_runtime, trainer.SOURCE_EXPERIMENT_ID, LABEL_DONOR_FOLD
-    )
     if source0_audit["contract_sha256"] != args.expected_source_fold0_contract:
         raise ValueError("fold0 source-runtime contract mismatch")
-    if donor_audit["contract_sha256"] != args.expected_label_donor_contract:
-        raise ValueError("label-donor source-runtime contract mismatch")
     if (
         source0_audit["contract_sha256"]
         != control_acceptances[OUTER_FOLD]["source_641_runtime_contract_sha256"]
     ):
         raise ValueError("training artifact and fold0 source runtime differ")
 
-    validation = [
+    full_validation = [
         row for row in source0_validation if row["category"] == FLAMMABLE
     ]
+    labels, components, label_packet_sha256 = bind_outer0_labels(
+        full_validation, args.registry
+    )
     if args.technical_smoke:
-        validation = validation[:2]
+        validation = full_validation[:2]
+        labels = labels[:2]
+        components = components[:2]
+    else:
+        validation = full_validation
     if len(validation) != int(control_acceptances[OUTER_FOLD]["rows"]):
         raise ValueError("accepted prediction count differs from flammable validation")
-    labels, components = bind_outer0_labels(validation, donor_train)
     control_scores, control_predictions = load_prediction_rows(
         control_paths[0], validation
     )
@@ -169,7 +236,7 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
             "experiment_id": EXPERIMENT_ID,
             "stage": "outer0_fast_remote_technical_smoke",
             "folds": [OUTER_FOLD],
-            "label_source": "fold3_outer_train_runtime_exact_global_index_join",
+            "label_source": "frozen_semantic_v3_registry_exact_ordered_packet",
             "changed_factor": "none_technical_transport_and_binding_only",
             "rows": len(labels),
             "candidate_prediction_sha256": frozen.sha256_file(candidate_paths[0]),
@@ -181,11 +248,14 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
                 "acceptance_sha256"
             ],
             "source_fold0_contract_sha256": source0_audit["contract_sha256"],
-            "label_donor_contract_sha256": donor_audit["contract_sha256"],
+            "registry_sha256": EXPECTED_REGISTRY_SHA256,
+            "label_packet_rows": len(full_validation),
+            "label_packet_sha256": label_packet_sha256,
+            "label_packet_full_coverage_verified": True,
             "candidate_scores_finite": bool(np.isfinite(candidate_scores).all()),
             "control_scores_finite": bool(np.isfinite(control_scores).all()),
             "validation_labels_read_by_training": 0,
-            "validation_labels_read_by_evaluator": len(labels),
+            "validation_labels_read_by_evaluator": len(full_validation),
             "sealed_rows": 0,
             "public_used": False,
             "threshold_tuned": False,
@@ -232,7 +302,7 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
         "experiment_id": EXPERIMENT_ID,
         "stage": "outer0_fast_remote",
         "folds": [OUTER_FOLD],
-        "label_source": "fold3_outer_train_runtime_exact_global_index_join",
+        "label_source": "frozen_semantic_v3_registry_exact_ordered_packet",
         "changed_factor": "add_fixed_rank_loss_weight_0.5_to_paired_hard_control",
         "flammable_average_precision": {
             "control": ap_control,
@@ -263,7 +333,10 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
             "acceptance_sha256"
         ],
         "source_fold0_contract_sha256": source0_audit["contract_sha256"],
-        "label_donor_contract_sha256": donor_audit["contract_sha256"],
+        "registry_sha256": EXPECTED_REGISTRY_SHA256,
+        "label_packet_rows": len(full_validation),
+        "label_packet_sha256": label_packet_sha256,
+        "label_packet_full_coverage_verified": True,
         "validation_rows": len(validation),
         "validation_labels_read_by_training": 0,
         "validation_labels_read_by_evaluator": len(labels),
@@ -289,9 +362,8 @@ if __name__ == "__main__":
     parser.add_argument("--control-score", type=Path, required=True)
     parser.add_argument("--control-acceptance", type=Path, required=True)
     parser.add_argument("--source-fold0-runtime", type=Path, required=True)
-    parser.add_argument("--label-donor-runtime", type=Path, required=True)
+    parser.add_argument("--registry", type=Path, required=True)
     parser.add_argument("--expected-source-fold0-contract", required=True)
-    parser.add_argument("--expected-label-donor-contract", required=True)
     parser.add_argument("--technical-smoke", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
