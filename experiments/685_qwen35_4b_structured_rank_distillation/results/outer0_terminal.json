@@ -1,0 +1,65 @@
+{
+  "artifact_contracts": {
+    "candidate_acceptance_sha256": "ecc06719fe80b8f1618cf2cc0e753bdaac99d966024cd888659e00324f3168e0",
+    "candidate_predictions_sha256": "9430588c8daaaf00de91bf2d4f29d10d11072f1f03841aee38d329ebf0b3ba69",
+    "control_acceptance_sha256": "4e80f001d9d668219b3eb0ee465ae8e736532aedea0dfe0e1f3400f90c0f5aac",
+    "control_predictions_sha256": "538e09bb83d86b606f38de49b411229c0283a39061dfc72b828d2d16578b0f81",
+    "evaluation_sha256": "c29ee49bcdfc9dfe6f6c15d9d69222fda1e80648585b5882ed07204bb96dde38",
+    "label_packet_sha256": "05825b512c9ed9538bbf7c432852badabcab36c9b8adad34409f711bde24b64c",
+    "registry_sha256": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae"
+  },
+  "decision": "REJECT_AT_OUTER0",
+  "experiment_id": 685,
+  "failure_class": "SCIENTIFIC",
+  "gates": {
+    "ap_positive": true,
+    "bad_route_byte_identical": true,
+    "corrections_to_regressions_at_least_1_2": false,
+    "fn_does_not_increase": false,
+    "macro_nonnegative": false
+  },
+  "leakage_contract": {
+    "label_packet_full_coverage_verified": true,
+    "label_packet_rows": 943,
+    "public_used": false,
+    "sealed_fold3_quality_read": false,
+    "training_validation_labels_read": 0
+  },
+  "metrics": {
+    "candidate": {
+      "average_precision": 0.8864609336964817,
+      "f1": 0.806451612903226,
+      "fn": 9,
+      "fp": 3,
+      "precision": 0.8928571428571429,
+      "recall": 0.7352941176470589,
+      "tp": 25
+    },
+    "control": {
+      "average_precision": 0.8681150897161739,
+      "f1": 0.8253968253968255,
+      "fn": 8,
+      "fp": 3,
+      "precision": 0.896551724137931,
+      "recall": 0.7647058823529411,
+      "tp": 26
+    },
+    "delta": {
+      "average_precision": 0.018345843980307808,
+      "corrected": 1,
+      "direct_macro": -0.009472606246799742,
+      "f1": -0.018945212493599484,
+      "fn": 1,
+      "regressed": 2
+    }
+  },
+  "next_authorized_hypothesis": "preserve_full_hard_bce_and_add_bounded_rank_regularizer",
+  "schema_version": 1,
+  "stage": "outer0_terminal",
+  "validation_policy": {
+    "outer0_is_development_for_followup": true,
+    "next_blind_screen_fold": 3,
+    "threshold": 0.0,
+    "threshold_tuned": false
+  }
+}

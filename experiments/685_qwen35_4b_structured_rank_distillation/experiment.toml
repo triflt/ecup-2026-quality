@@ -1,0 +1,30 @@
+[experiment]
+id = 685
+slug = "qwen35_4b_structured_rank_distillation"
+title = "Rank-normalized pairwise distillation into deployable Qwen3.5-4B"
+status = "TERMINAL_REJECT_AT_OUTER0"
+parent_experiment = 681
+teacher_score_experiment = 662
+public_submissions = 0
+
+[student]
+model = "Qwen/Qwen3.5-4B"
+category_scope = "flammable_only"
+seed = 42
+epochs = 1
+effective_batch_size = 16
+learning_rate = 0.0002
+
+[comparison]
+control_objective = "hard_bce"
+candidate_objective = "0.5_hard_bce_plus_0.5_pairwise_rank_loss"
+only_changed_factor = "rank_loss_weight"
+
+[validation]
+version = "semantic_family_v3"
+terminal_fold = 0
+decision = "REJECT_AT_OUTER0"
+threshold = 0.0
+threshold_tuned = false
+public_used = false
+next_blind_fold = 3
