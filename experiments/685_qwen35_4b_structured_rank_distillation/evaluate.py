@@ -51,6 +51,7 @@ def load_acceptances(
     *,
     folds_scope: tuple[int, ...],
     mode: str,
+    technical_smoke: bool = False,
 ) -> tuple[list[Path], dict[int, dict[str, Any]]]:
     if len(scores) != len(folds_scope) or len(acceptances) != len(folds_scope):
         raise ValueError("score/acceptance count differs from evaluation stage")
@@ -65,7 +66,7 @@ def load_acceptances(
         expected = {
             "experiment_id": EXPERIMENT_ID,
             "mode": mode,
-            "technical_smoke": False,
+            "technical_smoke": technical_smoke,
             "deployable_4b_only": True,
             "uses_27b_at_inference": False,
             "validation_labels_read": 0,

@@ -596,6 +596,7 @@ def build_fast_outer0_eval(args: argparse.Namespace) -> str:
         "--label-donor-runtime /work/label_donor/source_runtime "
         f"--expected-source-fold0-contract {args.expected_source_fold0_contract} "
         f"--expected-label-donor-contract {args.expected_label_donor_contract} "
+        f"{'--technical-smoke ' if args.eval_technical_smoke else ''}"
         "--output /work/output/evaluation.json"
     )
     lines = header(args, name="kd-eval-outer0-fast", command=command)
@@ -687,6 +688,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--label-donor-src")
     result.add_argument("--expected-source-fold0-contract")
     result.add_argument("--expected-label-donor-contract")
+    result.add_argument("--eval-technical-smoke", action="store_true")
     result.add_argument("--output", type=Path, required=True)
     return result
 

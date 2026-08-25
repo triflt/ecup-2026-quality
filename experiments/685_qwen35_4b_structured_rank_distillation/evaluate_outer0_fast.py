@@ -117,12 +117,14 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
         [args.control_acceptance],
         folds_scope=(OUTER_FOLD,),
         mode="paired_hard_control",
+        technical_smoke=args.technical_smoke,
     )
     candidate_paths, candidate_acceptances = frozen.load_acceptances(
         [args.candidate_score],
         [args.candidate_acceptance],
         folds_scope=(OUTER_FOLD,),
         mode="rank_candidate",
+        technical_smoke=args.technical_smoke,
     )
     frozen.verify_paired_contracts(control_acceptances, candidate_acceptances)
 
@@ -145,6 +147,8 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
     validation = [
         row for row in source0_validation if row["category"] == FLAMMABLE
     ]
+    if args.technical_smoke:
+        validation = validation[:2]
     if len(validation) != int(control_acceptances[OUTER_FOLD]["rows"]):
         raise ValueError("accepted prediction count differs from flammable validation")
     labels, components = bind_outer0_labels(validation, donor_train)
@@ -154,6 +158,43 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
     candidate_scores, candidate_predictions = load_prediction_rows(
         candidate_paths[0], validation
     )
+
+    if args.technical_smoke:
+        result = {
+            "schema_version": 1,
+            "experiment_id": EXPERIMENT_ID,
+            "stage": "outer0_fast_remote_technical_smoke",
+            "folds": [OUTER_FOLD],
+            "label_source": "fold3_outer_train_runtime_exact_global_index_join",
+            "changed_factor": "none_technical_transport_and_binding_only",
+            "rows": len(labels),
+            "candidate_prediction_sha256": frozen.sha256_file(candidate_paths[0]),
+            "control_prediction_sha256": frozen.sha256_file(control_paths[0]),
+            "candidate_acceptance_sha256": candidate_acceptances[OUTER_FOLD][
+                "acceptance_sha256"
+            ],
+            "control_acceptance_sha256": control_acceptances[OUTER_FOLD][
+                "acceptance_sha256"
+            ],
+            "source_fold0_contract_sha256": source0_audit["contract_sha256"],
+            "label_donor_contract_sha256": donor_audit["contract_sha256"],
+            "candidate_scores_finite": bool(np.isfinite(candidate_scores).all()),
+            "control_scores_finite": bool(np.isfinite(control_scores).all()),
+            "validation_labels_read_by_training": 0,
+            "validation_labels_read_by_evaluator": len(labels),
+            "sealed_rows": 0,
+            "public_used": False,
+            "threshold_tuned": False,
+            "decision": "ACCEPT_FAST_EVAL_TECHNICAL_SMOKE",
+            "authoritative_scope": "technical_only_no_scientific_promotion",
+        }
+        result["evaluation_sha256"] = canonical_sha256(result)
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(
+            json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        return result
 
     control_metrics = positive_class_metrics(labels, control_predictions)
     candidate_metrics = positive_class_metrics(labels, candidate_predictions)
@@ -247,6 +288,7 @@ if __name__ == "__main__":
     parser.add_argument("--label-donor-runtime", type=Path, required=True)
     parser.add_argument("--expected-source-fold0-contract", required=True)
     parser.add_argument("--expected-label-donor-contract", required=True)
+    parser.add_argument("--technical-smoke", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
     print(json.dumps(evaluate(arguments), ensure_ascii=False, indent=2, sort_keys=True))

@@ -281,9 +281,12 @@ class RemotePresetTests(unittest.TestCase):
                 label_donor_src="/approved/project/exp685/r0/fold3",
                 expected_source_fold0_contract="b" * 64,
                 expected_label_donor_contract="c" * 64,
+                eval_technical_smoke=False,
                 output_dst="/approved/project/exp685/eval/outer0/run1",
             )
             payload = MODULE.build_fast_outer0_eval(args)
+            args.eval_technical_smoke = True
+            smoke_payload = MODULE.build_fast_outer0_eval(args)
         self.assertIn("flavor: 8cpu-128ram", payload)
         self.assertEqual(payload.count("type: s3msk"), 6)
         self.assertIn("evaluate_outer0_fast.py", payload)
@@ -293,6 +296,8 @@ class RemotePresetTests(unittest.TestCase):
         self.assertIn("/work/label_donor/source_runtime", payload)
         self.assertNotIn("type: files", payload)
         self.assertNotIn("type: model_registry", payload)
+
+        self.assertIn("--technical-smoke", smoke_payload)
 
 
 if __name__ == "__main__":
