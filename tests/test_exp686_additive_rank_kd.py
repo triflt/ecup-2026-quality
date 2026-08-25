@@ -9,6 +9,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import numpy as np
+
 ROOT = Path(__file__).resolve().parents[1]
 EXP = ROOT / "experiments/686_qwen35_4b_additive_rank_kd"
 
@@ -136,6 +138,28 @@ def write_promotion_receipt(
 
 
 class AdditiveRankKDTests(unittest.TestCase):
+    def test_bad_route_gate_requires_exact_prediction_identity(self):
+        categories = np.array(["БАД", "БАД", "Легковоспламеняющиеся"])
+        folds = np.array([3, 3, 3])
+        baseline = np.array([0, 1, 0], dtype=np.int8)
+        control = np.array([0, 1, 1], dtype=np.int8)
+        candidate = np.array([1, 0, 1], dtype=np.int8)
+        identity = EVALUATE.bad_route_identity(
+            categories=categories,
+            folds=folds,
+            folds_scope=(3,),
+            baseline_prediction=baseline,
+            control_prediction=control,
+            candidate_prediction=candidate,
+        )
+        self.assertFalse(identity["byte_identical"])
+        self.assertFalse(identity["direct_control_candidate_equal"])
+        self.assertFalse(identity["production_baseline_candidate_equal"])
+        self.assertNotEqual(
+            identity["control_prediction_sha256"],
+            identity["candidate_prediction_sha256"],
+        )
+
     def test_candidate_adds_rank_loss_without_reducing_hard_bce(self):
         source = inspect.getsource(TRAIN.combine_pair_losses)
         self.assertIn('if mode == "paired_hard_control":\n        return hard', source)

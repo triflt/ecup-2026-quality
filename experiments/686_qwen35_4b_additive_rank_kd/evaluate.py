@@ -54,6 +54,32 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def bad_route_identity(
+    *,
+    categories: np.ndarray,
+    folds: np.ndarray,
+    folds_scope: tuple[int, ...],
+    baseline_prediction: np.ndarray,
+    control_prediction: np.ndarray,
+    candidate_prediction: np.ndarray,
+) -> dict[str, Any]:
+    selected = np.isin(folds, folds_scope) & (categories == "БАД")
+    baseline = np.asarray(baseline_prediction[selected], dtype=np.int8)
+    control = np.asarray(control_prediction[selected], dtype=np.int8)
+    candidate = np.asarray(candidate_prediction[selected], dtype=np.int8)
+    direct_equal = bool(np.array_equal(control, candidate))
+    production_equal = bool(np.array_equal(baseline, candidate))
+    return {
+        "rows": int(selected.sum()),
+        "direct_control_candidate_equal": direct_equal,
+        "production_baseline_candidate_equal": production_equal,
+        "baseline_prediction_sha256": hashlib.sha256(baseline.tobytes()).hexdigest(),
+        "control_prediction_sha256": hashlib.sha256(control.tobytes()).hexdigest(),
+        "candidate_prediction_sha256": hashlib.sha256(candidate.tobytes()).hexdigest(),
+        "byte_identical": direct_equal and production_equal,
+    }
+
+
 def load_acceptances(
     scores: list[Path],
     acceptances: list[Path],
@@ -406,11 +432,16 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
         np.sum(singleton & (control_prediction == labels) & (candidate_prediction != labels))
     )
     ap_deltas = [fold_ap[str(fold)]["delta"] for fold in folds_scope]
+    bad_identity = bad_route_identity(
+        categories=categories,
+        folds=folds,
+        folds_scope=folds_scope,
+        baseline_prediction=baseline_prediction,
+        control_prediction=control_prediction,
+        candidate_prediction=candidate_prediction,
+    )
     common = {
-        "bad_route_byte_identical": (
-            direct_metrics["categories"]["БАД"]["delta"] == 0.0
-            and production_metrics["categories"]["БАД"]["delta"] == 0.0
-        ),
+        "bad_route_byte_identical": bad_identity["byte_identical"],
     }
     if args.stage == "blind3":
         gates = common | {
@@ -499,11 +530,16 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
             )
         )
         blind_ap_deltas = [fold_ap[str(fold)]["delta"] for fold in blind_folds]
+        blind_bad_identity = bad_route_identity(
+            categories=categories,
+            folds=folds,
+            folds_scope=blind_folds,
+            baseline_prediction=baseline_prediction,
+            control_prediction=control_prediction,
+            candidate_prediction=candidate_prediction,
+        )
         blind_common = {
-            "bad_route_byte_identical": (
-                blind_direct_metrics["categories"]["БАД"]["delta"] == 0.0
-                and blind_production_metrics["categories"]["БАД"]["delta"] == 0.0
-            )
+            "bad_route_byte_identical": blind_bad_identity["byte_identical"]
         }
         gates = blind_common | {
             "flammable_false_negatives_do_not_increase": (
@@ -553,6 +589,7 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
         "mean_flammable_average_precision_delta": float(np.mean(ap_deltas)),
         "direct_control_metrics": direct_metrics,
         "production_baseline_metrics": production_metrics,
+        "bad_route_identity": bad_identity,
         "semantic_singleton_flammable": {
             "rows": int(singleton.sum()),
             "corrected": singleton_corrected,
@@ -567,6 +604,7 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
                 "singleton_rows": int(blind_singleton.sum()),
                 "singleton_corrected": blind_singleton_corrected,
                 "singleton_regressed": blind_singleton_regressed,
+                "bad_route_identity": blind_bad_identity,
             }
             if args.stage == "full"
             else None
