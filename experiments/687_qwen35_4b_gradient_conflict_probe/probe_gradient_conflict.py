@@ -49,6 +49,25 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def load_sanitizer_acceptance(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    body = dict(value)
+    digest = body.pop("sanitizer_acceptance_sha256", None)
+    if digest != canonical_sha256(body):
+        raise ValueError("sanitizer acceptance self-hash mismatch")
+    expected = {
+        "experiment_id": EXPERIMENT_ID,
+        "outer_fold": 3,
+        "outer_validation_transport_checksum_verified": True,
+        "outer_validation_rows_consumed_by_probe": 0,
+        "outer_validation_labels_read": 0,
+        "decision": "ACCEPT_SANITIZED_PROBE_SOURCE",
+    }
+    if any(value.get(key) != expected_value for key, expected_value in expected.items()):
+        raise ValueError("sanitizer acceptance scope mismatch")
+    return value
+
+
 def load_probe_inputs(
     source_runtime: Path,
     pair_runtime: Path,
@@ -349,9 +368,25 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     ):
         raise ValueError("probe-code acceptance provenance mismatch")
 
+    sanitizer_acceptance = load_sanitizer_acceptance(args.sanitizer_acceptance)
+    transport_value = json.loads(args.transport_acceptance.read_text(encoding="utf-8"))
+    transport_body = dict(transport_value)
+    transport_digest = transport_body.pop("transport_acceptance_sha256", None)
+    if (
+        transport_digest != canonical_sha256(transport_body)
+        or sanitizer_acceptance["transport_acceptance_sha256"] != transport_digest
+    ):
+        raise ValueError("sanitizer acceptance does not bind transport acceptance")
     train, pairs, pair_acceptance, source_audit = load_probe_inputs(
         args.runtime_dir, args.pair_runtime, args.transport_acceptance, fold=args.fold
     )
+    if (
+        sanitizer_acceptance["source_runtime_contract_sha256"]
+        != source_audit["contract_sha256"]
+        or sanitizer_acceptance["pair_runtime_contract_sha256"]
+        != pair_acceptance["runtime_contract_sha256"]
+    ):
+        raise ValueError("sanitizer acceptance does not bind probe runtimes")
     parent_code = parent.load_code_acceptance(args.parent_code_acceptance)
     vendor_acceptance = parent.load_vendor_acceptance(
         args.vendor_acceptance, args.vendor_archive
@@ -567,6 +602,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "pair_runtime_contract_sha256": pair_acceptance["runtime_contract_sha256"],
         "pair_runtime_acceptance_sha256": pair_acceptance["acceptance_sha256"],
         "source_runtime_contract_sha256": source_audit["contract_sha256"],
+        "sanitizer_acceptance_sha256": sanitizer_acceptance[
+            "sanitizer_acceptance_sha256"
+        ],
+        "sanitized_validation_sha256": sanitizer_acceptance["validation_sha256"],
         "parent_code_bundle_sha256": parent_code["bundle_sha256"],
         "parent_code_revision": parent_code["git_revision"],
         "parent_code_acceptance_sha256": parent_code["acceptance_sha256"],
@@ -629,6 +668,7 @@ def parser() -> argparse.ArgumentParser:
     result = control.parser_for(SOURCE_EXPERIMENT_ID)
     result.add_argument("--pair-runtime", type=Path, required=True)
     result.add_argument("--transport-acceptance", type=Path, required=True)
+    result.add_argument("--sanitizer-acceptance", type=Path, required=True)
     result.add_argument("--parent-code-acceptance", type=Path, required=True)
     result.add_argument("--probe-code-bundle", type=Path, required=True)
     result.add_argument("--probe-code-acceptance", type=Path, required=True)

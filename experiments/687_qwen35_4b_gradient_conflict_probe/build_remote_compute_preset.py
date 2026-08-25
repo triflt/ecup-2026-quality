@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse
 import copy
 import os
+import re
+import shlex
 from pathlib import Path
 
 import yaml
@@ -36,13 +38,35 @@ def _safe_extract_command(archive: str, destination: str, required_prefix: str) 
         "bad and (_ for _ in ()).throw(ValueError(\"unsafe tar members\"));"
         "len(names)!=len(set(names)) and (_ for _ in ()).throw(ValueError(\"duplicate tar members\"));"
         "handle.extractall(destination,members=members)' "
-        f"{archive} {destination} {required_prefix}"
+        f"{shlex.quote(archive)} {shlex.quote(destination)} {shlex.quote(required_prefix)}"
     )
 
 
 def build(args: argparse.Namespace) -> dict:
-    if args.output.exists():
+    generated_paths = [args.output]
+    if args.clean_output is not None:
+        generated_paths.extend([args.clean_output, args.overrides_output])
+    if any(path.exists() for path in generated_paths):
         raise FileExistsError("refusing to overwrite probe preset")
+    if (args.clean_output is None) != (args.overrides_output is None):
+        raise ValueError("clean and overrides outputs must be provided together")
+    if (
+        Path(args.probe_bundle_file).name != args.probe_bundle_file
+        or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", args.probe_bundle_file)
+        or not re.fullmatch(r"[0-9a-f]{64}", args.probe_bundle_sha256)
+        or not re.fullmatch(r"[0-9a-f]{40}", args.probe_code_revision)
+    ):
+        raise ValueError("probe bundle identity is not shell-safe and immutable")
+    expected_code_prefix = "/d.strizhakov/ecup/experiments/687/code/"
+    expected_output_prefix = "/d.strizhakov/ecup/experiments/687/probe/fold3/"
+    if (
+        not args.probe_bundle_src.startswith(expected_code_prefix)
+        or not args.output_dst.startswith(expected_output_prefix)
+        or ".." in Path(args.probe_bundle_src).parts
+        or ".." in Path(args.output_dst).parts
+        or any(character.isspace() for character in args.probe_bundle_src + args.output_dst)
+    ):
+        raise ValueError("probe S3 paths escape the frozen experiment scope")
     payload = yaml.safe_load(args.base_preset.read_text(encoding="utf-8"))
     job = payload.get("job")
     if not isinstance(job, dict):
@@ -99,11 +123,11 @@ def build(args: argparse.Namespace) -> dict:
             "&&",
             f"cp -R /work/probe_overlay/{PROBE_DIR} /work/code/experiments/",
             "&&",
-            "test -f /work/pair_clean/source_runtime/validation.jsonl",
-            "&&",
-            "rm -- /work/pair_clean/source_runtime/validation.jsonl",
-            "&&",
-            "test ! -e /work/pair_clean/source_runtime/validation.jsonl",
+            f"python3 -u /work/code/{PROBE_DIR}/sanitize_probe_source.py",
+            "--source-runtime /work/pair_clean/source_runtime",
+            "--pair-runtime /work/pair_clean/runtime",
+            "--transport-acceptance /work/pair_clean/transport_acceptance.json",
+            "--output /work/pair_clean/sanitizer_acceptance.json",
             "&&",
             f"PYTHONPATH={pythonpath}",
             f"python3 -u /work/code/{PROBE_DIR}/probe_gradient_conflict.py",
@@ -111,6 +135,7 @@ def build(args: argparse.Namespace) -> dict:
             "--runtime-dir /work/pair_clean/source_runtime",
             "--pair-runtime /work/pair_clean/runtime",
             "--transport-acceptance /work/pair_clean/transport_acceptance.json",
+            "--sanitizer-acceptance /work/pair_clean/sanitizer_acceptance.json",
             "--parent-code-acceptance /work/code_acceptance.json",
             f"--probe-code-bundle {probe_archive}",
             f"--expected-probe-code-sha256 {args.probe_bundle_sha256}",
@@ -166,6 +191,36 @@ def build(args: argparse.Namespace) -> dict:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
     os.chmod(args.output, 0o600)
+    if args.clean_output is not None:
+        clean = copy.deepcopy(payload)
+        clean_inputs = clean["job"]["input"]
+        overrides_inputs: list[dict[str, str]] = []
+        for spec in clean_inputs:
+            if "access_key" not in spec and "secret_key" not in spec:
+                continue
+            if not isinstance(spec.get("name"), str) or not spec["name"]:
+                raise ValueError("credential-bearing input lacks a stable name")
+            if "access_key" not in spec or "secret_key" not in spec:
+                raise ValueError("S3 credential pair is incomplete")
+            overrides_inputs.append(
+                {
+                    "name": spec["name"],
+                    "access_key": spec.pop("access_key"),
+                    "secret_key": spec.pop("secret_key"),
+                }
+            )
+        if not overrides_inputs:
+            raise ValueError("raw preset contains no ignored credential inputs")
+        args.clean_output.parent.mkdir(parents=True, exist_ok=True)
+        args.clean_output.write_text(
+            yaml.safe_dump(clean, sort_keys=False), encoding="utf-8"
+        )
+        args.overrides_output.write_text(
+            yaml.safe_dump({"job": {"input": overrides_inputs}}, sort_keys=False),
+            encoding="utf-8",
+        )
+        os.chmod(args.clean_output, 0o600)
+        os.chmod(args.overrides_output, 0o600)
     return {
         "region": args.region,
         "flavor": job["flavor"],
@@ -185,5 +240,7 @@ if __name__ == "__main__":
     parser.add_argument("--output-dst", required=True)
     parser.add_argument("--region", choices=("ix-m5-sm11", "ix-m5-sm12"), required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--clean-output", type=Path)
+    parser.add_argument("--overrides-output", type=Path)
     values = build(parser.parse_args())
     print(yaml.safe_dump(values, sort_keys=True).strip())

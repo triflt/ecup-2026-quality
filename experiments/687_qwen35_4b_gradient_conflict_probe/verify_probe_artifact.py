@@ -16,8 +16,57 @@ for path in (HERE, PARENT):
 from build_pair_runtime import canonical_sha256
 from gradient_metrics import CHECKPOINT_STEPS, DIAGNOSTIC_EFFECTIVE_BATCHES, pcgrad_gate
 
+NUMERIC_FIELDS = {
+    "hard_grad_norm",
+    "rank_grad_norm",
+    "cosine",
+    "weighted_norm_ratio",
+    "hard_cancellation",
+    "combined_hard_alignment",
+    "projection_retention",
+}
+OVERALL_FIELDS = {
+    "checkpoint_step",
+    "batch_index",
+    "conflict",
+    "hard_loss",
+    "rank_loss",
+    *NUMERIC_FIELDS,
+}
+GROUP_FIELDS = {"checkpoint_step", "batch_index", "group", "conflict", *NUMERIC_FIELDS}
+
+
+def verify_measurement_schema(row: Any, *, grouped: bool) -> None:
+    expected = GROUP_FIELDS if grouped else OVERALL_FIELDS
+    if not isinstance(row, dict) or set(row) != expected:
+        raise ValueError("probe measurement schema mismatch")
+    step = row["checkpoint_step"]
+    batch = row["batch_index"]
+    if (
+        not isinstance(step, int)
+        or isinstance(step, bool)
+        or step not in CHECKPOINT_STEPS
+        or not isinstance(batch, int)
+        or isinstance(batch, bool)
+        or batch not in range(DIAGNOSTIC_EFFECTIVE_BATCHES)
+        or not isinstance(row["conflict"], bool)
+    ):
+        raise TypeError("probe measurement key types mismatch")
+    if grouped and row["group"] not in {"q_proj", "k_proj", "v_proj", "o_proj"}:
+        raise ValueError("probe measurement group mismatch")
+    numeric = NUMERIC_FIELDS | (set() if grouped else {"hard_loss", "rank_loss"})
+    if any(
+        isinstance(row[field], bool)
+        or not isinstance(row[field], (int, float))
+        or not math.isfinite(float(row[field]))
+        for field in numeric
+    ):
+        raise TypeError("probe measurement numeric fields mismatch")
+
 
 def verify(report_path: Path) -> dict[str, Any]:
+    if report_path.is_symlink() or not report_path.is_file():
+        raise ValueError("probe report must be a regular non-symlink file")
     if {path.name for path in report_path.parent.iterdir()} != {
         "gradient_conflict_report.json"
     }:
@@ -57,19 +106,16 @@ def verify(report_path: Path) -> dict[str, Any]:
     rows = report.get("measurements")
     if not isinstance(rows, list) or len(rows) != len(CHECKPOINT_STEPS) * DIAGNOSTIC_EFFECTIVE_BATCHES:
         raise ValueError("probe measurement coverage mismatch")
-    if any(
-        not math.isfinite(float(value))
-        for row in rows
-        for key, value in row.items()
-        if key not in {"checkpoint_step", "batch_index", "conflict"}
-    ):
-        raise ValueError("non-finite probe measurement")
+    for row in rows:
+        verify_measurement_schema(row, grouped=False)
     group_rows = report.get("group_measurements")
     expected_groups = {"q_proj", "k_proj", "v_proj", "o_proj"}
     if not isinstance(group_rows, list) or len(group_rows) != len(rows) * len(
         expected_groups
     ):
         raise ValueError("probe group-measurement coverage mismatch")
+    for row in group_rows:
+        verify_measurement_schema(row, grouped=True)
     coverage = {
         (int(row["checkpoint_step"]), int(row["batch_index"]), str(row["group"]))
         for row in group_rows
@@ -82,13 +128,6 @@ def verify(report_path: Path) -> dict[str, Any]:
     }
     if coverage != expected_coverage or len(coverage) != len(group_rows):
         raise ValueError("probe group-measurement keys mismatch")
-    if any(
-        not math.isfinite(float(value))
-        for row in group_rows
-        for key, value in row.items()
-        if key not in {"checkpoint_step", "batch_index", "group", "conflict"}
-    ):
-        raise ValueError("non-finite probe group measurement")
     by_checkpoint = {
         step: [row for row in rows if int(row["checkpoint_step"]) == step]
         for step in CHECKPOINT_STEPS
@@ -100,6 +139,8 @@ def verify(report_path: Path) -> dict[str, Any]:
         "pair_runtime_contract_sha256",
         "pair_runtime_acceptance_sha256",
         "source_runtime_contract_sha256",
+        "sanitizer_acceptance_sha256",
+        "sanitized_validation_sha256",
         "parent_code_bundle_sha256",
         "parent_code_revision",
         "parent_code_acceptance_sha256",
@@ -145,11 +186,20 @@ if __name__ == "__main__":
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    if args.output.exists():
+    if args.output.parent.resolve() != args.report.parent.resolve() or args.output.name != "acceptance.json":
+        raise ValueError("probe acceptance must share the exact output directory")
+    if args.output.exists() or args.output.is_symlink():
         raise FileExistsError("refusing to overwrite probe acceptance")
     value = verify(args.report)
     args.output.write_text(
         json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    expected_inventory = {"gradient_conflict_report.json", "acceptance.json"}
+    observed_inventory = {path.name for path in args.output.parent.iterdir()}
+    if observed_inventory != expected_inventory or any(
+        path.is_symlink() or not path.is_file()
+        for path in (args.report, args.output)
+    ):
+        raise ValueError("final probe output inventory mismatch")
     print(json.dumps(value), flush=True)

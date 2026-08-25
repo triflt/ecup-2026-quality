@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import argparse
+import json
 import math
+from pathlib import Path
 
 import pytest
+from build_remote_compute_preset import build as build_preset
 from gradient_metrics import (
     CHECKPOINT_STEPS,
     DIAGNOSTIC_EFFECTIVE_BATCHES,
@@ -10,6 +14,8 @@ from gradient_metrics import (
     pcgrad_gate,
     wilson_interval,
 )
+from sanitize_probe_source import canonical_sha256, sanitize
+from verify_probe_artifact import verify_measurement_schema
 
 
 def test_orthogonal_gradients_preserve_rank_signal() -> None:
@@ -83,3 +89,120 @@ def test_checkpoint_coverage_is_fail_closed() -> None:
     }
     with pytest.raises(ValueError, match="checkpoint coverage"):
         pcgrad_gate(rows)
+
+
+def _write_self_hashed(path: Path, value: dict, field: str) -> None:
+    value[field] = canonical_sha256(value)
+    path.write_text(json.dumps(value), encoding="utf-8")
+
+
+def test_sanitizer_binds_validation_to_all_three_frozen_contracts(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    pair = tmp_path / "pair"
+    source.mkdir()
+    pair.mkdir()
+    validation = source / "validation.jsonl"
+    validation.write_text('{"id":"x"}\n', encoding="utf-8")
+    sha = __import__("hashlib").sha256(validation.read_bytes()).hexdigest()
+    _write_self_hashed(
+        source / "runtime_audit.json",
+        {"outer_fold": 3, "output_sha256": {"validation.jsonl": sha}},
+        "contract_sha256",
+    )
+    _write_self_hashed(
+        pair / "runtime_audit.json",
+        {
+            "outer_fold": 3,
+            "derived_680_output_sha256": {"validation.jsonl": sha},
+        },
+        "contract_sha256",
+    )
+    transport = tmp_path / "transport.json"
+    _write_self_hashed(
+        transport,
+        {
+            "accepted_files": {
+                "source_runtime/validation.jsonl": {"sha256": sha}
+            }
+        },
+        "transport_acceptance_sha256",
+    )
+    result = sanitize(source, pair, transport)
+    assert result["outer_validation_transport_checksum_verified"] is True
+    assert result["validation_sha256"] == sha
+    assert not validation.exists()
+
+
+def test_sanitizer_rejects_any_validation_checksum_disagreement(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    pair = tmp_path / "pair"
+    source.mkdir()
+    pair.mkdir()
+    validation = source / "validation.jsonl"
+    validation.write_text('{"id":"x"}\n', encoding="utf-8")
+    sha = __import__("hashlib").sha256(validation.read_bytes()).hexdigest()
+    _write_self_hashed(
+        source / "runtime_audit.json",
+        {"outer_fold": 3, "output_sha256": {"validation.jsonl": sha}},
+        "contract_sha256",
+    )
+    _write_self_hashed(
+        pair / "runtime_audit.json",
+        {
+            "outer_fold": 3,
+            "derived_680_output_sha256": {"validation.jsonl": "0" * 64},
+        },
+        "contract_sha256",
+    )
+    transport = tmp_path / "transport.json"
+    _write_self_hashed(
+        transport,
+        {
+            "accepted_files": {
+                "source_runtime/validation.jsonl": {"sha256": sha}
+            }
+        },
+        "transport_acceptance_sha256",
+    )
+    with pytest.raises(ValueError, match="differs from frozen"):
+        sanitize(source, pair, transport)
+    assert validation.exists()
+
+
+def test_measurement_schema_rejects_extra_fields_and_bool_indices() -> None:
+    row = {
+        "checkpoint_step": 0,
+        "batch_index": 0,
+        "conflict": True,
+        "hard_loss": 0.2,
+        "rank_loss": 0.3,
+        "hard_grad_norm": 1.0,
+        "rank_grad_norm": 1.0,
+        "cosine": -0.2,
+        "weighted_norm_ratio": 0.5,
+        "hard_cancellation": 0.1,
+        "combined_hard_alignment": 0.9,
+        "projection_retention": 0.8,
+    }
+    verify_measurement_schema(row, grouped=False)
+    with pytest.raises(ValueError, match="schema"):
+        verify_measurement_schema({**row, "extra": 1.0}, grouped=False)
+    with pytest.raises(TypeError, match="key types"):
+        verify_measurement_schema({**row, "batch_index": False}, grouped=False)
+
+
+def test_preset_rejects_shell_unsafe_bundle_basename_before_reading_inputs(
+    tmp_path: Path,
+) -> None:
+    args = argparse.Namespace(
+        output=tmp_path / "raw.yml",
+        clean_output=None,
+        overrides_output=None,
+        probe_bundle_file="bad;name.tar.gz",
+        probe_bundle_sha256="a" * 64,
+        probe_code_revision="b" * 40,
+        probe_bundle_src="/d.strizhakov/ecup/experiments/687/code/safe",
+        output_dst="/d.strizhakov/ecup/experiments/687/probe/fold3/safe",
+    )
+    with pytest.raises(ValueError, match="shell-safe"):
+        build_preset(args)
