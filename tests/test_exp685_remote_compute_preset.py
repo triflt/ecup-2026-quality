@@ -64,10 +64,10 @@ class RemotePresetTests(unittest.TestCase):
                 time_limit=None,
                 flavor=None,
                 bucket="approved-bucket",
-                code_src="/approved/project/exp685/code/abc",
-                source_src="/approved/project/exp685/source/f0/abc",
+                code_bundle_src="/approved/project/exp685/code",
+                code_bundle_file="code_abc.tar.gz",
+                code_bundle_sha256="a" * 64,
                 pair_src="/approved/project/exp685/pairs/f0/abc",
-                images_src="/approved/project/images/frozen",
                 output_dst="/approved/project/exp685/train/f0/control/run1",
                 model_input_line_file=model,
                 fold=0,
@@ -76,11 +76,70 @@ class RemotePresetTests(unittest.TestCase):
             )
             payload = MODULE.build_train(args)
         self.assertNotIn("type: files", payload)
-        self.assertEqual(payload.count("type: s3msk"), 5)
+        self.assertEqual(payload.count("type: s3msk"), 3)
         self.assertIn("when: on_job_status=succeeded", payload)
         self.assertIn("location: cluster", payload)
         self.assertIn("verify_training_artifact.py", payload)
         self.assertNotIn("adapter.zip", payload)
+        self.assertNotIn("images/frozen", payload)
+        self.assertIn("mkdir -p /work/vendor /work/images /work/output", payload)
+
+    def test_legacy_bridge_has_s3_only_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory) / "base.yaml"
+            base.write_text(BASE, encoding="utf-8")
+            args = argparse.Namespace(
+                base_preset=base,
+                time_limit="20m",
+                flavor="8cpu-128ram",
+                bucket="approved-bucket",
+                code_bundle_src="/approved/project/exp685/code",
+                code_bundle_file="code_abc.tar.gz",
+                code_bundle_sha256="a" * 64,
+                artifact_src=["0=job0/output0", "3=job3/output3"],
+                expected_score_sha=["0=" + "b" * 64, "3=" + "c" * 64],
+                expected_archive_sha=["0=" + "d" * 64, "3=" + "e" * 64],
+                output_dst="/approved/project/exp685/bridge/run1",
+            )
+            payload = MODULE.build_bridge(args)
+        self.assertEqual(payload.count("type: artifact"), 2)
+        self.assertEqual(payload.count("type: s3msk"), 2)
+        self.assertNotIn("type: files", payload)
+        self.assertIn("bridge_legacy_teacher.py", payload)
+        self.assertIn("when: on_job_status=succeeded", payload)
+
+    def test_prepare_uses_frozen_remote_bundles(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory) / "base.yaml"
+            base.write_text(BASE, encoding="utf-8")
+            args = argparse.Namespace(
+                base_preset=base,
+                time_limit="20m",
+                flavor="8cpu-128ram",
+                bucket="approved-bucket",
+                code_bundle_src="/approved/project/exp685/code",
+                code_bundle_file="code_abc.tar.gz",
+                code_bundle_sha256="a" * 64,
+                source_bundle_src="/approved/project/exp680",
+                source_bundle_file="source.tar.gz",
+                source_bundle_sha256="b" * 64,
+                source_runtime_rel="experiments/641/runtime/fold0",
+                teacher_bundle_src="/approved/project/exp662",
+                teacher_bundle_file="teacher.tar.gz",
+                teacher_bundle_sha256="c" * 64,
+                teacher_runtime_rel="runtime/fold0_full",
+                teacher_scores_src="/approved/project/exp685/bridge/run1/fold0",
+                teacher_artifact_rel="teacher_outer_train_scores.zip",
+                output_dst="/approved/project/exp685/r0/fold0/run1",
+                fold=0,
+            )
+            payload = MODULE.build_prepare(args)
+        self.assertNotIn("type: files", payload)
+        self.assertEqual(payload.count("type: s3msk"), 5)
+        self.assertIn("build_pair_runtime.py", payload)
+        self.assertIn("verify_pair_runtime.py", payload)
+        self.assertIn("cp -a", payload)
+        self.assertIn("source_runtime", payload)
 
 
 if __name__ == "__main__":

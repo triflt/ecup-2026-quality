@@ -76,10 +76,20 @@ until 685A supplies evidence.
 Full program and literature mapping:
 [DISTILLATION_RESEARCH_PLAN.md](DISTILLATION_RESEARCH_PLAN.md).
 
-All preparation, training and evaluation artifacts remain in remote compute/S3; the
-workstation holds only code, immutable manifests and compact terminal reports.
+All preparation, training, evaluation and terminal-report artifacts remain in
+remote compute/S3; the workstation holds only code, remote references/SHA and concise
+summaries.
 See [REMOTE_EXECUTION_CONTRACT.md](REMOTE_EXECUTION_CONTRACT.md). Local archive
 workarounds are forbidden, and a submission ZIP is downloaded only after all
 scientific/package/runtime gates pass and the user gives fresh approval.
 Team ownership, messaging and GPU rules are frozen in
 [TEAM_OPERATING_PROMPT.md](TEAM_OPERATING_PROMPT.md).
+
+Image delivery is not changed in 685A: frozen runtime rows keep the proven 641
+`image_url`, while `/work/images` is an ephemeral per-job cache. Introducing a
+new persistent image cache would confound the rank-loss ablation.
+
+The only legacy-input exception is a one-time, label-free remote compute bridge for
+accepted 662 folds0/3. It verifies the canonical inner archive and score SHA,
+then writes to an immutable S3 prefix. No legacy output is downloaded locally,
+and all later stages read the S3 copy.

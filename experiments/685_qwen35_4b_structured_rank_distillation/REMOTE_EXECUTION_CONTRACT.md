@@ -12,6 +12,11 @@ not an artifact-processing environment.
 
 ## Data flow
 
+0. The accepted legacy 662 fold0/fold3 remote compute outputs are copied once by a
+   label-free bridge job from exact `JOB/OUTPUT` inputs to a new immutable S3
+   prefix. The bridge accepts only the canonical inner archive with frozen
+   archive and teacher-score SHA; loose diagnostic files cannot substitute for
+   it. All later 685 stages consume the S3 copy.
 1. Each input is addressed by a unique S3 key plus SHA-256. Existing keys are
    immutable and are never overwritten.
 2. An remote compute preparation job reads accepted source artifacts from approved
@@ -20,6 +25,9 @@ not an artifact-processing environment.
 3. Training jobs read only an accepted pair-runtime key and its frozen SHA.
    Control and candidate use the same runtime, model revision, seed, batches,
    steps and validation rows. The sole changed factor is the rank term.
+   Images retain the proven 641 row-level `image_url` semantics and use only an
+   ephemeral per-job cache. Adding a new persistent image-cache artifact would
+   be a separate experiment and is forbidden in 685A.
 4. Every training job computes label-free structural/runtime checks before exit
    and writes predictions, adapter and a self-hashed result contract to S3.
 5. Performance checks run as separate minimal remote compute eval jobs. They alone

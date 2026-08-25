@@ -3,12 +3,17 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shlex
 from pathlib import PurePosixPath, Path
 
 
 EXPERIMENT_DIR = "experiments/685_qwen35_4b_structured_rank_distillation"
 MODEL_REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
 STAGE_FOLDS = {"outer0": (0,), "screen": (0, 3), "full": (0, 1, 2, 3, 4)}
+TEACHER_AGGREGATE = (
+    "experiments/662_qwen36_27b_outer_train_scoring/"
+    "results/full_target_set_acceptance.json"
+)
 
 
 def scalar(text: str, key: str, indent: int = 2) -> str:
@@ -30,6 +35,19 @@ def safe_s3_path(value: str, allowed_prefix: str) -> str:
     ):
         raise ValueError(f"unsafe or out-of-scope S3 path: {value}")
     return value.rstrip("/")
+
+
+def safe_relative(value: str) -> str:
+    path = PurePosixPath(value)
+    if path.is_absolute() or ".." in path.parts or not path.parts:
+        raise ValueError(f"unsafe relative path: {value}")
+    return path.as_posix()
+
+
+def sha256_value(value: str) -> str:
+    if not re.fullmatch(r"[0-9a-f]{64}", value):
+        raise ValueError("SHA-256 must be 64 lowercase hexadecimal characters")
+    return value
 
 
 def input_spec(
@@ -70,6 +88,50 @@ def output_spec(*, bucket: str, dst: str) -> list[str]:
         "      upload_policies:",
         "        - when: on_job_status=succeeded",
     ]
+
+
+def artifact_input_spec(*, src: str, dst: str) -> list[str]:
+    if not re.fullmatch(r"[A-Za-z0-9._-]+/[A-Za-z0-9._-]+", src):
+        raise ValueError("artifact source must be exact JOB/OUTPUT")
+    return [
+        "    - type: artifact",
+        f"      src: {json.dumps(src)}",
+        f"      dst: {json.dumps(dst)}",
+    ]
+
+
+def extract_segment(archive: str, destination: str, expected_sha256: str) -> str:
+    expected_sha256 = sha256_value(expected_sha256)
+    python = (
+        "import pathlib,sys,tarfile;"
+        "archive=pathlib.Path(sys.argv[1]);destination=pathlib.Path(sys.argv[2]);"
+        "handle=tarfile.open(archive);members=handle.getmembers();"
+        "bad=[m.name for m in members if pathlib.PurePosixPath(m.name).is_absolute() "
+        "or '..' in pathlib.PurePosixPath(m.name).parts or not (m.isfile() or m.isdir())];"
+        "bad and (_ for _ in ()).throw(ValueError('unsafe tar members'));"
+        "handle.extractall(destination,members=members)"
+    )
+    return (
+        f"test \"$(sha256sum {shlex.quote(archive)} | cut -d' ' -f1)\" = "
+        f"\"{expected_sha256}\" && mkdir -p {shlex.quote(destination)} && "
+        f"python3 -c {shlex.quote(python)} {shlex.quote(archive)} "
+        f"{shlex.quote(destination)}"
+    )
+
+
+def code_bootstrap(args: argparse.Namespace) -> str:
+    archive = f"/work/input/code/{args.code_bundle_file}"
+    return extract_segment(archive, "/work/code", args.code_bundle_sha256)
+
+
+def code_input(args: argparse.Namespace) -> list[str]:
+    return input_spec(
+        bucket=args.bucket,
+        src=args.code_bundle_src,
+        file=args.code_bundle_file,
+        dst=f"/work/input/code/{args.code_bundle_file}",
+        cluster_cache=True,
+    )
 
 
 def parse_fold_sources(values: list[str], folds: tuple[int, ...], label: str) -> dict[int, str]:
@@ -123,44 +185,84 @@ def header(args: argparse.Namespace, *, name: str, command: str) -> list[str]:
     ]
 
 
-def build_prepare(args: argparse.Namespace) -> str:
-    source = safe_s3_path(args.source_src, args.allowed_prefix)
-    teacher_runtime = safe_s3_path(args.teacher_runtime_src, args.allowed_prefix)
-    teacher_artifact = safe_s3_path(args.teacher_artifact_src, args.allowed_prefix)
-    teacher_aggregate = safe_s3_path(args.teacher_aggregate_src, args.allowed_prefix)
+def build_bridge(args: argparse.Namespace) -> str:
+    folds = (0, 3)
+    artifacts = parse_fold_sources(args.artifact_src, folds, "legacy artifact")
+    score_sha = parse_fold_sources(args.expected_score_sha, folds, "score SHA")
+    archive_sha = parse_fold_sources(args.expected_archive_sha, folds, "archive SHA")
+    for digest in [*score_sha.values(), *archive_sha.values()]:
+        sha256_value(digest)
+    fold_args = " ".join(
+        f"--fold-input {fold}=/work/legacy/fold{fold} "
+        f"--expected-archive-sha {fold}={archive_sha[fold]} "
+        f"--expected-score-sha {fold}={score_sha[fold]}"
+        for fold in folds
+    )
     command = (
+        f"{code_bootstrap(args)} && mkdir -p /work/output_parent && "
+        f"PYTHONPATH=/work/code/{EXPERIMENT_DIR} python3 -u "
+        f"/work/code/{EXPERIMENT_DIR}/bridge_legacy_teacher.py "
+        f"{fold_args} --output /work/output"
+    )
+    lines = header(args, name="kd-bridge-662", command=command)
+    lines.append("  input:")
+    lines.extend(code_input(args))
+    for fold in folds:
+        lines.extend(
+            artifact_input_spec(src=artifacts[fold], dst=f"/work/legacy/fold{fold}")
+        )
+    lines.append("  output:")
+    lines.extend(output_spec(bucket=args.bucket, dst=args.output_dst))
+    return "\n".join(lines) + "\n"
+
+
+def build_prepare(args: argparse.Namespace) -> str:
+    source_runtime = f"/work/source/{safe_relative(args.source_runtime_rel)}"
+    teacher_runtime = f"/work/teacher/{safe_relative(args.teacher_runtime_rel)}"
+    teacher_artifact = (
+        f"/work/teacher_scores/{safe_relative(args.teacher_artifact_rel)}"
+    )
+    source_archive = f"/work/input/source/{args.source_bundle_file}"
+    teacher_archive = f"/work/input/teacher/{args.teacher_bundle_file}"
+    command = (
+        f"{code_bootstrap(args)} && "
+        f"{extract_segment(source_archive, '/work/source', args.source_bundle_sha256)} && "
+        f"{extract_segment(teacher_archive, '/work/teacher', args.teacher_bundle_sha256)} && "
         "mkdir -p /work/output/runtime && "
         f"PYTHONPATH=/work/code/{EXPERIMENT_DIR} python3 -u "
         f"/work/code/{EXPERIMENT_DIR}/build_pair_runtime.py "
-        f"--source-runtime /work/source --teacher-runtime /work/teacher_runtime "
-        f"--teacher-artifact /work/teacher_artifact/{args.teacher_artifact_file} "
-        f"--teacher-aggregate /work/teacher_aggregate/{args.teacher_aggregate_file} "
+        f"--source-runtime {shlex.quote(source_runtime)} "
+        f"--teacher-runtime {shlex.quote(teacher_runtime)} "
+        f"--teacher-artifact {shlex.quote(teacher_artifact)} "
+        f"--teacher-aggregate /work/code/{TEACHER_AGGREGATE} "
         f"--output /work/output/runtime --fold {args.fold} && "
         f"PYTHONPATH=/work/code/{EXPERIMENT_DIR} python3 -u "
         f"/work/code/{EXPERIMENT_DIR}/verify_pair_runtime.py "
-        "--runtime /work/output/runtime --output /work/output/r0_acceptance.json"
+        "--runtime /work/output/runtime --output /work/output/r0_acceptance.json && "
+        f"cp -a {shlex.quote(source_runtime)} /work/output/source_runtime"
     )
     lines = header(args, name=f"kd-r0-f{args.fold}", command=command)
     lines.append("  input:")
     for spec in (
-        input_spec(bucket=args.bucket, src=args.code_src, dst="/work/code", cluster_cache=True),
-        input_spec(bucket=args.bucket, src=source, dst="/work/source"),
+        code_input(args),
         input_spec(
             bucket=args.bucket,
-            src=teacher_runtime,
-            dst="/work/teacher_runtime",
+            src=args.source_bundle_src,
+            file=args.source_bundle_file,
+            dst=source_archive,
+            cluster_cache=True,
         ),
         input_spec(
             bucket=args.bucket,
-            src=teacher_artifact,
-            file=args.teacher_artifact_file,
-            dst=f"/work/teacher_artifact/{args.teacher_artifact_file}",
+            src=args.teacher_bundle_src,
+            file=args.teacher_bundle_file,
+            dst=teacher_archive,
+            cluster_cache=True,
         ),
         input_spec(
             bucket=args.bucket,
-            src=teacher_aggregate,
-            file=args.teacher_aggregate_file,
-            dst=f"/work/teacher_aggregate/{args.teacher_aggregate_file}",
+            src=args.teacher_scores_src,
+            dst="/work/teacher_scores",
         ),
     ):
         lines.extend(spec)
@@ -172,33 +274,29 @@ def build_prepare(args: argparse.Namespace) -> str:
 def build_train(args: argparse.Namespace) -> str:
     smoke = " --technical-smoke" if args.technical_smoke else ""
     command = (
-        "mkdir -p /work/vendor /work/output && "
+        f"{code_bootstrap(args)} && "
+        "mkdir -p /work/vendor /work/images /work/output && "
         "python3 -m zipfile -e "
         "/work/code/research/peft-vendor-extracted/peft-0.20.0.zip /work/vendor && "
         f"PYTHONPATH=/work/code/{EXPERIMENT_DIR}:/work/code/experiments/645_qwen_scale_2x3_gate:/work/vendor "
         f"python3 -u /work/code/{EXPERIMENT_DIR}/train_pair_fold.py "
-        f"--fold {args.fold} --runtime-dir /work/source --pair-runtime /work/pair "
+        f"--fold {args.fold} --runtime-dir /work/pair/source_runtime "
+        "--pair-runtime /work/pair/runtime "
         f"--images /work/images --model-root /hf_models --model-revision {MODEL_REVISION} "
         f"--vendor /work/vendor --output-dir /work/output --runtime-backend legacy_eager "
         f"--micro-batch-size-override 2 --mode {args.mode}{smoke} && "
         f"PYTHONPATH=/work/code/{EXPERIMENT_DIR}:/work/code/experiments/645_qwen_scale_2x3_gate:/work/vendor "
         f"python3 -u /work/code/{EXPERIMENT_DIR}/verify_training_artifact.py "
         f"--output-dir /work/output --fold {args.fold} --mode {args.mode} "
-        f"--source-runtime /work/source --pair-runtime /work/pair{smoke} "
+        "--source-runtime /work/pair/source_runtime "
+        f"--pair-runtime /work/pair/runtime{smoke} "
         "--output /work/output/acceptance.json"
     )
     lines = header(args, name=f"kd-{args.mode[:4]}-f{args.fold}", command=command)
     lines.append("  input:")
     for spec in (
-        input_spec(bucket=args.bucket, src=args.code_src, dst="/work/code", cluster_cache=True),
-        input_spec(bucket=args.bucket, src=args.source_src, dst="/work/source"),
+        code_input(args),
         input_spec(bucket=args.bucket, src=args.pair_src, dst="/work/pair"),
-        input_spec(
-            bucket=args.bucket,
-            src=args.images_src,
-            dst="/work/images",
-            cluster_cache=True,
-        ),
     ):
         lines.extend(spec)
     model_input = args.model_input_line_file.read_text(encoding="utf-8").strip()
@@ -225,7 +323,7 @@ def build_eval(args: argparse.Namespace) -> str:
         for fold in folds
     )
     command = (
-        "mkdir -p /work/output && "
+        f"{code_bootstrap(args)} && mkdir -p /work/output && "
         f"PYTHONPATH=/work/code/{EXPERIMENT_DIR} python3 -u "
         f"/work/code/{EXPERIMENT_DIR}/evaluate.py --stage {args.eval_stage} "
         f"--bundle /work/replay/{args.bundle_file} "
@@ -235,9 +333,7 @@ def build_eval(args: argparse.Namespace) -> str:
     )
     lines = header(args, name=f"kd-eval-{args.eval_stage}", command=command)
     lines.append("  input:")
-    lines.extend(
-        input_spec(bucket=args.bucket, src=args.code_src, dst="/work/code", cluster_cache=True)
-    )
+    lines.extend(code_input(args))
     lines.extend(input_spec(bucket=args.bucket, src=args.replay_src, dst="/work/replay"))
     for fold in folds:
         lines.extend(
@@ -261,23 +357,33 @@ def build_eval(args: argparse.Namespace) -> str:
 
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
-    result.add_argument("--stage", choices=("prepare", "train", "eval"), required=True)
+    result.add_argument(
+        "--stage", choices=("bridge", "prepare", "train", "eval"), required=True
+    )
     result.add_argument("--base-preset", type=Path, required=True)
     result.add_argument("--bucket", required=True)
     result.add_argument("--allowed-prefix", required=True)
-    result.add_argument("--code-src", required=True)
+    result.add_argument("--code-bundle-src", required=True)
+    result.add_argument("--code-bundle-file", required=True)
+    result.add_argument("--code-bundle-sha256", required=True)
     result.add_argument("--output-dst", required=True)
     result.add_argument("--time-limit")
     result.add_argument("--flavor")
     result.add_argument("--fold", type=int, choices=range(5))
-    result.add_argument("--source-src")
-    result.add_argument("--teacher-runtime-src")
-    result.add_argument("--teacher-artifact-src")
-    result.add_argument("--teacher-artifact-file")
-    result.add_argument("--teacher-aggregate-src")
-    result.add_argument("--teacher-aggregate-file")
+    result.add_argument("--artifact-src", action="append", default=[])
+    result.add_argument("--expected-score-sha", action="append", default=[])
+    result.add_argument("--expected-archive-sha", action="append", default=[])
+    result.add_argument("--source-bundle-src")
+    result.add_argument("--source-bundle-file")
+    result.add_argument("--source-bundle-sha256")
+    result.add_argument("--source-runtime-rel")
+    result.add_argument("--teacher-bundle-src")
+    result.add_argument("--teacher-bundle-file")
+    result.add_argument("--teacher-bundle-sha256")
+    result.add_argument("--teacher-runtime-rel")
+    result.add_argument("--teacher-scores-src")
+    result.add_argument("--teacher-artifact-rel")
     result.add_argument("--pair-src")
-    result.add_argument("--images-src")
     result.add_argument("--mode", choices=("paired_hard_control", "rank_candidate"))
     result.add_argument("--technical-smoke", action="store_true")
     result.add_argument("--model-input-line-file", type=Path)
@@ -300,36 +406,43 @@ def require(args: argparse.Namespace, names: tuple[str, ...]) -> None:
 
 if __name__ == "__main__":
     args = parser().parse_args()
-    args.code_src = safe_s3_path(args.code_src, args.allowed_prefix)
+    args.code_bundle_src = safe_s3_path(args.code_bundle_src, args.allowed_prefix)
+    sha256_value(args.code_bundle_sha256)
     args.output_dst = safe_s3_path(args.output_dst, args.allowed_prefix)
-    if args.stage == "prepare":
+    if args.stage == "bridge":
+        require(args, ("artifact_src", "expected_score_sha", "expected_archive_sha"))
+        payload = build_bridge(args)
+    elif args.stage == "prepare":
         require(
             args,
             (
                 "fold",
-                "source_src",
-                "teacher_runtime_src",
-                "teacher_artifact_src",
-                "teacher_artifact_file",
-                "teacher_aggregate_src",
-                "teacher_aggregate_file",
+                "source_bundle_src",
+                "source_bundle_file",
+                "source_bundle_sha256",
+                "source_runtime_rel",
+                "teacher_bundle_src",
+                "teacher_bundle_file",
+                "teacher_bundle_sha256",
+                "teacher_runtime_rel",
+                "teacher_scores_src",
+                "teacher_artifact_rel",
             ),
         )
+        for name in ("source_bundle_src", "teacher_bundle_src", "teacher_scores_src"):
+            setattr(args, name, safe_s3_path(getattr(args, name), args.allowed_prefix))
         payload = build_prepare(args)
     elif args.stage == "train":
         require(
             args,
             (
                 "fold",
-                "source_src",
                 "pair_src",
-                "images_src",
                 "mode",
                 "model_input_line_file",
             ),
         )
-        for name in ("source_src", "pair_src", "images_src"):
-            setattr(args, name, safe_s3_path(getattr(args, name), args.allowed_prefix))
+        args.pair_src = safe_s3_path(args.pair_src, args.allowed_prefix)
         payload = build_train(args)
     else:
         require(
