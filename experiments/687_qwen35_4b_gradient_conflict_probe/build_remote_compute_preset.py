@@ -19,7 +19,7 @@ EXPECTED_PAIR_ACCEPTANCE = (
 )
 
 
-def _safe_extract_command(archive: str, destination: str) -> str:
+def _safe_extract_command(archive: str, destination: str, required_prefix: str) -> str:
     return (
         "python3 -c 'import pathlib,sys,tarfile;"
         "archive=pathlib.Path(sys.argv[1]);destination=pathlib.Path(sys.argv[2]);"
@@ -29,11 +29,14 @@ def _safe_extract_command(archive: str, destination: str) -> str:
         "bad=[m.name for m,p,n in zip(members,paths,names) "
         "if p.is_absolute() or \"..\" in p.parts or any(x == \"__MACOSX\" "
         "or x == \".DS_Store\" or x.startswith(\"._\") for x in p.parts) "
-        "or not n or not (m.isfile() or m.isdir())];"
+        "or not n or (n != \"EXP687_CODE_BUNDLE_MANIFEST.json\" "
+        "and n not in {\"experiments\",sys.argv[3].rstrip(\"/\")} "
+        "and not n.startswith(sys.argv[3].rstrip(\"/\")+\"/\")) "
+        "or not (m.isfile() or m.isdir())];"
         "bad and (_ for _ in ()).throw(ValueError(\"unsafe tar members\"));"
         "len(names)!=len(set(names)) and (_ for _ in ()).throw(ValueError(\"duplicate tar members\"));"
         "handle.extractall(destination,members=members)' "
-        f"{archive} {destination}"
+        f"{archive} {destination} {required_prefix}"
     )
 
 
@@ -79,7 +82,22 @@ def build(args: argparse.Namespace) -> dict:
             "&&",
             f'test "$(sha256sum {probe_archive} | cut -d\' \' -f1)" = "{args.probe_bundle_sha256}"',
             "&&",
-            _safe_extract_command(probe_archive, "/work/code"),
+            "rm -rf /work/probe_overlay",
+            "&&",
+            "mkdir -p /work/probe_overlay /work/probe_code_acceptance",
+            "&&",
+            _safe_extract_command(probe_archive, "/work/probe_overlay", PROBE_DIR),
+            "&&",
+            f"python3 -u /work/probe_overlay/{PROBE_DIR}/verify_probe_code_bundle.py",
+            "--root /work/probe_overlay",
+            f"--archive {probe_archive}",
+            f"--expected-revision {args.probe_code_revision}",
+            f"--expected-bundle-sha256 {args.probe_bundle_sha256}",
+            "--output /work/probe_code_acceptance/acceptance.json",
+            "&&",
+            f"test ! -e /work/code/{PROBE_DIR}",
+            "&&",
+            f"cp -R /work/probe_overlay/{PROBE_DIR} /work/code/experiments/",
             "&&",
             "test -f /work/pair_clean/source_runtime/validation.jsonl",
             "&&",
@@ -97,6 +115,7 @@ def build(args: argparse.Namespace) -> dict:
             f"--probe-code-bundle {probe_archive}",
             f"--expected-probe-code-sha256 {args.probe_bundle_sha256}",
             f"--probe-code-revision {args.probe_code_revision}",
+            "--probe-code-acceptance /work/probe_code_acceptance/acceptance.json",
             "--vendor-acceptance /work/input/vendor/acceptance.json",
             "--vendor-archive /work/input/vendor/peft-0.20.0.zip",
             "--images /work/images",

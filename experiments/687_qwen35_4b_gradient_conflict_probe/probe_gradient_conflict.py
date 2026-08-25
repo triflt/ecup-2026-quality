@@ -202,6 +202,19 @@ def restore_rng(state: dict[str, Any]) -> None:
     torch.cuda.set_rng_state_all(state["cuda"])
 
 
+def rng_state_sha256(state: dict[str, Any]) -> str:
+    digest = hashlib.sha256()
+    digest.update(repr(state["python"]).encode())
+    numpy_state = state["numpy"]
+    digest.update(str(numpy_state[0]).encode())
+    digest.update(numpy_state[1].tobytes())
+    digest.update(repr(tuple(numpy_state[2:])).encode())
+    digest.update(state["torch"].cpu().numpy().tobytes())
+    for cuda_state in state["cuda"]:
+        digest.update(cuda_state.cpu().numpy().tobytes())
+    return digest.hexdigest()
+
+
 def measure_effective_batch(
     *,
     model: Any,
@@ -219,6 +232,7 @@ def measure_effective_batch(
     if len(pair_indices) != GRADIENT_ACCUMULATION_PAIRS:
         raise ValueError("diagnostic effective batch must contain eight pairs")
     rng = capture_rng()
+    expected_rng_sha256 = rng_state_sha256(rng)
     was_training = model.training
     model.eval()
     hard_grads: dict[str, Any] = {}
@@ -297,6 +311,8 @@ def measure_effective_batch(
         model.zero_grad(set_to_none=True)
         restore_rng(rng)
         model.train(was_training)
+        if rng_state_sha256(capture_rng()) != expected_rng_sha256:
+            raise RuntimeError("diagnostic pass changed the training RNG state")
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
@@ -314,6 +330,24 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("probe overlay bundle SHA mismatch")
     if len(args.probe_code_revision) != 40:
         raise ValueError("probe code revision must be a full git SHA")
+    probe_code_acceptance = json.loads(
+        args.probe_code_acceptance.read_text(encoding="utf-8")
+    )
+    acceptance_body = dict(probe_code_acceptance)
+    acceptance_digest = acceptance_body.pop("acceptance_sha256", None)
+    if acceptance_digest != canonical_sha256(acceptance_body):
+        raise ValueError("probe-code acceptance self-hash mismatch")
+    expected_probe_code = {
+        "experiment_id": EXPERIMENT_ID,
+        "git_revision": args.probe_code_revision,
+        "bundle_sha256": args.expected_probe_code_sha256,
+        "decision": "ACCEPT_PROBE_CODE_BUNDLE",
+    }
+    if any(
+        probe_code_acceptance.get(key) != value
+        for key, value in expected_probe_code.items()
+    ):
+        raise ValueError("probe-code acceptance provenance mismatch")
 
     train, pairs, pair_acceptance, source_audit = load_probe_inputs(
         args.runtime_dir, args.pair_runtime, args.transport_acceptance, fold=args.fold
@@ -538,6 +572,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "parent_code_acceptance_sha256": parent_code["acceptance_sha256"],
         "probe_code_bundle_sha256": args.expected_probe_code_sha256,
         "probe_code_revision": args.probe_code_revision,
+        "probe_code_acceptance_sha256": acceptance_digest,
         "vendor_zip_sha256": vendor_acceptance["vendor_zip_sha256"],
         "vendor_bridge_sha256": vendor_acceptance["bridge_sha256"],
         "model_id": control.CELL_SPECS[SOURCE_EXPERIMENT_ID].model_id,
@@ -563,7 +598,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "runtime_minutes": (time.monotonic() - started) / 60,
         "peak_cuda_bytes": int(torch.cuda.max_memory_allocated()),
         "inline_technical_preflight": True,
-        "outer_validation_rows_read": 0,
+        "diagnostic_rng_noninterference": True,
+        "outer_validation_transport_checksum_verified": True,
+        "outer_validation_rows_consumed_by_probe": 0,
         "outer_validation_labels_read": 0,
         "outer_quality_metrics_computed": 0,
         "sealed_rows_used": 0,
@@ -594,6 +631,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--transport-acceptance", type=Path, required=True)
     result.add_argument("--parent-code-acceptance", type=Path, required=True)
     result.add_argument("--probe-code-bundle", type=Path, required=True)
+    result.add_argument("--probe-code-acceptance", type=Path, required=True)
     result.add_argument("--expected-probe-code-sha256", required=True)
     result.add_argument("--probe-code-revision", required=True)
     result.add_argument("--vendor-acceptance", type=Path, required=True)
@@ -603,4 +641,3 @@ def parser() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     run(parser().parse_args())
-

@@ -20,8 +20,8 @@ time_limit = "3h"
 
 [data_boundary]
 outer_train_labels = true
-outer_validation_rows = false
+outer_validation_transport_checksum_verified = true
+outer_validation_rows_consumed_by_probe = false
 outer_validation_labels = false
 sealed_rows = false
 public = false
-

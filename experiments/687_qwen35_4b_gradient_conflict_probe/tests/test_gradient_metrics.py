@@ -62,6 +62,20 @@ def test_pcgrad_gate_rejects_low_conflict() -> None:
     assert pcgrad_gate(rows)["decision"] == "REJECT_PCGRAD_LOW_CONFLICT"
 
 
+def test_pcgrad_gate_does_not_hide_low_conflict_retention_with_nonconflicts() -> None:
+    rows = {
+        step: [
+            _row(conflict=index < 4, retention=0.0 if index < 4 else 1.0)
+            for index in range(DIAGNOSTIC_EFFECTIVE_BATCHES)
+        ]
+        for step in CHECKPOINT_STEPS
+    }
+    result = pcgrad_gate(rows)
+    assert result["aggregate"]["projection_retention"]["median"] == 1.0
+    assert result["aggregate"]["conflicting_projection_retention_median"] == 0.0
+    assert result["decision"] == "REJECT_PCGRAD_LOW_RETAINED_RANK_SIGNAL"
+
+
 def test_checkpoint_coverage_is_fail_closed() -> None:
     rows = {
         step: [_row(conflict=True) for _ in range(DIAGNOSTIC_EFFECTIVE_BATCHES)]
@@ -69,4 +83,3 @@ def test_checkpoint_coverage_is_fail_closed() -> None:
     }
     with pytest.raises(ValueError, match="checkpoint coverage"):
         pcgrad_gate(rows)
-

@@ -98,9 +98,19 @@ def summarize(rows: Iterable[dict[str, Any]]) -> dict[str, Any]:
             "p10": _percentile(series, 0.10),
             "p90": _percentile(series, 0.90),
         }
-    conflicting = [float(row["hard_cancellation"]) for row in values if row["conflict"]]
+    conflicting_cancellation = [
+        float(row["hard_cancellation"]) for row in values if row["conflict"]
+    ]
+    conflicting_retention = [
+        float(row["projection_retention"]) for row in values if row["conflict"]
+    ]
     result["conflicting_hard_cancellation_median"] = (
-        statistics.median(conflicting) if conflicting else 0.0
+        statistics.median(conflicting_cancellation)
+        if conflicting_cancellation
+        else 0.0
+    )
+    result["conflicting_projection_retention_median"] = (
+        statistics.median(conflicting_retention) if conflicting_retention else 0.0
     )
     return result
 
@@ -136,8 +146,8 @@ def pcgrad_gate(checkpoint_rows: dict[int, list[dict[str, Any]]]) -> dict[str, A
             "median"
         ]
         >= 0.10,
-        "projection_retention_median_ge_0_50": aggregate["projection_retention"][
-            "median"
+        "conflicting_projection_retention_median_ge_0_50": aggregate[
+            "conflicting_projection_retention_median"
         ]
         >= 0.50,
     }
@@ -156,7 +166,7 @@ def pcgrad_gate(checkpoint_rows: dict[int, list[dict[str, Any]]]) -> dict[str, A
         decision = "ROUTE_MAGNITUDE_CONTROL"
     elif (
         aggregate["conflict_rate"] >= 0.25
-        and aggregate["projection_retention"]["median"] < 0.50
+        and aggregate["conflicting_projection_retention_median"] < 0.50
     ):
         decision = "REJECT_PCGRAD_LOW_RETAINED_RANK_SIGNAL"
     else:
@@ -168,4 +178,3 @@ def pcgrad_gate(checkpoint_rows: dict[int, list[dict[str, Any]]]) -> dict[str, A
         "aggregate": aggregate,
         "per_checkpoint": per_checkpoint,
     }
-

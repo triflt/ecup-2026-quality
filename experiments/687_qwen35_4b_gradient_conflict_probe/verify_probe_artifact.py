@@ -18,6 +18,10 @@ from gradient_metrics import CHECKPOINT_STEPS, DIAGNOSTIC_EFFECTIVE_BATCHES, pcg
 
 
 def verify(report_path: Path) -> dict[str, Any]:
+    if {path.name for path in report_path.parent.iterdir()} != {
+        "gradient_conflict_report.json"
+    }:
+        raise ValueError("probe output contains unexpected members before acceptance")
     report = json.loads(report_path.read_text(encoding="utf-8"))
     body = dict(report)
     digest = body.pop("report_sha256", None)
@@ -29,7 +33,9 @@ def verify(report_path: Path) -> dict[str, Any]:
         "outer_fold": 3,
         "objective": "outer_validation_label_free_gradient_conflict_probe",
         "inline_technical_preflight": True,
-        "outer_validation_rows_read": 0,
+        "diagnostic_rng_noninterference": True,
+        "outer_validation_transport_checksum_verified": True,
+        "outer_validation_rows_consumed_by_probe": 0,
         "outer_validation_labels_read": 0,
         "outer_quality_metrics_computed": 0,
         "sealed_rows_used": 0,
@@ -58,6 +64,31 @@ def verify(report_path: Path) -> dict[str, Any]:
         if key not in {"checkpoint_step", "batch_index", "conflict"}
     ):
         raise ValueError("non-finite probe measurement")
+    group_rows = report.get("group_measurements")
+    expected_groups = {"q_proj", "k_proj", "v_proj", "o_proj"}
+    if not isinstance(group_rows, list) or len(group_rows) != len(rows) * len(
+        expected_groups
+    ):
+        raise ValueError("probe group-measurement coverage mismatch")
+    coverage = {
+        (int(row["checkpoint_step"]), int(row["batch_index"]), str(row["group"]))
+        for row in group_rows
+    }
+    expected_coverage = {
+        (step, batch_index, group)
+        for step in CHECKPOINT_STEPS
+        for batch_index in range(DIAGNOSTIC_EFFECTIVE_BATCHES)
+        for group in expected_groups
+    }
+    if coverage != expected_coverage or len(coverage) != len(group_rows):
+        raise ValueError("probe group-measurement keys mismatch")
+    if any(
+        not math.isfinite(float(value))
+        for row in group_rows
+        for key, value in row.items()
+        if key not in {"checkpoint_step", "batch_index", "group", "conflict"}
+    ):
+        raise ValueError("non-finite probe group measurement")
     by_checkpoint = {
         step: [row for row in rows if int(row["checkpoint_step"]) == step]
         for step in CHECKPOINT_STEPS
@@ -74,6 +105,7 @@ def verify(report_path: Path) -> dict[str, Any]:
         "parent_code_acceptance_sha256",
         "probe_code_bundle_sha256",
         "probe_code_revision",
+        "probe_code_acceptance_sha256",
         "vendor_zip_sha256",
         "vendor_bridge_sha256",
         "model_revision",
@@ -95,7 +127,9 @@ def verify(report_path: Path) -> dict[str, Any]:
         "measurements": len(rows),
         "checkpoint_steps": list(CHECKPOINT_STEPS),
         "diagnostic_effective_batches": DIAGNOSTIC_EFFECTIVE_BATCHES,
-        "outer_validation_rows_read": 0,
+        "diagnostic_rng_noninterference": True,
+        "outer_validation_transport_checksum_verified": True,
+        "outer_validation_rows_consumed_by_probe": 0,
         "outer_validation_labels_read": 0,
         "outer_quality_metrics_computed": 0,
         "sealed_rows_used": 0,
@@ -119,4 +153,3 @@ if __name__ == "__main__":
         encoding="utf-8",
     )
     print(json.dumps(value), flush=True)
-
