@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -40,9 +41,20 @@ def sanitize(source_runtime: Path, pair_runtime: Path, transport: Path) -> dict[
     transport_audit = self_hashed(transport, "transport_acceptance_sha256")
     if source_audit.get("outer_fold") != 3 or pair_audit.get("outer_fold") != 3:
         raise ValueError("sanitizer is frozen to outer fold3")
+    if (
+        pair_audit.get("source_641_runtime_contract_sha256")
+        != source_audit.get("contract_sha256")
+    ):
+        raise ValueError("pair runtime is not derived from the transported source runtime")
+    derived_validation_sha = pair_audit.get("derived_680_output_sha256", {}).get(
+        "validation.jsonl"
+    )
+    if not isinstance(derived_validation_sha, str) or not re.fullmatch(
+        r"[0-9a-f]{64}", derived_validation_sha
+    ):
+        raise ValueError("pair runtime lacks the filtered validation checksum")
     expected = [
         source_audit.get("output_sha256", {}).get("validation.jsonl"),
-        pair_audit.get("derived_680_output_sha256", {}).get("validation.jsonl"),
         transport_audit.get("accepted_files", {})
         .get("source_runtime/validation.jsonl", {})
         .get("sha256"),
@@ -64,6 +76,7 @@ def sanitize(source_runtime: Path, pair_runtime: Path, transport: Path) -> dict[
             "transport_acceptance_sha256"
         ],
         "validation_sha256": actual,
+        "derived_filtered_validation_sha256": derived_validation_sha,
         "validation_bytes_verified": bytes_verified,
         "outer_validation_transport_checksum_verified": True,
         "outer_validation_rows_consumed_by_probe": 0,

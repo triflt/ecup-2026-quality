@@ -96,7 +96,7 @@ def _write_self_hashed(path: Path, value: dict, field: str) -> None:
     path.write_text(json.dumps(value), encoding="utf-8")
 
 
-def test_sanitizer_binds_validation_to_all_three_frozen_contracts(tmp_path: Path) -> None:
+def test_sanitizer_binds_full_validation_and_all_source_contracts(tmp_path: Path) -> None:
     source = tmp_path / "source"
     pair = tmp_path / "pair"
     source.mkdir()
@@ -104,16 +104,21 @@ def test_sanitizer_binds_validation_to_all_three_frozen_contracts(tmp_path: Path
     validation = source / "validation.jsonl"
     validation.write_text('{"id":"x"}\n', encoding="utf-8")
     sha = __import__("hashlib").sha256(validation.read_bytes()).hexdigest()
+    source_audit = {
+        "outer_fold": 3,
+        "output_sha256": {"validation.jsonl": sha},
+    }
     _write_self_hashed(
         source / "runtime_audit.json",
-        {"outer_fold": 3, "output_sha256": {"validation.jsonl": sha}},
+        source_audit,
         "contract_sha256",
     )
     _write_self_hashed(
         pair / "runtime_audit.json",
         {
             "outer_fold": 3,
-            "derived_680_output_sha256": {"validation.jsonl": sha},
+            "source_641_runtime_contract_sha256": source_audit["contract_sha256"],
+            "derived_680_output_sha256": {"validation.jsonl": "1" * 64},
         },
         "contract_sha256",
     )
@@ -130,10 +135,52 @@ def test_sanitizer_binds_validation_to_all_three_frozen_contracts(tmp_path: Path
     result = sanitize(source, pair, transport)
     assert result["outer_validation_transport_checksum_verified"] is True
     assert result["validation_sha256"] == sha
+    assert result["derived_filtered_validation_sha256"] == "1" * 64
     assert not validation.exists()
 
 
-def test_sanitizer_rejects_any_validation_checksum_disagreement(tmp_path: Path) -> None:
+def test_sanitizer_rejects_transport_validation_checksum_disagreement(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    pair = tmp_path / "pair"
+    source.mkdir()
+    pair.mkdir()
+    validation = source / "validation.jsonl"
+    validation.write_text('{"id":"x"}\n', encoding="utf-8")
+    sha = __import__("hashlib").sha256(validation.read_bytes()).hexdigest()
+    source_audit = {
+        "outer_fold": 3,
+        "output_sha256": {"validation.jsonl": sha},
+    }
+    _write_self_hashed(
+        source / "runtime_audit.json",
+        source_audit,
+        "contract_sha256",
+    )
+    _write_self_hashed(
+        pair / "runtime_audit.json",
+        {
+            "outer_fold": 3,
+            "source_641_runtime_contract_sha256": source_audit["contract_sha256"],
+            "derived_680_output_sha256": {"validation.jsonl": "1" * 64},
+        },
+        "contract_sha256",
+    )
+    transport = tmp_path / "transport.json"
+    _write_self_hashed(
+        transport,
+        {
+            "accepted_files": {
+                "source_runtime/validation.jsonl": {"sha256": "0" * 64}
+            }
+        },
+        "transport_acceptance_sha256",
+    )
+    with pytest.raises(ValueError, match="differs from frozen"):
+        sanitize(source, pair, transport)
+    assert validation.exists()
+
+
+def test_sanitizer_rejects_pair_source_contract_mismatch(tmp_path: Path) -> None:
     source = tmp_path / "source"
     pair = tmp_path / "pair"
     source.mkdir()
@@ -150,21 +197,18 @@ def test_sanitizer_rejects_any_validation_checksum_disagreement(tmp_path: Path) 
         pair / "runtime_audit.json",
         {
             "outer_fold": 3,
-            "derived_680_output_sha256": {"validation.jsonl": "0" * 64},
+            "source_641_runtime_contract_sha256": "0" * 64,
+            "derived_680_output_sha256": {"validation.jsonl": "1" * 64},
         },
         "contract_sha256",
     )
     transport = tmp_path / "transport.json"
     _write_self_hashed(
         transport,
-        {
-            "accepted_files": {
-                "source_runtime/validation.jsonl": {"sha256": sha}
-            }
-        },
+        {"accepted_files": {"source_runtime/validation.jsonl": {"sha256": sha}}},
         "transport_acceptance_sha256",
     )
-    with pytest.raises(ValueError, match="differs from frozen"):
+    with pytest.raises(ValueError, match="not derived"):
         sanitize(source, pair, transport)
     assert validation.exists()
 
