@@ -9,6 +9,8 @@ import shlex
 import tempfile
 from pathlib import Path, PurePosixPath
 
+from exp691_consumer import verify_routed_acceptance
+
 MODEL_REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
 EXPERIMENT_DIR = "experiments/693_qwen4_causal_distillation"
 JOBS = (
@@ -243,6 +245,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--acceptance-output-src", required=True)
     result.add_argument("--acceptance-file", required=True)
     result.add_argument("--acceptance-sha256", required=True)
+    result.add_argument("--local-acceptance", type=Path, required=True)
     result.add_argument("--vendor-bundle-src", required=True)
     result.add_argument("--vendor-bundle-file", required=True)
     result.add_argument("--vendor-bundle-sha256", required=True)
@@ -296,6 +299,9 @@ def validate(args: argparse.Namespace) -> None:
 
 def build_all(args: argparse.Namespace) -> dict[str, object]:
     validate(args)
+    acceptance = verify_routed_acceptance(
+        args.local_acceptance, expected_file_sha256=args.acceptance_sha256
+    )
     if args.output_dir.exists():
         raise FileExistsError("refusing to overwrite preset output directory")
     args.output_dir.parent.mkdir(parents=True, exist_ok=True)
@@ -317,6 +323,8 @@ def build_all(args: argparse.Namespace) -> dict[str, object]:
         "files": sorted(rendered),
         "project_supplied": True,
         "model_revision": MODEL_REVISION,
+        "teacher_acceptance_file_sha256": args.acceptance_sha256,
+        "teacher_acceptance_self_sha256": acceptance["acceptance_sha256"],
         "presets_sha256": {
             name: hashlib.sha256(payload.encode()).hexdigest() for name, payload in rendered.items()
         },

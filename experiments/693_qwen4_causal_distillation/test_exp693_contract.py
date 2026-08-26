@@ -524,6 +524,10 @@ def test_evaluation_binds_ordered_ten_outputs(tmp_path: Path):
 
 
 def preset_args(output_dir: Path):
+    _, _, acceptance_path, acceptance_sha = teacher_fixture(
+        output_dir.parent / "teacher", with_acceptance=True
+    )
+    assert acceptance_path is not None and acceptance_sha is not None
     return __import__("argparse").Namespace(
         project="example-project",
         region="example-region",
@@ -546,7 +550,8 @@ def preset_args(output_dir: Path):
         qwen27_output_src="/example/qwen27-terminal",
         acceptance_output_src="/example/exp692",
         acceptance_file="acceptance.json",
-        acceptance_sha256="e" * 64,
+        acceptance_sha256=acceptance_sha,
+        local_acceptance=acceptance_path,
         vendor_bundle_src="/example/vendor",
         vendor_bundle_file="vendor.zip",
         vendor_bundle_sha256="f" * 64,
@@ -574,6 +579,14 @@ def test_real_preset_builder_emits_exactly_three_secret_free_job_shapes(tmp_path
         assert "upload_policies" not in payload
         assert payload.count("type: s3msk") == 7
         assert "project:" not in payload
+
+
+def test_preset_builder_rejects_placeholder_acceptance_before_output(tmp_path: Path):
+    args = preset_args(tmp_path / "presets")
+    args.acceptance_sha256 = "e" * 64
+    with pytest.raises(ValueError, match="acceptance file SHA-256 mismatch"):
+        PRESET.build_all(args)
+    assert not args.output_dir.exists()
 
 
 def test_bundle_whitelist_is_exact_and_label_free():
