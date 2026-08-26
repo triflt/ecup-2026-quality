@@ -117,7 +117,7 @@ SMOKE_PROMOTION_GATE_FIELDS = {
     "scope",
     "status",
     "decision",
-    "independent_integrator_required",
+    "independent_remote_reverification",
     "remote_acceptance_sha256",
     "remote_acceptance_self_sha256",
     "smoke_commit_sha",
@@ -133,8 +133,10 @@ SMOKE_PROMOTION_GATE_FIELDS = {
     "model_registry_input_identity_sha256",
     "model_tree_sha256",
     "processor_sha256",
-    "terminal_metadata_sha256",
-    "terminal_metadata_self_sha256",
+    "resolved_job_metadata_sha256",
+    "resolved_job_metadata_self_sha256",
+    "resolved_preset_sha256",
+    "resolved_command_sha256",
     "terminal_state",
     "remote_receipt_sha256",
     "remote_receipt_self_sha256",
@@ -491,12 +493,12 @@ def validate_smoke_promotion_gate(
     validate_self_hash(gate, "accepted teacher smoke promotion gate")
     acceptance_file_sha = sha256_file(acceptance_path)
     expected = {
-        "schema_version": "exp689_teacher_smoke_promotion_gate_v1",
+        "schema_version": "exp689_teacher_smoke_promotion_gate_v2",
         "experiment_id": "689",
         "scope": "technical_smoke_to_full_teacher",
         "status": "accepted",
         "decision": "OPEN_FULL_TEACHER",
-        "independent_integrator_required": True,
+        "independent_remote_reverification": True,
         "remote_acceptance_sha256": acceptance_file_sha,
         "remote_acceptance_self_sha256": acceptance["self_sha256"],
         "smoke_commit_sha": acceptance["commit_sha"],
@@ -533,8 +535,10 @@ def validate_smoke_promotion_gate(
         if gate[field] != value:
             raise ContractError(f"accepted teacher smoke promotion gate: {field} mismatch")
     for field in (
-        "terminal_metadata_sha256",
-        "terminal_metadata_self_sha256",
+        "resolved_job_metadata_sha256",
+        "resolved_job_metadata_self_sha256",
+        "resolved_preset_sha256",
+        "resolved_command_sha256",
         "verifier_bundle_sha256",
         "verifier_sha256",
         "gate_builder_sha256",
