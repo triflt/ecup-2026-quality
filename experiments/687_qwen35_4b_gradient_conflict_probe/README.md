@@ -1,6 +1,22 @@
 # Experiment 687 — Qwen3.5-4B gradient-conflict probe
 
-Status: `PRE_GPU_IMPLEMENTATION`.
+Status: `TERMINAL_ACCEPT_PROBE_REJECT_PCGRAD`.
+
+## Terminal result
+
+The remote probe and its independent verifier completed successfully with all
+80 preregistered measurements: 16 fixed effective batches at each of optimizer
+steps 0, 170, 340, 510 and 680. Training consumed zero outer-validation rows or
+labels, zero sealed rows and no Public information.
+
+The frozen scientific decision is
+`REJECT_PCGRAD_LOW_RETAINED_RANK_SIGNAL`. The measured conflict was not a usable
+PCGrad route because the non-conflicting rank component retained after the
+hard-primary projection was below the preregistered minimum. This is a
+successful diagnostic and a negative model-selection result: neither PCGrad nor
+the norm-cap fallback is opened. The next distillation hypothesis must change
+the supervision interface rather than tune rank-loss weights, thresholds or
+gradient-composition rules.
 
 ## Hypothesis
 

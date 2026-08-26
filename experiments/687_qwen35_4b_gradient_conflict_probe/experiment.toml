@@ -1,6 +1,6 @@
 id = 687
 name = "qwen35_4b_gradient_conflict_probe"
-status = "pre_gpu_implementation"
+status = "TERMINAL_ACCEPT_PROBE_REJECT_PCGRAD"
 parent_experiment = 686
 outer_fold = 3
 changed_factor = "train_only_gradient_conflict_measurement"

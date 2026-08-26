@@ -1,0 +1,23 @@
+{
+  "acceptance_sha256": "e2b931e5530ff30bdd11927ef979bbee96fc5e6a261cac0110c4153f0ad4950c",
+  "checkpoint_steps": [
+    0,
+    170,
+    340,
+    510,
+    680
+  ],
+  "decision": "TERMINAL_ACCEPT_PROBE_REJECT_PCGRAD",
+  "diagnostic_effective_batches": 16,
+  "diagnostic_rng_noninterference": true,
+  "experiment_id": 687,
+  "measurements": 80,
+  "outer_quality_metrics_computed": 0,
+  "outer_validation_labels_read": 0,
+  "outer_validation_rows_consumed": 0,
+  "public_used": false,
+  "report_sha256": "c1d331c75933667b780deaabfdbe1d16f68543a839596c1d6e19383daf57b8a5",
+  "schema_version": 1,
+  "scientific_decision": "REJECT_PCGRAD_LOW_RETAINED_RANK_SIGNAL",
+  "sealed_rows_used": 0
+}

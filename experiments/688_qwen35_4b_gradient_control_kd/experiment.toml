@@ -1,6 +1,6 @@
 id = 688
 name = "qwen35_4b_gradient_control_kd"
-status = "PREREGISTERED_AWAITING_TERMINAL_EXP687"
+status = "TERMINAL_NO_GO_SELECTOR"
 owner = "gradient-control-kd"
 parent = 686
 selector_experiment = 687

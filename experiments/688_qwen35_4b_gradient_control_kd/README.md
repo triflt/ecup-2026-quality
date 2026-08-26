@@ -1,10 +1,20 @@
 # Experiment 688 — hard-primary gradient-controlled rank KD
 
-Status: `PREREGISTERED_AWAITING_TERMINAL_EXP687`. Parent: experiment 686.
+Status: `TERMINAL_NO_GO_SELECTOR`. Parent: experiment 686.
+
+## Terminal selector result
+
+Experiment 687 returned the frozen decision
+`REJECT_PCGRAD_LOW_RETAINED_RANK_SIGNAL`. Experiment 688 permits a candidate
+only for `OPEN_ASYMMETRIC_PCGRAD_SCREEN` or `ROUTE_MAGNITUDE_CONTROL`, so no
+mode is selected and no bundle, preset, upload or GPU job is created. This is a
+terminal negative result, not an infrastructure block. Manually choosing
+PCGrad, norm-cap, a different lambda or a decision threshold would violate the
+preregistered selector and is forbidden.
 
 No generated preset, upload or job is authorized or present. Infrastructure-only
-builders are available, but they fail closed until a terminal, independently
-accepted experiment-687 artifact selects exactly one candidate.
+builders remain unused because the terminal, independently accepted
+experiment-687 artifact selected no candidate.
 
 ## Hypothesis and one changed factor
 

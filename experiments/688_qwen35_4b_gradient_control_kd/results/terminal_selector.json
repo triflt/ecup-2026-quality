@@ -1,0 +1,11 @@
+{
+  "candidate_mode_selected": null,
+  "decision": "TERMINAL_NO_GO_SELECTOR",
+  "experiment_id": 688,
+  "jobs_launched": 0,
+  "parent_probe_acceptance_sha256": "e2b931e5530ff30bdd11927ef979bbee96fc5e6a261cac0110c4153f0ad4950c",
+  "parent_probe_report_sha256": "c1d331c75933667b780deaabfdbe1d16f68543a839596c1d6e19383daf57b8a5",
+  "parent_scientific_decision": "REJECT_PCGRAD_LOW_RETAINED_RANK_SIGNAL",
+  "public_used": false,
+  "schema_version": 1
+}
