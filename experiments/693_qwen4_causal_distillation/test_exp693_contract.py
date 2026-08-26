@@ -265,6 +265,7 @@ def test_evaluator_reports_required_metrics_and_bad_exact():
     report = EVAL.evaluate_rows(rows)
     assert report["bad_exact"] is True
     assert report["corrected"] == 1
+    assert report["corrections_regressions_ratio"] == "inf"
     assert report["singleton_delta"] == 1
     assert "tie_aware_ap" in report and "macro" in report
 
@@ -317,6 +318,8 @@ def test_label_policy_slice_reports_all_three_fp_and_blocks_regression():
         "fp": {"baseline": 0, "control": 0, "candidate": 1},
     }
     assert report["gate"]["label_policy_fp_nonincrease"] is False
+    assert report["gate"]["evidence_slice_systematic_regression_guard"] is False
+    assert report["gate"]["evidence_slice_regression_failures"] == ["ignition_products"]
     assert report["decision"] == "REJECT_CANDIDATE"
     assert "ignition_products" in report["pooled"]["evidence_slices"]
 
@@ -359,6 +362,43 @@ def test_exp692_evidence_slice_definitions_are_reused_exactly():
         "ignition_products",
         "charcoal_fire_starting",
     }
+
+
+def test_captain_scientific_gate_is_the_exact_strict_conjunction():
+    assert EVAL.MIN_POOLED_MACRO_DELTA == 0.006
+    assert EVAL.MIN_FLAMMABLE_F1_DELTA == 0.012
+    assert EVAL.MIN_FOLD_WINS == 4
+    assert EVAL.MIN_CORRECTIONS_REGRESSIONS_RATIO == 1.5
+    assert EVAL.MIN_BOOTSTRAP_P_GAIN == 0.90
+    passing = {field: True for field in EVAL.SCIENTIFIC_PASS_FIELDS}
+    assert EVAL.scientific_gate_passes(passing) is True
+    for field in EVAL.SCIENTIFIC_PASS_FIELDS:
+        failing = dict(passing)
+        failing[field] = False
+        assert EVAL.scientific_gate_passes(failing) is False
+
+
+def test_resource_gate_reports_contract_values_and_stages_missing_limits():
+    observations = {
+        "control": {
+            "runtime_minutes": [1.0] * 5,
+            "peak_gpu_memory_bytes": [10.0, 20.0],
+        },
+        "candidate": {
+            "runtime_minutes": [1.0] * 5,
+            "peak_gpu_memory_bytes": [30.0],
+        },
+    }
+    pending = EVAL.resource_summary(observations, None)
+    assert pending["status"] == "STAGE_PENDING"
+    assert pending["recorded_paired_training_runtime_minutes"] == 10.0
+    assert pending["peak_gpu_memory_bytes_by_arm"] == {
+        "control": 20.0,
+        "candidate": 30.0,
+    }
+    assert EVAL.resource_summary(observations, 10.0)["status"] == "PASS"
+    assert EVAL.resource_summary(observations, 9.9)["status"] == "FAIL"
+    assert EVAL.resource_summary(None, 10.0)["status"] == "STAGE_PENDING"
 
 
 def evaluation_fixture(root: Path, *, validation_has_label: bool = False) -> tuple[Path, ...]:
@@ -437,3 +477,17 @@ def test_validation_name_must_match_frozen_train_registry(tmp_path: Path):
     write_jsonl(validation_path, [value])
     with pytest.raises(ValueError, match="cross-fold registry"):
         EVAL.aligned_rows(*paths)
+
+
+def test_paired_contract_resource_values_are_forwarded(tmp_path: Path):
+    paths = evaluation_fixture(tmp_path)
+    for fold in range(5):
+        for arm_index, root in enumerate(paths[2:]):
+            contract_path = root / f"fold{fold}" / "output_contract.json"
+            contract = json.loads(contract_path.read_text(encoding="utf-8"))
+            contract["runtime_minutes"] = float(fold + arm_index + 1)
+            contract["peak_gpu_memory_bytes"] = float(100 + fold + arm_index)
+            contract_path.write_text(json.dumps(contract), encoding="utf-8")
+    resources = EVAL.verify_paired_arms_frozen(paths[2], paths[3])
+    assert len(resources["control"]["runtime_minutes"]) == 5
+    assert max(resources["candidate"]["peak_gpu_memory_bytes"]) == 105.0

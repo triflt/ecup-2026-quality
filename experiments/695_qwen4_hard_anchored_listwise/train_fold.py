@@ -21,7 +21,6 @@ EXPERIMENT_ID = "695"
 SOURCE_EXPERIMENT_ID = "641"
 FLAMMABLE = "Легковоспламеняющиеся"
 RANK_COEFFICIENT = 0.50
-RANK_CAP_FRACTION = 0.25
 MODES = ("hard_bce_control", "rank_candidate")
 
 
@@ -64,7 +63,7 @@ def arrange_matched_batches(rows: list[dict[str, Any]], *, seed: int = 42) -> li
     return [row for row in arranged if row is not None]
 
 
-def bounded_listwise_loss(scores: Any, rows: list[SimpleNamespace], hard: Any):
+def listwise_loss(scores: Any, rows: list[SimpleNamespace]):
     import torch
     from torch.nn import functional
 
@@ -74,8 +73,7 @@ def bounded_listwise_loss(scores: Any, rows: list[SimpleNamespace], hard: Any):
     losses = [
         functional.softplus(-sign * (scores[left] - scores[right])) for left, right, sign in pairs
     ]
-    raw = torch.stack(losses).mean() * RANK_COEFFICIENT
-    return torch.minimum(raw, hard.detach() * RANK_CAP_FRACTION)
+    return torch.stack(losses).mean()
 
 
 def candidate_loss(model, processor, rows, images, zero_token, one_token):
@@ -94,7 +92,7 @@ def candidate_loss(model, processor, rows, images, zero_token, one_token):
         [int(row.label) for row in rows], dtype=torch.float32, device=model.device
     )
     hard = functional.binary_cross_entropy_with_logits(scores, labels)
-    return hard + bounded_listwise_loss(scores, rows, hard)
+    return hard + RANK_COEFFICIENT * listwise_loss(scores, rows)
 
 
 def run(args: Any) -> dict[str, Any]:
@@ -136,7 +134,7 @@ def run(args: Any) -> dict[str, Any]:
             "hard_bce_coefficient": 1.0,
             "rank_coefficient": RANK_COEFFICIENT if args.mode == "rank_candidate" else 0.0,
             "rank_scope": "flammable_same_hard_label_only",
-            "rank_cap_fraction_of_hard": RANK_CAP_FRACTION,
+            "loss_formula": "L_hard + 0.5 * L_rank",
             "lambda_grid": False,
             "teacher_outer_safe_required": True,
             "exp691_binding": teacher_binding,

@@ -17,7 +17,7 @@ folds = [0, 1, 2, 3, 4]
 seed = 42
 hard_bce_coefficient = 1.0
 rank_coefficient = 0.50
-rank_cap_fraction_of_hard = 0.25
+loss_formula = "L_hard + 0.5 * L_rank"
 rank_scope = "flammable_same_hard_label_only"
 hard_bce_scope = "all_categories"
 bad_production_replay = "frozen_byte_identical"
@@ -32,3 +32,13 @@ jobs = 1
 upload_authorized = false
 submit_authorized = false
 public_authorized = false
+
+[evaluation]
+minimum_fold_wins = 4
+minimum_pooled_macro_delta = 0.006
+minimum_flammable_f1_delta = 0.012
+minimum_corrections_regressions_ratio = 1.5
+minimum_bootstrap_p_gain = 0.90
+singleton_delta = "strictly_positive"
+evidence_slice_guard = "regressions_lte_corrections_each_slice"
+runtime_limit_source = "explicit_submission_limit_argument"

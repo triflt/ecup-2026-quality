@@ -21,6 +21,7 @@ def main() -> None:
     parser.add_argument("--teacher-root", type=Path, required=True)
     parser.add_argument("--teacher-acceptance", type=Path, required=True)
     parser.add_argument("--teacher-acceptance-sha256", required=True)
+    parser.add_argument("--submission-limit-minutes", type=float)
     parser.add_argument("--baseline-root", type=Path, required=True)
     parser.add_argument("--images", type=Path, required=True)
     parser.add_argument("--model-root", type=Path, required=True)
@@ -69,29 +70,31 @@ def main() -> None:
             if args.technical_smoke:
                 command.append("--technical-smoke")
             subprocess.run(command, check=True)
-    subprocess.run(
-        [
-            sys.executable,
-            str(HERE / "evaluate.py"),
-            "--runtime-root",
-            str(args.runtime_root),
-            "--teacher-root",
-            str(args.teacher_root),
-            "--teacher-acceptance",
-            str(args.teacher_acceptance),
-            "--teacher-acceptance-sha256",
-            args.teacher_acceptance_sha256,
-            "--baseline-root",
-            str(args.baseline_root),
-            "--control-root",
-            str(args.output_root / "control"),
-            "--candidate-root",
-            str(args.output_root / "candidate"),
-            "--output",
-            str(args.output_root / "evaluation.json"),
-        ],
-        check=True,
-    )
+    evaluation_command = [
+        sys.executable,
+        str(HERE / "evaluate.py"),
+        "--runtime-root",
+        str(args.runtime_root),
+        "--teacher-root",
+        str(args.teacher_root),
+        "--teacher-acceptance",
+        str(args.teacher_acceptance),
+        "--teacher-acceptance-sha256",
+        args.teacher_acceptance_sha256,
+        "--baseline-root",
+        str(args.baseline_root),
+        "--control-root",
+        str(args.output_root / "control"),
+        "--candidate-root",
+        str(args.output_root / "candidate"),
+        "--output",
+        str(args.output_root / "evaluation.json"),
+    ]
+    if args.submission_limit_minutes is not None:
+        evaluation_command.extend(
+            ["--submission-limit-minutes", str(args.submission_limit_minutes)]
+        )
+    subprocess.run(evaluation_command, check=True)
 
 
 if __name__ == "__main__":

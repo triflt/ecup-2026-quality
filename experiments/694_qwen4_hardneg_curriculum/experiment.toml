@@ -35,3 +35,13 @@ jobs = 1
 upload_authorized = false
 submit_authorized = false
 public_authorized = false
+
+[evaluation]
+minimum_fold_wins = 4
+minimum_pooled_macro_delta = 0.006
+minimum_flammable_f1_delta = 0.012
+minimum_corrections_regressions_ratio = 1.5
+minimum_bootstrap_p_gain = 0.90
+singleton_delta = "strictly_positive"
+evidence_slice_guard = "regressions_lte_corrections_each_slice"
+runtime_limit_source = "explicit_submission_limit_argument"

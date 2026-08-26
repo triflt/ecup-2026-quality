@@ -176,9 +176,7 @@ def run(args: Any) -> dict[str, Any]:
             ),
             "auxiliary_component_coefficients": {
                 component: (
-                    AUXILIARY_COMPONENT_COEFFICIENT
-                    if args.mode == "causal_candidate"
-                    else 0.0
+                    AUXILIARY_COMPONENT_COEFFICIENT if args.mode == "causal_candidate" else 0.0
                 )
                 for component in AUXILIARY_COMPONENTS
             },

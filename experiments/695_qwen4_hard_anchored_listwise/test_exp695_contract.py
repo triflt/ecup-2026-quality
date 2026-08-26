@@ -26,11 +26,12 @@ def test_pairs_never_cross_hard_label_boundary_or_bad():
     assert all(rows[left].label == rows[right].label for left, right, _ in pairs)
 
 
-def test_rank_auxiliary_is_bounded_and_hard_is_not_downweighted():
-    source = inspect.getsource(TRAIN.bounded_listwise_loss)
+def test_literal_frozen_rank_formula_and_hard_is_not_downweighted():
+    source = inspect.getsource(TRAIN.listwise_loss)
     candidate = inspect.getsource(TRAIN.candidate_loss)
-    assert "torch.minimum(raw, hard.detach() * RANK_CAP_FRACTION)" in source
-    assert "return hard + bounded_listwise_loss" in candidate
+    assert "torch.minimum" not in source
+    assert "hard.detach" not in source
+    assert "return hard + RANK_COEFFICIENT * listwise_loss" in candidate
     assert TRAIN.RANK_COEFFICIENT == 0.50
 
 

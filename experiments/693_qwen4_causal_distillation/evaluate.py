@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import random
 import sys
 from collections import Counter
@@ -21,6 +22,24 @@ BOOTSTRAP_REPLICATES = 2_000
 BOOTSTRAP_SEED = 42
 LABEL_POLICY_ROWS = 25
 LABEL_POLICY_SUBSTRINGS = ("топлив", "зажигал")
+MIN_POOLED_MACRO_DELTA = 0.006
+MIN_FLAMMABLE_F1_DELTA = 0.012
+MIN_FOLD_WINS = 4
+MIN_CORRECTIONS_REGRESSIONS_RATIO = 1.5
+MIN_BOOTSTRAP_P_GAIN = 0.90
+SCIENTIFIC_PASS_FIELDS = (
+    "fold_wins_pass",
+    "pooled_macro_delta_pass",
+    "flammable_ap_delta_pass",
+    "flammable_f1_delta_pass",
+    "flammable_fn_nonincrease",
+    "corrections_regressions_ratio_pass",
+    "bootstrap_p_gain_pass",
+    "singleton_strict_gain",
+    "label_policy_fp_nonincrease",
+    "evidence_slice_systematic_regression_guard",
+    "bad_byte_identical",
+)
 
 
 def sha256_bytes(values: list[int]) -> str:
@@ -129,7 +148,7 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "categories": categories,
         "corrected": corrected,
         "regressed": regressed,
-        "corrections_regressions_ratio": corrected / regressed if regressed else None,
+        "corrections_regressions_ratio": corrected / regressed if regressed else "inf",
         "bad_exact": bad_candidate == bad_baseline,
         "bad_prediction_sha256": sha256_bytes(bad_candidate),
         "rows": len(rows),
@@ -191,9 +210,7 @@ def evidence_slices(row: dict[str, Any], evidence_row: dict[str, Any]) -> set[st
 def load_accepted_evidence(
     teacher_root: Path, acceptance_path: Path, acceptance_sha256: str
 ) -> dict[tuple[int, int], dict[str, Any]]:
-    acceptance = verify_routed_acceptance(
-        acceptance_path, expected_file_sha256=acceptance_sha256
-    )
+    acceptance = verify_routed_acceptance(acceptance_path, expected_file_sha256=acceptance_sha256)
     output: dict[tuple[int, int], dict[str, Any]] = {}
     for fold, binding in enumerate(acceptance["artifact_bindings"]):
         path = teacher_root / f"fold{fold}" / "evidence.jsonl"
@@ -213,16 +230,12 @@ def load_accepted_evidence(
 def evaluate_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     report = summarize(rows)
     singleton = [
-        row
-        for row in rows
-        if bool(row.get("singleton", int(row.get("component_size", 0)) == 1))
+        row for row in rows if bool(row.get("singleton", int(row.get("component_size", 0)) == 1))
     ]
     singleton_summary = summarize(singleton) if singleton else None
     report["semantic_singletons"] = singleton_summary
     report["singleton_delta"] = (
-        singleton_summary["corrected"] - singleton_summary["regressed"]
-        if singleton_summary
-        else 0
+        singleton_summary["corrected"] - singleton_summary["regressed"] if singleton_summary else 0
     )
     report["label_policy_slice"] = label_policy_summary(rows)
     report["evidence_slices"] = {
@@ -232,10 +245,16 @@ def evaluate_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return report
 
 
-def verify_paired_arms_frozen(control_root: Path, candidate_root: Path) -> None:
+def verify_paired_arms_frozen(
+    control_root: Path, candidate_root: Path
+) -> dict[str, dict[str, list[float]]]:
     """Fail before opening any label registry unless both arms are complete."""
+    resources: dict[str, dict[str, list[float]]] = {
+        "control": {"runtime_minutes": [], "peak_gpu_memory_bytes": []},
+        "candidate": {"runtime_minutes": [], "peak_gpu_memory_bytes": []},
+    }
     for fold in range(5):
-        for root in (control_root, candidate_root):
+        for arm, root in (("control", control_root), ("candidate", candidate_root)):
             directory = root / f"fold{fold}"
             predictions = directory / "predictions.jsonl"
             contract_path = directory / "output_contract.json"
@@ -248,6 +267,14 @@ def verify_paired_arms_frozen(control_root: Path, candidate_root: Path) -> None:
                 or contract.get("technical_smoke") is not False
             ):
                 raise ValueError(f"paired arm contract is not evaluable for fold {fold}")
+            for field in ("runtime_minutes", "peak_gpu_memory_bytes"):
+                if field not in contract:
+                    continue
+                value = float(contract[field])
+                if not math.isfinite(value) or value < 0:
+                    raise ValueError(f"paired arm {field} is invalid for fold {fold}")
+                resources[arm][field].append(value)
+    return resources
 
 
 def build_label_registry(
@@ -278,12 +305,15 @@ def aligned_rows(
     baseline_root: Path,
     control_root: Path,
     candidate_root: Path,
+    *,
+    resource_observations: dict[str, dict[str, list[float]]] | None = None,
 ) -> list[dict[str, Any]]:
-    verify_paired_arms_frozen(control_root, candidate_root)
+    resources = verify_paired_arms_frozen(control_root, candidate_root)
+    if resource_observations is not None:
+        resource_observations.update(resources)
     labels, identities = build_label_registry(runtime_root)
     validation_by_fold = {
-        fold: read_jsonl(runtime_root / f"fold{fold}" / "validation.jsonl")
-        for fold in range(5)
+        fold: read_jsonl(runtime_root / f"fold{fold}" / "validation.jsonl") for fold in range(5)
     }
     if any("label" in row for rows in validation_by_fold.values() for row in rows):
         raise ValueError("outer validation runtime must remain label-free")
@@ -339,41 +369,128 @@ def aligned_rows(
     return output
 
 
-def build_report(rows: list[dict[str, Any]]) -> dict[str, Any]:
+def resource_summary(
+    observations: dict[str, dict[str, list[float]]] | None,
+    submission_limit_minutes: float | None,
+) -> dict[str, Any]:
+    runtime_by_arm = {
+        arm: sum((observations or {}).get(arm, {}).get("runtime_minutes", []))
+        for arm in ("control", "candidate")
+    }
+    runtime_counts = {
+        arm: len((observations or {}).get(arm, {}).get("runtime_minutes", []))
+        for arm in ("control", "candidate")
+    }
+    peak_values = {
+        arm: (observations or {}).get(arm, {}).get("peak_gpu_memory_bytes", [])
+        for arm in ("control", "candidate")
+    }
+    runtime_complete = all(count == 5 for count in runtime_counts.values())
+    recorded_runtime = sum(runtime_by_arm.values()) if runtime_complete else None
+    if submission_limit_minutes is not None and submission_limit_minutes <= 0:
+        raise ValueError("submission limit must be positive")
+    within_limit = (
+        recorded_runtime <= submission_limit_minutes
+        if recorded_runtime is not None and submission_limit_minutes is not None
+        else None
+    )
+    if within_limit is None:
+        status = "STAGE_PENDING"
+    else:
+        status = "PASS" if within_limit else "FAIL"
+    return {
+        "status": status,
+        "runtime_contracts_complete": runtime_complete,
+        "runtime_minutes_by_arm": runtime_by_arm,
+        "runtime_contract_count_by_arm": runtime_counts,
+        "recorded_paired_training_runtime_minutes": recorded_runtime,
+        "submission_limit_minutes": submission_limit_minutes,
+        "runtime_within_submission_limit": within_limit,
+        "peak_gpu_memory_bytes_by_arm": {
+            arm: max(values) if values else None for arm, values in peak_values.items()
+        },
+        "peak_gpu_memory_contract_count_by_arm": {
+            arm: len(values) for arm, values in peak_values.items()
+        },
+    }
+
+
+def scientific_gate_passes(gate: dict[str, Any]) -> bool:
+    return all(bool(gate[field]) for field in SCIENTIFIC_PASS_FIELDS)
+
+
+def build_report(
+    rows: list[dict[str, Any]],
+    *,
+    resource_observations: dict[str, dict[str, list[float]]] | None = None,
+    submission_limit_minutes: float | None = None,
+) -> dict[str, Any]:
     policy = label_policy_summary(rows)
     if policy["rows"] != LABEL_POLICY_ROWS or policy["labels_zero"] != LABEL_POLICY_ROWS:
         raise ValueError("frozen NAME label-policy slice is not exactly 25/25 label=0")
     folds = {
-        str(fold): evaluate_rows([row for row in rows if row["fold"] == fold])
-        for fold in range(5)
+        str(fold): evaluate_rows([row for row in rows if row["fold"] == fold]) for fold in range(5)
     }
     pooled = evaluate_rows(rows)
     pooled["bootstrap_p_gain_gt_zero"] = bootstrap_probability(rows)
     flammable = pooled["categories"][FLAMMABLE]
+    flammable_f1_delta = flammable["candidate"]["f1"] - flammable["control"]["f1"]
+    corrections_ratio = pooled["corrections_regressions_ratio"]
+    corrections_ratio_pass = (
+        corrections_ratio == "inf" or float(corrections_ratio) >= MIN_CORRECTIONS_REGRESSIONS_RATIO
+    )
+    evidence_slice_regression_failures = sorted(
+        name
+        for name, summary in pooled["evidence_slices"].items()
+        if int(summary["regressed"]) > int(summary["corrected"])
+    )
     gate = {
         "fold_wins": sum(
             report["macro"]["delta"] is not None and report["macro"]["delta"] > 0
             for report in folds.values()
         ),
-        "pooled_macro_gain": pooled["macro"]["delta"] > 0,
-        "flammable_ap_gain": pooled["tie_aware_ap"]["delta"] > 0,
-        "flammable_f1_gain": flammable["candidate"]["f1"] > flammable["control"]["f1"],
-        "flammable_fn_nonincrease": (
-            flammable["candidate"]["fn"] <= flammable["control"]["fn"]
-        ),
-        "singleton_nonregression": pooled["singleton_delta"] >= 0,
-        "label_policy_fp_nonincrease": (
-            policy["fp"]["candidate"] <= policy["fp"]["control"]
-        ),
+        "fold_wins_required": MIN_FOLD_WINS,
+        "fold_wins_pass": False,
+        "pooled_macro_delta": pooled["macro"]["delta"],
+        "pooled_macro_delta_minimum": MIN_POOLED_MACRO_DELTA,
+        "pooled_macro_delta_pass": pooled["macro"]["delta"] >= MIN_POOLED_MACRO_DELTA,
+        "flammable_ap_delta": pooled["tie_aware_ap"]["delta"],
+        "flammable_ap_delta_pass": pooled["tie_aware_ap"]["delta"] > 0,
+        "flammable_f1_delta": flammable_f1_delta,
+        "flammable_f1_delta_minimum": MIN_FLAMMABLE_F1_DELTA,
+        "flammable_f1_delta_pass": flammable_f1_delta >= MIN_FLAMMABLE_F1_DELTA,
+        "flammable_fn_nonincrease": (flammable["candidate"]["fn"] <= flammable["control"]["fn"]),
+        "corrections_regressions_ratio": corrections_ratio,
+        "corrections_regressions_ratio_minimum": MIN_CORRECTIONS_REGRESSIONS_RATIO,
+        "corrections_regressions_ratio_pass": corrections_ratio_pass,
+        "bootstrap_p_gain_gt_zero": pooled["bootstrap_p_gain_gt_zero"],
+        "bootstrap_p_gain_minimum": MIN_BOOTSTRAP_P_GAIN,
+        "bootstrap_p_gain_pass": (pooled["bootstrap_p_gain_gt_zero"] >= MIN_BOOTSTRAP_P_GAIN),
+        "singleton_delta": pooled["singleton_delta"],
+        "singleton_strict_gain": pooled["singleton_delta"] > 0,
+        "label_policy_fp_nonincrease": (policy["fp"]["candidate"] <= policy["fp"]["control"]),
+        "evidence_slice_systematic_regression_guard": (not evidence_slice_regression_failures),
+        "evidence_slice_regression_failures": evidence_slice_regression_failures,
         "bad_byte_identical": pooled["bad_exact"],
     }
-    decision = (
-        "ACCEPT_CANDIDATE"
-        if gate["fold_wins"] >= 4
-        and all(value for key, value in gate.items() if key != "fold_wins")
-        else "REJECT_CANDIDATE"
-    )
-    return {"folds": folds, "pooled": pooled, "gate": gate, "decision": decision}
+    gate["fold_wins_pass"] = gate["fold_wins"] >= MIN_FOLD_WINS
+    scientific_pass = scientific_gate_passes(gate)
+    resources = resource_summary(resource_observations, submission_limit_minutes)
+    if not scientific_pass:
+        decision = "REJECT_CANDIDATE"
+    elif resources["status"] == "STAGE_PENDING":
+        decision = "STAGE_PENDING_RESOURCE_EVIDENCE"
+    elif resources["status"] == "FAIL":
+        decision = "REJECT_RUNTIME_LIMIT"
+    else:
+        decision = "ACCEPT_CANDIDATE"
+    return {
+        "folds": folds,
+        "pooled": pooled,
+        "gate": gate,
+        "resources": resources,
+        "decision": decision,
+    }
 
 
 def main() -> None:
@@ -385,12 +502,18 @@ def main() -> None:
     parser.add_argument("--baseline-root", type=Path, required=True)
     parser.add_argument("--control-root", type=Path, required=True)
     parser.add_argument("--candidate-root", type=Path, required=True)
+    parser.add_argument("--submission-limit-minutes", type=float)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():
         raise FileExistsError("refusing to overwrite evaluation")
+    resource_observations: dict[str, dict[str, list[float]]] = {}
     rows = aligned_rows(
-        args.runtime_root, args.baseline_root, args.control_root, args.candidate_root
+        args.runtime_root,
+        args.baseline_root,
+        args.control_root,
+        args.candidate_root,
+        resource_observations=resource_observations,
     )
     accepted_evidence = load_accepted_evidence(
         args.teacher_root, args.teacher_acceptance, args.teacher_acceptance_sha256
@@ -403,7 +526,11 @@ def main() -> None:
         if evidence_row is None or str(evidence_row.get("id")) != str(row["id"]):
             raise ValueError("accepted exp692 evidence is missing an OOF flammable row")
         row["slices"] = sorted(evidence_slices(row, evidence_row))
-    report = build_report(rows)
+    report = build_report(
+        rows,
+        resource_observations=resource_observations,
+        submission_limit_minutes=args.submission_limit_minutes,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",

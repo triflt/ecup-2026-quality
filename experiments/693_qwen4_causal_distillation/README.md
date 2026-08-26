@@ -32,3 +32,10 @@ The evaluator binds exp692 evidence bytes, reports its frozen evidence slices,
 semantic singletons and paired bootstrap probability. It also verifies the
 frozen 25/25 label-zero NAME slice containing both `топлив` and `зажигал`,
 reports baseline/control/candidate FP, and rejects any candidate FP increase.
+The final scientific gate additionally requires at least 4/5 fold wins, pooled
+Macro delta >=0.006, flammable F1 delta >=0.012, positive AP delta, FN
+nonincrease, corrections/regressions >=1.5 (serialization-safe `inf` for zero
+regressions), bootstrap probability >=0.90, strict singleton gain, BAD exact,
+and no evidence slice with more regressions than corrections. Runtime and peak
+GPU memory are forwarded from paired output contracts when present. Without a
+submission-minute limit the otherwise-passing result is resource-stage-pending.
