@@ -148,6 +148,17 @@
   Эксперимент терминально закрыт без fold 0, full replay, refit, упаковки,
   Public и подбора `lambda/threshold`. Ranking-сигнал сохраняется только как
   основание для заранее зарегистрированного контроля рангового градиента.
+- `687`: train-only gradient-conflict probe завершился успешно и принят
+  независимой remote-first проверкой. Получены все 80 preregistered измерений
+  на шагах `0/170/340/510/680`; validation rows/labels/quality, sealed и Public
+  не читались. Frozen scientific verdict —
+  `REJECT_PCGRAD_LOW_RETAINED_RANK_SIGNAL`: после hard-primary проекции
+  сохраняется недостаточно полезного рангового градиента. PCGrad и norm-cap не
+  открыты.
+- `688`: terminal `NO_GO` на selector до создания GPU-задач. Parent verdict
+  687 не совпал ни с одним из двух разрешённых режимов, поэтому candidate mode
+  отсутствует, jobs `0`, Public не использовался. Ручной override, подбор
+  веса/порога и повторный запуск запрещены.
 - `650`: отклонён на frozen folds 0/3. Эмбеддер проиграл TF-IDF `−0,115927` и
   `−0,047743` Macro F1, ухудшил обе категории и дал 121 исправление против 281
   ухудшения. Дообучение и интеграция в 140 остановлены по заранее записанному

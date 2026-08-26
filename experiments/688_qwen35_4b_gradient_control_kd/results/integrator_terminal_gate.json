@@ -1,0 +1,41 @@
+{
+  "acceptance_decision": "ACCEPT_GRADIENT_CONFLICT_PROBE",
+  "acceptance_self_hash_independently_verified": true,
+  "candidate_mode_selected": null,
+  "decision": "TERMINAL_NO_GO_SELECTOR",
+  "experiment_id": 688,
+  "gate_sha256": "e55cb30a774d909421a027166751ce9a065059cd7486c34ae4bb3766ba2117f7",
+  "jobs_launched": 0,
+  "parent_acceptance_sha256": "e2b931e5530ff30bdd11927ef979bbee96fc5e6a261cac0110c4153f0ad4950c",
+  "parent_bundle_identity_verified": true,
+  "parent_checkpoint_steps": [
+    0,
+    170,
+    340,
+    510,
+    680
+  ],
+  "parent_code_identity_verified": true,
+  "parent_diagnostic_effective_batches": 16,
+  "parent_experiment_id": 687,
+  "parent_measurements": 80,
+  "parent_preset_identity_verified": true,
+  "parent_report_self_hash_verified_by_remote_verifier": true,
+  "parent_report_sha256": "c1d331c75933667b780deaabfdbe1d16f68543a839596c1d6e19383daf57b8a5",
+  "parent_scientific_decision": "REJECT_PCGRAD_LOW_RETAINED_RANK_SIGNAL",
+  "parent_terminal_state": "SUCCEEDED",
+  "privacy_boundary": {
+    "outer_quality_metrics_computed": 0,
+    "outer_validation_labels_read": 0,
+    "outer_validation_rows_consumed": 0,
+    "public_used": false,
+    "sealed_rows_used": 0
+  },
+  "remote_terminal_binding_independently_verified": true,
+  "schema_version": 1,
+  "selector_allowed_parent_decisions": [
+    "OPEN_ASYMMETRIC_PCGRAD_SCREEN",
+    "ROUTE_MAGNITUDE_CONTROL"
+  ],
+  "stages_opened": []
+}
