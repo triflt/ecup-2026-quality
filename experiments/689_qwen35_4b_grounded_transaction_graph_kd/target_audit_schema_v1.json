@@ -1,0 +1,139 @@
+{
+  "$defs": {
+    "evidence_candidate": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_index": {"minimum": 0, "type": "integer"},
+        "char_end": {"minimum": 1, "type": "integer"},
+        "char_start": {"minimum": 0, "type": "integer"},
+        "evidence_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "source_index": {"minimum": 0, "type": "integer"}
+      },
+      "required": [
+        "candidate_index",
+        "source_index",
+        "char_start",
+        "char_end",
+        "evidence_sha256"
+      ],
+      "type": "object"
+    },
+    "review": {
+      "additionalProperties": false,
+      "properties": {
+        "contradiction": {"type": ["boolean", "null"]},
+        "evidence_supported": {"type": ["boolean", "null"]},
+        "relation_correct": {"type": ["boolean", "null"]},
+        "sold_object_correct": {"type": ["boolean", "null"]}
+      },
+      "required": [
+        "sold_object_correct",
+        "relation_correct",
+        "evidence_supported",
+        "contradiction"
+      ],
+      "type": "object"
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "source_index": {"minimum": 0, "type": "integer"},
+        "source_kind": {"enum": ["name", "description", "ocr"], "type": "string"},
+        "text": {"minLength": 1, "type": "string"},
+        "text_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+      },
+      "required": ["source_index", "source_kind", "text", "text_sha256"],
+      "type": "object"
+    },
+    "target": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_candidate_indices": {
+          "items": {"minimum": 0, "type": "integer"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "relation": {
+          "enum": [
+            "primary_sold_object",
+            "included",
+            "compatible_external",
+            "mentioned_only",
+            "negated",
+            "absent",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "sold_object": {
+          "enum": ["device", "fuel_consumable", "accessory", "kit", "other", "unknown"],
+          "type": "string"
+        },
+        "substance": {
+          "enum": [
+            "gas",
+            "flammable_liquid",
+            "solid_fuel",
+            "ignition_aid",
+            "none",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "supervise": {"type": "boolean"},
+        "support_status": {
+          "enum": ["supported", "unsupported", "ambiguous"],
+          "type": "string"
+        }
+      },
+      "required": [
+        "sold_object",
+        "substance",
+        "relation",
+        "evidence_candidate_indices",
+        "support_status",
+        "supervise"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "exp689_target_audit_row_v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "audit_id": {"pattern": "^G689-[0-9]{3}$", "type": "string"},
+    "evidence_candidates": {
+      "items": {"$ref": "#/$defs/evidence_candidate"},
+      "type": "array"
+    },
+    "record_id": {"minLength": 1, "type": "string"},
+    "request_row_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "review": {"$ref": "#/$defs/review"},
+    "schema_version": {"const": "exp689_target_audit_row_v1"},
+    "source_card_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "sources": {"items": {"$ref": "#/$defs/source"}, "minItems": 1, "type": "array"},
+    "stratum": {
+      "enum": [
+        "direct_included_fuel",
+        "device_accessory_compatible_mention",
+        "singleton_new_family_ambiguous"
+      ],
+      "type": "string"
+    },
+    "target": {"$ref": "#/$defs/target"}
+  },
+  "required": [
+    "schema_version",
+    "audit_id",
+    "record_id",
+    "stratum",
+    "source_card_sha256",
+    "request_row_sha256",
+    "sources",
+    "evidence_candidates",
+    "target",
+    "review"
+  ],
+  "title": "Experiment 689 grounded transaction-graph target-audit row",
+  "type": "object"
+}
