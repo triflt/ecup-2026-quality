@@ -296,3 +296,42 @@ def test_diagnostic_preset_rejects_source_or_output_substitution() -> None:
     args.output_prefix = args.source_f03_key + "/nested"
     with pytest.raises(ValueError, match="disjoint"):
         preset_builder.build(args)
+
+
+def test_diagnostic_cli_names_bind_exact_diagnose_signature() -> None:
+    parsed = diagnostic.parser().parse_args(
+        [
+            "--archive",
+            "source.tar.gz",
+            "--bundle-root",
+            "bundle",
+            "--bundle-sha256",
+            "1" * 64,
+            "--manifest",
+            "manifest.json",
+            "--manifest-sha256",
+            "2" * 64,
+            "--manifest-self-sha256",
+            "3" * 64,
+            "--revision",
+            "a" * 40,
+            "--work-dir",
+            "work",
+            "--output",
+            "report.json",
+        ]
+    )
+    assert set(vars(parsed)) == {
+        "archive_path",
+        "bundle_root",
+        "bundle_sha256",
+        "manifest_path",
+        "manifest_sha256",
+        "manifest_self_sha256",
+        "revision",
+        "work_dir",
+        "output_path",
+    }
+    assert parsed.archive_path == Path("source.tar.gz")
+    assert parsed.manifest_path == Path("manifest.json")
+    assert parsed.output_path == Path("report.json")

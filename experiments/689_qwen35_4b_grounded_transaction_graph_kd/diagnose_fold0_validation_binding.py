@@ -316,15 +316,15 @@ def diagnose(
 
 def parser() -> argparse.ArgumentParser:
     value = argparse.ArgumentParser(description=__doc__)
-    value.add_argument("--archive", type=Path, required=True)
+    value.add_argument("--archive", dest="archive_path", type=Path, required=True)
     value.add_argument("--bundle-root", type=Path, required=True)
     value.add_argument("--bundle-sha256", required=True)
-    value.add_argument("--manifest", type=Path, required=True)
+    value.add_argument("--manifest", dest="manifest_path", type=Path, required=True)
     value.add_argument("--manifest-sha256", required=True)
     value.add_argument("--manifest-self-sha256", required=True)
     value.add_argument("--revision", required=True)
     value.add_argument("--work-dir", type=Path, required=True)
-    value.add_argument("--output", type=Path, required=True)
+    value.add_argument("--output", dest="output_path", type=Path, required=True)
     return value
 
 
