@@ -16,6 +16,7 @@ EXPERIMENT = (
 sys.path.insert(0, str(EXPERIMENT))
 
 import audit_source_archives as audit
+import verify_source_archive_audit as verifier
 
 
 def make_tar(path: Path, *, unsafe: bool) -> None:
@@ -81,3 +82,68 @@ def test_header_audit_requires_exact_size_and_sha(tmp_path: Path) -> None:
         audit.audit_archive(path, audit.sha256_file(path), path.stat().st_size + 1, "source")
     with pytest.raises(ValueError, match="SHA mismatch"):
         audit.audit_archive(path, "0" * 64, path.stat().st_size, "source")
+
+
+def test_compact_verifier_rejects_frozen_object_substitution(tmp_path: Path) -> None:
+    report = {
+        "schema_version": "exp689_source_archive_header_audit_v1",
+        "execution_scope": "remote_cpu_header_only",
+        "archives": [
+            {
+                "archive_id": archive_id,
+                "sha256": sha,
+                "size_bytes": size,
+                "member_count": 1,
+                "type_counts": {"regular": 1},
+                "unsafe_member_count": 0,
+                "unsafe_members": [],
+                "file_contents_extracted": False,
+            }
+            for archive_id, sha, size in (
+                (
+                    "source_f03",
+                    "e371c03a3fc893d990d38874e07200a5ac136b8c72f43109aa7f567761943ccd",
+                    15_852_324,
+                ),
+                (
+                    "source_f124",
+                    "1dfb9bf01a9567286051ee76a79fc4b41c2af360e5761b7a4663090745c5474d",
+                    15_000_958,
+                ),
+            )
+        ],
+        "labels_read": 0,
+        "sealed_rows_read": 0,
+        "public_used": False,
+        "jobs_launched_by_auditor": 0,
+        "self_sha256": None,
+    }
+    report["self_sha256"] = audit.hashlib.sha256(
+        audit.canonical_json_bytes(report)
+    ).hexdigest()
+    report_path = tmp_path / "report.json"
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+    result = verifier.verify(
+        report_path=report_path,
+        expected_report_sha256=verifier.sha256_file(report_path),
+        expected_code_commit="a" * 40,
+        expected_code_sha256="b" * 64,
+        output_path=tmp_path / "acceptance.json",
+    )
+    assert result["decision"] == "NO_UNSAFE_MEMBERS_EXTRACTOR_MISMATCH"
+    assert result["prepare_retry_authorized"] is False
+    report["archives"][0]["size_bytes"] += 1
+    report["self_sha256"] = None
+    report["self_sha256"] = audit.hashlib.sha256(
+        audit.canonical_json_bytes(report)
+    ).hexdigest()
+    forged = tmp_path / "forged.json"
+    forged.write_text(json.dumps(report), encoding="utf-8")
+    with pytest.raises(ValueError, match="frozen object binding mismatch"):
+        verifier.verify(
+            report_path=forged,
+            expected_report_sha256=verifier.sha256_file(forged),
+            expected_code_commit="a" * 40,
+            expected_code_sha256="b" * 64,
+            output_path=tmp_path / "forbidden.json",
+        )
