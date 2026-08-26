@@ -170,6 +170,13 @@ def test_non_overlapping_rejects_two_verifier_outputs() -> None:
         preset_builder._non_overlapping(outputs=["/out", "/out/nested"], inputs=[])
 
 
+def test_resolved_terminal_rejects_second_platform_attempt() -> None:
+    with pytest.raises(ValueError, match="retry/platform attempt mismatch"):
+        verifier._validate_terminal_attempts(
+            {"retry_attempt": 1, "platform_attempt": 2}
+        )
+
+
 def test_retry_verifier_bundle_is_deterministic_and_runner_only(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()

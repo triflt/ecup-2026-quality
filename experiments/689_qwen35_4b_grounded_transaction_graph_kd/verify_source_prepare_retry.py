@@ -83,7 +83,7 @@ MATERIALIZATION_RECEIPT_FIELDS = _fields(
     student_gpu_authorized public_used self_sha256"""
 )
 RESOLVED_TERMINAL_FIELDS = _fields(
-    """schema_version metadata_source experiment_id retry_attempt job_id status
+    """schema_version metadata_source experiment_id retry_attempt platform_attempt job_id status
     exit_code finished_at region flavor image gpu_count preset_sha256
     preset_size_bytes resolved_command_sha256 submit_receipt live_go
     materialization_receipt retry_gate retry_contract retry_code resolved_inputs
@@ -474,6 +474,17 @@ def _object_binding(reference: str, file_sha256: str, self_sha256: str) -> dict[
     }
 
 
+def _validate_terminal_attempts(value: dict[str, Any]) -> None:
+    platform_attempt = value["platform_attempt"]
+    if (
+        value["retry_attempt"] != 1
+        or not isinstance(platform_attempt, int)
+        or isinstance(platform_attempt, bool)
+        or platform_attempt != 1
+    ):
+        raise ValueError("resolved terminal retry/platform attempt mismatch")
+
+
 def _validate_resolved_terminal_metadata(
     args: argparse.Namespace,
     *,
@@ -490,6 +501,7 @@ def _validate_resolved_terminal_metadata(
         expected_fields=RESOLVED_TERMINAL_FIELDS,
         context="independently exported resolved terminal metadata",
     )
+    _validate_terminal_attempts(value)
     expected_inputs = {
         "bundle": {
             "reference": args.retry_bundle_ref,
@@ -574,7 +586,6 @@ def _validate_resolved_terminal_metadata(
         != "exp689_source_prepare_retry_resolved_terminal_metadata_v1"
         or value["metadata_source"] != "remote_compute_resolved_job_api_independent"
         or value["experiment_id"] != "689"
-        or value["retry_attempt"] != 1
         or value["job_id"] != submit_receipt["job_id"]
         or value["status"] != "SUCCESS"
         or value["exit_code"] != 0
@@ -1029,6 +1040,7 @@ def verify(args: argparse.Namespace) -> dict[str, Any]:
         "approved_s3_output_ref": args.prepare_output_ref,
         "max_jobs": 1,
         "retry_attempt": 1,
+        "platform_attempt": resolved_terminal["platform_attempt"],
         "teacher_authorized": False,
         "model_authorized": False,
         "review_authorized": False,
