@@ -30,12 +30,19 @@ def directory_input_lines(name: str, bucket: str, key: str, dst: str) -> list[st
     ]
 
 
-def _non_overlapping(*keys: str) -> None:
-    paths = [PurePosixPath(key) for key in keys]
-    for index, left in enumerate(paths):
-        for right in paths[index + 1 :]:
-            if left == right or left.is_relative_to(right) or right.is_relative_to(left):
-                raise ValueError("verifier input/output prefixes must not overlap")
+def _non_overlapping(*, outputs: list[str], inputs: list[str]) -> None:
+    output_paths = [PurePosixPath(key) for key in outputs]
+    input_paths = [PurePosixPath(key) for key in inputs]
+    pairs = [
+        (left, right)
+        for index, left in enumerate(output_paths)
+        for right in output_paths[index + 1 :]
+    ] + [(output, input_path) for output in output_paths for input_path in input_paths]
+    if any(
+        left == right or left.is_relative_to(right) or right.is_relative_to(left)
+        for left, right in pairs
+    ):
+        raise ValueError("verifier outputs must be disjoint from all inputs and outputs")
 
 
 def build(args: argparse.Namespace) -> str:
@@ -66,7 +73,19 @@ def build(args: argparse.Namespace) -> str:
         "retry_gate_sha256",
         "retry_gate_self_sha256",
         "retry_preset_builder_sha256",
-        "terminal_metadata_sha256",
+        "submit_receipt_sha256",
+        "submit_receipt_self_sha256",
+        "live_go_sha256",
+        "live_go_self_sha256",
+        "materialization_receipt_sha256",
+        "materialization_receipt_self_sha256",
+        "resolved_terminal_metadata_sha256",
+        "resolved_terminal_metadata_self_sha256",
+        "terminal_transport_f03_sha256",
+        "terminal_transport_f03_self_sha256",
+        "terminal_transport_f124_sha256",
+        "terminal_transport_f124_self_sha256",
+        "expected_resolved_command_sha256",
     )
     if any(not HEX64.fullmatch(getattr(args, field)) for field in hash_fields):
         raise ValueError("all transport-aware verifier inputs require exact SHA-256")
@@ -91,17 +110,33 @@ def build(args: argparse.Namespace) -> str:
         "exclusion_672_key",
         "prepared_prefix",
         "prepare_transport_report_prefix",
-        "terminal_metadata_key",
         "diagnostic_acceptance_key",
         "retry_contract_key",
         "retry_gate_key",
+        "submit_receipt_key",
+        "live_go_key",
+        "materialization_receipt_key",
+        "resolved_terminal_metadata_key",
+        "terminal_transport_f03_key",
+        "terminal_transport_f124_key",
         "output_prefix",
     )
     keys = {field: safe_key(getattr(args, field)) for field in key_fields}
+    expected_terminal_keys = {
+        "terminal_transport_f03_key": (
+            keys["prepare_transport_report_prefix"].rstrip("/")
+            + "/source_f03_extraction.json"
+        ),
+        "terminal_transport_f124_key": (
+            keys["prepare_transport_report_prefix"].rstrip("/")
+            + "/source_f124_extraction.json"
+        ),
+    }
+    if any(keys[field] != expected for field, expected in expected_terminal_keys.items()):
+        raise ValueError("terminal transport report key differs from exact output inventory")
     _non_overlapping(
-        keys["prepared_prefix"],
-        keys["prepare_transport_report_prefix"],
-        keys["output_prefix"],
+        outputs=[keys["output_prefix"]],
+        inputs=[value for field, value in keys.items() if field != "output_prefix"],
     )
     refs = {
         field.removesuffix("_key") + "_ref": s3_ref(args.bucket, value)
@@ -110,7 +145,6 @@ def build(args: argparse.Namespace) -> str:
     }
     prepare_output_ref = s3_ref(args.bucket, keys["prepared_prefix"])
     runner_path = f"/work/verifier_code/{EXPERIMENT}/verify_source_prepare_retry.py"
-    terminal_name = PurePosixPath(keys["terminal_metadata_key"]).name
     segments = [
         safe_extract(
             "/work/input/verifier_code/verifier_bundle.tar.gz",
@@ -213,15 +247,68 @@ def build(args: argparse.Namespace) -> str:
             args.retry_gate_sha256,
             refs["retry_gate_ref"],
         ),
-        (
-            "terminal-metadata",
-            f"/work/input/terminal/{terminal_name}",
-            args.terminal_metadata_sha256,
-            refs["terminal_metadata_ref"],
-        ),
     )
     for name, path, sha, reference in file_arguments:
-        command_args.extend([f"--{name}", path, f"--{name}-sha256", sha, f"--{name}-ref", reference])
+        command_args.extend(
+            [f"--{name}", path, f"--{name}-sha256", sha, f"--{name}-ref", reference]
+        )
+    provenance_arguments = (
+        (
+            "submit-receipt",
+            "/work/input/submit_receipt/submit_receipt.json",
+            args.submit_receipt_sha256,
+            args.submit_receipt_self_sha256,
+            refs["submit_receipt_ref"],
+        ),
+        (
+            "live-go",
+            "/work/input/live_go/live_go.json",
+            args.live_go_sha256,
+            args.live_go_self_sha256,
+            refs["live_go_ref"],
+        ),
+        (
+            "materialization-receipt",
+            "/work/input/materialization/materialization_receipt.json",
+            args.materialization_receipt_sha256,
+            args.materialization_receipt_self_sha256,
+            refs["materialization_receipt_ref"],
+        ),
+        (
+            "resolved-terminal-metadata",
+            "/work/input/resolved_terminal/resolved_terminal_metadata.json",
+            args.resolved_terminal_metadata_sha256,
+            args.resolved_terminal_metadata_self_sha256,
+            refs["resolved_terminal_metadata_ref"],
+        ),
+        (
+            "terminal-transport-f03",
+            "/work/input/terminal_transport_f03/source_f03_extraction.json",
+            args.terminal_transport_f03_sha256,
+            args.terminal_transport_f03_self_sha256,
+            refs["terminal_transport_f03_ref"],
+        ),
+        (
+            "terminal-transport-f124",
+            "/work/input/terminal_transport_f124/source_f124_extraction.json",
+            args.terminal_transport_f124_sha256,
+            args.terminal_transport_f124_self_sha256,
+            refs["terminal_transport_f124_ref"],
+        ),
+    )
+    for name, path, file_sha, self_sha, reference in provenance_arguments:
+        command_args.extend(
+            [
+                f"--{name}",
+                path,
+                f"--{name}-sha256",
+                file_sha,
+                f"--{name}-self-sha256",
+                self_sha,
+                f"--{name}-ref",
+                reference,
+            ]
+        )
     command_args.extend(
         [
             "--diagnostic-acceptance-self-sha256",
@@ -234,6 +321,8 @@ def build(args: argparse.Namespace) -> str:
             args.retry_gate_self_sha256,
             "--retry-preset-builder-sha256",
             args.retry_preset_builder_sha256,
+            "--expected-resolved-command-sha256",
+            args.expected_resolved_command_sha256,
             "--retry-bundle-ref",
             refs["retry_bundle_ref"],
             "--retry-manifest-ref",
@@ -341,10 +430,40 @@ def build(args: argparse.Namespace) -> str:
             "transport_retry_gate.json",
         ),
         (
-            "terminal",
-            keys["terminal_metadata_key"],
-            "/work/input/terminal",
-            terminal_name,
+            "submit_receipt",
+            keys["submit_receipt_key"],
+            "/work/input/submit_receipt",
+            "submit_receipt.json",
+        ),
+        (
+            "live_go",
+            keys["live_go_key"],
+            "/work/input/live_go",
+            "live_go.json",
+        ),
+        (
+            "materialization",
+            keys["materialization_receipt_key"],
+            "/work/input/materialization",
+            "materialization_receipt.json",
+        ),
+        (
+            "resolved_terminal",
+            keys["resolved_terminal_metadata_key"],
+            "/work/input/resolved_terminal",
+            "resolved_terminal_metadata.json",
+        ),
+        (
+            "transport_f03",
+            keys["terminal_transport_f03_key"],
+            "/work/input/terminal_transport_f03",
+            "source_f03_extraction.json",
+        ),
+        (
+            "transport_f124",
+            keys["terminal_transport_f124_key"],
+            "/work/input/terminal_transport_f124",
+            "source_f124_extraction.json",
         ),
     )
     for name, key, dst, filename in file_specs:
@@ -358,7 +477,7 @@ def build(args: argparse.Namespace) -> str:
         [
             "  output:",
             "    - type: s3msk",
-            "      name: source_prepare_retry_acceptance",
+            "      name: src_retry_accept",
             "      src: /work/output",
             f"      dst: {json.dumps(keys['output_prefix'])}",
             f"      bucket: {json.dumps(args.bucket)}",
@@ -387,21 +506,25 @@ def parser() -> argparse.ArgumentParser:
         value.add_argument(f"--{name}-sha256", required=True)
     value.add_argument("--prepared-prefix", required=True)
     value.add_argument("--prepare-transport-report-prefix", required=True)
-    value.add_argument("--terminal-metadata-key", required=True)
-    value.add_argument("--terminal-metadata-sha256", required=True)
-    value.add_argument("--diagnostic-acceptance-key", required=True)
-    value.add_argument("--diagnostic-acceptance-sha256", required=True)
-    value.add_argument("--diagnostic-acceptance-self-sha256", required=True)
+    for name in (
+        "diagnostic-acceptance",
+        "retry-contract",
+        "retry-gate",
+        "submit-receipt",
+        "live-go",
+        "materialization-receipt",
+        "resolved-terminal-metadata",
+        "terminal-transport-f03",
+        "terminal-transport-f124",
+    ):
+        value.add_argument(f"--{name}-key", required=True)
+        value.add_argument(f"--{name}-sha256", required=True)
+        value.add_argument(f"--{name}-self-sha256", required=True)
     value.add_argument(
         "--diagnostic-verifier-terminal-metadata-sha256", required=True
     )
-    value.add_argument("--retry-contract-key", required=True)
-    value.add_argument("--retry-contract-sha256", required=True)
-    value.add_argument("--retry-contract-self-sha256", required=True)
-    value.add_argument("--retry-gate-key", required=True)
-    value.add_argument("--retry-gate-sha256", required=True)
-    value.add_argument("--retry-gate-self-sha256", required=True)
     value.add_argument("--retry-preset-builder-sha256", required=True)
+    value.add_argument("--expected-resolved-command-sha256", required=True)
     value.add_argument("--output-prefix", required=True)
     value.add_argument("--output", type=Path, required=True)
     return value

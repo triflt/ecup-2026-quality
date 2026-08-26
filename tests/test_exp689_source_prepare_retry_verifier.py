@@ -54,8 +54,6 @@ def preset_args() -> argparse.Namespace:
         ],
         prepared_prefix="/team/689/prepare/retry1",
         prepare_transport_report_prefix="/team/689/prepare-transport/retry1",
-        terminal_metadata_key="/team/689/terminal/retry1.json",
-        terminal_metadata_sha256="9" * 64,
         diagnostic_acceptance_key="/team/689/diagnostic/acceptance.json",
         diagnostic_acceptance_sha256="a" * 64,
         diagnostic_acceptance_self_sha256="b" * 64,
@@ -67,6 +65,29 @@ def preset_args() -> argparse.Namespace:
         retry_gate_sha256="f" * 64,
         retry_gate_self_sha256="0" * 64,
         retry_preset_builder_sha256="1" * 64,
+        expected_resolved_command_sha256="e" * 64,
+        submit_receipt_key="/team/689/submit/receipt.json",
+        submit_receipt_sha256="2" * 64,
+        submit_receipt_self_sha256="3" * 64,
+        live_go_key="/team/689/go/live_go.json",
+        live_go_sha256="4" * 64,
+        live_go_self_sha256="5" * 64,
+        materialization_receipt_key="/team/689/materialization/receipt.json",
+        materialization_receipt_sha256="6" * 64,
+        materialization_receipt_self_sha256="7" * 64,
+        resolved_terminal_metadata_key="/team/689/terminal/resolved.json",
+        resolved_terminal_metadata_sha256="8" * 64,
+        resolved_terminal_metadata_self_sha256="9" * 64,
+        terminal_transport_f03_key=(
+            "/team/689/prepare-transport/retry1/source_f03_extraction.json"
+        ),
+        terminal_transport_f03_sha256="a" * 64,
+        terminal_transport_f03_self_sha256="b" * 64,
+        terminal_transport_f124_key=(
+            "/team/689/prepare-transport/retry1/source_f124_extraction.json"
+        ),
+        terminal_transport_f124_sha256="c" * 64,
+        terminal_transport_f124_self_sha256="d" * 64,
         output_prefix="/team/689/verification/retry1",
         output=Path("unused.yaml"),
     )
@@ -80,6 +101,24 @@ def test_transport_aware_preset_is_cpu_only_and_uses_original_archives() -> None
     assert "verify_source_prepare_retry.py" in preset
     assert "--retry-gate /work/input/retry_gate/transport_retry_gate.json" in preset
     assert "--diagnostic-acceptance " in preset
+    assert "--submit-receipt /work/input/submit_receipt/submit_receipt.json" in preset
+    assert "--live-go /work/input/live_go/live_go.json" in preset
+    assert (
+        "--materialization-receipt "
+        "/work/input/materialization/materialization_receipt.json" in preset
+    )
+    assert (
+        "--resolved-terminal-metadata "
+        "/work/input/resolved_terminal/resolved_terminal_metadata.json" in preset
+    )
+    assert (
+        "--terminal-transport-f03 "
+        "/work/input/terminal_transport_f03/source_f03_extraction.json" in preset
+    )
+    assert (
+        "--terminal-transport-f124 "
+        "/work/input/terminal_transport_f124/source_f124_extraction.json" in preset
+    )
     assert "--source-f03 /work/input/source_f03/source_f03.tar.gz" in preset
     assert "--source-f124 /work/input/source_f124/source_f124.tar.gz" in preset
     assert "--prepare-dir /work/input/prepared/prepared" in preset
@@ -88,7 +127,9 @@ def test_transport_aware_preset_is_cpu_only_and_uses_original_archives() -> None
     assert "--retry-manifest-self-sha256 " + "7" * 64 in preset
     assert "  input:\n" in preset and "  output:\n" in preset
     assert "  inputs:\n" not in preset and "  outputs:\n" not in preset
-    assert preset.count("    - type: s3msk") == 14
+    assert "      name: src_retry_accept" in preset
+    assert len("src_retry_accept") <= 20
+    assert preset.count("    - type: s3msk") == 19
 
 
 def test_transport_aware_preset_rejects_archive_or_output_substitution() -> None:
@@ -97,9 +138,36 @@ def test_transport_aware_preset_rejects_archive_or_output_substitution() -> None
     with pytest.raises(ValueError, match="frozen source archive"):
         preset_builder.build(args)
     args = preset_args()
-    args.output_prefix = args.prepared_prefix + "/nested"
-    with pytest.raises(ValueError, match="must not overlap"):
+    args.output_prefix = args.retry_gate_key + "/nested"
+    with pytest.raises(ValueError, match="disjoint"):
         preset_builder.build(args)
+
+
+@pytest.mark.parametrize(
+    "input_field",
+    [
+        "verifier_bundle_key",
+        "retry_bundle_key",
+        "source_f03_key",
+        "exclusion_670_key",
+        "retry_gate_key",
+        "resolved_terminal_metadata_key",
+        "prepared_prefix",
+        "terminal_transport_f03_key",
+    ],
+)
+def test_verifier_output_is_disjoint_from_every_input_class(
+    input_field: str,
+) -> None:
+    args = preset_args()
+    args.output_prefix = getattr(args, input_field) + "/nested"
+    with pytest.raises(ValueError, match="disjoint"):
+        preset_builder.build(args)
+
+
+def test_non_overlapping_rejects_two_verifier_outputs() -> None:
+    with pytest.raises(ValueError, match="disjoint"):
+        preset_builder._non_overlapping(outputs=["/out", "/out/nested"], inputs=[])
 
 
 def test_retry_verifier_bundle_is_deterministic_and_runner_only(tmp_path: Path) -> None:
@@ -207,7 +275,12 @@ def test_gate_rejection_happens_before_original_archive_payload_access(
         "diagnostic_acceptance",
         "retry_contract",
         "retry_gate",
-        "terminal_metadata",
+        "submit_receipt",
+        "live_go",
+        "materialization_receipt",
+        "resolved_terminal_metadata",
+        "terminal_transport_f03",
+        "terminal_transport_f124",
     ):
         path = tmp_path / f"{name}.dat"
         path.write_bytes(b"frozen")
@@ -268,7 +341,19 @@ def test_gate_rejection_happens_before_original_archive_payload_access(
         "retry_gate_sha256": "2" * 64,
         "retry_gate_self_sha256": "3" * 64,
         "retry_preset_builder_sha256": "4" * 64,
-        "terminal_metadata_sha256": "5" * 64,
+        "expected_resolved_command_sha256": "1" * 64,
+        "submit_receipt_sha256": "5" * 64,
+        "submit_receipt_self_sha256": "6" * 64,
+        "live_go_sha256": "7" * 64,
+        "live_go_self_sha256": "8" * 64,
+        "materialization_receipt_sha256": "9" * 64,
+        "materialization_receipt_self_sha256": "a" * 64,
+        "resolved_terminal_metadata_sha256": "b" * 64,
+        "resolved_terminal_metadata_self_sha256": "c" * 64,
+        "terminal_transport_f03_sha256": "d" * 64,
+        "terminal_transport_f03_self_sha256": "e" * 64,
+        "terminal_transport_f124_sha256": "f" * 64,
+        "terminal_transport_f124_self_sha256": "0" * 64,
         "verifier_revision": "a" * 40,
         "retry_revision": "b" * 40,
         "base_acceptance": tmp_path / "out/base.json",
@@ -286,7 +371,12 @@ def test_gate_rejection_happens_before_original_archive_payload_access(
         "diagnostic_acceptance_ref": "s3://bucket/diagnostic.json",
         "retry_contract_ref": "s3://bucket/contract.json",
         "retry_gate_ref": "s3://bucket/gate.json",
-        "terminal_metadata_ref": "s3://bucket/terminal.json",
+        "submit_receipt_ref": "s3://bucket/submit.json",
+        "live_go_ref": "s3://bucket/live_go.json",
+        "materialization_receipt_ref": "s3://bucket/materialization.json",
+        "resolved_terminal_metadata_ref": "s3://bucket/terminal.json",
+        "terminal_transport_f03_ref": "s3://bucket/transport/source_f03_extraction.json",
+        "terminal_transport_f124_ref": "s3://bucket/transport/source_f124_extraction.json",
         "prepare_output_ref": "s3://bucket/prepare",
         "prepare_dir": tmp_path / "prepared",
     }

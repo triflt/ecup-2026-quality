@@ -40,6 +40,57 @@ TRANSPORT_REPORT_FIELDS = {
 }
 
 
+def _fields(value: str) -> set[str]:
+    return set(value.split())
+
+
+LIVE_GO_FIELDS = _fields(
+    """schema_version experiment_id issuer_role decision preset_sha256
+    preset_size_bytes gate_file_sha256 gate_self_sha256 contract_file_sha256
+    contract_self_sha256 materialization_receipt_file_sha256
+    materialization_receipt_self_sha256 materialization_args_file_sha256
+    builder_commit builder_sha256 submit_wrapper_sha256 submit_wrapper_test_sha256
+    s3_endpoint s3_cli_sha256 s3_requirements_sha256 project_file_sha256
+    one_shot_nonce receipt_path_sha256 output_bucket output_prefix
+    transport_report_prefix audit_preset_errors audit_preset_warnings
+    audit_preset_result_sha256 server_dry_run_passed server_dry_run_receipt_sha256
+    empty_prefix_max_age_seconds max_jobs retry_attempt teacher_authorized
+    model_authorized review_authorized student_gpu_authorized public_used
+    resolved_terminal_metadata_required self_sha256"""
+)
+SUBMIT_RECEIPT_FIELDS = _fields(
+    """schema_version experiment_id state returncode job_id error_class
+    live_go_file_sha256 live_go_self_sha256 actual_sent_clean_preset_sha256
+    actual_sent_clean_preset_size_bytes gate_file_sha256 gate_self_sha256
+    contract_file_sha256 contract_self_sha256 materialization_receipt_file_sha256
+    materialization_receipt_self_sha256 materialization_args_file_sha256
+    builder_commit builder_sha256 submit_wrapper_sha256 submit_wrapper_test_sha256
+    s3_endpoint s3_cli_sha256 s3_requirements_sha256 project_file_sha256
+    one_shot_nonce receipt_path_sha256 output_bucket output_prefix
+    transport_report_prefix empty_prefix_proof empty_prefix_proof_self_sha256
+    max_jobs retry_attempt teacher_authorized model_authorized review_authorized
+    student_gpu_authorized public_used resolved_terminal_metadata_required
+    audit_preset_result_sha256 server_dry_run_receipt_sha256
+    secret_payload_persisted process_output_persisted self_sha256"""
+)
+MATERIALIZATION_RECEIPT_FIELDS = _fields(
+    """schema_version experiment_id scope retry_attempt
+    diagnostic_acceptance_file_sha256 diagnostic_acceptance_self_sha256
+    transport_retry_gate_file_sha256 transport_retry_gate_self_sha256
+    preset_contract_file_sha256 preset_semantic_contract_sha256
+    final_preset_sha256 final_preset_size_bytes retry_preset_builder_sha256
+    controlled_prepare_retry_authorized max_jobs teacher_authorized
+    student_gpu_authorized public_used self_sha256"""
+)
+RESOLVED_TERMINAL_FIELDS = _fields(
+    """schema_version metadata_source experiment_id retry_attempt job_id status
+    exit_code finished_at region flavor image gpu_count preset_sha256
+    preset_size_bytes resolved_command_sha256 submit_receipt live_go
+    materialization_receipt retry_gate retry_contract retry_code resolved_inputs
+    resolved_outputs self_sha256"""
+)
+
+
 def canonical_json_bytes(value: Any) -> bytes:
     return json.dumps(
         value,
@@ -197,6 +248,374 @@ def _validate_transport_report(
     }
 
 
+def _read_exact_document(
+    path: Path,
+    *,
+    expected_file_sha256: str,
+    expected_self_sha256: str,
+    expected_fields: set[str],
+    context: str,
+) -> dict[str, Any]:
+    if sha256_file(path) != expected_file_sha256:
+        raise ValueError(f"{context} file SHA mismatch")
+    value = _json(path, context)
+    if set(value) != expected_fields:
+        raise ValueError(f"{context} exact schema mismatch")
+    if _self_hash(value, context) != expected_self_sha256:
+        raise ValueError(f"{context} expected self SHA mismatch")
+    return value
+
+
+def _false_authorizations(value: dict[str, Any]) -> bool:
+    return all(
+        value[field] is False
+        for field in (
+            "teacher_authorized",
+            "model_authorized",
+            "review_authorized",
+            "student_gpu_authorized",
+            "public_used",
+        )
+    )
+
+
+def _validate_live_go(
+    args: argparse.Namespace, contract: dict[str, Any]
+) -> dict[str, Any]:
+    value = _read_exact_document(
+        args.live_go,
+        expected_file_sha256=args.live_go_sha256,
+        expected_self_sha256=args.live_go_self_sha256,
+        expected_fields=LIVE_GO_FIELDS,
+        context="independent live GO",
+    )
+    sha_fields = [field for field in LIVE_GO_FIELDS if field.endswith("_sha256")]
+    if (
+        any(not HEX64.fullmatch(value[field]) for field in sha_fields)
+        or not HEX64.fullmatch(value["one_shot_nonce"])
+    ):
+        raise ValueError("independent live GO contains a non-exact SHA")
+    if (
+        value["schema_version"] != "exp689_source_prepare_retry_live_go_v1"
+        or value["experiment_id"] != "689"
+        or value["issuer_role"] != "independent_integrator"
+        or value["decision"] != "OPEN_EXACT_ONE_CPU_SOURCE_PREPARE_RETRY"
+        or value["gate_file_sha256"] != args.retry_gate_sha256
+        or value["gate_self_sha256"] != args.retry_gate_self_sha256
+        or value["contract_file_sha256"] != args.retry_contract_sha256
+        or value["contract_self_sha256"] != args.retry_contract_self_sha256
+        or value["materialization_receipt_file_sha256"]
+        != args.materialization_receipt_sha256
+        or value["materialization_receipt_self_sha256"]
+        != args.materialization_receipt_self_sha256
+        or value["builder_commit"] != args.retry_revision
+        or value["builder_sha256"] != args.retry_preset_builder_sha256
+        or value["output_bucket"] != contract["bucket"]
+        or value["output_prefix"] != contract["outputs"]["source_prepare"]
+        or value["transport_report_prefix"]
+        != contract["outputs"]["transport_reports"]
+        or value["audit_preset_errors"] != 0
+        or value["audit_preset_warnings"] != 1
+        or value["server_dry_run_passed"] is not True
+        or isinstance(value["empty_prefix_max_age_seconds"], bool)
+        or value["empty_prefix_max_age_seconds"] not in range(1, 121)
+        or value["max_jobs"] != 1
+        or value["retry_attempt"] != 1
+        or value["resolved_terminal_metadata_required"] is not True
+        or not _false_authorizations(value)
+        or not isinstance(value["preset_size_bytes"], int)
+        or isinstance(value["preset_size_bytes"], bool)
+        or value["preset_size_bytes"] <= 0
+    ):
+        raise ValueError("independent live GO frozen authorization mismatch")
+    return value
+
+
+def _validate_materialization_receipt(
+    args: argparse.Namespace, live_go: dict[str, Any]
+) -> dict[str, Any]:
+    value = _read_exact_document(
+        args.materialization_receipt,
+        expected_file_sha256=args.materialization_receipt_sha256,
+        expected_self_sha256=args.materialization_receipt_self_sha256,
+        expected_fields=MATERIALIZATION_RECEIPT_FIELDS,
+        context="materialization receipt",
+    )
+    if (
+        value["schema_version"]
+        != "exp689_source_prepare_retry_materialization_v1"
+        or value["experiment_id"] != "689"
+        or value["scope"] != "source_prepare_transport_retry_only"
+        or value["retry_attempt"] != 1
+        or value["diagnostic_acceptance_file_sha256"]
+        != args.diagnostic_acceptance_sha256
+        or value["diagnostic_acceptance_self_sha256"]
+        != args.diagnostic_acceptance_self_sha256
+        or value["transport_retry_gate_file_sha256"] != args.retry_gate_sha256
+        or value["transport_retry_gate_self_sha256"]
+        != args.retry_gate_self_sha256
+        or value["preset_contract_file_sha256"] != args.retry_contract_sha256
+        or value["preset_semantic_contract_sha256"]
+        != args.retry_contract_self_sha256
+        or value["final_preset_sha256"] != live_go["preset_sha256"]
+        or value["final_preset_size_bytes"] != live_go["preset_size_bytes"]
+        or value["retry_preset_builder_sha256"]
+        != args.retry_preset_builder_sha256
+        or value["controlled_prepare_retry_authorized"] is not True
+        or value["max_jobs"] != 1
+        or value["teacher_authorized"] is not False
+        or value["student_gpu_authorized"] is not False
+        or value["public_used"] is not False
+    ):
+        raise ValueError("materialization receipt frozen lineage mismatch")
+    return value
+
+
+def _validate_submit_receipt(
+    args: argparse.Namespace,
+    live_go: dict[str, Any],
+    materialization: dict[str, Any],
+) -> dict[str, Any]:
+    value = _read_exact_document(
+        args.submit_receipt,
+        expected_file_sha256=args.submit_receipt_sha256,
+        expected_self_sha256=args.submit_receipt_self_sha256,
+        expected_fields=SUBMIT_RECEIPT_FIELDS,
+        context="one-shot submit receipt",
+    )
+    proof = value["empty_prefix_proof"]
+    if not isinstance(proof, dict):
+        raise TypeError("one-shot submit receipt empty-prefix proof missing")
+    proof_self = _self_hash(proof, "empty-prefix proof")
+    expected_prefixes = [
+        {"prefix": live_go["output_prefix"], "object_count": 0},
+        {"prefix": live_go["transport_report_prefix"], "object_count": 0},
+    ]
+    if (
+        set(proof)
+        != {
+            "schema_version",
+            "checked_at_utc",
+            "bucket",
+            "prefixes",
+            "method",
+            "max_age_seconds",
+            "self_sha256",
+        }
+        or not isinstance(proof["checked_at_utc"], str)
+        or not proof["checked_at_utc"].strip()
+        or proof.get("schema_version")
+        != "exp689_source_prepare_retry_empty_prefix_proof_v1"
+        or proof.get("bucket") != live_go["output_bucket"]
+        or proof.get("prefixes") != expected_prefixes
+        or proof.get("method") != "s3_list_limit_1"
+        or proof.get("max_age_seconds") != live_go["empty_prefix_max_age_seconds"]
+        or proof_self != value["empty_prefix_proof_self_sha256"]
+    ):
+        raise ValueError("one-shot submit receipt empty-prefix proof mismatch")
+    if (
+        value["schema_version"] != "exp689_source_prepare_retry_submit_receipt_v1"
+        or value["experiment_id"] != "689"
+        or value["state"] != "SUBMITTED"
+        or value["returncode"] != 0
+        or not isinstance(value["job_id"], str)
+        or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", value["job_id"])
+        or value["error_class"] is not None
+        or value["live_go_file_sha256"] != args.live_go_sha256
+        or value["live_go_self_sha256"] != args.live_go_self_sha256
+        or value["actual_sent_clean_preset_sha256"] != live_go["preset_sha256"]
+        or value["actual_sent_clean_preset_size_bytes"]
+        != live_go["preset_size_bytes"]
+        or value["gate_file_sha256"] != args.retry_gate_sha256
+        or value["gate_self_sha256"] != args.retry_gate_self_sha256
+        or value["contract_file_sha256"] != args.retry_contract_sha256
+        or value["contract_self_sha256"] != args.retry_contract_self_sha256
+        or value["materialization_receipt_file_sha256"]
+        != args.materialization_receipt_sha256
+        or value["materialization_receipt_self_sha256"]
+        != materialization["self_sha256"]
+        or value["materialization_args_file_sha256"]
+        != live_go["materialization_args_file_sha256"]
+        or value["builder_commit"] != live_go["builder_commit"]
+        or value["builder_sha256"] != live_go["builder_sha256"]
+        or value["submit_wrapper_sha256"] != live_go["submit_wrapper_sha256"]
+        or value["submit_wrapper_test_sha256"]
+        != live_go["submit_wrapper_test_sha256"]
+        or value["s3_endpoint"] != live_go["s3_endpoint"]
+        or value["s3_cli_sha256"] != live_go["s3_cli_sha256"]
+        or value["s3_requirements_sha256"] != live_go["s3_requirements_sha256"]
+        or value["project_file_sha256"] != live_go["project_file_sha256"]
+        or value["one_shot_nonce"] != live_go["one_shot_nonce"]
+        or value["receipt_path_sha256"] != live_go["receipt_path_sha256"]
+        or value["output_bucket"] != live_go["output_bucket"]
+        or value["output_prefix"] != live_go["output_prefix"]
+        or value["transport_report_prefix"]
+        != live_go["transport_report_prefix"]
+        or value["max_jobs"] != 1
+        or value["retry_attempt"] != 1
+        or value["resolved_terminal_metadata_required"] is not True
+        or value["audit_preset_result_sha256"]
+        != live_go["audit_preset_result_sha256"]
+        or value["server_dry_run_receipt_sha256"]
+        != live_go["server_dry_run_receipt_sha256"]
+        or value["secret_payload_persisted"] is not False
+        or value["process_output_persisted"] is not False
+        or not _false_authorizations(value)
+    ):
+        raise ValueError("one-shot submit receipt frozen lineage mismatch")
+    return value
+
+
+def _object_binding(reference: str, file_sha256: str, self_sha256: str) -> dict[str, str]:
+    return {
+        "reference": reference,
+        "file_sha256": file_sha256,
+        "self_sha256": self_sha256,
+    }
+
+
+def _validate_resolved_terminal_metadata(
+    args: argparse.Namespace,
+    *,
+    contract: dict[str, Any],
+    live_go: dict[str, Any],
+    materialization: dict[str, Any],
+    submit_receipt: dict[str, Any],
+    terminal_report_inventory: list[dict[str, Any]],
+) -> dict[str, Any]:
+    value = _read_exact_document(
+        args.resolved_terminal_metadata,
+        expected_file_sha256=args.resolved_terminal_metadata_sha256,
+        expected_self_sha256=args.resolved_terminal_metadata_self_sha256,
+        expected_fields=RESOLVED_TERMINAL_FIELDS,
+        context="independently exported resolved terminal metadata",
+    )
+    expected_inputs = {
+        "bundle": {
+            "reference": args.retry_bundle_ref,
+            "sha256": args.retry_bundle_sha256,
+        },
+        "manifest": _object_binding(
+            args.retry_manifest_ref,
+            args.retry_manifest_sha256,
+            args.retry_manifest_self_sha256,
+        ),
+        "source_f03": {
+            "reference": args.source_f03_ref,
+            "sha256": args.source_f03_sha256,
+        },
+        "source_f124": {
+            "reference": args.source_f124_ref,
+            "sha256": args.source_f124_sha256,
+        },
+        "exclusion_670": {
+            "reference": args.exclusion_670_ref,
+            "sha256": args.exclusion_670_sha256,
+        },
+        "exclusion_672": {
+            "reference": args.exclusion_672_ref,
+            "sha256": args.exclusion_672_sha256,
+        },
+        "diagnostic_acceptance": _object_binding(
+            args.diagnostic_acceptance_ref,
+            args.diagnostic_acceptance_sha256,
+            args.diagnostic_acceptance_self_sha256,
+        ),
+        "retry_contract": _object_binding(
+            args.retry_contract_ref,
+            args.retry_contract_sha256,
+            args.retry_contract_self_sha256,
+        ),
+        "retry_gate": _object_binding(
+            args.retry_gate_ref,
+            args.retry_gate_sha256,
+            args.retry_gate_self_sha256,
+        ),
+    }
+    resolved_outputs = value["resolved_outputs"]
+    if not isinstance(resolved_outputs, dict):
+        raise TypeError("resolved terminal outputs must be an object")
+    prepared_output = resolved_outputs.get("prepared")
+    if (
+        not isinstance(prepared_output, dict)
+        or set(prepared_output) != {"reference", "inventory_sha256", "inventory"}
+        or prepared_output["reference"] != args.prepare_output_ref
+        or not isinstance(prepared_output["inventory"], list)
+        or not isinstance(prepared_output["inventory_sha256"], str)
+        or not HEX64.fullmatch(prepared_output["inventory_sha256"])
+        or prepared_output["inventory_sha256"]
+        != sha256_bytes(canonical_json_bytes(prepared_output["inventory"]))
+    ):
+        raise ValueError("resolved prepared-output inventory mismatch")
+    expected_outputs = {
+        "prepared": prepared_output,
+        "transport_reports": {
+            "prefix": _expected_ref(
+                contract, contract["outputs"]["transport_reports"]
+            ),
+            "inventory": terminal_report_inventory,
+        },
+    }
+    expected_retry_code = {
+        "builder_commit": args.retry_revision,
+        "bundle": {
+            "reference": args.retry_bundle_ref,
+            "sha256": args.retry_bundle_sha256,
+        },
+        "manifest": {
+            "reference": args.retry_manifest_ref,
+            "file_sha256": args.retry_manifest_sha256,
+            "self_sha256": args.retry_manifest_self_sha256,
+        },
+        "extractor_sha256": args.extractor_sha256,
+    }
+    if (
+        value["schema_version"]
+        != "exp689_source_prepare_retry_resolved_terminal_metadata_v1"
+        or value["metadata_source"] != "remote_compute_resolved_job_api_independent"
+        or value["experiment_id"] != "689"
+        or value["retry_attempt"] != 1
+        or value["job_id"] != submit_receipt["job_id"]
+        or value["status"] != "SUCCESS"
+        or value["exit_code"] != 0
+        or not isinstance(value["finished_at"], str)
+        or not value["finished_at"].strip()
+        or value["region"] != contract["job"]["region"]
+        or value["flavor"] != contract["job"]["flavor"]
+        or value["image"] != contract["job"]["image"]
+        or value["gpu_count"] != 0
+        or value["gpu_count"] != contract["job"]["gpu_count"]
+        or value["preset_sha256"] != live_go["preset_sha256"]
+        or value["preset_sha256"] != materialization["final_preset_sha256"]
+        or value["preset_size_bytes"] != live_go["preset_size_bytes"]
+        or value["preset_size_bytes"] != materialization["final_preset_size_bytes"]
+        or value["resolved_command_sha256"] != args.expected_resolved_command_sha256
+        or value["submit_receipt"]
+        != _object_binding(
+            args.submit_receipt_ref,
+            args.submit_receipt_sha256,
+            args.submit_receipt_self_sha256,
+        )
+        or value["live_go"]
+        != _object_binding(
+            args.live_go_ref, args.live_go_sha256, args.live_go_self_sha256
+        )
+        or value["materialization_receipt"]
+        != _object_binding(
+            args.materialization_receipt_ref,
+            args.materialization_receipt_sha256,
+            args.materialization_receipt_self_sha256,
+        )
+        or value["retry_gate"] != expected_inputs["retry_gate"]
+        or value["retry_contract"] != expected_inputs["retry_contract"]
+        or value["retry_code"] != expected_retry_code
+        or value["resolved_inputs"] != expected_inputs
+        or value["resolved_outputs"] != expected_outputs
+    ):
+        raise ValueError("resolved terminal metadata frozen lineage mismatch")
+    return value
+
+
 def verify(args: argparse.Namespace) -> dict[str, Any]:
     hash_fields = (
         "verifier_bundle_sha256",
@@ -219,7 +638,19 @@ def verify(args: argparse.Namespace) -> dict[str, Any]:
         "retry_gate_sha256",
         "retry_gate_self_sha256",
         "retry_preset_builder_sha256",
-        "terminal_metadata_sha256",
+        "submit_receipt_sha256",
+        "submit_receipt_self_sha256",
+        "live_go_sha256",
+        "live_go_self_sha256",
+        "materialization_receipt_sha256",
+        "materialization_receipt_self_sha256",
+        "resolved_terminal_metadata_sha256",
+        "resolved_terminal_metadata_self_sha256",
+        "terminal_transport_f03_sha256",
+        "terminal_transport_f03_self_sha256",
+        "terminal_transport_f124_sha256",
+        "terminal_transport_f124_self_sha256",
+        "expected_resolved_command_sha256",
     )
     if any(not HEX64.fullmatch(getattr(args, field)) for field in hash_fields):
         raise ValueError("transport-aware verifier requires exact SHA-256 bindings")
@@ -237,7 +668,12 @@ def verify(args: argparse.Namespace) -> dict[str, Any]:
         args.diagnostic_acceptance,
         args.retry_contract,
         args.retry_gate,
-        args.terminal_metadata,
+        args.submit_receipt,
+        args.live_go,
+        args.materialization_receipt,
+        args.resolved_terminal_metadata,
+        args.terminal_transport_f03,
+        args.terminal_transport_f124,
     ):
         if not path.is_file() or path.is_symlink():
             raise ValueError("verifier inputs must be regular non-symlink files")
@@ -372,6 +808,68 @@ def verify(args: argparse.Namespace) -> dict[str, Any]:
     ):
         raise ValueError("frozen archive/exclusion SHA mismatch")
 
+    live_go = _validate_live_go(args, contract)
+    materialization = _validate_materialization_receipt(args, live_go)
+    submit_receipt = _validate_submit_receipt(args, live_go, materialization)
+    terminal_report_paths = {
+        "source_f03": args.terminal_transport_f03,
+        "source_f124": args.terminal_transport_f124,
+    }
+    terminal_report_refs = {
+        "source_f03": args.terminal_transport_f03_ref,
+        "source_f124": args.terminal_transport_f124_ref,
+    }
+    expected_terminal_report_refs = {
+        archive_id: _expected_ref(
+            contract,
+            contract["outputs"]["transport_reports"].rstrip("/")
+            + f"/{archive_id}_extraction.json",
+        )
+        for archive_id in ("source_f03", "source_f124")
+    }
+    if terminal_report_refs != expected_terminal_report_refs:
+        raise ValueError("terminal transport report object reference mismatch")
+    terminal_report_inventory: list[dict[str, Any]] = []
+    for archive_id, file_sha, self_sha in (
+        (
+            "source_f03",
+            args.terminal_transport_f03_sha256,
+            args.terminal_transport_f03_self_sha256,
+        ),
+        (
+            "source_f124",
+            args.terminal_transport_f124_sha256,
+            args.terminal_transport_f124_self_sha256,
+        ),
+    ):
+        binding = _validate_transport_report(
+            terminal_report_paths[archive_id],
+            archive_id,
+            transport.PROFILES[archive_id],
+        )
+        if (
+            binding["report_file_sha256"] != file_sha
+            or binding["report_self_sha256"] != self_sha
+        ):
+            raise ValueError("terminal transport report expected hash mismatch")
+        terminal_report_inventory.append(
+            {
+                "archive_id": archive_id,
+                "reference": terminal_report_refs[archive_id],
+                "file_sha256": file_sha,
+                "self_sha256": self_sha,
+                "size_bytes": terminal_report_paths[archive_id].stat().st_size,
+            }
+        )
+    resolved_terminal = _validate_resolved_terminal_metadata(
+        args,
+        contract=contract,
+        live_go=live_go,
+        materialization=materialization,
+        submit_receipt=submit_receipt,
+        terminal_report_inventory=terminal_report_inventory,
+    )
+
     args.transport_report_dir.mkdir(parents=True, exist_ok=False)
     args.runtime_root.mkdir(parents=True, exist_ok=False)
     transport_reports: dict[str, dict[str, Any]] = {}
@@ -394,7 +892,26 @@ def verify(args: argparse.Namespace) -> dict[str, Any]:
         transport_reports[archive_id] = _validate_transport_report(
             report_path, archive_id, transport.PROFILES[archive_id]
         )
+        if report_path.read_bytes() != terminal_report_paths[archive_id].read_bytes():
+            raise ValueError(
+                f"{archive_id} regenerated transport report differs from terminal object"
+            )
 
+    base_terminal = {
+        "schema_version": "exp689_source_prepare_terminal_v1",
+        "job_id": resolved_terminal["job_id"],
+        "status": resolved_terminal["status"],
+        "finished_at": resolved_terminal["finished_at"],
+        "output_ref": args.prepare_output_ref,
+        "self_sha256": None,
+    }
+    base_terminal["self_sha256"] = sha256_bytes(canonical_json_bytes(base_terminal))
+    base_terminal_path = args.runtime_root / "source_prepare_terminal.json"
+    base_terminal_path.write_text(
+        json.dumps(base_terminal, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    base_terminal_file_sha = sha256_file(base_terminal_path)
     args.base_acceptance.parent.mkdir(parents=True, exist_ok=True)
     base = source_verifier.verify(
         prepare_dir=args.prepare_dir,
@@ -418,8 +935,8 @@ def verify(args: argparse.Namespace) -> dict[str, Any]:
         bundle_manifest_sha256=args.retry_manifest_sha256,
         builder_revision=args.retry_revision,
         spec_path=(args.retry_bundle_root / f"{EXPERIMENT}/source_prepare_spec_v1.json"),
-        terminal_metadata_path=args.terminal_metadata,
-        terminal_metadata_sha256=args.terminal_metadata_sha256,
+        terminal_metadata_path=base_terminal_path,
+        terminal_metadata_sha256=base_terminal_file_sha,
         approved_s3_output_ref=args.prepare_output_ref,
         acceptance_path=args.base_acceptance,
     )
@@ -442,9 +959,15 @@ def verify(args: argparse.Namespace) -> dict[str, Any]:
     if (
         base.get("schema_version") != "exp689_source_prepare_acceptance_v1"
         or base.get("decision") != "ACCEPT"
-        or base.get("terminal_metadata_sha256") != args.terminal_metadata_sha256
+        or base.get("terminal_metadata_sha256") != base_terminal_file_sha
         or base.get("approved_s3_output_ref") != args.prepare_output_ref
         or base.get("runtime_archives") != expected_runtime_archives
+        or resolved_terminal["resolved_outputs"]["prepared"]
+        != {
+            "reference": args.prepare_output_ref,
+            "inventory_sha256": base["output_inventory_sha256"],
+            "inventory": base["output_inventory"],
+        }
     ):
         raise ValueError("base source PREPARE acceptance identity mismatch")
     base_self = _self_hash(base, "base source PREPARE acceptance")
@@ -452,11 +975,6 @@ def verify(args: argparse.Namespace) -> dict[str, Any]:
         (json.dumps(base, ensure_ascii=False, allow_nan=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
     ):
         raise ValueError("base source PREPARE acceptance file serialization mismatch")
-    terminal = _json(args.terminal_metadata, "resolved terminal metadata")
-    terminal_self = _self_hash(terminal, "resolved terminal metadata")
-    if terminal.get("status") != "SUCCESS" or terminal.get("output_ref") != args.prepare_output_ref:
-        raise ValueError("resolved terminal metadata does not bind terminal PREPARE output")
-
     acceptance = {
         "schema_version": "exp689_source_prepare_retry_acceptance_v1",
         "decision": "ACCEPT_TRANSPORT_AWARE_RETRY",
@@ -481,13 +999,30 @@ def verify(args: argparse.Namespace) -> dict[str, Any]:
         "retry_gate_self_sha256": args.retry_gate_self_sha256,
         "original_runtime_archives": base["runtime_archives"],
         "transport_reports": transport_reports,
+        "terminal_transport_report_inventory": terminal_report_inventory,
         "source_prepare_acceptance_file_sha256": sha256_file(args.base_acceptance),
         "source_prepare_acceptance_self_sha256": base_self,
         "output_inventory_sha256": base["output_inventory_sha256"],
         "output_inventory": base["output_inventory"],
-        "resolved_terminal_metadata_ref": args.terminal_metadata_ref,
-        "resolved_terminal_metadata_file_sha256": args.terminal_metadata_sha256,
-        "resolved_terminal_metadata_self_sha256": terminal_self,
+        "submit_receipt_ref": args.submit_receipt_ref,
+        "submit_receipt_file_sha256": args.submit_receipt_sha256,
+        "submit_receipt_self_sha256": args.submit_receipt_self_sha256,
+        "live_go_ref": args.live_go_ref,
+        "live_go_file_sha256": args.live_go_sha256,
+        "live_go_self_sha256": args.live_go_self_sha256,
+        "materialization_receipt_ref": args.materialization_receipt_ref,
+        "materialization_receipt_file_sha256": args.materialization_receipt_sha256,
+        "materialization_receipt_self_sha256": (
+            args.materialization_receipt_self_sha256
+        ),
+        "resolved_terminal_metadata_ref": args.resolved_terminal_metadata_ref,
+        "resolved_terminal_metadata_file_sha256": (
+            args.resolved_terminal_metadata_sha256
+        ),
+        "resolved_terminal_metadata_self_sha256": (
+            args.resolved_terminal_metadata_self_sha256
+        ),
+        "resolved_command_sha256": resolved_terminal["resolved_command_sha256"],
         "terminal_job_id": base["terminal_job_id"],
         "terminal_status": base["terminal_status"],
         "terminal_finished_at": base["terminal_finished_at"],
@@ -535,21 +1070,30 @@ def parser() -> argparse.ArgumentParser:
         "source-f124",
         "exclusion-670",
         "exclusion-672",
-        "diagnostic-acceptance",
-        "retry-contract",
-        "retry-gate",
-        "terminal-metadata",
     ):
         value.add_argument(f"--{name}", type=Path, required=True)
         value.add_argument(f"--{name}-sha256", required=True)
         value.add_argument(f"--{name}-ref", required=True)
-    value.add_argument("--diagnostic-acceptance-self-sha256", required=True)
+    for name in (
+        "diagnostic-acceptance",
+        "retry-contract",
+        "retry-gate",
+        "submit-receipt",
+        "live-go",
+        "materialization-receipt",
+        "resolved-terminal-metadata",
+        "terminal-transport-f03",
+        "terminal-transport-f124",
+    ):
+        value.add_argument(f"--{name}", type=Path, required=True)
+        value.add_argument(f"--{name}-sha256", required=True)
+        value.add_argument(f"--{name}-self-sha256", required=True)
+        value.add_argument(f"--{name}-ref", required=True)
     value.add_argument(
         "--diagnostic-verifier-terminal-metadata-sha256", required=True
     )
-    value.add_argument("--retry-contract-self-sha256", required=True)
-    value.add_argument("--retry-gate-self-sha256", required=True)
     value.add_argument("--retry-preset-builder-sha256", required=True)
+    value.add_argument("--expected-resolved-command-sha256", required=True)
     value.add_argument("--retry-bundle-ref", required=True)
     value.add_argument("--retry-manifest-ref", required=True)
     value.add_argument("--prepare-output-prefix", required=True)
