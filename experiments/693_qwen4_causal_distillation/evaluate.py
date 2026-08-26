@@ -14,7 +14,12 @@ HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
-from exp691_consumer import read_jsonl, sha256_file, verify_routed_acceptance
+from exp691_consumer import (
+    canonical_sha256,
+    read_jsonl,
+    sha256_file,
+    verify_routed_acceptance,
+)
 
 FLAMMABLE = "Легковоспламеняющиеся"
 BAD = "БАД"
@@ -40,6 +45,7 @@ SCIENTIFIC_PASS_FIELDS = (
     "evidence_slice_systematic_regression_guard",
     "bad_byte_identical",
 )
+METHOD_EXPERIMENTS = {"causal": "693", "hardneg": "694", "rank": "695"}
 
 
 def sha256_bytes(values: list[int]) -> str:
@@ -277,6 +283,42 @@ def verify_paired_arms_frozen(
     return resources
 
 
+def paired_output_bindings(
+    control_root: Path, candidate_root: Path, *, experiment_id: str
+) -> list[dict[str, Any]]:
+    bindings: list[dict[str, Any]] = []
+    for fold in range(5):
+        for arm, root in (("control", control_root), ("candidate", candidate_root)):
+            directory = root / f"fold{fold}"
+            contract_path = directory / "output_contract.json"
+            prediction_path = directory / "predictions.jsonl"
+            contract = json.loads(contract_path.read_text(encoding="utf-8"))
+            body = dict(contract)
+            contract_self_sha256 = body.pop("contract_sha256", None)
+            if contract_self_sha256 != canonical_sha256(body):
+                raise ValueError("paired output contract self-hash mismatch")
+            prediction_sha256 = sha256_file(prediction_path)
+            if (
+                str(contract.get("experiment_id")) != experiment_id
+                or int(contract.get("outer_fold", -1)) != fold
+                or contract.get("artifacts", {}).get("predictions.jsonl") != prediction_sha256
+            ):
+                raise ValueError("paired output provenance mismatch")
+            bindings.append(
+                {
+                    "fold": fold,
+                    "arm": arm,
+                    "mode": str(contract.get("mode")),
+                    "output_contract_file_sha256": sha256_file(contract_path),
+                    "output_contract_self_sha256": contract_self_sha256,
+                    "predictions_sha256": prediction_sha256,
+                }
+            )
+    if len(bindings) != 10:
+        raise ValueError("paired output bindings must contain ordered 10 entries")
+    return bindings
+
+
 def build_label_registry(
     runtime_root: Path,
 ) -> tuple[dict[int, int], dict[int, tuple[str, str, str]]]:
@@ -493,7 +535,50 @@ def build_report(
     }
 
 
-def main() -> None:
+def bind_evaluation_provenance(
+    metrics: dict[str, Any],
+    *,
+    frozen_method: str,
+    teacher_acceptance: dict[str, Any],
+    teacher_acceptance_file_sha256: str,
+    runtime_bundle_sha256: str,
+    baseline_bundle_sha256: str,
+    control_root: Path,
+    candidate_root: Path,
+) -> dict[str, Any]:
+    for field in (
+        teacher_acceptance_file_sha256,
+        runtime_bundle_sha256,
+        baseline_bundle_sha256,
+    ):
+        if (
+            not isinstance(field, str)
+            or len(field) != 64
+            or any(character not in "0123456789abcdef" for character in field)
+        ):
+            raise ValueError("bundle identity must be lowercase SHA-256")
+    report = {
+        "schema_version": "qwen4_student_evaluation_v1",
+        "experiment_id": METHOD_EXPERIMENTS[frozen_method],
+        "method": frozen_method,
+        "teacher_acceptance_file_sha256": teacher_acceptance_file_sha256,
+        "teacher_acceptance_self_sha256": teacher_acceptance["acceptance_sha256"],
+        "runtime_bundle_sha256": runtime_bundle_sha256,
+        "baseline_bundle_sha256": baseline_bundle_sha256,
+        "paired_output_bindings": paired_output_bindings(
+            control_root,
+            candidate_root,
+            experiment_id=METHOD_EXPERIMENTS[frozen_method],
+        ),
+        **metrics,
+    }
+    report["evaluation_sha256"] = canonical_sha256(report)
+    return report
+
+
+def main(*, frozen_method: str) -> None:
+    if frozen_method not in METHOD_EXPERIMENTS:
+        raise ValueError("unknown frozen evaluator method")
     parser = argparse.ArgumentParser()
     parser.add_argument("--runtime-root", type=Path, required=True)
     parser.add_argument("--teacher-root", type=Path, required=True)
@@ -503,6 +588,8 @@ def main() -> None:
     parser.add_argument("--control-root", type=Path, required=True)
     parser.add_argument("--candidate-root", type=Path, required=True)
     parser.add_argument("--submission-limit-minutes", type=float)
+    parser.add_argument("--runtime-bundle-sha256", required=True)
+    parser.add_argument("--baseline-bundle-sha256", required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():
@@ -518,6 +605,10 @@ def main() -> None:
     accepted_evidence = load_accepted_evidence(
         args.teacher_root, args.teacher_acceptance, args.teacher_acceptance_sha256
     )
+    teacher_acceptance = verify_routed_acceptance(
+        args.teacher_acceptance,
+        expected_file_sha256=args.teacher_acceptance_sha256,
+    )
     for row in rows:
         if row["category"] != FLAMMABLE:
             row["slices"] = []
@@ -526,10 +617,20 @@ def main() -> None:
         if evidence_row is None or str(evidence_row.get("id")) != str(row["id"]):
             raise ValueError("accepted exp692 evidence is missing an OOF flammable row")
         row["slices"] = sorted(evidence_slices(row, evidence_row))
-    report = build_report(
+    metrics = build_report(
         rows,
         resource_observations=resource_observations,
         submission_limit_minutes=args.submission_limit_minutes,
+    )
+    report = bind_evaluation_provenance(
+        metrics,
+        frozen_method=frozen_method,
+        teacher_acceptance=teacher_acceptance,
+        teacher_acceptance_file_sha256=args.teacher_acceptance_sha256,
+        runtime_bundle_sha256=args.runtime_bundle_sha256,
+        baseline_bundle_sha256=args.baseline_bundle_sha256,
+        control_root=args.control_root,
+        candidate_root=args.candidate_root,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
@@ -539,4 +640,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(frozen_method="causal")

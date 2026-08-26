@@ -24,6 +24,10 @@ def load(name: str):
 CONSUMER = load("exp691_consumer")
 TRAIN = load("train_fold")
 EVAL = load("evaluate")
+BUILD_CODE = load("build_code_bundle")
+PRESET = load("build_preset")
+REMOTE = load("remote_entrypoint")
+RUNNER = load("run_all_folds")
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -439,16 +443,18 @@ def evaluation_fixture(root: Path, *, validation_has_label: bool = False) -> tup
             arm_fold = arm / f"fold{fold}"
             arm_fold.mkdir(parents=True)
             write_jsonl(arm_fold / "predictions.jsonl", [prediction])
-            (arm_fold / "output_contract.json").write_text(
-                json.dumps(
-                    {
-                        "outer_fold": fold,
-                        "decision": "GO_EVALUATE",
-                        "technical_smoke": False,
-                    }
-                ),
-                encoding="utf-8",
-            )
+            contract = {
+                "experiment_id": "693",
+                "outer_fold": fold,
+                "mode": "hard_bce_control" if arm == control else "causal_candidate",
+                "decision": "GO_EVALUATE",
+                "technical_smoke": False,
+                "artifacts": {
+                    "predictions.jsonl": CONSUMER.sha256_file(arm_fold / "predictions.jsonl")
+                },
+            }
+            contract["contract_sha256"] = CONSUMER.canonical_sha256(contract)
+            (arm_fold / "output_contract.json").write_text(json.dumps(contract), encoding="utf-8")
     return runtime, baseline, control, candidate
 
 
@@ -491,3 +497,114 @@ def test_paired_contract_resource_values_are_forwarded(tmp_path: Path):
     resources = EVAL.verify_paired_arms_frozen(paths[2], paths[3])
     assert len(resources["control"]["runtime_minutes"]) == 5
     assert max(resources["candidate"]["peak_gpu_memory_bytes"]) == 105.0
+
+
+def test_evaluation_binds_ordered_ten_outputs(tmp_path: Path):
+    paths = evaluation_fixture(tmp_path)
+    bindings = EVAL.paired_output_bindings(paths[2], paths[3], experiment_id="693")
+    assert [(row["fold"], row["arm"]) for row in bindings] == [
+        (fold, arm) for fold in range(5) for arm in ("control", "candidate")
+    ]
+    assert all(len(row["predictions_sha256"]) == 64 for row in bindings)
+    report = EVAL.bind_evaluation_provenance(
+        {"decision": "REJECT_CANDIDATE", "folds": {}, "pooled": {}},
+        frozen_method="causal",
+        teacher_acceptance={"acceptance_sha256": "a" * 64},
+        teacher_acceptance_file_sha256="b" * 64,
+        runtime_bundle_sha256="c" * 64,
+        baseline_bundle_sha256="d" * 64,
+        control_root=paths[2],
+        candidate_root=paths[3],
+    )
+    body = dict(report)
+    digest = body.pop("evaluation_sha256")
+    assert digest == CONSUMER.canonical_sha256(body)
+    assert report["method"] == "causal" and report["experiment_id"] == "693"
+    assert len(report["paired_output_bindings"]) == 10
+
+
+def preset_args(output_dir: Path):
+    return __import__("argparse").Namespace(
+        project="example-project",
+        region="example-region",
+        image="example/image:immutable",
+        h100_flavor="gpu-h100-1-80",
+        time_limit="20h0m",
+        preemption="never",
+        input_bucket="example-input-bucket",
+        output_bucket="example-output-bucket",
+        code_bundle_src="/example/code",
+        code_bundle_file="code.tar.gz",
+        code_bundle_sha256="a" * 64,
+        code_revision="b" * 40,
+        runtime_bundle_src="/example/runtime",
+        runtime_bundle_file="runtime.tar.gz",
+        runtime_bundle_sha256="c" * 64,
+        baseline_bundle_src="/example/baseline",
+        baseline_bundle_file="baseline.tar.gz",
+        baseline_bundle_sha256="d" * 64,
+        qwen27_output_src="/example/qwen27-terminal",
+        acceptance_output_src="/example/exp692",
+        acceptance_file="acceptance.json",
+        acceptance_sha256="e" * 64,
+        vendor_bundle_src="/example/vendor",
+        vendor_bundle_file="vendor.zip",
+        vendor_bundle_sha256="f" * 64,
+        model_mrid=f"example/qwen/{PRESET.MODEL_REVISION}",
+        output_prefix="/example/student-output/run-1",
+        output_dir=output_dir,
+    )
+
+
+def test_real_preset_builder_emits_exactly_three_secret_free_job_shapes(tmp_path: Path):
+    output = tmp_path / "presets"
+    result = PRESET.build_all(preset_args(output))
+    assert result["jobs"] == ["qwen4-causal", "qwen4-hardneg", "qwen4-rank"]
+    assert sorted(path.name for path in output.iterdir()) == result["files"]
+    for job_name, method in PRESET.JOBS:
+        payload = (output / f"{job_name}.yaml").read_text(encoding="utf-8")
+        assert f"generate_name: {job_name}" in payload
+        assert "type: model_registry" in payload
+        assert PRESET.MODEL_REVISION in payload
+        assert f"--method {method}" in payload
+        assert "upload_policies" not in payload
+        assert payload.count("type: s3msk") == 7
+        assert "project:" not in payload
+
+
+def test_bundle_whitelist_is_exact_and_label_free():
+    assert BUILD_CODE.BUNDLE_PATHS == (
+        "experiments/693_qwen4_causal_distillation",
+        "experiments/694_qwen4_hardneg_curriculum",
+        "experiments/695_qwen4_hard_anchored_listwise",
+        "experiments/645_qwen_scale_2x3_gate/grid_contract.py",
+        "experiments/645_qwen_scale_2x3_gate/train_lora.py",
+        "experiments/645_qwen_scale_2x3_gate/frozen_spec.json",
+        "experiments/641_qwen35_4b_class_only_lora/frozen_spec.json",
+    )
+    assert not any(path.startswith("validation/") for path in BUILD_CODE.BUNDLE_PATHS)
+
+
+def test_remote_archive_extraction_rejects_path_escape(tmp_path: Path):
+    import hashlib
+    import zipfile
+
+    archive = tmp_path / "bad.zip"
+    with zipfile.ZipFile(archive, "w") as destination:
+        destination.writestr("../escape", "forbidden")
+    with pytest.raises(ValueError, match="unsafe archive member"):
+        REMOTE.extract_archive(
+            archive,
+            tmp_path / "output",
+            hashlib.sha256(archive.read_bytes()).hexdigest(),
+        )
+
+
+def test_fold_output_is_committed_by_atomic_rename(tmp_path: Path):
+    staging = tmp_path / ".incomplete" / "control" / "fold0"
+    staging.mkdir(parents=True)
+    (staging / "output_contract.json").write_text("{}", encoding="utf-8")
+    final = tmp_path / "control" / "fold0"
+    RUNNER.commit_fold_output(staging, final)
+    assert (final / "output_contract.json").is_file()
+    assert not staging.exists()

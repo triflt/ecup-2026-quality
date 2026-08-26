@@ -13,4 +13,4 @@ sys.modules[spec.name] = module
 spec.loader.exec_module(module)
 
 if __name__ == "__main__":
-    module.main()
+    module.main(frozen_method="rank")

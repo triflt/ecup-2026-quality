@@ -1,12 +1,20 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 MODES = ("hard_bce_control", "rank_candidate")
+
+
+def commit_fold_output(staging: Path, final: Path) -> None:
+    if final.exists():
+        raise FileExistsError(f"refusing to replace committed fold output: {final}")
+    final.parent.mkdir(parents=True, exist_ok=True)
+    os.replace(staging, final)
 
 
 def main() -> None:
@@ -24,6 +32,8 @@ def main() -> None:
     parser.add_argument("--model-revision", required=True)
     parser.add_argument("--teacher-acceptance", type=Path, required=True)
     parser.add_argument("--teacher-acceptance-sha256", required=True)
+    parser.add_argument("--runtime-bundle-sha256", required=True)
+    parser.add_argument("--baseline-bundle-sha256", required=True)
     parser.add_argument("--submission-limit-minutes", type=float)
     parser.add_argument(
         "--runtime-backend", choices=("verified_fast_path", "legacy_eager"), default="legacy_eager"
@@ -36,6 +46,14 @@ def main() -> None:
     for fold in range(5):
         for mode in MODES:
             arm = "control" if mode == MODES[0] else "candidate"
+            final_output = args.output_root / arm / f"fold{fold}"
+            staging_output = (
+                args.output_root.parent
+                / ".qwen4_staging"
+                / args.output_root.name
+                / arm
+                / f"fold{fold}"
+            )
             command = [
                 sys.executable,
                 str(HERE / "train_fold.py"),
@@ -58,7 +76,7 @@ def main() -> None:
                 "--vendor",
                 str(args.vendor),
                 "--output-dir",
-                str(args.output_root / arm / f"fold{fold}"),
+                str(staging_output),
                 "--runtime-backend",
                 args.runtime_backend,
                 "--micro-batch-size-override",
@@ -69,6 +87,7 @@ def main() -> None:
             if args.technical_smoke:
                 command.append("--technical-smoke")
             subprocess.run(command, check=True)
+            commit_fold_output(staging_output, final_output)
     evaluation_command = [
         sys.executable,
         str(HERE / "evaluate.py"),
@@ -80,6 +99,10 @@ def main() -> None:
         str(args.teacher_acceptance),
         "--teacher-acceptance-sha256",
         args.teacher_acceptance_sha256,
+        "--runtime-bundle-sha256",
+        args.runtime_bundle_sha256,
+        "--baseline-bundle-sha256",
+        args.baseline_bundle_sha256,
         "--baseline-root",
         str(args.baseline_root),
         "--control-root",
