@@ -6,11 +6,24 @@ import math
 from pathlib import Path
 from typing import Any
 
-TEACHER_EXPERIMENT_ID = "691"
 ROUTED_EXPERIMENT_ID = "692"
-FOLD_SCHEMA = "exp691_fold_report_v1"
 ACCEPTANCE_SCHEMA = "exp692_qwen27_routed_acceptance_v1"
+WINNER_SCHEMA = "exp692_all_data_teacher_winner_v1"
 FLAMMABLE = "Легковоспламеняющиеся"
+TEACHERS = {
+    "691": {
+        "model_id": "Qwen/Qwen3.6-27B",
+        "revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+        "backend": "legacy_eager",
+        "layout": "root",
+    },
+    "696": {
+        "model_id": "Qwen/Qwen3.8-27B",
+        "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+        "backend": "verified_fast_path",
+        "layout": "fivefold",
+    },
+}
 
 
 def canonical_sha256(value: Any) -> str:
@@ -38,23 +51,70 @@ def verify_self_hash(value: dict[str, Any], field: str) -> None:
         raise ValueError(f"{field} mismatch")
 
 
-def verify_routed_acceptance(path: Path, *, expected_file_sha256: str) -> dict[str, Any]:
+def verify_winner_gate(path: Path, *, expected_file_sha256: str) -> dict[str, Any]:
+    if sha256_file(path) != expected_file_sha256:
+        raise ValueError("exp692 winner gate file SHA-256 mismatch")
+    value = json.loads(path.read_text(encoding="utf-8"))
+    verify_self_hash(value, "winner_sha256")
+    if (
+        value.get("schema_version") != WINNER_SCHEMA
+        or value.get("experiment_id") != ROUTED_EXPERIMENT_ID
+        or value.get("decision") != "OPEN_WINNING_ALL_DATA_TEACHER_FOR_THREE_STUDENTS"
+        or value.get("student_methods_open") != ["693", "694", "695"]
+        or value.get("public_used") is not False
+        or value.get("sealed_rows") != 0
+    ):
+        raise ValueError("exp692 winner gate is not open")
+    teacher_id = value.get("selected_teacher_experiment_id")
+    expected = TEACHERS.get(str(teacher_id))
+    if expected is None or any(
+        value.get(field) != expected_value
+        for field, expected_value in {
+            "selected_teacher_model_id": expected["model_id"],
+            "selected_teacher_model_revision": expected["revision"],
+            "selected_teacher_runtime_backend": expected["backend"],
+            "selected_teacher_layout": expected["layout"],
+        }.items()
+    ):
+        raise ValueError("exp692 winner teacher identity mismatch")
+    return value
+
+
+def verify_routed_acceptance(
+    path: Path,
+    *,
+    expected_file_sha256: str,
+    winner_path: Path,
+    expected_winner_file_sha256: str,
+) -> dict[str, Any]:
     if sha256_file(path) != expected_file_sha256:
         raise ValueError("exp692 routed acceptance file SHA-256 mismatch")
     value = json.loads(path.read_text(encoding="utf-8"))
     verify_self_hash(value, "acceptance_sha256")
+    winner = verify_winner_gate(winner_path, expected_file_sha256=expected_winner_file_sha256)
+    teacher_id = str(winner["selected_teacher_experiment_id"])
+    teacher = TEACHERS[teacher_id]
     expected = {
         "schema_version": ACCEPTANCE_SCHEMA,
         "experiment_id": ROUTED_EXPERIMENT_ID,
-        "teacher_experiment_id": TEACHER_EXPERIMENT_ID,
+        "teacher_experiment_id": teacher_id,
+        "teacher_model_id": teacher["model_id"],
+        "teacher_model_revision": teacher["revision"],
+        "teacher_runtime_backend": teacher["backend"],
         "teacher_scope": "all",
         "runtime_labels_read_after_teacher_terminal": True,
         "public_used": False,
         "sealed_rows": 0,
-        "decision": "OPEN_THREE_STUDENT_METHODS",
+        "decision": "READY_FOR_TEACHER_COMPARISON",
     }
     if any(value.get(key) != expected_value for key, expected_value in expected.items()):
         raise ValueError("exp692 routed acceptance contract mismatch")
+    if (
+        winner.get("selected_acceptance_sha256") != value["acceptance_sha256"]
+        or winner.get("selected_acceptance_file_sha256") != expected_file_sha256
+        or winner.get("selected_artifact_bindings_sha256") != value.get("artifact_bindings_sha256")
+    ):
+        raise ValueError("winner gate does not bind selected teacher acceptance")
     if set(value.get("folds", {})) != {str(fold) for fold in range(5)} or not isinstance(
         value.get("pooled"), dict
     ):
@@ -93,6 +153,13 @@ def verify_routed_acceptance(path: Path, *, expected_file_sha256: str) -> dict[s
                 raise ValueError(f"exp692 {field} is invalid")
         if not isinstance(binding.get("evidence_rows"), int) or binding["evidence_rows"] < 0:
             raise ValueError("exp692 evidence row count is invalid")
+    if value.get("artifact_bindings_sha256") != canonical_sha256(bindings):
+        raise ValueError("exp692 artifact bindings SHA mismatch")
+    policy = value.get("pooled", {}).get("lighter_fuel_label_policy", {})
+    if policy.get("rows") != 27 or policy.get("gold_negative") != 27:
+        raise ValueError("exp692 lighter-fuel policy slice is not authoritative 27/27")
+    value["winner_gate"] = winner
+    value["winner_gate_file_sha256"] = expected_winner_file_sha256
     return value
 
 
@@ -102,6 +169,7 @@ def _verify_fold_report(
     fold: int,
     runtime_contract_sha256: str,
     binding: dict[str, Any],
+    teacher_experiment_id: str,
 ) -> dict[str, Any]:
     path = directory / "report.json"
     if sha256_file(path) != binding["fold_report_file_sha256"]:
@@ -109,8 +177,8 @@ def _verify_fold_report(
     report = json.loads(path.read_text(encoding="utf-8"))
     verify_self_hash(report, "report_sha256")
     expected = {
-        "schema_version": FOLD_SCHEMA,
-        "experiment_id": TEACHER_EXPERIMENT_ID,
+        "schema_version": f"exp{teacher_experiment_id}_fold_report_v1",
+        "experiment_id": teacher_experiment_id,
         "scope": "all",
         "fold": fold,
         "runtime_contract_sha256": runtime_contract_sha256,
@@ -209,17 +277,25 @@ def load_fold(
     require_evidence: bool,
     acceptance_path: Path,
     expected_acceptance_file_sha256: str,
+    winner_path: Path,
+    expected_winner_file_sha256: str,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     acceptance = verify_routed_acceptance(
-        acceptance_path, expected_file_sha256=expected_acceptance_file_sha256
+        acceptance_path,
+        expected_file_sha256=expected_acceptance_file_sha256,
+        winner_path=winner_path,
+        expected_winner_file_sha256=expected_winner_file_sha256,
     )
+    teacher_experiment_id = str(acceptance["teacher_experiment_id"])
     binding = acceptance["artifact_bindings"][fold]
-    directory = teacher_root / f"fold{fold}"
+    layout = TEACHERS[teacher_experiment_id]["layout"]
+    directory = teacher_root / ("fivefold" if layout == "fivefold" else "") / f"fold{fold}"
     report = _verify_fold_report(
         directory,
         fold=fold,
         runtime_contract_sha256=runtime_contract_sha256,
         binding=binding,
+        teacher_experiment_id=teacher_experiment_id,
     )
     enriched = _merge_targets(
         directory / "teacher_targets.jsonl",
@@ -235,7 +311,7 @@ def load_fold(
             train=enriched,
         )
     consumer_binding = {
-        "teacher_experiment_id": TEACHER_EXPERIMENT_ID,
+        "teacher_experiment_id": teacher_experiment_id,
         "routed_acceptance_experiment_id": ROUTED_EXPERIMENT_ID,
         "fold": fold,
         "fold_report_file_sha256": binding["fold_report_file_sha256"],
@@ -244,6 +320,8 @@ def load_fold(
         "evidence_sha256": binding["evidence_sha256"] if require_evidence else None,
         "routed_acceptance_sha256": acceptance["acceptance_sha256"],
         "routed_acceptance_file_sha256": expected_acceptance_file_sha256,
+        "winner_gate_sha256": acceptance["winner_gate"]["winner_sha256"],
+        "winner_gate_file_sha256": expected_winner_file_sha256,
         "scope": "all",
     }
     return enriched, consumer_binding

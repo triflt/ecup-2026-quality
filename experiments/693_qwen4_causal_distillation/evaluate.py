@@ -25,7 +25,6 @@ FLAMMABLE = "Легковоспламеняющиеся"
 BAD = "БАД"
 BOOTSTRAP_REPLICATES = 2_000
 BOOTSTRAP_SEED = 42
-LABEL_POLICY_ROWS = 25
 LABEL_POLICY_SUBSTRINGS = ("топлив", "зажигал")
 MIN_POOLED_MACRO_DELTA = 0.006
 MIN_FLAMMABLE_F1_DELTA = 0.012
@@ -46,6 +45,11 @@ SCIENTIFIC_PASS_FIELDS = (
     "bad_byte_identical",
 )
 METHOD_EXPERIMENTS = {"causal": "693", "hardneg": "694", "rank": "695"}
+METHOD_MODES = {
+    "causal": "causal_candidate",
+    "hardneg": "hardneg_candidate",
+    "rank": "rank_candidate",
+}
 
 
 def sha256_bytes(values: list[int]) -> str:
@@ -214,9 +218,21 @@ def evidence_slices(row: dict[str, Any], evidence_row: dict[str, Any]) -> set[st
 
 
 def load_accepted_evidence(
-    teacher_root: Path, acceptance_path: Path, acceptance_sha256: str
+    teacher_root: Path,
+    acceptance_path: Path,
+    acceptance_sha256: str,
+    winner_path: Path,
+    winner_sha256: str,
 ) -> dict[tuple[int, int], dict[str, Any]]:
-    acceptance = verify_routed_acceptance(acceptance_path, expected_file_sha256=acceptance_sha256)
+    acceptance = verify_routed_acceptance(
+        acceptance_path,
+        expected_file_sha256=acceptance_sha256,
+        winner_path=winner_path,
+        expected_winner_file_sha256=winner_sha256,
+    )
+    teacher_root = teacher_root / (
+        "fivefold" if acceptance["teacher_experiment_id"] == "696" else ""
+    )
     output: dict[tuple[int, int], dict[str, Any]] = {}
     for fold, binding in enumerate(acceptance["artifact_bindings"]):
         path = teacher_root / f"fold{fold}" / "evidence.jsonl"
@@ -251,71 +267,96 @@ def evaluate_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return report
 
 
-def verify_paired_arms_frozen(
-    control_root: Path, candidate_root: Path
-) -> dict[str, dict[str, list[float]]]:
-    """Fail before opening any label registry unless both arms are complete."""
+def verify_candidate_frozen(candidate_root: Path) -> dict[str, dict[str, list[float]]]:
+    """Fail before opening labels unless all five candidate outputs are complete."""
     resources: dict[str, dict[str, list[float]]] = {
         "control": {"runtime_minutes": [], "peak_gpu_memory_bytes": []},
         "candidate": {"runtime_minutes": [], "peak_gpu_memory_bytes": []},
     }
     for fold in range(5):
-        for arm, root in (("control", control_root), ("candidate", candidate_root)):
-            directory = root / f"fold{fold}"
-            predictions = directory / "predictions.jsonl"
-            contract_path = directory / "output_contract.json"
-            if not predictions.is_file() or not contract_path.is_file():
-                raise ValueError(f"paired arm is not frozen for fold {fold}")
-            contract = json.loads(contract_path.read_text(encoding="utf-8"))
-            if (
-                int(contract.get("outer_fold", -1)) != fold
-                or contract.get("decision") != "GO_EVALUATE"
-                or contract.get("technical_smoke") is not False
-            ):
-                raise ValueError(f"paired arm contract is not evaluable for fold {fold}")
-            for field in ("runtime_minutes", "peak_gpu_memory_bytes"):
-                if field not in contract:
-                    continue
-                value = float(contract[field])
-                if not math.isfinite(value) or value < 0:
-                    raise ValueError(f"paired arm {field} is invalid for fold {fold}")
-                resources[arm][field].append(value)
+        directory = candidate_root / f"fold{fold}"
+        predictions = directory / "predictions.jsonl"
+        contract_path = directory / "output_contract.json"
+        if not predictions.is_file() or not contract_path.is_file():
+            raise ValueError(f"candidate is not frozen for fold {fold}")
+        contract = json.loads(contract_path.read_text(encoding="utf-8"))
+        if (
+            int(contract.get("outer_fold", -1)) != fold
+            or contract.get("decision") != "GO_EVALUATE"
+            or contract.get("technical_smoke") is not False
+        ):
+            raise ValueError(f"candidate contract is not evaluable for fold {fold}")
+        for field in ("runtime_minutes", "peak_gpu_memory_bytes"):
+            if field not in contract:
+                continue
+            value = float(contract[field])
+            if not math.isfinite(value) or value < 0:
+                raise ValueError(f"candidate {field} is invalid for fold {fold}")
+            resources["candidate"][field].append(value)
     return resources
 
 
-def paired_output_bindings(
-    control_root: Path, candidate_root: Path, *, experiment_id: str
+def candidate_output_bindings(
+    candidate_root: Path,
+    *,
+    experiment_id: str,
+    expected_mode: str,
+    teacher_acceptance: dict[str, Any],
+    teacher_acceptance_file_sha256: str,
+    teacher_winner_file_sha256: str,
+    require_evidence: bool,
 ) -> list[dict[str, Any]]:
     bindings: list[dict[str, Any]] = []
     for fold in range(5):
-        for arm, root in (("control", control_root), ("candidate", candidate_root)):
-            directory = root / f"fold{fold}"
-            contract_path = directory / "output_contract.json"
-            prediction_path = directory / "predictions.jsonl"
-            contract = json.loads(contract_path.read_text(encoding="utf-8"))
-            body = dict(contract)
-            contract_self_sha256 = body.pop("contract_sha256", None)
-            if contract_self_sha256 != canonical_sha256(body):
-                raise ValueError("paired output contract self-hash mismatch")
-            prediction_sha256 = sha256_file(prediction_path)
-            if (
-                str(contract.get("experiment_id")) != experiment_id
-                or int(contract.get("outer_fold", -1)) != fold
-                or contract.get("artifacts", {}).get("predictions.jsonl") != prediction_sha256
-            ):
-                raise ValueError("paired output provenance mismatch")
-            bindings.append(
-                {
-                    "fold": fold,
-                    "arm": arm,
-                    "mode": str(contract.get("mode")),
-                    "output_contract_file_sha256": sha256_file(contract_path),
-                    "output_contract_self_sha256": contract_self_sha256,
-                    "predictions_sha256": prediction_sha256,
-                }
-            )
-    if len(bindings) != 10:
-        raise ValueError("paired output bindings must contain ordered 10 entries")
+        directory = candidate_root / f"fold{fold}"
+        contract_path = directory / "output_contract.json"
+        prediction_path = directory / "predictions.jsonl"
+        if not contract_path.is_file() or not prediction_path.is_file():
+            raise ValueError(f"candidate is not frozen for fold {fold}")
+        contract = json.loads(contract_path.read_text(encoding="utf-8"))
+        body = dict(contract)
+        contract_self_sha256 = body.pop("contract_sha256", None)
+        if contract_self_sha256 != canonical_sha256(body):
+            raise ValueError("candidate output contract self-hash mismatch")
+        prediction_sha256 = sha256_file(prediction_path)
+        if (
+            str(contract.get("experiment_id")) != experiment_id
+            or int(contract.get("outer_fold", -1)) != fold
+            or contract.get("mode") != expected_mode
+            or contract.get("decision") != "GO_EVALUATE"
+            or contract.get("technical_smoke") is not False
+            or contract.get("artifacts", {}).get("predictions.jsonl") != prediction_sha256
+        ):
+            raise ValueError("candidate output provenance mismatch")
+        acceptance_binding = teacher_acceptance["artifact_bindings"][fold]
+        expected_teacher_binding = {
+            "teacher_experiment_id": teacher_acceptance["teacher_experiment_id"],
+            "routed_acceptance_experiment_id": "692",
+            "fold": fold,
+            "fold_report_file_sha256": acceptance_binding["fold_report_file_sha256"],
+            "fold_report_self_sha256": acceptance_binding["fold_report_self_sha256"],
+            "teacher_targets_sha256": acceptance_binding["teacher_targets_sha256"],
+            "evidence_sha256": acceptance_binding["evidence_sha256"] if require_evidence else None,
+            "routed_acceptance_sha256": teacher_acceptance["acceptance_sha256"],
+            "routed_acceptance_file_sha256": teacher_acceptance_file_sha256,
+            "winner_gate_sha256": teacher_acceptance["winner_gate"]["winner_sha256"],
+            "winner_gate_file_sha256": teacher_winner_file_sha256,
+            "scope": "all",
+        }
+        if contract.get("exp691_binding") != expected_teacher_binding:
+            raise ValueError("candidate output teacher winner lineage mismatch")
+        bindings.append(
+            {
+                "fold": fold,
+                "arm": "candidate",
+                "mode": str(contract.get("mode")),
+                "output_contract_file_sha256": sha256_file(contract_path),
+                "output_contract_self_sha256": contract_self_sha256,
+                "predictions_sha256": prediction_sha256,
+            }
+        )
+    if len(bindings) != 5:
+        raise ValueError("candidate output bindings must contain ordered 5 entries")
     return bindings
 
 
@@ -345,12 +386,29 @@ def build_label_registry(
 def aligned_rows(
     runtime_root: Path,
     baseline_root: Path,
-    control_root: Path,
     candidate_root: Path,
     *,
+    candidate_experiment_id: str,
+    expected_candidate_mode: str,
+    teacher_acceptance: dict[str, Any],
+    teacher_acceptance_file_sha256: str,
+    teacher_winner_file_sha256: str,
+    require_evidence: bool,
     resource_observations: dict[str, dict[str, list[float]]] | None = None,
+    candidate_bindings_out: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
-    resources = verify_paired_arms_frozen(control_root, candidate_root)
+    bindings = candidate_output_bindings(
+        candidate_root,
+        experiment_id=candidate_experiment_id,
+        expected_mode=expected_candidate_mode,
+        teacher_acceptance=teacher_acceptance,
+        teacher_acceptance_file_sha256=teacher_acceptance_file_sha256,
+        teacher_winner_file_sha256=teacher_winner_file_sha256,
+        require_evidence=require_evidence,
+    )
+    if candidate_bindings_out is not None:
+        candidate_bindings_out.extend(bindings)
+    resources = verify_candidate_frozen(candidate_root)
     if resource_observations is not None:
         resource_observations.update(resources)
     labels, identities = build_label_registry(runtime_root)
@@ -369,13 +427,12 @@ def aligned_rows(
         truth = {int(row["global_index"]): row for row in validation_by_fold[fold]}
         paths = (
             baseline_root / f"fold{fold}" / "predictions.jsonl",
-            control_root / f"fold{fold}" / "predictions.jsonl",
             candidate_root / f"fold{fold}" / "predictions.jsonl",
         )
         streams = [{int(row["global_index"]): row for row in read_jsonl(path)} for path in paths]
         if any(set(stream) != set(truth) for stream in streams):
             raise ValueError(f"prediction alignment mismatch in fold {fold}")
-        baseline, control, candidate = streams
+        baseline, candidate = streams
         for key, source in truth.items():
             identity = (
                 str(source["id"]),
@@ -398,13 +455,14 @@ def aligned_rows(
                     "description": str(source.get("description", "")),
                     "singleton": bool(component) and component_counts[component] == 1,
                     "baseline": baseline_prediction,
-                    "control": baseline_prediction
-                    if category == BAD
-                    else int(control[key]["prediction"]),
+                    "baseline_score": float(
+                        baseline[key].get("score", 2 * baseline_prediction - 1)
+                    ),
+                    "control": baseline_prediction,
                     "candidate": baseline_prediction
                     if category == BAD
                     else int(candidate[key]["prediction"]),
-                    "control_score": float(control[key]["score"]),
+                    "control_score": float(baseline[key].get("score", 2 * baseline_prediction - 1)),
                     "candidate_score": float(candidate[key]["score"]),
                 }
             )
@@ -466,15 +524,30 @@ def build_report(
     *,
     resource_observations: dict[str, dict[str, list[float]]] | None = None,
     submission_limit_minutes: float | None = None,
+    expected_label_policy_rows: int,
 ) -> dict[str, Any]:
-    policy = label_policy_summary(rows)
-    if policy["rows"] != LABEL_POLICY_ROWS or policy["labels_zero"] != LABEL_POLICY_ROWS:
-        raise ValueError("frozen NAME label-policy slice is not exactly 25/25 label=0")
+    if isinstance(expected_label_policy_rows, bool) or expected_label_policy_rows <= 0:
+        raise ValueError("authoritative label-policy row count must be positive")
+    primary_rows = [
+        {
+            **row,
+            "control": row["baseline"],
+            "control_score": float(row.get("baseline_score", 2 * int(row["baseline"]) - 1)),
+        }
+        for row in rows
+    ]
+    policy = label_policy_summary(primary_rows)
+    if (
+        policy["rows"] != expected_label_policy_rows
+        or policy["labels_zero"] != expected_label_policy_rows
+    ):
+        raise ValueError("frozen NAME label-policy slice disagrees with accepted exp692")
     folds = {
-        str(fold): evaluate_rows([row for row in rows if row["fold"] == fold]) for fold in range(5)
+        str(fold): evaluate_rows([row for row in primary_rows if row["fold"] == fold])
+        for fold in range(5)
     }
-    pooled = evaluate_rows(rows)
-    pooled["bootstrap_p_gain_gt_zero"] = bootstrap_probability(rows)
+    pooled = evaluate_rows(primary_rows)
+    pooled["bootstrap_p_gain_gt_zero"] = bootstrap_probability(primary_rows)
     flammable = pooled["categories"][FLAMMABLE]
     flammable_f1_delta = flammable["candidate"]["f1"] - flammable["control"]["f1"]
     corrections_ratio = pooled["corrections_regressions_ratio"]
@@ -527,9 +600,15 @@ def build_report(
     else:
         decision = "ACCEPT_CANDIDATE"
     return {
+        "primary_comparison": "candidate_routed_vs_frozen_production_route",
         "folds": folds,
         "pooled": pooled,
         "gate": gate,
+        "shared_control_reference": {
+            "source": "accepted_frozen_641_production_predictions",
+            "same_as_primary_baseline": True,
+            "fresh_control_training_skipped": True,
+        },
         "resources": resources,
         "decision": decision,
     }
@@ -543,8 +622,8 @@ def bind_evaluation_provenance(
     teacher_acceptance_file_sha256: str,
     runtime_bundle_sha256: str,
     baseline_bundle_sha256: str,
-    control_root: Path,
     candidate_root: Path,
+    candidate_bindings: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     for field in (
         teacher_acceptance_file_sha256,
@@ -563,12 +642,21 @@ def bind_evaluation_provenance(
         "method": frozen_method,
         "teacher_acceptance_file_sha256": teacher_acceptance_file_sha256,
         "teacher_acceptance_self_sha256": teacher_acceptance["acceptance_sha256"],
+        "teacher_winner_file_sha256": teacher_acceptance["winner_gate_file_sha256"],
+        "teacher_winner_self_sha256": teacher_acceptance["winner_gate"]["winner_sha256"],
+        "selected_teacher_experiment_id": teacher_acceptance["teacher_experiment_id"],
         "runtime_bundle_sha256": runtime_bundle_sha256,
         "baseline_bundle_sha256": baseline_bundle_sha256,
-        "paired_output_bindings": paired_output_bindings(
-            control_root,
+        "candidate_output_bindings": candidate_bindings
+        if candidate_bindings is not None
+        else candidate_output_bindings(
             candidate_root,
             experiment_id=METHOD_EXPERIMENTS[frozen_method],
+            expected_mode=METHOD_MODES[frozen_method],
+            teacher_acceptance=teacher_acceptance,
+            teacher_acceptance_file_sha256=teacher_acceptance_file_sha256,
+            teacher_winner_file_sha256=teacher_acceptance["winner_gate_file_sha256"],
+            require_evidence=frozen_method == "causal",
         ),
         **metrics,
     }
@@ -584,8 +672,9 @@ def main(*, frozen_method: str) -> None:
     parser.add_argument("--teacher-root", type=Path, required=True)
     parser.add_argument("--teacher-acceptance", type=Path, required=True)
     parser.add_argument("--teacher-acceptance-sha256", required=True)
+    parser.add_argument("--teacher-winner", type=Path, required=True)
+    parser.add_argument("--teacher-winner-sha256", required=True)
     parser.add_argument("--baseline-root", type=Path, required=True)
-    parser.add_argument("--control-root", type=Path, required=True)
     parser.add_argument("--candidate-root", type=Path, required=True)
     parser.add_argument("--runtime-bundle-sha256", required=True)
     parser.add_argument("--baseline-bundle-sha256", required=True)
@@ -593,20 +682,33 @@ def main(*, frozen_method: str) -> None:
     args = parser.parse_args()
     if args.output.exists():
         raise FileExistsError("refusing to overwrite evaluation")
-    resource_observations: dict[str, dict[str, list[float]]] = {}
-    rows = aligned_rows(
-        args.runtime_root,
-        args.baseline_root,
-        args.control_root,
-        args.candidate_root,
-        resource_observations=resource_observations,
-    )
-    accepted_evidence = load_accepted_evidence(
-        args.teacher_root, args.teacher_acceptance, args.teacher_acceptance_sha256
-    )
     teacher_acceptance = verify_routed_acceptance(
         args.teacher_acceptance,
         expected_file_sha256=args.teacher_acceptance_sha256,
+        winner_path=args.teacher_winner,
+        expected_winner_file_sha256=args.teacher_winner_sha256,
+    )
+    resource_observations: dict[str, dict[str, list[float]]] = {}
+    candidate_bindings: list[dict[str, Any]] = []
+    rows = aligned_rows(
+        args.runtime_root,
+        args.baseline_root,
+        args.candidate_root,
+        candidate_experiment_id=METHOD_EXPERIMENTS[frozen_method],
+        expected_candidate_mode=METHOD_MODES[frozen_method],
+        teacher_acceptance=teacher_acceptance,
+        teacher_acceptance_file_sha256=args.teacher_acceptance_sha256,
+        teacher_winner_file_sha256=args.teacher_winner_sha256,
+        require_evidence=frozen_method == "causal",
+        resource_observations=resource_observations,
+        candidate_bindings_out=candidate_bindings,
+    )
+    accepted_evidence = load_accepted_evidence(
+        args.teacher_root,
+        args.teacher_acceptance,
+        args.teacher_acceptance_sha256,
+        args.teacher_winner,
+        args.teacher_winner_sha256,
     )
     for row in rows:
         if row["category"] != FLAMMABLE:
@@ -622,6 +724,9 @@ def main(*, frozen_method: str) -> None:
         # Paired train/eval runtime is not deployment inference runtime. Resource
         # acceptance remains pending until the later package inference measurement.
         submission_limit_minutes=None,
+        expected_label_policy_rows=int(
+            teacher_acceptance["pooled"]["lighter_fuel_label_policy"]["rows"]
+        ),
     )
     report = bind_evaluation_provenance(
         metrics,
@@ -630,8 +735,8 @@ def main(*, frozen_method: str) -> None:
         teacher_acceptance_file_sha256=args.teacher_acceptance_sha256,
         runtime_bundle_sha256=args.runtime_bundle_sha256,
         baseline_bundle_sha256=args.baseline_bundle_sha256,
-        control_root=args.control_root,
         candidate_root=args.candidate_root,
+        candidate_bindings=candidate_bindings,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

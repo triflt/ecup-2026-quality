@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import os
 import subprocess
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-MODES = ("hard_bce_control", "rank_candidate")
+MODES = ("rank_candidate",)
 
 
 def commit_fold_output(staging: Path, final: Path) -> None:
@@ -18,7 +20,9 @@ def commit_fold_output(staging: Path, final: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="One job: paired train+eval for all five folds.")
+    parser = argparse.ArgumentParser(
+        description="One job: changed-factor smoke, then candidate train+eval for five folds."
+    )
     for name in (
         "runtime-root",
         "teacher-root",
@@ -32,6 +36,8 @@ def main() -> None:
     parser.add_argument("--model-revision", required=True)
     parser.add_argument("--teacher-acceptance", type=Path, required=True)
     parser.add_argument("--teacher-acceptance-sha256", required=True)
+    parser.add_argument("--teacher-winner", type=Path, required=True)
+    parser.add_argument("--teacher-winner-sha256", required=True)
     parser.add_argument("--runtime-bundle-sha256", required=True)
     parser.add_argument("--baseline-bundle-sha256", required=True)
     parser.add_argument(
@@ -44,7 +50,7 @@ def main() -> None:
     args.output_root.mkdir(parents=True, exist_ok=True)
     for fold in range(5):
         for mode in MODES:
-            arm = "control" if mode == MODES[0] else "candidate"
+            arm = "candidate"
             final_output = args.output_root / arm / f"fold{fold}"
             staging_output = (
                 args.output_root.parent
@@ -66,6 +72,10 @@ def main() -> None:
                 str(args.teacher_acceptance),
                 "--teacher-acceptance-sha256",
                 args.teacher_acceptance_sha256,
+                "--teacher-winner",
+                str(args.teacher_winner),
+                "--teacher-winner-sha256",
+                args.teacher_winner_sha256,
                 "--images",
                 str(args.images),
                 "--model-root",
@@ -83,6 +93,34 @@ def main() -> None:
                 "--mode",
                 mode,
             ]
+            if fold == 0 and not args.technical_smoke:
+                smoke_output = args.output_root / "changed_factor_smoke"
+                smoke_command = list(command)
+                smoke_command[smoke_command.index("--output-dir") + 1] = str(smoke_output)
+                smoke_command.append("--technical-smoke")
+                subprocess.run(smoke_command, check=True)
+                contract = json.loads(
+                    (smoke_output / "output_contract.json").read_text(encoding="utf-8")
+                )
+                body = dict(contract)
+                declared = body.pop("contract_sha256", None)
+                factor = contract.get("changed_factor_smoke", {})
+                if (
+                    declared
+                    != hashlib.sha256(
+                        json.dumps(
+                            body,
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        ).encode()
+                    ).hexdigest()
+                    or contract.get("technical_smoke") is not True
+                    or contract.get("decision") != "TECHNICAL_SMOKE_ONLY"
+                    or int(factor.get("pair_count", 0)) < 1
+                    or float(factor.get("rank_loss", 0.0)) <= 0.0
+                ):
+                    raise ValueError("rank changed-factor smoke contract failed")
             if args.technical_smoke:
                 command.append("--technical-smoke")
             subprocess.run(command, check=True)
@@ -98,14 +136,16 @@ def main() -> None:
         str(args.teacher_acceptance),
         "--teacher-acceptance-sha256",
         args.teacher_acceptance_sha256,
+        "--teacher-winner",
+        str(args.teacher_winner),
+        "--teacher-winner-sha256",
+        args.teacher_winner_sha256,
         "--runtime-bundle-sha256",
         args.runtime_bundle_sha256,
         "--baseline-bundle-sha256",
         args.baseline_bundle_sha256,
         "--baseline-root",
         str(args.baseline_root),
-        "--control-root",
-        str(args.output_root / "control"),
         "--candidate-root",
         str(args.output_root / "candidate"),
         "--output",

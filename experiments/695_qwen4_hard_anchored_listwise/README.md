@@ -1,14 +1,14 @@
 # Experiment 695 — qwen4-rank
 
-Status: CPU-tested against the actual experiment-691 fold-specific
-`teacher_targets.jsonl`, fold report, and authoritative exp692 routed acceptance. Evidence is
+Status: CPU-tested against the experiment-692 selected winner (691/root or
+696/fivefold), exact fold targets/report, routed acceptance and winner gate. Evidence is
 not opened by the training method; the post-freeze evaluator opens only exp692-bound
-evidence slices. One H100 job runs paired control/candidate training and
-inline evaluation for all five folds sequentially.
+evidence slices. One H100 job first runs one same-label pairwise fold0 smoke,
+then candidate training and inline evaluation for all five folds sequentially.
+Frozen 641 OOF predictions are the shared control.
 
-Both arms see the same all-category rows in the same order with the same model
-initialization, seed, batches and steps. Both keep full hard BCE coefficient
-1.0. Candidate uses the literal frozen formula `L = L_hard + 0.5 * L_rank`
+Candidate sees all-category rows in the frozen parent order and keeps full hard
+BCE coefficient 1.0. It uses the literal formula `L = L_hard + 0.5 * L_rank`
 only among flammable rows inside the same hard-label stratum. There is no cap
 and no lambda grid; boundary protection comes from never constructing a rank
 pair across hard-label strata.
@@ -19,10 +19,10 @@ This does not duplicate 685/686: those objectives rank opposite-label pairs;
 all-category support. Precedent: learning-to-rank distillation with a supervised
 anchor. Transfer mechanism: preserve classification calibration while learning
 teacher ordering within positive and negative flammable strata.
-The consumer binds target bytes to `exp691_fold_report_v1`, binds each fold
-to exact `exp692_qwen27_routed_acceptance_v1`, and attaches `score` only to flammable
+The consumer binds target bytes to the selected teacher report, routed acceptance
+and winner gate, and attaches `score` only to flammable
 training occurrences.
 
 The shared evaluator binds exp692 evidence slices, reports bootstrap and
 singleton results, and gates the frozen
-25/25 label-zero NAME policy slice against candidate FP regression.
+27/27 label-zero NAME policy slice against candidate FP regression.

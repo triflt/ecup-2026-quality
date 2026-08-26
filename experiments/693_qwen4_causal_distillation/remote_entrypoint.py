@@ -123,6 +123,8 @@ def main() -> None:
     parser.add_argument("--teacher-root", type=Path, required=True)
     parser.add_argument("--acceptance", type=Path, required=True)
     parser.add_argument("--acceptance-sha256", required=True)
+    parser.add_argument("--winner", type=Path, required=True)
+    parser.add_argument("--winner-sha256", required=True)
     parser.add_argument("--vendor-archive", type=Path, required=True)
     parser.add_argument("--vendor-sha256", required=True)
     parser.add_argument("--model-root", type=Path, required=True)
@@ -143,11 +145,18 @@ def main() -> None:
         vendor = work / "vendor_bundle"
         require_fivefold(runtime, "runtime_audit.json")
         require_fivefold(baseline, "predictions.jsonl")
-        require_fivefold(args.teacher_root, "report.json")
         if not (vendor / "peft" / "__init__.py").is_file():
             raise ValueError("PEFT vendor archive lacks peft/__init__.py at archive root")
         if sha256_file(args.acceptance) != args.acceptance_sha256:
             raise ValueError("exp692 acceptance file SHA-256 mismatch")
+        if sha256_file(args.winner) != args.winner_sha256:
+            raise ValueError("exp692 winner gate file SHA-256 mismatch")
+        winner = json.loads(args.winner.read_text(encoding="utf-8"))
+        selected_id = str(winner.get("selected_teacher_experiment_id"))
+        selected_root = args.teacher_root / ("fivefold" if selected_id == "696" else "")
+        if selected_id not in {"691", "696"}:
+            raise ValueError("winner gate selected unknown teacher")
+        require_fivefold(selected_root, "report.json")
         command = [
             "python3",
             "-u",
@@ -160,6 +169,10 @@ def main() -> None:
             str(args.acceptance),
             "--teacher-acceptance-sha256",
             args.acceptance_sha256,
+            "--teacher-winner",
+            str(args.winner),
+            "--teacher-winner-sha256",
+            args.winner_sha256,
             "--runtime-bundle-sha256",
             args.runtime_sha256,
             "--baseline-bundle-sha256",

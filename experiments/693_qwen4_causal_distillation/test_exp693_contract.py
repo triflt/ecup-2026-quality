@@ -83,7 +83,7 @@ def teacher_fixture(
     evidence_path = directory / "evidence.jsonl"
     write_jsonl(evidence_path, evidence_rows)
     report = {
-        "schema_version": CONSUMER.FOLD_SCHEMA,
+        "schema_version": "exp691_fold_report_v1",
         "experiment_id": "691",
         "scope": "all",
         "fold": 0,
@@ -130,9 +130,14 @@ def teacher_fixture(
         "schema_version": CONSUMER.ACCEPTANCE_SCHEMA,
         "experiment_id": "692",
         "teacher_experiment_id": "691",
+        "teacher_model_id": CONSUMER.TEACHERS["691"]["model_id"],
+        "teacher_model_revision": CONSUMER.TEACHERS["691"]["revision"],
+        "teacher_runtime_backend": CONSUMER.TEACHERS["691"]["backend"],
         "teacher_scope": "all",
         "folds": {str(fold): {} for fold in range(5)},
-        "pooled": {},
+        "pooled": {
+            "lighter_fuel_label_policy": {"rows": 27, "gold_negative": 27},
+        },
         "gate": {
             "fold_wins": 5,
             "flammable_ap_delta": 0.1,
@@ -141,16 +146,98 @@ def teacher_fixture(
             "bad_byte_identical": True,
         },
         "artifact_bindings": bindings,
+        "artifact_bindings_sha256": CONSUMER.canonical_sha256(bindings),
         "teacher_fold_report_self_sha256": report_hashes,
         "runtime_labels_read_after_teacher_terminal": True,
         "public_used": False,
         "sealed_rows": 0,
-        "decision": "OPEN_THREE_STUDENT_METHODS",
+        "decision": "READY_FOR_TEACHER_COMPARISON",
     }
     acceptance["acceptance_sha256"] = CONSUMER.canonical_sha256(acceptance)
     acceptance_path = root / "student_consumer_acceptance.json"
     acceptance_path.write_text(json.dumps(acceptance), encoding="utf-8")
+    winner = {
+        "schema_version": CONSUMER.WINNER_SCHEMA,
+        "experiment_id": "692",
+        "selected_teacher_experiment_id": "691",
+        "selected_teacher_model_id": CONSUMER.TEACHERS["691"]["model_id"],
+        "selected_teacher_model_revision": CONSUMER.TEACHERS["691"]["revision"],
+        "selected_teacher_runtime_backend": CONSUMER.TEACHERS["691"]["backend"],
+        "selected_teacher_layout": "root",
+        "selected_acceptance_sha256": acceptance["acceptance_sha256"],
+        "selected_acceptance_file_sha256": CONSUMER.sha256_file(acceptance_path),
+        "selected_artifact_bindings_sha256": acceptance["artifact_bindings_sha256"],
+        "student_methods_open": ["693", "694", "695"],
+        "public_used": False,
+        "sealed_rows": 0,
+        "decision": "OPEN_WINNING_ALL_DATA_TEACHER_FOR_THREE_STUDENTS",
+    }
+    winner["winner_sha256"] = CONSUMER.canonical_sha256(winner)
+    (root / "teacher_winner.json").write_text(json.dumps(winner), encoding="utf-8")
     return train, runtime_sha, acceptance_path, CONSUMER.sha256_file(acceptance_path)
+
+
+def winner_args(acceptance_path: Path) -> tuple[Path, str]:
+    path = acceptance_path.parent / "teacher_winner.json"
+    return path, CONSUMER.sha256_file(path)
+
+
+def convert_fixture_to_696(root: Path, acceptance_path: Path) -> tuple[Path, str]:
+    fivefold = root / "fivefold"
+    fivefold.mkdir()
+    (root / "fold0").rename(fivefold / "fold0")
+    report_path = fivefold / "fold0" / "report.json"
+    report = json.loads(report_path.read_text())
+    report.pop("report_sha256")
+    report.update(
+        {
+            "schema_version": "exp696_fold_report_v1",
+            "experiment_id": "696",
+            "runtime_backend": "verified_fast_path",
+        }
+    )
+    report["report_sha256"] = CONSUMER.canonical_sha256(report)
+    report_path.write_text(json.dumps(report))
+    acceptance = json.loads(acceptance_path.read_text())
+    acceptance.pop("acceptance_sha256")
+    acceptance.update(
+        {
+            "teacher_experiment_id": "696",
+            "teacher_model_id": CONSUMER.TEACHERS["696"]["model_id"],
+            "teacher_model_revision": CONSUMER.TEACHERS["696"]["revision"],
+            "teacher_runtime_backend": CONSUMER.TEACHERS["696"]["backend"],
+        }
+    )
+    acceptance["artifact_bindings"][0]["fold_report_file_sha256"] = CONSUMER.sha256_file(
+        report_path
+    )
+    acceptance["artifact_bindings"][0]["fold_report_self_sha256"] = report["report_sha256"]
+    acceptance["teacher_fold_report_self_sha256"][0] = report["report_sha256"]
+    acceptance["artifact_bindings_sha256"] = CONSUMER.canonical_sha256(
+        acceptance["artifact_bindings"]
+    )
+    acceptance["acceptance_sha256"] = CONSUMER.canonical_sha256(acceptance)
+    acceptance_path.write_text(json.dumps(acceptance))
+    winner = {
+        "schema_version": CONSUMER.WINNER_SCHEMA,
+        "experiment_id": "692",
+        "selected_teacher_experiment_id": "696",
+        "selected_teacher_model_id": CONSUMER.TEACHERS["696"]["model_id"],
+        "selected_teacher_model_revision": CONSUMER.TEACHERS["696"]["revision"],
+        "selected_teacher_runtime_backend": CONSUMER.TEACHERS["696"]["backend"],
+        "selected_teacher_layout": "fivefold",
+        "selected_acceptance_sha256": acceptance["acceptance_sha256"],
+        "selected_acceptance_file_sha256": CONSUMER.sha256_file(acceptance_path),
+        "selected_artifact_bindings_sha256": acceptance["artifact_bindings_sha256"],
+        "student_methods_open": ["693", "694", "695"],
+        "public_used": False,
+        "sealed_rows": 0,
+        "decision": "OPEN_WINNING_ALL_DATA_TEACHER_FOR_THREE_STUDENTS",
+    }
+    winner["winner_sha256"] = CONSUMER.canonical_sha256(winner)
+    winner_path = root / "teacher_winner.json"
+    winner_path.write_text(json.dumps(winner))
+    return winner_path, CONSUMER.sha256_file(winner_path)
 
 
 def test_actual_exp691_targets_merge_only_into_flammable(tmp_path: Path):
@@ -158,6 +245,7 @@ def test_actual_exp691_targets_merge_only_into_flammable(tmp_path: Path):
         tmp_path, with_acceptance=True
     )
     assert acceptance_path is not None and acceptance_sha is not None
+    winner_path, winner_sha = winner_args(acceptance_path)
     enriched, binding = CONSUMER.load_fold(
         tmp_path,
         fold=0,
@@ -166,6 +254,8 @@ def test_actual_exp691_targets_merge_only_into_flammable(tmp_path: Path):
         require_evidence=False,
         acceptance_path=acceptance_path,
         expected_acceptance_file_sha256=acceptance_sha,
+        winner_path=winner_path,
+        expected_winner_file_sha256=winner_sha,
     )
     assert enriched[0]["teacher_score"] == 2.0
     assert "teacher_score" not in enriched[1]
@@ -178,6 +268,7 @@ def test_actual_exp691_evidence_shape_drives_closed_aux_target(tmp_path: Path):
         tmp_path, with_acceptance=True
     )
     assert acceptance_path is not None and acceptance_sha is not None
+    winner_path, winner_sha = winner_args(acceptance_path)
     enriched, _ = CONSUMER.load_fold(
         tmp_path,
         fold=0,
@@ -186,6 +277,8 @@ def test_actual_exp691_evidence_shape_drives_closed_aux_target(tmp_path: Path):
         require_evidence=True,
         acceptance_path=acceptance_path,
         expected_acceptance_file_sha256=acceptance_sha,
+        winner_path=winner_path,
+        expected_winner_file_sha256=winner_sha,
     )
     targets = TRAIN.structured_targets(SimpleNamespace(**enriched[0]))
     assert tuple(targets) == TRAIN.AUXILIARY_COMPONENTS
@@ -203,9 +296,47 @@ def test_actual_exp691_evidence_shape_drives_closed_aux_target(tmp_path: Path):
     )
 
 
+def test_qwen38_winner_consumes_fivefold_layout(tmp_path: Path) -> None:
+    train, runtime_sha, acceptance_path, _ = teacher_fixture(tmp_path, with_acceptance=True)
+    assert acceptance_path is not None
+    winner_path, winner_sha = convert_fixture_to_696(tmp_path, acceptance_path)
+    enriched, binding = CONSUMER.load_fold(
+        tmp_path,
+        fold=0,
+        train=train,
+        runtime_contract_sha256=runtime_sha,
+        require_evidence=True,
+        acceptance_path=acceptance_path,
+        expected_acceptance_file_sha256=CONSUMER.sha256_file(acceptance_path),
+        winner_path=winner_path,
+        expected_winner_file_sha256=winner_sha,
+    )
+    assert enriched[0]["teacher_score"] == 2.0
+    assert binding["teacher_experiment_id"] == "696"
+
+
+def test_winner_selected_acceptance_mismatch_is_rejected(tmp_path: Path) -> None:
+    _, _, acceptance_path, _ = teacher_fixture(tmp_path, with_acceptance=True)
+    assert acceptance_path is not None
+    winner_path, _ = winner_args(acceptance_path)
+    winner = json.loads(winner_path.read_text())
+    winner.pop("winner_sha256")
+    winner["selected_acceptance_sha256"] = "f" * 64
+    winner["winner_sha256"] = CONSUMER.canonical_sha256(winner)
+    winner_path.write_text(json.dumps(winner))
+    with pytest.raises(ValueError, match="does not bind selected"):
+        CONSUMER.verify_routed_acceptance(
+            acceptance_path,
+            expected_file_sha256=CONSUMER.sha256_file(acceptance_path),
+            winner_path=winner_path,
+            expected_winner_file_sha256=CONSUMER.sha256_file(winner_path),
+        )
+
+
 def test_causal_acceptance_requires_exact_file_sha(tmp_path: Path):
     train, runtime_sha, acceptance_path, _ = teacher_fixture(tmp_path, with_acceptance=True)
     assert acceptance_path is not None
+    winner_path, winner_sha = winner_args(acceptance_path)
     with pytest.raises(ValueError, match="acceptance file SHA-256 mismatch"):
         CONSUMER.load_fold(
             tmp_path,
@@ -215,12 +346,15 @@ def test_causal_acceptance_requires_exact_file_sha(tmp_path: Path):
             require_evidence=True,
             acceptance_path=acceptance_path,
             expected_acceptance_file_sha256="0" * 64,
+            winner_path=winner_path,
+            expected_winner_file_sha256=winner_sha,
         )
 
 
 def test_rejected_exp692_acceptance_cannot_open_any_student(tmp_path: Path):
     _, _, acceptance_path, _ = teacher_fixture(tmp_path, with_acceptance=True)
     assert acceptance_path is not None
+    winner_path, winner_sha = winner_args(acceptance_path)
     value = json.loads(acceptance_path.read_text(encoding="utf-8"))
     value.pop("acceptance_sha256")
     value["decision"] = "REJECT_TEACHER_TARGETS"
@@ -230,6 +364,8 @@ def test_rejected_exp692_acceptance_cannot_open_any_student(tmp_path: Path):
         CONSUMER.verify_routed_acceptance(
             acceptance_path,
             expected_file_sha256=CONSUMER.sha256_file(acceptance_path),
+            winner_path=winner_path,
+            expected_winner_file_sha256=winner_sha,
         )
 
 
@@ -294,7 +430,7 @@ def test_label_policy_slice_reports_all_three_fp_and_blocks_regression():
             "singleton": False,
             "slices": ["ignition_products"],
         }
-        for index in range(EVAL.LABEL_POLICY_ROWS)
+        for index in range(27)
     ]
     rows.extend(
         [
@@ -314,11 +450,11 @@ def test_label_policy_slice_reports_all_three_fp_and_blocks_regression():
             for fold in range(5)
         ]
     )
-    report = EVAL.build_report(rows)
+    report = EVAL.build_report(rows, expected_label_policy_rows=27)
     policy = report["pooled"]["label_policy_slice"]
     assert policy == {
-        "rows": 25,
-        "labels_zero": 25,
+        "rows": 27,
+        "labels_zero": 27,
         "fp": {"baseline": 0, "control": 0, "candidate": 1},
     }
     assert report["gate"]["label_policy_fp_nonincrease"] is False
@@ -343,10 +479,10 @@ def test_label_policy_contract_rejects_nonzero_gold_without_relabeling():
             "singleton": False,
             "slices": [],
         }
-        for index in range(EVAL.LABEL_POLICY_ROWS)
+        for index in range(27)
     ]
-    with pytest.raises(ValueError, match="25/25 label=0"):
-        EVAL.build_report(rows)
+    with pytest.raises(ValueError, match="disagrees with accepted exp692"):
+        EVAL.build_report(rows, expected_label_policy_rows=27)
 
 
 def test_exp692_evidence_slice_definitions_are_reused_exactly():
@@ -449,6 +585,7 @@ def evaluation_fixture(root: Path, *, validation_has_label: bool = False) -> tup
                 "mode": "hard_bce_control" if arm == control else "causal_candidate",
                 "decision": "GO_EVALUATE",
                 "technical_smoke": False,
+                "exp691_binding": evaluation_teacher_binding(fold, require_evidence=True),
                 "artifacts": {
                     "predictions.jsonl": CONSUMER.sha256_file(arm_fold / "predictions.jsonl")
                 },
@@ -458,21 +595,72 @@ def evaluation_fixture(root: Path, *, validation_has_label: bool = False) -> tup
     return runtime, baseline, control, candidate
 
 
-def test_labels_are_joined_from_cross_fold_registry_only_after_both_arms_frozen(
+def evaluation_teacher_acceptance() -> dict:
+    return {
+        "teacher_experiment_id": "691",
+        "acceptance_sha256": "a" * 64,
+        "winner_gate_file_sha256": "e" * 64,
+        "winner_gate": {"winner_sha256": "f" * 64},
+        "artifact_bindings": [
+            {
+                "fold_report_file_sha256": f"{100 + fold:064x}",
+                "fold_report_self_sha256": f"{200 + fold:064x}",
+                "teacher_targets_sha256": f"{300 + fold:064x}",
+                "evidence_sha256": f"{400 + fold:064x}",
+            }
+            for fold in range(5)
+        ],
+    }
+
+
+def evaluation_teacher_binding(fold: int, *, require_evidence: bool) -> dict:
+    acceptance = evaluation_teacher_acceptance()
+    binding = acceptance["artifact_bindings"][fold]
+    return {
+        "teacher_experiment_id": "691",
+        "routed_acceptance_experiment_id": "692",
+        "fold": fold,
+        "fold_report_file_sha256": binding["fold_report_file_sha256"],
+        "fold_report_self_sha256": binding["fold_report_self_sha256"],
+        "teacher_targets_sha256": binding["teacher_targets_sha256"],
+        "evidence_sha256": binding["evidence_sha256"] if require_evidence else None,
+        "routed_acceptance_sha256": "a" * 64,
+        "routed_acceptance_file_sha256": "b" * 64,
+        "winner_gate_sha256": "f" * 64,
+        "winner_gate_file_sha256": "e" * 64,
+        "scope": "all",
+    }
+
+
+def aligned_fixture_rows(paths: tuple[Path, ...]) -> list[dict]:
+    return EVAL.aligned_rows(
+        paths[0],
+        paths[1],
+        paths[3],
+        candidate_experiment_id="693",
+        expected_candidate_mode="causal_candidate",
+        teacher_acceptance=evaluation_teacher_acceptance(),
+        teacher_acceptance_file_sha256="b" * 64,
+        teacher_winner_file_sha256="e" * 64,
+        require_evidence=True,
+    )
+
+
+def test_labels_are_joined_only_after_candidate_and_teacher_lineage_are_frozen(
     tmp_path: Path,
 ):
     paths = evaluation_fixture(tmp_path)
-    rows = EVAL.aligned_rows(*paths)
+    rows = aligned_fixture_rows(paths)
     assert [row["label"] for row in rows] == [0, 1, 0, 1, 0]
     (paths[3] / "fold0" / "output_contract.json").unlink()
-    with pytest.raises(ValueError, match="paired arm is not frozen"):
-        EVAL.aligned_rows(*paths)
+    with pytest.raises(ValueError, match="candidate is not frozen"):
+        aligned_fixture_rows(paths)
 
 
-def test_outer_validation_label_is_rejected_even_after_arms_are_frozen(tmp_path: Path):
+def test_outer_validation_label_is_rejected_after_candidate_is_frozen(tmp_path: Path):
     paths = evaluation_fixture(tmp_path, validation_has_label=True)
     with pytest.raises(ValueError, match="label-free"):
-        EVAL.aligned_rows(*paths)
+        aligned_fixture_rows(paths)
 
 
 def test_validation_name_must_match_frozen_train_registry(tmp_path: Path):
@@ -482,10 +670,87 @@ def test_validation_name_must_match_frozen_train_registry(tmp_path: Path):
     value["name"] = "топливо для зажигалки"
     write_jsonl(validation_path, [value])
     with pytest.raises(ValueError, match="cross-fold registry"):
-        EVAL.aligned_rows(*paths)
+        aligned_fixture_rows(paths)
 
 
-def test_paired_contract_resource_values_are_forwarded(tmp_path: Path):
+def test_student_jobs_train_exactly_one_candidate_per_fold() -> None:
+    assert RUNNER.MODES == ("causal_candidate",)
+    hardneg_source = (HERE.parent / "694_qwen4_hardneg_curriculum/run_all_folds.py").read_text()
+    rank_source = (HERE.parent / "695_qwen4_hard_anchored_listwise/run_all_folds.py").read_text()
+    assert 'MODES = ("hardneg_candidate",)' in hardneg_source
+    assert 'MODES = ("rank_candidate",)' in rank_source
+    assert hardneg_source.count("subprocess.run(smoke_command, check=True)") == 1
+    assert rank_source.count("subprocess.run(smoke_command, check=True)") == 1
+    assert "if fold == 0 and not args.technical_smoke" in hardneg_source
+    assert "if fold == 0 and not args.technical_smoke" in rank_source
+
+
+def test_structured_memory_smoke_is_fail_closed_before_fivefold() -> None:
+    contract = {
+        "mode": "causal_candidate",
+        "technical_smoke": True,
+        "decision": "TECHNICAL_SMOKE_ONLY",
+        "peak_gpu_memory_bytes": 60 * 1024**3,
+        "changed_factor_smoke": {
+            "eligible_grounded_rows": 1,
+            "auxiliary_losses": {
+                "sold_object": 1.0,
+                "substance": 1.0,
+                "relation": 1.0,
+                "evidence_pointer": 1.0,
+            },
+        },
+    }
+    contract["contract_sha256"] = CONSUMER.canonical_sha256(contract)
+    assert RUNNER.validate_memory_smoke_contract(contract) == 60 * 1024**3
+    with pytest.raises(ValueError, match="memory smoke"):
+        oversized = {**contract, "peak_gpu_memory_bytes": 76 * 1024**3}
+        oversized.pop("contract_sha256")
+        oversized["contract_sha256"] = CONSUMER.canonical_sha256(oversized)
+        RUNNER.validate_memory_smoke_contract(oversized)
+
+
+def test_primary_evaluation_is_frozen_production_route() -> None:
+    rows = [
+        {
+            "fold": fold,
+            "label": 1,
+            "category": "БАД",
+            "name": "",
+            "baseline": 1,
+            "control": 0,
+            "candidate": 1,
+            "baseline_score": 1.0,
+            "control_score": -1.0,
+            "candidate_score": 1.0,
+            "singleton": False,
+            "slices": [],
+        }
+        for fold in range(5)
+    ]
+    rows.extend(
+        {
+            "fold": index % 5,
+            "label": 0,
+            "category": TRAIN.FLAMMABLE,
+            "name": f"топливо для зажигалки {index}",
+            "baseline": 0,
+            "control": 1,
+            "candidate": 0,
+            "baseline_score": -1.0,
+            "control_score": 1.0,
+            "candidate_score": -1.0,
+            "singleton": False,
+            "slices": [],
+        }
+        for index in range(27)
+    )
+    report = EVAL.build_report(rows, expected_label_policy_rows=27)
+    assert report["primary_comparison"] == "candidate_routed_vs_frozen_production_route"
+    assert report["pooled"]["categories"][TRAIN.FLAMMABLE]["control"]["fp"] == 0
+
+
+def test_candidate_contract_resource_values_are_forwarded(tmp_path: Path):
     paths = evaluation_fixture(tmp_path)
     for fold in range(5):
         for arm_index, root in enumerate(paths[2:]):
@@ -494,33 +759,41 @@ def test_paired_contract_resource_values_are_forwarded(tmp_path: Path):
             contract["runtime_minutes"] = float(fold + arm_index + 1)
             contract["peak_gpu_memory_bytes"] = float(100 + fold + arm_index)
             contract_path.write_text(json.dumps(contract), encoding="utf-8")
-    resources = EVAL.verify_paired_arms_frozen(paths[2], paths[3])
-    assert len(resources["control"]["runtime_minutes"]) == 5
+    resources = EVAL.verify_candidate_frozen(paths[3])
+    assert resources["control"]["runtime_minutes"] == []
     assert max(resources["candidate"]["peak_gpu_memory_bytes"]) == 105.0
 
 
-def test_evaluation_binds_ordered_ten_outputs(tmp_path: Path):
+def test_evaluation_binds_ordered_five_candidate_outputs(tmp_path: Path):
     paths = evaluation_fixture(tmp_path)
-    bindings = EVAL.paired_output_bindings(paths[2], paths[3], experiment_id="693")
+    bindings = EVAL.candidate_output_bindings(
+        paths[3],
+        experiment_id="693",
+        expected_mode="causal_candidate",
+        teacher_acceptance=evaluation_teacher_acceptance(),
+        teacher_acceptance_file_sha256="b" * 64,
+        teacher_winner_file_sha256="e" * 64,
+        require_evidence=True,
+    )
     assert [(row["fold"], row["arm"]) for row in bindings] == [
-        (fold, arm) for fold in range(5) for arm in ("control", "candidate")
+        (fold, "candidate") for fold in range(5)
     ]
     assert all(len(row["predictions_sha256"]) == 64 for row in bindings)
     report = EVAL.bind_evaluation_provenance(
         {"decision": "REJECT_CANDIDATE", "folds": {}, "pooled": {}},
         frozen_method="causal",
-        teacher_acceptance={"acceptance_sha256": "a" * 64},
+        teacher_acceptance=evaluation_teacher_acceptance(),
         teacher_acceptance_file_sha256="b" * 64,
         runtime_bundle_sha256="c" * 64,
         baseline_bundle_sha256="d" * 64,
-        control_root=paths[2],
         candidate_root=paths[3],
+        candidate_bindings=bindings,
     )
     body = dict(report)
     digest = body.pop("evaluation_sha256")
     assert digest == CONSUMER.canonical_sha256(body)
     assert report["method"] == "causal" and report["experiment_id"] == "693"
-    assert len(report["paired_output_bindings"]) == 10
+    assert len(report["candidate_output_bindings"]) == 5
 
 
 def preset_args(output_dir: Path):
@@ -528,6 +801,7 @@ def preset_args(output_dir: Path):
         output_dir.parent / "teacher", with_acceptance=True
     )
     assert acceptance_path is not None and acceptance_sha is not None
+    winner_path, winner_sha = winner_args(acceptance_path)
     return __import__("argparse").Namespace(
         project="example-project",
         region="example-region",
@@ -552,6 +826,10 @@ def preset_args(output_dir: Path):
         acceptance_file="acceptance.json",
         acceptance_sha256=acceptance_sha,
         local_acceptance=acceptance_path,
+        winner_output_src="/example/exp692-winner",
+        winner_file="teacher_winner.json",
+        winner_sha256=winner_sha,
+        local_winner=winner_path,
         vendor_bundle_src="/example/vendor",
         vendor_bundle_file="vendor.zip",
         vendor_bundle_sha256="f" * 64,
@@ -577,7 +855,7 @@ def test_real_preset_builder_emits_exactly_three_secret_free_job_shapes(tmp_path
         assert 'file: "acceptance.json"' in payload
         assert 'dst: "/work/input/acceptance/acceptance.json"' in payload
         assert "upload_policies" not in payload
-        assert payload.count("type: s3msk") == 7
+        assert payload.count("type: s3msk") == 8
         assert "project:" not in payload
 
 

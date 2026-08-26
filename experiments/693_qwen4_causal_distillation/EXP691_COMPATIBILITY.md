@@ -1,21 +1,20 @@
-# Experiment 691 consumer compatibility
+# Selected-teacher consumer compatibility
 
-The consumer is bound to the actual experiment-691 output layout:
-`foldK/teacher_targets.jsonl`, `foldK/evidence.jsonl`, `foldK/report.json`, and
-`fivefold_report.json`.
+The consumer is bound to the experiment-692 winner gate and accepts either
+experiment 691 at `foldK` or experiment 696 at `fivefold/foldK`. It opens only
+the exact routed acceptance selected by that gate.
 
 ## P0 blockers found
 
-1. Raw `exp691_fold_report_v1` does not bind evidence bytes, and raw
-   `exp691_fivefold_report_v1` does not provide the canonical routed promotion
-   decision. The running frozen teacher is not changed or retried.
-2. Frozen experiment 692 performs the post-terminal routed evaluation and emits
-   `exp692_qwen27_routed_acceptance_v1`. All three students require its exact
-   file SHA, `OPEN_THREE_STUDENT_METHODS`, canonical AP/F1/FN gates, frozen BAD
-   identity, and per-fold report/target/evidence bindings. Only 693 opens the
-   accepted evidence bytes; 694/695 consume accepted teacher-target bytes only.
+1. A raw teacher fold report cannot select a teacher or open student training.
+2. Experiment 692 performs routed evaluation for both teachers, selects the
+   winner using the frozen head-to-head gate, and emits the selected acceptance.
+3. All students require exact winner and acceptance file/self hashes, canonical
+   AP/F1/FN gates, frozen BAD identity, and per-fold report/target/evidence
+   bindings. Only 693 opens accepted evidence bytes; 694/695 consume accepted
+   teacher targets only.
 
-The consumer additionally ignores BAD teacher scores, verifies exact ordered
-occurrence identity for every target, requires `scope=all`, binds every fold
-report to the self-hashed fivefold report, and never reads evidence for methods
-694/695.
+The consumer ignores BAD teacher scores, verifies exact ordered occurrence
+identity for every target, requires `scope=all`, binds every candidate output
+to the selected per-fold teacher artifacts, and never reads evidence for
+methods 694/695.

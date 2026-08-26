@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import os
 import subprocess
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-MODES = ("causal_candidate", "hard_bce_control")
+MODES = ("causal_candidate",)
 
 
 def checked_empty(path: Path) -> None:
@@ -23,12 +25,44 @@ def commit_fold_output(staging: Path, final: Path) -> None:
     os.replace(staging, final)
 
 
+def validate_memory_smoke_contract(contract: dict[str, object]) -> int:
+    body = dict(contract)
+    declared = body.pop("contract_sha256", None)
+    if (
+        declared
+        != hashlib.sha256(
+            json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+    ):
+        raise ValueError("structured candidate memory smoke self-hash failed")
+    peak = contract.get("peak_gpu_memory_bytes")
+    factor = contract.get("changed_factor_smoke")
+    if (
+        contract.get("mode") != "causal_candidate"
+        or contract.get("technical_smoke") is not True
+        or contract.get("decision") != "TECHNICAL_SMOKE_ONLY"
+        or isinstance(peak, bool)
+        or not isinstance(peak, int)
+        or not 0 < peak < 75 * 1024**3
+        or not isinstance(factor, dict)
+        or int(factor.get("eligible_grounded_rows", 0)) < 1
+        or set(factor.get("auxiliary_losses", {}))
+        != {"sold_object", "substance", "relation", "evidence_pointer"}
+    ):
+        raise ValueError("structured candidate memory smoke contract failed")
+    return peak
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="One job: paired train+eval for all five folds.")
+    parser = argparse.ArgumentParser(
+        description="One job: changed-factor smoke, then candidate train+eval for five folds."
+    )
     parser.add_argument("--runtime-root", type=Path, required=True)
     parser.add_argument("--teacher-root", type=Path, required=True)
     parser.add_argument("--teacher-acceptance", type=Path, required=True)
     parser.add_argument("--teacher-acceptance-sha256", required=True)
+    parser.add_argument("--teacher-winner", type=Path, required=True)
+    parser.add_argument("--teacher-winner-sha256", required=True)
     parser.add_argument("--runtime-bundle-sha256", required=True)
     parser.add_argument("--baseline-bundle-sha256", required=True)
     parser.add_argument("--baseline-root", type=Path, required=True)
@@ -43,9 +77,80 @@ def main() -> None:
     parser.add_argument("--technical-smoke", action="store_true")
     args = parser.parse_args()
     checked_empty(args.output_root)
+
+    def training_command(fold: int, mode: str, output: Path, *, smoke: bool) -> list[str]:
+        command = [
+            sys.executable,
+            str(HERE / "train_fold.py"),
+            "--fold",
+            str(fold),
+            "--runtime-dir",
+            str(args.runtime_root / f"fold{fold}"),
+            "--teacher-root",
+            str(args.teacher_root),
+            "--teacher-acceptance",
+            str(args.teacher_acceptance),
+            "--teacher-acceptance-sha256",
+            args.teacher_acceptance_sha256,
+            "--teacher-winner",
+            str(args.teacher_winner),
+            "--teacher-winner-sha256",
+            args.teacher_winner_sha256,
+            "--images",
+            str(args.images),
+            "--model-root",
+            str(args.model_root),
+            "--model-revision",
+            args.model_revision,
+            "--vendor",
+            str(args.vendor),
+            "--output-dir",
+            str(output),
+            "--runtime-backend",
+            args.runtime_backend,
+            "--micro-batch-size-override",
+            "2",
+            "--mode",
+            mode,
+        ]
+        if smoke:
+            command.append("--technical-smoke")
+        return command
+
+    if not args.technical_smoke:
+        smoke_output = args.output_root / "memory_smoke"
+        subprocess.run(
+            training_command(0, "causal_candidate", smoke_output, smoke=True), check=True
+        )
+        smoke_contract_path = smoke_output / "output_contract.json"
+        smoke_contract = json.loads(smoke_contract_path.read_text(encoding="utf-8"))
+        peak = validate_memory_smoke_contract(smoke_contract)
+        smoke_acceptance = {
+            "schema_version": "exp693_structured_memory_smoke_v1",
+            "fold": 0,
+            "peak_gpu_memory_bytes": peak,
+            "limit_bytes": 75 * 1024**3,
+            "output_contract_file_sha256": hashlib.sha256(
+                smoke_contract_path.read_bytes()
+            ).hexdigest(),
+            "output_contract_self_sha256": smoke_contract["contract_sha256"],
+            "decision": "OPEN_FIVEFOLD_CANDIDATE_IN_SAME_JOB",
+        }
+        smoke_acceptance["acceptance_sha256"] = hashlib.sha256(
+            json.dumps(
+                smoke_acceptance,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+        ).hexdigest()
+        (args.output_root / "memory_smoke_acceptance.json").write_text(
+            json.dumps(smoke_acceptance, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
     for fold in range(5):
         for mode in MODES:
-            arm = "control" if mode == "hard_bce_control" else "candidate"
+            arm = "candidate"
             final_output = args.output_root / arm / f"fold{fold}"
             staging_output = (
                 args.output_root.parent
@@ -54,39 +159,10 @@ def main() -> None:
                 / arm
                 / f"fold{fold}"
             )
-            command = [
-                sys.executable,
-                str(HERE / "train_fold.py"),
-                "--fold",
-                str(fold),
-                "--runtime-dir",
-                str(args.runtime_root / f"fold{fold}"),
-                "--teacher-root",
-                str(args.teacher_root),
-                "--teacher-acceptance",
-                str(args.teacher_acceptance),
-                "--teacher-acceptance-sha256",
-                args.teacher_acceptance_sha256,
-                "--images",
-                str(args.images),
-                "--model-root",
-                str(args.model_root),
-                "--model-revision",
-                args.model_revision,
-                "--vendor",
-                str(args.vendor),
-                "--output-dir",
-                str(staging_output),
-                "--runtime-backend",
-                args.runtime_backend,
-                "--micro-batch-size-override",
-                "2",
-                "--mode",
-                mode,
-            ]
-            if args.technical_smoke:
-                command.append("--technical-smoke")
-            subprocess.run(command, check=True)
+            subprocess.run(
+                training_command(fold, mode, staging_output, smoke=args.technical_smoke),
+                check=True,
+            )
             commit_fold_output(staging_output, final_output)
     evaluation_command = [
         sys.executable,
@@ -99,14 +175,16 @@ def main() -> None:
         str(args.teacher_acceptance),
         "--teacher-acceptance-sha256",
         args.teacher_acceptance_sha256,
+        "--teacher-winner",
+        str(args.teacher_winner),
+        "--teacher-winner-sha256",
+        args.teacher_winner_sha256,
         "--runtime-bundle-sha256",
         args.runtime_bundle_sha256,
         "--baseline-bundle-sha256",
         args.baseline_bundle_sha256,
         "--baseline-root",
         str(args.baseline_root),
-        "--control-root",
-        str(args.output_root / "control"),
         "--candidate-root",
         str(args.output_root / "candidate"),
         "--output",

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import importlib.util
 import inspect
-import random
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -31,11 +30,11 @@ def test_literal_frozen_rank_formula_and_hard_is_not_downweighted():
     candidate = inspect.getsource(TRAIN.candidate_loss)
     assert "torch.minimum" not in source
     assert "hard.detach" not in source
-    assert "return hard + RANK_COEFFICIENT * listwise_loss" in candidate
+    assert "return hard + RANK_COEFFICIENT * rank" in candidate
     assert TRAIN.RANK_COEFFICIENT == 0.50
 
 
-def test_both_arms_receive_identical_same_stratum_pair_batches():
+def test_pair_selection_does_not_reorder_parent_rows():
     rows = [
         {"global_index": 0, "category": TRAIN.FLAMMABLE, "label": 0},
         {"global_index": 1, "category": TRAIN.FLAMMABLE, "label": 0},
@@ -43,13 +42,13 @@ def test_both_arms_receive_identical_same_stratum_pair_batches():
         {"global_index": 3, "category": TRAIN.FLAMMABLE, "label": 1},
         {"global_index": 4, "category": "БАД", "label": 0},
     ]
-    arranged = TRAIN.arrange_matched_batches(rows)
-    indices = list(range(len(rows)))
-    random.Random(42).shuffle(indices)
-    observed = [arranged[index] for index in indices]
-    assert observed[:2][0]["label"] == observed[:2][1]["label"] == 0
-    assert observed[2:4][0]["label"] == observed[2:4][1]["label"] == 1
-    assert sorted(row["global_index"] for row in arranged) == list(range(5))
+    observed = TRAIN.preserve_frozen_base_order(rows)
+    assert observed == rows
+    assert [row["global_index"] for row in observed] == list(range(5))
+    pairs = TRAIN.within_stratum_pairs(
+        [SimpleNamespace(**item, teacher_score=float(i)) for i, item in enumerate(observed)]
+    )
+    assert all(observed[left]["label"] == observed[right]["label"] for left, right, _ in pairs)
 
 
 def test_train_contract_records_measured_cuda_peak(monkeypatch):

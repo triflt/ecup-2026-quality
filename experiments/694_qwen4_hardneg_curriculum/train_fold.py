@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import random
+import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -36,32 +36,9 @@ def measured_cuda_peak_memory_bytes() -> int:
     return int(torch.cuda.max_memory_allocated()) if torch.cuda.is_available() else 0
 
 
-def curriculum_key(row: dict[str, Any]) -> tuple[int, float, int]:
-    if row["category"] != FLAMMABLE:
-        stage, hardness = 3, 0.0
-    else:
-        score = float(row["teacher_score"])
-        label = int(row["label"])
-        if label == 0:
-            stage, hardness = 0, -score  # strongest teacher false-positive risk first
-        elif label == 1:
-            stage, hardness = 1, score  # strongest missed-positive risk first
-        else:
-            raise ValueError("hard label must be binary")
-    return stage, hardness, int(row["global_index"])
-
-
-def arrange_for_frozen_shuffle(
-    rows: list[dict[str, Any]], *, seed: int = 42
-) -> list[dict[str, Any]]:
-    """Invert the parent's fixed shuffle so its observed sequence is the curriculum."""
-    desired = sorted(rows, key=curriculum_key)
-    permutation = list(range(len(rows)))
-    random.Random(seed).shuffle(permutation)
-    arranged: list[dict[str, Any] | None] = [None] * len(rows)
-    for desired_index, source_index in enumerate(permutation):
-        arranged[source_index] = desired[desired_index]
-    return [row for row in arranged if row is not None]
+def preserve_frozen_base_order(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Teacher hardness changes only BCE weights, never the parent row order."""
+    return list(rows)
 
 
 def frozen_hard_example_weight(row: Any) -> float:
@@ -110,6 +87,7 @@ def run(args: Any) -> dict[str, Any]:
     original_loss = control.primary_loss
 
     teacher_binding: dict[str, Any] = {}
+    smoke_diagnostics: dict[str, Any] = {}
 
     def load_runtime(runtime_dir: Path, spec_id: str, fold: int):
         train, validation, audit = original_load(runtime_dir, spec_id, fold)
@@ -121,15 +99,37 @@ def run(args: Any) -> dict[str, Any]:
             require_evidence=False,
             acceptance_path=args.teacher_acceptance,
             expected_acceptance_file_sha256=args.teacher_acceptance_sha256,
+            winner_path=args.teacher_winner,
+            expected_winner_file_sha256=args.teacher_winner_sha256,
         )
         teacher_binding.update(binding)
-        # Both paired arms receive the exact same teacher-guided order.  The
-        # candidate differs only by its fixed per-occurrence hard-BCE weights.
-        return arrange_for_frozen_shuffle(train), validation, audit
+        if args.technical_smoke and args.mode == "hardneg_candidate":
+            hard = [row for row in train if frozen_hard_example_weight(type("R", (), row)()) > 1.0]
+            if not hard:
+                raise ValueError("hardneg smoke lacks a flammable teacher-disagreement row")
+            hard_ids = {id(row) for row in hard}
+            train = hard + [row for row in train if id(row) not in hard_ids]
+        # The candidate retains the exact frozen parent order. Its only change
+        # is fixed per-occurrence hard-BCE weighting.
+        return preserve_frozen_base_order(train), validation, audit
 
     control.load_runtime = load_runtime
     if args.mode == "hardneg_candidate":
-        control.primary_loss = weighted_hard_bce_loss
+
+        def tracked_weighted_loss(model, processor, rows, images, zero_token, one_token):
+            loss = weighted_hard_bce_loss(model, processor, rows, images, zero_token, one_token)
+            if args.technical_smoke:
+                weights = [frozen_hard_example_weight(row) for row in rows]
+                smoke_diagnostics.update(
+                    {
+                        "weighted_rows": sum(weight > 1.0 for weight in weights),
+                        "max_weight": max(weights),
+                        "weighted_bce_loss": float(loss.detach().float().item()),
+                    }
+                )
+            return loss
+
+        control.primary_loss = tracked_weighted_loss
     reset_cuda_peak_memory()
     try:
         report = control.run(SOURCE_EXPERIMENT_ID, args)
@@ -137,6 +137,16 @@ def run(args: Any) -> dict[str, Any]:
     finally:
         control.load_runtime = original_load
         control.primary_loss = original_loss
+    if (
+        args.technical_smoke
+        and args.mode == "hardneg_candidate"
+        and (
+            smoke_diagnostics.get("weighted_rows", 0) < 1
+            or float(smoke_diagnostics.get("max_weight", 1.0)) <= 1.0
+            or not math.isfinite(float(smoke_diagnostics.get("weighted_bce_loss", math.nan)))
+        )
+    ):
+        raise ValueError("hardneg changed-factor smoke did not exercise finite weighted BCE")
     report.update(
         {
             "experiment_id": EXPERIMENT_ID,
@@ -151,13 +161,14 @@ def run(args: Any) -> dict[str, Any]:
                 if args.mode == "hardneg_candidate"
                 else "none"
             ),
-            "paired_order": "identical_teacher_guided_curriculum",
+            "paired_order": "identical_frozen_parent_order",
             "max_hard_example_weight": (
                 MAX_HARD_EXAMPLE_WEIGHT if args.mode == "hardneg_candidate" else 1.0
             ),
             "teacher_outer_safe_required": True,
             "exp691_binding": teacher_binding,
             "peak_gpu_memory_bytes": peak_gpu_memory_bytes,
+            "changed_factor_smoke": smoke_diagnostics if args.technical_smoke else None,
         }
     )
     report.pop("contract_sha256", None)
@@ -174,5 +185,7 @@ if __name__ == "__main__":
     parser.add_argument("--teacher-root", type=Path, required=True)
     parser.add_argument("--teacher-acceptance", type=Path, required=True)
     parser.add_argument("--teacher-acceptance-sha256", required=True)
+    parser.add_argument("--teacher-winner", type=Path, required=True)
+    parser.add_argument("--teacher-winner-sha256", required=True)
     parsed = parser.parse_args()
     print(json.dumps(run(parsed), ensure_ascii=False, indent=2, sort_keys=True))

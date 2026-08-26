@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import importlib.util
 import inspect
-import random
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -45,14 +44,12 @@ def rows():
     ]
 
 
-def test_paired_curriculum_order_survives_parent_shuffle():
+def test_auxiliary_weighting_preserves_parent_order_byte_for_byte():
     source = rows()
-    arranged = TRAIN.arrange_for_frozen_shuffle(source)
-    indices = list(range(len(arranged)))
-    random.Random(42).shuffle(indices)
-    observed = [arranged[index] for index in indices]
-    assert observed == sorted(source, key=TRAIN.curriculum_key)
-    assert sorted(row["id"] for row in arranged) == sorted(row["id"] for row in source)
+    observed = TRAIN.preserve_frozen_base_order(source)
+    assert observed == source
+    assert [row["global_index"] for row in observed] == [row["global_index"] for row in source]
+    assert observed is not source
 
 
 def test_teacher_signal_is_flammable_only_and_weights_hard_gold_bce():

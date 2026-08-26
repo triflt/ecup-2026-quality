@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -20,6 +21,21 @@ AUXILIARY_COEFFICIENT = 0.10
 AUXILIARY_COMPONENTS = ("sold_object", "substance", "relation", "evidence_pointer")
 AUXILIARY_COMPONENT_COEFFICIENT = AUXILIARY_COEFFICIENT / len(AUXILIARY_COMPONENTS)
 MODES = ("hard_bce_control", "causal_candidate")
+
+
+def structured_evidence_eligible(row: Any) -> bool:
+    evidence = getattr(row, "teacher_evidence", {})
+    return bool(
+        row.category == FLAMMABLE
+        and evidence.get("parse_valid") is True
+        and evidence.get("grounded") is True
+        and evidence.get("abstain") is False
+        and all(
+            evidence.get(field, {}).get("source") != "unknown"
+            and evidence.get(field, {}).get("value") != "unknown"
+            for field in ("sold_object", "substance", "relation")
+        )
+    )
 
 
 def reset_cuda_peak_memory() -> None:
@@ -76,18 +92,7 @@ def structured_auxiliary_loss(
 
     selected = []
     for row, image in zip(rows, images, strict=True):
-        evidence = getattr(row, "teacher_evidence", {})
-        if (
-            row.category == FLAMMABLE
-            and evidence.get("parse_valid") is True
-            and evidence.get("grounded") is True
-            and evidence.get("abstain") is False
-            and all(
-                evidence.get(field, {}).get("source") != "unknown"
-                and evidence.get(field, {}).get("value") != "unknown"
-                for field in ("sold_object", "substance", "relation")
-            )
-        ):
+        if structured_evidence_eligible(row):
             selected.append((row, image))
     if not selected:
         return None
@@ -145,6 +150,7 @@ def run(args: Any) -> dict[str, Any]:
     original_load = control.load_runtime
     original_loss = control.primary_loss
     teacher_binding: dict[str, Any] = {}
+    smoke_diagnostics: dict[str, Any] = {}
 
     def load_runtime(runtime_dir: Path, spec_id: str, fold: int):
         train, validation, audit = original_load(runtime_dir, spec_id, fold)
@@ -156,8 +162,18 @@ def run(args: Any) -> dict[str, Any]:
             require_evidence=args.mode == "causal_candidate",
             acceptance_path=args.teacher_acceptance,
             expected_acceptance_file_sha256=args.teacher_acceptance_sha256,
+            winner_path=args.teacher_winner,
+            expected_winner_file_sha256=args.teacher_winner_sha256,
         )
         teacher_binding.update(binding)
+        if args.technical_smoke and args.mode == "causal_candidate":
+            eligible = [
+                row for row in enriched if structured_evidence_eligible(SimpleNamespace(**row))
+            ]
+            if not eligible:
+                raise ValueError("causal smoke lacks an eligible grounded evidence row")
+            eligible_ids = {id(row) for row in eligible}
+            enriched = eligible + [row for row in enriched if id(row) not in eligible_ids]
         return enriched, validation, audit
 
     def primary_loss(model, processor, rows, images, zero_token, one_token):
@@ -167,7 +183,23 @@ def run(args: Any) -> dict[str, Any]:
             if args.mode == "causal_candidate"
             else None
         )
-        return combine_losses(hard, auxiliary, mode=args.mode)
+        combined = combine_losses(hard, auxiliary, mode=args.mode)
+        if args.technical_smoke and args.mode == "causal_candidate":
+            values = {
+                component: float(loss.detach().float().item())
+                for component, loss in (auxiliary or {}).items()
+            }
+            smoke_diagnostics.update(
+                {
+                    "eligible_grounded_rows": sum(
+                        structured_evidence_eligible(row) for row in rows
+                    ),
+                    "hard_loss": float(hard.detach().float().item()),
+                    "auxiliary_losses": values,
+                    "combined_loss": float(combined.detach().float().item()),
+                }
+            )
+        return combined
 
     control.load_runtime = load_runtime
     control.primary_loss = primary_loss
@@ -178,6 +210,23 @@ def run(args: Any) -> dict[str, Any]:
     finally:
         control.load_runtime = original_load
         control.primary_loss = original_loss
+    if (
+        args.technical_smoke
+        and args.mode == "causal_candidate"
+        and (
+            smoke_diagnostics.get("eligible_grounded_rows", 0) < 1
+            or set(smoke_diagnostics.get("auxiliary_losses", {})) != set(AUXILIARY_COMPONENTS)
+            or not all(
+                math.isfinite(float(value))
+                for value in (
+                    smoke_diagnostics.get("hard_loss", math.nan),
+                    smoke_diagnostics.get("combined_loss", math.nan),
+                    *smoke_diagnostics.get("auxiliary_losses", {}).values(),
+                )
+            )
+        )
+    ):
+        raise ValueError("causal changed-factor smoke did not exercise finite auxiliary loss")
     report.update(
         {
             "experiment_id": EXPERIMENT_ID,
@@ -200,6 +249,7 @@ def run(args: Any) -> dict[str, Any]:
             "teacher_outer_safe_required": True,
             "exp691_binding": teacher_binding,
             "peak_gpu_memory_bytes": peak_gpu_memory_bytes,
+            "changed_factor_smoke": smoke_diagnostics if args.technical_smoke else None,
         }
     )
     report.pop("contract_sha256", None)
@@ -217,5 +267,7 @@ if __name__ == "__main__":
     parser.add_argument("--teacher-root", type=Path, required=True)
     parser.add_argument("--teacher-acceptance", type=Path, required=True)
     parser.add_argument("--teacher-acceptance-sha256", required=True)
+    parser.add_argument("--teacher-winner", type=Path, required=True)
+    parser.add_argument("--teacher-winner-sha256", required=True)
     parsed = parser.parse_args()
     print(json.dumps(run(parsed), ensure_ascii=False, indent=2, sort_keys=True))

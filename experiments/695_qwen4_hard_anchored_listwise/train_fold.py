@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import random
+import math
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -52,28 +52,9 @@ def within_stratum_pairs(rows: list[SimpleNamespace]) -> list[tuple[int, int, fl
     return pairs
 
 
-def arrange_matched_batches(rows: list[dict[str, Any]], *, seed: int = 42) -> list[dict[str, Any]]:
-    """Give both arms identical microbatches with same-label flammable pairs."""
-    paired: list[dict[str, Any]] = []
-    residual: list[dict[str, Any]] = []
-    consumed: set[int] = set()
-    for label in (0, 1):
-        group = sorted(
-            (row for row in rows if row["category"] == FLAMMABLE and int(row["label"]) == label),
-            key=lambda row: int(row["global_index"]),
-        )
-        even = len(group) - len(group) % 2
-        paired.extend(group[:even])
-        residual.extend(group[even:])
-        consumed.update(id(row) for row in group)
-    residual.extend(row for row in rows if id(row) not in consumed)
-    desired = paired + residual
-    permutation = list(range(len(rows)))
-    random.Random(seed).shuffle(permutation)
-    arranged: list[dict[str, Any] | None] = [None] * len(rows)
-    for desired_index, source_index in enumerate(permutation):
-        arranged[source_index] = desired[desired_index]
-    return [row for row in arranged if row is not None]
+def preserve_frozen_base_order(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Rank pairs are selected inside each batch without reordering base rows."""
+    return list(rows)
 
 
 def listwise_loss(scores: Any, rows: list[SimpleNamespace]):
@@ -89,7 +70,16 @@ def listwise_loss(scores: Any, rows: list[SimpleNamespace]):
     return torch.stack(losses).mean()
 
 
-def candidate_loss(model, processor, rows, images, zero_token, one_token):
+def candidate_loss(
+    model,
+    processor,
+    rows,
+    images,
+    zero_token,
+    one_token,
+    *,
+    diagnostics: dict[str, Any] | None = None,
+):
     import torch
     from torch.nn import functional
 
@@ -105,7 +95,16 @@ def candidate_loss(model, processor, rows, images, zero_token, one_token):
         [int(row.label) for row in rows], dtype=torch.float32, device=model.device
     )
     hard = functional.binary_cross_entropy_with_logits(scores, labels)
-    return hard + RANK_COEFFICIENT * listwise_loss(scores, rows)
+    rank = listwise_loss(scores, rows)
+    if diagnostics is not None:
+        diagnostics.update(
+            {
+                "pair_count": len(within_stratum_pairs(rows)),
+                "hard_loss": float(hard.detach().float().item()),
+                "rank_loss": float(rank.detach().float().item()),
+            }
+        )
+    return hard + RANK_COEFFICIENT * rank
 
 
 def run(args: Any) -> dict[str, Any]:
@@ -115,6 +114,7 @@ def run(args: Any) -> dict[str, Any]:
     original_loss = control.primary_loss
 
     teacher_binding: dict[str, Any] = {}
+    smoke_diagnostics: dict[str, Any] = {}
 
     def load_runtime(runtime_dir: Path, spec_id: str, fold: int):
         train, validation, audit = original_load(runtime_dir, spec_id, fold)
@@ -126,13 +126,36 @@ def run(args: Any) -> dict[str, Any]:
             require_evidence=False,
             acceptance_path=args.teacher_acceptance,
             expected_acceptance_file_sha256=args.teacher_acceptance_sha256,
+            winner_path=args.teacher_winner,
+            expected_winner_file_sha256=args.teacher_winner_sha256,
         )
         teacher_binding.update(binding)
-        return arrange_matched_batches(train), validation, audit
+        if args.technical_smoke and args.mode == "rank_candidate":
+            namespaces = [SimpleNamespace(**row) for row in train]
+            pairs = within_stratum_pairs(namespaces)
+            if not pairs:
+                raise ValueError("rank smoke lacks a same-label teacher-ordered pair")
+            left, right, _ = pairs[0]
+            selected = [train[left], train[right]]
+            selected_ids = {id(row) for row in selected}
+            train = selected + [row for row in train if id(row) not in selected_ids]
+        return preserve_frozen_base_order(train), validation, audit
 
     control.load_runtime = load_runtime
     if args.mode == "rank_candidate":
-        control.primary_loss = candidate_loss
+
+        def tracked_candidate_loss(model, processor, rows, images, zero_token, one_token):
+            return candidate_loss(
+                model,
+                processor,
+                rows,
+                images,
+                zero_token,
+                one_token,
+                diagnostics=smoke_diagnostics if args.technical_smoke else None,
+            )
+
+        control.primary_loss = tracked_candidate_loss
     reset_cuda_peak_memory()
     try:
         report = control.run(SOURCE_EXPERIMENT_ID, args)
@@ -140,6 +163,17 @@ def run(args: Any) -> dict[str, Any]:
     finally:
         control.load_runtime = original_load
         control.primary_loss = original_loss
+    if (
+        args.technical_smoke
+        and args.mode == "rank_candidate"
+        and (
+            smoke_diagnostics.get("pair_count", 0) < 1
+            or not math.isfinite(float(smoke_diagnostics.get("hard_loss", math.nan)))
+            or not math.isfinite(float(smoke_diagnostics.get("rank_loss", math.nan)))
+            or float(smoke_diagnostics.get("rank_loss", 0.0)) <= 0.0
+        )
+    ):
+        raise ValueError("rank changed-factor smoke did not exercise finite nonzero rank loss")
     report.update(
         {
             "experiment_id": EXPERIMENT_ID,
@@ -149,11 +183,13 @@ def run(args: Any) -> dict[str, Any]:
             "hard_bce_coefficient": 1.0,
             "rank_coefficient": RANK_COEFFICIENT if args.mode == "rank_candidate" else 0.0,
             "rank_scope": "flammable_same_hard_label_only",
+            "rank_pair_selection": "deterministic_within_frozen_batch_without_reorder",
             "loss_formula": "L_hard + 0.5 * L_rank",
             "lambda_grid": False,
             "teacher_outer_safe_required": True,
             "exp691_binding": teacher_binding,
             "peak_gpu_memory_bytes": peak_gpu_memory_bytes,
+            "changed_factor_smoke": smoke_diagnostics if args.technical_smoke else None,
         }
     )
     report.pop("contract_sha256", None)
@@ -170,5 +206,7 @@ if __name__ == "__main__":
     parser.add_argument("--teacher-root", type=Path, required=True)
     parser.add_argument("--teacher-acceptance", type=Path, required=True)
     parser.add_argument("--teacher-acceptance-sha256", required=True)
+    parser.add_argument("--teacher-winner", type=Path, required=True)
+    parser.add_argument("--teacher-winner-sha256", required=True)
     parsed = parser.parse_args()
     print(json.dumps(run(parsed), ensure_ascii=False, indent=2, sort_keys=True))

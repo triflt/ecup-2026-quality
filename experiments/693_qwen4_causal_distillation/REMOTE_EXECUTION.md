@@ -20,20 +20,25 @@ Frozen archive layouts are:
 - runtime bundle: `runtime/fold0` through `runtime/fold4`;
 - baseline bundle: `fold0/predictions.jsonl` through fold4 at archive root;
 - PEFT vendor bundle: `peft/__init__.py` at archive root;
-- qwen27-all terminal output: `fold0` through `fold4` at the mounted root;
-- exp692 output: the exact routed-acceptance file named by the builder argument.
+- selected teacher terminal output: experiment 691 uses `fold0` through `fold4`
+  at the mounted root; experiment 696 uses `fivefold/fold0` through
+  `fivefold/fold4`;
+- exp692 outputs: the exact routed acceptance and winner gate named by the
+  builder arguments.
 
-Each 1×H100 job sequentially runs paired arms for folds 0..4 and then evaluates.
-Each arm/fold trains outside the S3 output root and becomes visible at
-`control|candidate/foldK` by an atomic rename only after success. The S3 output
-has deliberately no `upload_policies`, so remote compute uploads completed fold
+Each 1×H100 job first runs one changed-factor technical smoke, then trains only
+the candidate sequentially on folds 0..4 and evaluates it against the accepted
+frozen production route. Each fold trains outside the S3 output root and becomes
+visible at `candidate/foldK` by an atomic rename only after success. The S3
+output has deliberately no `upload_policies`, so remote compute uploads completed fold
 directories and the minimal failure marker on any terminal state. No builder
 uploads, dry-runs or submits.
 
 Final `evaluation.json` is method-bound and self-hashed. It binds the exact
-teacher acceptance file/self hashes, runtime and baseline bundle hashes, and an
-ordered list of ten output-contract/prediction bindings.
-Paired training runtime and peak memory remain observations only: the job time
+teacher acceptance and winner file/self hashes, runtime and baseline bundle
+hashes, and an ordered list of five candidate output-contract/prediction
+bindings. Full candidate provenance is checked before cross-fold labels open.
+Candidate training runtime and peak memory remain observations only: the job time
 limit is never passed as a deployment-inference limit. Consequently a
 science-passing candidate stays `STAGE_PENDING_RESOURCE_EVIDENCE` until a later
 package inference measurement supplies the real submission-limit evidence.

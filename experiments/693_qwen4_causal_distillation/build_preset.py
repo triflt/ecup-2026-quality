@@ -126,6 +126,7 @@ def render(args: argparse.Namespace, *, job_name: str, method: str) -> str:
     baseline_archive = f"/work/input/baseline/{args.baseline_bundle_file}"
     vendor_archive = f"/work/input/vendor/{args.vendor_bundle_file}"
     acceptance = f"/work/input/acceptance/{args.acceptance_file}"
+    winner = f"/work/input/winner/{args.winner_file}"
     bootstrap = extraction_bootstrap(code_archive, args.code_bundle_sha256)
     command = (
         f"set -euo pipefail; {bootstrap} && "
@@ -142,6 +143,8 @@ def render(args: argparse.Namespace, *, job_name: str, method: str) -> str:
         "--teacher-root /work/input/teacher "
         f"--acceptance {shlex.quote(acceptance)} "
         f"--acceptance-sha256 {args.acceptance_sha256} "
+        f"--winner {shlex.quote(winner)} "
+        f"--winner-sha256 {args.winner_sha256} "
         f"--vendor-archive {shlex.quote(vendor_archive)} "
         f"--vendor-sha256 {args.vendor_bundle_sha256} "
         "--model-root /hf_models --output /work/output"
@@ -196,6 +199,12 @@ def render(args: argparse.Namespace, *, job_name: str, method: str) -> str:
         ),
         input_spec(
             bucket=args.input_bucket,
+            src=args.winner_output_src,
+            file=args.winner_file,
+            dst=winner,
+        ),
+        input_spec(
+            bucket=args.input_bucket,
             src=args.vendor_bundle_src,
             file=args.vendor_bundle_file,
             dst=vendor_archive,
@@ -246,6 +255,10 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--acceptance-file", required=True)
     result.add_argument("--acceptance-sha256", required=True)
     result.add_argument("--local-acceptance", type=Path, required=True)
+    result.add_argument("--winner-output-src", required=True)
+    result.add_argument("--winner-file", required=True)
+    result.add_argument("--winner-sha256", required=True)
+    result.add_argument("--local-winner", type=Path, required=True)
     result.add_argument("--vendor-bundle-src", required=True)
     result.add_argument("--vendor-bundle-file", required=True)
     result.add_argument("--vendor-bundle-sha256", required=True)
@@ -271,6 +284,7 @@ def validate(args: argparse.Namespace) -> None:
         "baseline_bundle_src",
         "qwen27_output_src",
         "acceptance_output_src",
+        "winner_output_src",
         "vendor_bundle_src",
         "output_prefix",
     ):
@@ -280,6 +294,7 @@ def validate(args: argparse.Namespace) -> None:
         "runtime_bundle_file",
         "baseline_bundle_file",
         "acceptance_file",
+        "winner_file",
         "vendor_bundle_file",
     ):
         setattr(args, field, safe_file(getattr(args, field)))
@@ -288,6 +303,7 @@ def validate(args: argparse.Namespace) -> None:
         "runtime_bundle_sha256",
         "baseline_bundle_sha256",
         "acceptance_sha256",
+        "winner_sha256",
         "vendor_bundle_sha256",
     ):
         setattr(args, field, hex_sha256(getattr(args, field)))
@@ -300,7 +316,10 @@ def validate(args: argparse.Namespace) -> None:
 def build_all(args: argparse.Namespace) -> dict[str, object]:
     validate(args)
     acceptance = verify_routed_acceptance(
-        args.local_acceptance, expected_file_sha256=args.acceptance_sha256
+        args.local_acceptance,
+        expected_file_sha256=args.acceptance_sha256,
+        winner_path=args.local_winner,
+        expected_winner_file_sha256=args.winner_sha256,
     )
     if args.output_dir.exists():
         raise FileExistsError("refusing to overwrite preset output directory")
@@ -325,6 +344,8 @@ def build_all(args: argparse.Namespace) -> dict[str, object]:
         "model_revision": MODEL_REVISION,
         "teacher_acceptance_file_sha256": args.acceptance_sha256,
         "teacher_acceptance_self_sha256": acceptance["acceptance_sha256"],
+        "teacher_winner_file_sha256": args.winner_sha256,
+        "teacher_winner_self_sha256": acceptance["winner_gate"]["winner_sha256"],
         "presets_sha256": {
             name: hashlib.sha256(payload.encode()).hexdigest() for name, payload in rendered.items()
         },
