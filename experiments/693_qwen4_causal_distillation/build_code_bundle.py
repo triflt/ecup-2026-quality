@@ -129,7 +129,7 @@ def build(repo: Path, output: Path) -> dict[str, Any]:
         output.parent.mkdir(parents=True, exist_ok=True)
         with (
             output.open("xb") as raw,
-            gzip.GzipFile(fileobj=raw, mode="wb", mtime=0) as compressed,
+            gzip.GzipFile(filename="", fileobj=raw, mode="wb", mtime=0) as compressed,
             tarfile.open(fileobj=compressed, mode="w") as destination,
         ):
             for info, payload in members:
