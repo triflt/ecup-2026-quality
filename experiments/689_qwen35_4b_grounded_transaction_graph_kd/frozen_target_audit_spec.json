@@ -67,6 +67,7 @@
     "minimum_image_required_rows": 30,
     "minimum_image_required_strict_pass": 27,
     "minimum_relation_cohen_kappa": 0.8,
+    "minimum_relation_gwet_ac1": 0.8,
     "minimum_s1_object_relation_correct": 95,
     "minimum_s2_object_relation_correct": 90,
     "minimum_s3_object_relation_correct": 90,
@@ -163,5 +164,5 @@
     "job_metadata_sha256",
     "selection_rows_sha256"
   ],
-  "self_sha256": "85fea27723297dca0f91baf2bc718595b6817f01a30aa95c46083e37a19e58f6"
+  "self_sha256": "cd5dabb3d70b0bd8263de083f15c55d4d664a6412d60ce7bb9a6e2b34e9a27a8"
 }

@@ -520,6 +520,7 @@ def test_remote_pipeline_accepts_exact_dual_300_and_never_authorizes_gpu(
     assert result["metrics"]["image_required_rows"] == 30
     assert result["metrics"]["relation_cohen_kappa"] == 1.0
     assert result["metrics"]["relation_gwet_ac1"] == 1.0
+    assert result["gate_checks"]["relation_gwet_ac1"] is True
     assert result["student_gpu_authorized"] is False
 
 
@@ -615,6 +616,7 @@ def test_low_relation_kappa_rejects_despite_adjudicated_final_pass(tmp_path: Pat
     assert result["metrics"]["relation_cohen_kappa"] < 0.8
     assert result["metrics"]["relation_gwet_ac1"] > 0.8
     assert result["gate_checks"]["relation_cohen_kappa"] is False
+    assert result["gate_checks"]["relation_gwet_ac1"] is True
     assert result["status"] == "rejected_by_frozen_gate"
 
 

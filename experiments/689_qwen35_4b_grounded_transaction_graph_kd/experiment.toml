@@ -41,6 +41,7 @@ minimum_rare_positive_coverage = 0.80
 maximum_contradiction_rate = 0.05
 minimum_exact_review_agreement = 0.90
 minimum_relation_cohen_kappa = 0.80
+minimum_relation_gwet_ac1 = 0.80
 minimum_image_required_rows = 30
 minimum_image_required_strict_pass = 27
 maximum_image_required_unsupported_visual_claims = 0

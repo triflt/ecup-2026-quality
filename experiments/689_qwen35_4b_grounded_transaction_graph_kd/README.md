@@ -86,8 +86,9 @@ All frozen gates must pass:
 - object+relation at least S1 `95/100`, S2 `90/100`, and S3 `90/100`;
 - supported evidence at least `297/300`, coverage at least `225/300` overall
   and `80/100` in direct/included fuel, contradictions at most `15/300`;
-- exact whole-review agreement at least `0.90` and relation Cohen kappa at
-  least `0.80`; raw per-attribute agreement and relation Gwet AC1 are reported;
+- exact whole-review agreement at least `0.90`, relation Cohen kappa at least
+  `0.80`, and relation Gwet AC1 at least `0.80`; both imbalance-sensitive and
+  skew-robust agreement gates must pass;
 - at least 30 final `image_required` rows, at least 27 strict passes in that
   slice, and zero unsupported visual claims there;
 - exact record/source nonduplication and the component-disjointness claim above.

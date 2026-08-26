@@ -594,6 +594,7 @@ def validate(
         "contradiction_rate": counts["contradictions"] <= gates["maximum_contradictions"],
         "exact_review_agreement": raw_exact_agreement >= gates["minimum_exact_review_agreement"],
         "relation_cohen_kappa": relation_kappa >= gates["minimum_relation_cohen_kappa"],
+        "relation_gwet_ac1": relation_ac1 >= gates["minimum_relation_gwet_ac1"],
         "image_required_rows": counts["image_required"] >= gates["minimum_image_required_rows"],
         "image_required_strict_pass": (
             counts["image_required_strict_pass"] >= gates["minimum_image_required_strict_pass"]
