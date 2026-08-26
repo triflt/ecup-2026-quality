@@ -451,14 +451,9 @@ def _image_regions(image: Image.Image) -> dict[str, str]:
     boxes = {
         "full": (0, 0, image.width, image.height),
         "q00": (0, 0, max(1, middle_x), max(1, middle_y)),
-        "q01": (middle_x, 0, middle_x + max(1, middle_x), max(1, middle_y)),
-        "q10": (0, middle_y, max(1, middle_x), middle_y + max(1, middle_y)),
-        "q11": (
-            middle_x,
-            middle_y,
-            middle_x + max(1, middle_x),
-            middle_y + max(1, middle_y),
-        ),
+        "q01": (middle_x, 0, image.width, max(1, middle_y)),
+        "q10": (0, middle_y, max(1, middle_x), image.height),
+        "q11": (middle_x, middle_y, image.width, image.height),
     }
     result: dict[str, str] = {}
     for region, box in boxes.items():
@@ -690,6 +685,7 @@ def prepare(
                     "fold": int(row["fold"]),
                     "stratum": row["_stratum"],
                     "reference": reference,
+                    "source_image_url_sha256": sha256_text(url),
                     "original_bytes_sha256": sha256_bytes(original),
                     "resized_rgb_sha256": pixel_sha,
                     "transformed_jpeg_sha256": transformed_sha,
@@ -722,6 +718,7 @@ def prepare(
                         "record_id": item["record_id"],
                         "row_token": item["row_token"],
                         "reference": item["reference"],
+                        "source_image_url_sha256": item["source_image_url_sha256"],
                         "original_bytes_sha256": item["original_bytes_sha256"],
                     }
                     for item in image_manifest

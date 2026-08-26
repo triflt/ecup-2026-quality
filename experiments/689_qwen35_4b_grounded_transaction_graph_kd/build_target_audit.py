@@ -232,6 +232,8 @@ def validate_source_prepare_acceptance(
     source_rows_path: Path,
     source_contract_path: Path,
     source_contract: dict[str, Any],
+    exclusion_670_sha256: str,
+    exclusion_672_sha256: str,
 ) -> None:
     """Require an independently emitted ACCEPT and recompute its local bindings."""
     expect_exact_keys(
@@ -246,6 +248,11 @@ def validate_source_prepare_acceptance(
             "source_prepare_spec_sha256",
             "runtime_archives",
             "runtime_bindings_sha256",
+            "exclusion_670_sha256",
+            "exclusion_672_sha256",
+            "eligibility_universe_sha256",
+            "stratum_derivation_sha256",
+            "source_membership_reconstruction_sha256",
             "source_contract_sha256",
             "source_contract_self_sha256",
             "source_rows_sha256",
@@ -259,6 +266,7 @@ def validate_source_prepare_acceptance(
             "approved_s3_output_ref",
             "label_fields_present",
             "score_fields_present",
+            "ocr_source_count",
             "sealed_rows",
             "public_rows",
             "self_sha256",
@@ -283,6 +291,11 @@ def validate_source_prepare_acceptance(
         "bundle_manifest_sha256",
         "source_prepare_spec_sha256",
         "runtime_bindings_sha256",
+        "exclusion_670_sha256",
+        "exclusion_672_sha256",
+        "eligibility_universe_sha256",
+        "stratum_derivation_sha256",
+        "source_membership_reconstruction_sha256",
         "source_contract_sha256",
         "source_contract_self_sha256",
         "source_rows_sha256",
@@ -296,6 +309,16 @@ def validate_source_prepare_acceptance(
         raise ContractError("source prepare acceptance: builder revision SHA mismatch")
     if acceptance["builder_revision_sha256"] != source_contract["builder_revision_sha256"]:
         raise ContractError("source prepare acceptance: source-contract builder mismatch")
+    if acceptance["exclusion_670_sha256"] != exclusion_670_sha256 or acceptance[
+        "exclusion_672_sha256"
+    ] != exclusion_672_sha256:
+        raise ContractError("source prepare acceptance: exclusion input binding mismatch")
+    if acceptance["eligibility_universe_sha256"] != source_contract[
+        "eligibility_universe_sha256"
+    ] or acceptance["stratum_derivation_sha256"] != source_contract[
+        "stratum_derivation_sha256"
+    ]:
+        raise ContractError("source prepare acceptance: eligibility/strata binding mismatch")
     if acceptance["source_contract_sha256"] != sha256_file(source_contract_path):
         raise ContractError("source prepare acceptance: source-contract file binding mismatch")
     if acceptance["source_contract_self_sha256"] != source_contract["self_sha256"]:
@@ -307,25 +330,36 @@ def validate_source_prepare_acceptance(
     if acceptance["source_row_count"] != source_contract["source_row_count"]:
         raise ContractError("source prepare acceptance: source-row count mismatch")
     archives = acceptance["runtime_archives"]
-    if not isinstance(archives, list) or len(archives) != 5:
-        raise ContractError("source prepare acceptance: exactly five runtime archives required")
-    for fold, archive in enumerate(archives):
+    if not isinstance(archives, list) or len(archives) != 2:
+        raise ContractError("source prepare acceptance: exactly two runtime archives required")
+    covered_folds: list[int] = []
+    for index, archive in enumerate(archives):
         if not isinstance(archive, dict):
-            raise ContractError(f"source prepare acceptance: archive {fold} must be an object")
+            raise ContractError(f"source prepare acceptance: archive {index} must be an object")
         expect_exact_keys(
             archive,
-            {"fold", "reference", "sha256", "size_bytes"},
-            f"source prepare acceptance archive {fold}",
+            {"archive_id", "folds", "reference", "sha256", "size_bytes"},
+            f"source prepare acceptance archive {index}",
         )
-        if archive["fold"] != fold or not isinstance(archive["size_bytes"], int) or archive[
-            "size_bytes"
-        ] < 0:
-            raise ContractError(f"source prepare acceptance: archive {fold} metadata mismatch")
-        require_hex64(archive["sha256"], f"source prepare acceptance archive {fold}.sha256")
+        folds = archive["folds"]
+        if (
+            not isinstance(archive["archive_id"], str)
+            or not archive["archive_id"].strip()
+            or not isinstance(folds, list)
+            or any(not isinstance(fold, int) or fold not in range(5) for fold in folds)
+            or folds != sorted(set(folds))
+            or not isinstance(archive["size_bytes"], int)
+            or archive["size_bytes"] < 0
+        ):
+            raise ContractError(f"source prepare acceptance: archive {index} metadata mismatch")
+        covered_folds.extend(folds)
+        require_hex64(archive["sha256"], f"source prepare acceptance archive {index}.sha256")
         if not isinstance(archive["reference"], str) or not S3_REFERENCE.fullmatch(
             archive["reference"]
         ):
-            raise ContractError(f"source prepare acceptance: archive {fold} ref is not approved S3")
+            raise ContractError(f"source prepare acceptance: archive {index} ref is not approved S3")
+    if sorted(covered_folds) != list(range(5)):
+        raise ContractError("source prepare acceptance: archive fold mapping mismatch")
     inventory = acceptance["output_inventory"]
     if not isinstance(inventory, list) or len(inventory) != 303:
         raise ContractError("source prepare acceptance: exact 303-file output inventory required")
@@ -378,6 +412,8 @@ def validate_source_prepare_acceptance(
         "score_fields_present"
     ] is not False:
         raise ContractError("source prepare acceptance: labels/scores must be absent")
+    if acceptance["ocr_source_count"] != 0:
+        raise ContractError("source prepare acceptance: OCR sources must be zero")
     if acceptance["sealed_rows"] != 0 or acceptance["public_rows"] != 0:
         raise ContractError("source prepare acceptance: sealed/Public rows must be zero")
 
@@ -954,6 +990,8 @@ def prepare(
         source_rows_path=resolved_source_rows,
         source_contract_path=resolved_source_contract,
         source_contract=source_contract,
+        exclusion_670_sha256=exclusion_670_sha256,
+        exclusion_672_sha256=exclusion_672_sha256,
     )
     output_dir = require_remote_path(
         remote_root, output_dir, context="prepare output", must_exist=False

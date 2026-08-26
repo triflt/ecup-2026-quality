@@ -80,8 +80,27 @@
   "opaque_token_scheme": "sha256_utf8_v1",
   "ocr_policy": "disabled_unverified",
   "quota_per_fold_per_stratum": 20,
+  "runtime_archives": [
+    {
+      "archive_id": "folds_0_3",
+      "folds": [
+        0,
+        3
+      ],
+      "sha256": "e371c03a3fc893d990d38874e07200a5ac136b8c72f43109aa7f567761943ccd"
+    },
+    {
+      "archive_id": "folds_1_2_4",
+      "folds": [
+        1,
+        2,
+        4
+      ],
+      "sha256": "1dfb9bf01a9567286051ee76a79fc4b41c2af360e5761b7a4663090745c5474d"
+    }
+  ],
   "schema_version": "exp689_source_prepare_spec_v1",
-  "self_sha256": "ace1ad4c7f1ed7aad244847e4adc93eb5384db50aa50f6ba16a87922809a2ca1",
+  "self_sha256": "c41f1d11e956af0262688810c1b1770a201feb49515b12b0239232dab3c65cf3",
   "singleton_cue_free_per_fold": 10,
   "strata": [
     {

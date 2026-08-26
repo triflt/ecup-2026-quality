@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import re
-from collections import Counter
+import unicodedata
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -37,9 +39,36 @@ SOURCE_ROW_FIELDS = {
 }
 IMAGE_MANIFEST_FIELDS = {
     "record_id", "row_token", "component_token", "fold", "stratum", "reference",
+    "source_image_url_sha256",
     "original_bytes_sha256", "resized_rgb_sha256", "transformed_jpeg_sha256",
     "transformed_rgb_sha256", "width", "height", "region_sha256",
 }
+
+VERIFY_FUEL = re.compile(
+    r"\b(?:газ|газов|топлив|бензин|керосин|пропан|бутан|изобутан|уголь|"
+    r"розжиг|жидкост\w*\s+для\s+розжига|баллон|картридж|капсул|горюч)\w*\b",
+    re.IGNORECASE,
+)
+VERIFY_DEVICE = re.compile(
+    r"\b(?:горелк|плит|ламп|обогревател|грил|печ|зажигал|резак|паяльн|"
+    r"генератор|котел|примус|камин|фонар)\w*\b",
+    re.IGNORECASE,
+)
+VERIFY_ACCESSORY = re.compile(
+    r"\b(?:адаптер|переходник|шланг|насадк|чехол|держател|креплен|"
+    r"аксессуар|комплектующ|совместим)\w*\b",
+    re.IGNORECASE,
+)
+VERIFY_RELATION = re.compile(
+    r"\b(?:для|к)\b|\b(?:подход|совместим|использу|заправ|подключ|"
+    r"работа|комплект|включен|прилага)\w*\b",
+    re.IGNORECASE,
+)
+VERIFY_EXTERNAL_OR_NEGATED = re.compile(
+    r"\bбез\b|\bне\s+входит\b|\bотдельно\b|\bприобретается\s+отдельно\b|"
+    r"\bпуст\w*\b|\bнезаправлен\w*\b",
+    re.IGNORECASE,
+)
 FORBIDDEN_KEYS = {
     "gold", "label", "logit", "prediction", "prob", "probability", "public", "rank",
     "score", "sealed", "target", "verdict", "y_true",
@@ -149,6 +178,169 @@ def _reject_forbidden(value: Any, context: str) -> None:
             _reject_forbidden(item, context)
 
 
+def _normalise(value: Any) -> str:
+    return re.sub(
+        r"\s+",
+        " ",
+        unicodedata.normalize("NFKC", str(value or "")).lower().replace("ё", "е"),
+    ).strip()
+
+
+def _cue_flags(row: dict[str, Any]) -> dict[str, bool]:
+    name = _normalise(row["name"])
+    text = _normalise(f"{row['name']} {row['description']}")
+    return {
+        "fuel_name": bool(VERIFY_FUEL.search(name)),
+        "fuel_any": bool(VERIFY_FUEL.search(text)),
+        "device_any": bool(VERIFY_DEVICE.search(text)),
+        "accessory_any": bool(VERIFY_ACCESSORY.search(text)),
+        "relation_any": bool(VERIFY_RELATION.search(text)),
+        "external_or_negated": bool(VERIFY_EXTERNAL_OR_NEGATED.search(text)),
+    }
+
+
+def _stable_key(namespace: str, row: dict[str, Any]) -> str:
+    return sha256_text(f"{namespace}\0{row['semantic_component']}\0{row['id']}")
+
+
+def _load_exclusions(
+    path_670: Path,
+    path_672: Path,
+    expected_sha_670: str,
+    expected_sha_672: str,
+    spec: dict[str, Any],
+) -> tuple[set[str], dict[str, Any]]:
+    for name, path, expected_sha in (
+        ("exp670", path_670, expected_sha_670),
+        ("exp672", path_672, expected_sha_672),
+    ):
+        _hex(expected_sha, f"{name} expected SHA")
+        if not path.is_file() or path.is_symlink() or sha256_file(path) != expected_sha:
+            raise VerificationError(f"{name}: exact exclusion SHA mismatch")
+    cfg670 = spec["exclusions"]["exp670"]
+    with path_670.open(encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(stream)
+        if reader.fieldnames is None or cfg670["component_column"] not in reader.fieldnames:
+            raise VerificationError("exp670: semantic_component column is absent")
+        values_670 = [str(row[cfg670["component_column"]]).strip() for row in reader]
+    value_672: Any = _json(path_672, "exp672 exclusion")
+    locator = spec["exclusions"]["exp672"]["component_locator"]
+    for part in locator.split("."):
+        if not isinstance(value_672, dict) or part not in value_672:
+            raise VerificationError(f"exp672: missing JSON locator {locator}")
+        value_672 = value_672[part]
+    if not isinstance(value_672, list) or any(not isinstance(value, str) for value in value_672):
+        raise VerificationError("exp672: component list must contain only strings")
+    values_672 = [value.strip() for value in value_672]
+    if any(not value for value in [*values_670, *values_672]):
+        raise VerificationError("exclusions: empty component")
+    sets = {"exp670": set(values_670), "exp672": set(values_672)}
+    for name, values in (("exp670", values_670), ("exp672", values_672)):
+        if (
+            len(values) != len(sets[name])
+            or len(values) != spec["exclusions"][name]["expected_count"]
+        ):
+            raise VerificationError(f"{name}: exact unique component count mismatch")
+    intersection = sets["exp670"] & sets["exp672"]
+    union = sets["exp670"] | sets["exp672"]
+    if len(intersection) != spec["exclusions"]["expected_intersection_count"]:
+        raise VerificationError("exclusions: intersection count mismatch")
+    if len(union) != spec["exclusions"]["expected_union_count"]:
+        raise VerificationError("exclusions: union count mismatch")
+    return union, {
+        "exp670_sha256": expected_sha_670,
+        "exp672_sha256": expected_sha_672,
+        "exp670_count": len(sets["exp670"]),
+        "exp672_count": len(sets["exp672"]),
+        "intersection_count": len(intersection),
+        "union_count": len(union),
+        "union_tokens": sorted(sha256_text(value) for value in union),
+    }
+
+
+def _reconstruct_selection(
+    rows: list[dict[str, Any]], exclusions: set[str], spec: dict[str, Any]
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    by_id: dict[str, dict[str, Any]] = {}
+    component_fold: dict[str, int] = {}
+    component_ids: dict[str, set[str]] = defaultdict(set)
+    for row in rows:
+        row_id = str(row["id"])
+        component = str(row["semantic_component"])
+        fold = int(row["fold"])
+        if row_id in by_id:
+            raise VerificationError(f"runtime union: duplicate ID {row_id!r}")
+        by_id[row_id] = row
+        if component in component_fold and component_fold[component] != fold:
+            raise VerificationError(f"runtime union: component {component!r} crosses folds")
+        component_fold[component] = fold
+        component_ids[component].add(row_id)
+    representatives: list[dict[str, Any]] = []
+    for component, ids in component_ids.items():
+        if component in exclusions:
+            continue
+        candidates = [by_id[row_id] for row_id in ids]
+        representative = min(candidates, key=lambda row: _stable_key("representative", row))
+        copy = dict(representative)
+        copy["_component_size"] = len(ids)
+        copy["_cues"] = _cue_flags(copy)
+        cues = copy["_cues"]
+        if (cues["device_any"] or cues["accessory_any"]) and cues["fuel_any"]:
+            copy["_stratum"] = "device_accessory_compatible_mention"
+        elif cues["fuel_name"] and not (
+            cues["device_any"] or cues["accessory_any"] or cues["external_or_negated"]
+        ):
+            copy["_stratum"] = "direct_included_fuel"
+        elif copy["_component_size"] == 1:
+            copy["_stratum"] = "singleton_new_family_ambiguous"
+        else:
+            copy["_stratum"] = None
+        representatives.append(copy)
+    selected: list[dict[str, Any]] = []
+    quota = int(spec["quota_per_fold_per_stratum"])
+    cue_free_quota = int(spec["singleton_cue_free_per_fold"])
+    for stratum in [item["name"] for item in spec["strata"]]:
+        for fold in range(5):
+            candidates = [
+                row
+                for row in representatives
+                if row["_stratum"] == stratum and int(row["fold"]) == fold
+            ]
+            if stratum == "singleton_new_family_ambiguous":
+                cue_free = [row for row in candidates if not any(row["_cues"].values())]
+                other = [row for row in candidates if row not in cue_free]
+                cue_free.sort(key=lambda row: _stable_key(f"{stratum}:cue-free", row))
+                other.sort(key=lambda row: _stable_key(f"{stratum}:other", row))
+                chosen = cue_free[:cue_free_quota] + other[: quota - cue_free_quota]
+                if len(cue_free) < cue_free_quota or len(other) < quota - cue_free_quota:
+                    raise VerificationError(f"fold {fold} {stratum}: insufficient candidates")
+            else:
+                candidates.sort(key=lambda row: _stable_key(stratum, row))
+                chosen = candidates[:quota]
+                if len(chosen) != quota:
+                    raise VerificationError(f"fold {fold} {stratum}: insufficient candidates")
+            selected.extend(chosen)
+    if len(selected) != 300 or len({str(row["semantic_component"]) for row in selected}) != 300:
+        raise VerificationError("independent selection is not exactly 300 component-disjoint rows")
+    report_rows = [
+        {
+            "row_token": sha256_text(str(row["id"])),
+            "component_token": sha256_text(str(row["semantic_component"])),
+            "fold": int(row["fold"]),
+            "stratum": row["_stratum"],
+            "component_size": row["_component_size"],
+            "cue_flags": row["_cues"],
+        }
+        for row in selected
+    ]
+    return selected, {
+        "union_row_count": len(rows),
+        "union_component_count": len(component_ids),
+        "eligible_component_count": len(representatives),
+        "selected": report_rows,
+    }
+
+
 def _rgb_sha(image: Image.Image) -> str:
     image = image.convert("RGB")
     return sha256_bytes(image.tobytes())
@@ -160,9 +352,9 @@ def _regions(image: Image.Image) -> dict[str, str]:
     boxes = {
         "full": (0, 0, image.width, image.height),
         "q00": (0, 0, max(1, mx), max(1, my)),
-        "q01": (mx, 0, mx + max(1, mx), max(1, my)),
-        "q10": (0, my, max(1, mx), my + max(1, my)),
-        "q11": (mx, my, mx + max(1, mx), my + max(1, my)),
+        "q01": (mx, 0, image.width, max(1, my)),
+        "q10": (0, my, max(1, mx), image.height),
+        "q11": (mx, my, image.width, image.height),
     }
     return {
         name: _rgb_sha(image if name == "full" else image.crop(box))
@@ -238,10 +430,13 @@ def _validate_bundle(
     return expected_manifest_sha256, sha256_file(builder_path)
 
 
-def _runtime_bindings(runtime_dirs: list[Path], spec: dict[str, Any]) -> list[dict[str, Any]]:
+def _runtime_bindings(
+    runtime_dirs: list[Path], spec: dict[str, Any]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     if len(runtime_dirs) != 5:
         raise VerificationError("exactly five runtime directories are required")
     bindings: list[dict[str, Any]] = []
+    all_rows: list[dict[str, Any]] = []
     for fold, runtime_dir in enumerate(runtime_dirs):
         expected = spec["folds"][str(fold)]
         validation = runtime_dir / "validation.jsonl"
@@ -257,6 +452,22 @@ def _runtime_bindings(runtime_dirs: list[Path], spec: dict[str, Any]) -> list[di
             raise VerificationError(f"fold {fold}: runtime identity mismatch")
         if audit.get("output_sha256", {}).get("validation.jsonl") != expected["validation_sha256"]:
             raise VerificationError(f"fold {fold}: runtime output binding mismatch")
+        rows = _jsonl(validation, f"fold {fold} validation")
+        if len(rows) != expected["validation_rows"]:
+            raise VerificationError(f"fold {fold}: validation row count mismatch")
+        allowed = set(spec["validation_fields"])
+        for index, row in enumerate(rows):
+            _reject_forbidden(row, f"fold {fold} validation row {index}")
+            if set(row) != allowed:
+                raise VerificationError(f"fold {fold} validation row {index}: schema mismatch")
+            if row["category"] != spec["category"] or int(row["fold"]) != fold:
+                raise VerificationError(f"fold {fold} validation row {index}: scope mismatch")
+            if not all(
+                str(row[field]).strip()
+                for field in ("id", "semantic_component", "name", "image_url")
+            ):
+                raise VerificationError(f"fold {fold} validation row {index}: empty identity/input")
+        all_rows.extend(rows)
         bindings.append(
             {
                 "fold": fold,
@@ -267,7 +478,7 @@ def _runtime_bindings(runtime_dirs: list[Path], spec: dict[str, Any]) -> list[di
                 "validation_rows": expected["validation_rows"],
             }
         )
-    return bindings
+    return bindings, all_rows
 
 
 def _inventory(root: Path) -> list[dict[str, Any]]:
@@ -301,7 +512,10 @@ def verify(
     runtime_dirs: list[Path],
     runtime_archives: list[Path],
     runtime_archive_refs: list[str],
-    runtime_archive_sha256: list[str],
+    exclusion_670_path: Path,
+    exclusion_672_path: Path,
+    exclusion_670_sha256: str,
+    exclusion_672_sha256: str,
     bundle_root: Path,
     bundle_manifest_path: Path,
     bundle_manifest_sha256: str,
@@ -330,21 +544,53 @@ def verify(
     bundle_sha, builder_sha = _validate_bundle(
         bundle_root, bundle_manifest_path, bundle_manifest_sha256, builder_revision
     )
-    runtime_bindings = _runtime_bindings(runtime_dirs, spec)
-    if not (len(runtime_archives) == len(runtime_archive_refs) == len(runtime_archive_sha256) == 5):
-        raise VerificationError("exactly five archive paths/refs/SHAs are required")
+    runtime_bindings, validation_rows = _runtime_bindings(runtime_dirs, spec)
+    exclusions, exclusion_report = _load_exclusions(
+        exclusion_670_path,
+        exclusion_672_path,
+        exclusion_670_sha256,
+        exclusion_672_sha256,
+        spec,
+    )
+    selected_originals, selection_report = _reconstruct_selection(
+        validation_rows, exclusions, spec
+    )
+    archive_spec = spec.get("runtime_archives")
+    if not isinstance(archive_spec, list) or len(archive_spec) != 2:
+        raise VerificationError("source prepare spec: exact two-archive mapping required")
+    if not (len(runtime_archives) == len(runtime_archive_refs) == 2):
+        raise VerificationError("exactly two archive paths/refs are required")
     archive_bindings: list[dict[str, Any]] = []
-    for fold, (path, reference, expected_sha) in enumerate(
-        zip(runtime_archives, runtime_archive_refs, runtime_archive_sha256, strict=True)
+    covered_folds: list[int] = []
+    for index, (path, reference, frozen) in enumerate(
+        zip(runtime_archives, runtime_archive_refs, archive_spec, strict=True)
     ):
-        _hex(expected_sha, f"fold {fold} archive SHA")
+        if not isinstance(frozen, dict) or set(frozen) != {"archive_id", "folds", "sha256"}:
+            raise VerificationError(f"archive {index}: frozen mapping schema mismatch")
+        expected_sha = _hex(frozen["sha256"], f"archive {index} frozen SHA")
+        folds = frozen["folds"]
+        if (
+            not isinstance(folds, list)
+            or any(not isinstance(fold, int) or fold not in range(5) for fold in folds)
+            or folds != sorted(set(folds))
+        ):
+            raise VerificationError(f"archive {index}: invalid frozen fold mapping")
         if not S3_REF.fullmatch(reference):
-            raise VerificationError(f"fold {fold}: archive ref must be s3:// without query")
+            raise VerificationError(f"archive {index}: ref must be s3:// without query")
         if not path.is_file() or path.is_symlink() or sha256_file(path) != expected_sha:
-            raise VerificationError(f"fold {fold}: exact runtime archive SHA mismatch")
+            raise VerificationError(f"archive {index}: exact frozen runtime archive SHA mismatch")
+        covered_folds.extend(folds)
         archive_bindings.append(
-            {"fold": fold, "reference": reference, "sha256": expected_sha, "size_bytes": path.stat().st_size}
+            {
+                "archive_id": frozen["archive_id"],
+                "folds": folds,
+                "reference": reference,
+                "sha256": expected_sha,
+                "size_bytes": path.stat().st_size,
+            }
         )
+    if sorted(covered_folds) != list(range(5)):
+        raise VerificationError("runtime archives must cover each fold exactly once")
 
     inventory = _inventory(prepare_dir)
     source_rows_path = prepare_dir / "source_rows.jsonl"
@@ -384,7 +630,9 @@ def verify(
     component_tokens: set[str] = set()
     source_cards: list[str] = []
     candidate_ids: list[str] = []
-    for index, (row, image_item) in enumerate(zip(rows, manifest, strict=True), 1):
+    for index, (row, image_item, original) in enumerate(
+        zip(rows, manifest, selected_originals, strict=True), 1
+    ):
         context = f"source row {index}"
         _reject_forbidden(row, context)
         _exact_keys(row, SOURCE_ROW_FIELDS, context)
@@ -394,22 +642,49 @@ def verify(
             raise VerificationError(f"{context}: opaque record ordering mismatch")
         for field in ("row_token", "component_token", "family_token", "source_card_sha256"):
             _hex(row[field], f"{context}.{field}")
+        expected_row_token = sha256_text(str(original["id"]))
+        expected_component_token = sha256_text(str(original["semantic_component"]))
+        expected_family_token = sha256_text(
+            f"component-surrogate\0{original['semantic_component']}"
+        )
+        if (
+            row["row_token"] != expected_row_token
+            or row["component_token"] != expected_component_token
+            or row["family_token"] != expected_family_token
+            or row["stratum"] != original["_stratum"]
+        ):
+            raise VerificationError(f"{context}: independent ID/component/stratum mismatch")
         if row["row_token"] in row_tokens or row["component_token"] in component_tokens:
             raise VerificationError(f"{context}: duplicate row/component token")
         row_tokens.add(row["row_token"])
         component_tokens.add(row["component_token"])
         if image_item["row_token"] != row["row_token"] or image_item["component_token"] != row["component_token"]:
             raise VerificationError(f"{context}: image manifest membership mismatch")
-        if image_item["stratum"] != row["stratum"] or image_item["fold"] not in range(5):
+        if (
+            image_item["stratum"] != row["stratum"]
+            or image_item["fold"] != int(original["fold"])
+            or image_item["source_image_url_sha256"]
+            != sha256_text(str(original["image_url"]))
+        ):
             raise VerificationError(f"{context}: fold/stratum manifest mismatch")
         stratum_counts[row["stratum"]] += 1
         fold_stratum_counts[(image_item["fold"], row["stratum"])] += 1
         sources = row["sources"]
         if not isinstance(sources, list) or not sources:
             raise VerificationError(f"{context}: sources missing")
+        expected_sources = [("name", str(original["name"]))]
+        if str(original["description"]):
+            expected_sources.append(("description", str(original["description"])))
+        if len(sources) != len(expected_sources):
+            raise VerificationError(f"{context}: OCR or invented source detected")
         for source_index, item in enumerate(sources):
             _exact_keys(item, {"source_index", "source_kind", "text", "text_sha256"}, f"{context}.source")
-            if item["source_index"] != source_index or item["source_kind"] not in {"name", "description", "ocr"}:
+            expected_kind, expected_text = expected_sources[source_index]
+            if (
+                item["source_index"] != source_index
+                or item["source_kind"] != expected_kind
+                or item["text"] != expected_text
+            ):
                 raise VerificationError(f"{context}: source identity mismatch")
             if not isinstance(item["text"], str) or not item["text"].strip() or sha256_text(item["text"]) != item["text_sha256"]:
                 raise VerificationError(f"{context}: source text SHA mismatch")
@@ -459,8 +734,33 @@ def verify(
     if fold_stratum_counts != Counter({(fold, stratum): 20 for fold in range(5) for stratum in strata}):
         raise VerificationError("source rows: 20-per-fold-per-stratum quota mismatch")
 
+    eligibility_sha = sha256_bytes(
+        canonical_json_bytes(
+            {
+                "exclusions": exclusion_report,
+                "union_row_count": selection_report["union_row_count"],
+                "union_component_count": selection_report["union_component_count"],
+                "eligible_component_count": selection_report["eligible_component_count"],
+            }
+        )
+    )
+    stratum_sha = sha256_bytes(canonical_json_bytes(selection_report["selected"]))
+    if (
+        contract["eligibility_universe_sha256"] != eligibility_sha
+        or contract["stratum_derivation_sha256"] != stratum_sha
+    ):
+        raise VerificationError(
+            "source contract: independently recomputed eligibility/strata mismatch"
+        )
+
     membership_sha = sha256_bytes(canonical_json_bytes([
-        {"record_id": item["record_id"], "row_token": item["row_token"], "reference": item["reference"], "original_bytes_sha256": item["original_bytes_sha256"]}
+        {
+            "record_id": item["record_id"],
+            "row_token": item["row_token"],
+            "reference": item["reference"],
+            "source_image_url_sha256": item["source_image_url_sha256"],
+            "original_bytes_sha256": item["original_bytes_sha256"],
+        }
         for item in manifest
     ]))
     transform_sha = sha256_bytes(canonical_json_bytes({
@@ -490,6 +790,22 @@ def verify(
         raise VerificationError("terminal metadata: approved output ref mismatch")
 
     inventory_sha = sha256_bytes(canonical_json_bytes(inventory))
+    source_membership_reconstruction_sha = sha256_bytes(
+        canonical_json_bytes(
+            [
+                {
+                    "id": str(row["id"]),
+                    "semantic_component": str(row["semantic_component"]),
+                    "fold": int(row["fold"]),
+                    "name": str(row["name"]),
+                    "description": str(row["description"]),
+                    "image_url": str(row["image_url"]),
+                    "stratum": row["_stratum"],
+                }
+                for row in selected_originals
+            ]
+        )
+    )
     acceptance = {
         "schema_version": "exp689_source_prepare_acceptance_v1",
         "decision": "ACCEPT",
@@ -500,6 +816,11 @@ def verify(
         "source_prepare_spec_sha256": sha256_file(spec_path),
         "runtime_archives": archive_bindings,
         "runtime_bindings_sha256": sha256_bytes(canonical_json_bytes(runtime_bindings)),
+        "exclusion_670_sha256": exclusion_670_sha256,
+        "exclusion_672_sha256": exclusion_672_sha256,
+        "eligibility_universe_sha256": eligibility_sha,
+        "stratum_derivation_sha256": stratum_sha,
+        "source_membership_reconstruction_sha256": source_membership_reconstruction_sha,
         "source_contract_sha256": sha256_file(contract_path),
         "source_contract_self_sha256": contract["self_sha256"],
         "source_rows_sha256": sha256_file(source_rows_path),
@@ -513,6 +834,7 @@ def verify(
         "approved_s3_output_ref": approved_s3_output_ref,
         "label_fields_present": False,
         "score_fields_present": False,
+        "ocr_source_count": 0,
         "sealed_rows": 0,
         "public_rows": 0,
         "self_sha256": None,
@@ -532,7 +854,10 @@ def main() -> None:
     parser.add_argument("--runtime-dir", type=Path, action="append", required=True)
     parser.add_argument("--runtime-archive", type=Path, action="append", required=True)
     parser.add_argument("--runtime-archive-ref", action="append", required=True)
-    parser.add_argument("--runtime-archive-sha256", action="append", required=True)
+    parser.add_argument("--exclusion-670", type=Path, required=True)
+    parser.add_argument("--exclusion-672", type=Path, required=True)
+    parser.add_argument("--exclusion-670-sha256", required=True)
+    parser.add_argument("--exclusion-672-sha256", required=True)
     parser.add_argument("--bundle-root", type=Path, required=True)
     parser.add_argument("--bundle-manifest", type=Path, required=True)
     parser.add_argument("--bundle-manifest-sha256", required=True)
@@ -548,7 +873,10 @@ def main() -> None:
         runtime_dirs=args.runtime_dir,
         runtime_archives=args.runtime_archive,
         runtime_archive_refs=args.runtime_archive_ref,
-        runtime_archive_sha256=args.runtime_archive_sha256,
+        exclusion_670_path=args.exclusion_670,
+        exclusion_672_path=args.exclusion_672,
+        exclusion_670_sha256=args.exclusion_670_sha256,
+        exclusion_672_sha256=args.exclusion_672_sha256,
         bundle_root=args.bundle_root,
         bundle_manifest_path=args.bundle_manifest,
         bundle_manifest_sha256=args.bundle_manifest_sha256,

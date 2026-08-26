@@ -192,14 +192,29 @@ def make_runtime_inputs(
             "source_prepare_spec_sha256": token("source-prepare-spec"),
             "runtime_archives": [
                 {
-                    "fold": fold,
-                    "reference": f"s3://approved-input/runtime-{fold}.tar",
-                    "sha256": token(f"runtime-archive-{fold}"),
+                    "archive_id": archive_id,
+                    "folds": folds,
+                    "reference": f"s3://approved-input/{archive_id}.tar",
+                    "sha256": token(f"runtime-archive-{archive_id}"),
                     "size_bytes": 1,
                 }
-                for fold in range(5)
+                for archive_id, folds in (
+                    ("folds_0_3", [0, 3]),
+                    ("folds_1_2_4", [1, 2, 4]),
+                )
             ],
             "runtime_bindings_sha256": token("runtime-bindings"),
+            "exclusion_670_sha256": token("synthetic-exclusion-670"),
+            "exclusion_672_sha256": token("synthetic-exclusion-672"),
+            "eligibility_universe_sha256": source_contract[
+                "eligibility_universe_sha256"
+            ],
+            "stratum_derivation_sha256": source_contract[
+                "stratum_derivation_sha256"
+            ],
+            "source_membership_reconstruction_sha256": token(
+                "source-membership-reconstruction"
+            ),
             "source_contract_sha256": build.sha256_file(source_contract_path),
             "source_contract_self_sha256": source_contract["self_sha256"],
             "source_rows_sha256": build.sha256_file(source_rows),
@@ -215,6 +230,7 @@ def make_runtime_inputs(
             "approved_s3_output_ref": "s3://approved-output/exp689-source-prepare",
             "label_fields_present": False,
             "score_fields_present": False,
+            "ocr_source_count": 0,
             "sealed_rows": 0,
             "public_rows": 0,
             "self_sha256": None,
@@ -274,6 +290,11 @@ def make_runtime_inputs(
             "exclusion_670_token_mode": "already_sha256",
             "exclusion_672_token_mode": "already_sha256",
         }
+    source_prepare_acceptance["exclusion_670_sha256"] = build.sha256_file(exclusion_670)
+    source_prepare_acceptance["exclusion_672_sha256"] = build.sha256_file(exclusion_672)
+    source_prepare_acceptance["self_sha256"] = None
+    source_prepare_acceptance = build.with_self_hash(source_prepare_acceptance)
+    write_json(source_prepare_acceptance_path, source_prepare_acceptance)
     return {
         "root": root,
         "source_rows": source_rows,

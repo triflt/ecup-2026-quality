@@ -43,6 +43,22 @@ def image_bytes(size: tuple[int, int] = (32, 24)) -> bytes:
     return stream.getvalue()
 
 
+def test_frozen_spec_pins_two_exact_runtime_archives() -> None:
+    spec = source.load_spec()
+    assert spec["runtime_archives"] == [
+        {
+            "archive_id": "folds_0_3",
+            "folds": [0, 3],
+            "sha256": "e371c03a3fc893d990d38874e07200a5ac136b8c72f43109aa7f567761943ccd",
+        },
+        {
+            "archive_id": "folds_1_2_4",
+            "folds": [1, 2, 4],
+            "sha256": "1dfb9bf01a9567286051ee76a79fc4b41c2af360e5761b7a4663090745c5474d",
+        },
+    ]
+
+
 def make_row(fold: int, kind: str, index: int) -> dict[str, Any]:
     if kind == "device":
         name = f"Газовая горелка {fold}-{index}"
@@ -295,6 +311,19 @@ def test_image_is_fetched_once_and_area_capped(tmp_path: Path) -> None:
     )
 
 
+def test_odd_dimension_quadrants_cover_right_and_bottom_pixels() -> None:
+    image = Image.new("RGB", (5, 3))
+    image.putdata(
+        [(index, (index * 7) % 256, (index * 13) % 256) for index in range(15)]
+    )
+    regions = source._image_regions(image)
+    assert regions["q00"] == source.sha256_bytes(image.crop((0, 0, 2, 1)).tobytes())
+    assert regions["q01"] == source.sha256_bytes(image.crop((2, 0, 5, 1)).tobytes())
+    assert regions["q10"] == source.sha256_bytes(image.crop((0, 1, 2, 3)).tobytes())
+    assert regions["q11"] == source.sha256_bytes(image.crop((2, 1, 5, 3)).tobytes())
+    assert 2 * 1 + 3 * 1 + 2 * 2 + 3 * 2 == image.width * image.height
+
+
 @pytest.mark.skipif(teacher is None, reason="teacher runner lands in a separate commit")
 def test_raw_rgb_and_quadrants_load_in_teacher_runner(tmp_path: Path) -> None:
     assert teacher is not None
@@ -303,7 +332,7 @@ def test_raw_rgb_and_quadrants_load_in_teacher_runner(tmp_path: Path) -> None:
     source.prepare(
         **inputs,
         output_dir=output,
-        image_fetcher=lambda _url: image_bytes((33, 25)),
+        image_fetcher=lambda _url: image_bytes((32, 24)),
     )
     verifier_arguments = make_verifier_inputs(tmp_path, inputs, output)
     verifier.verify(**verifier_arguments)
@@ -377,6 +406,23 @@ def make_verifier_inputs(
     bundle_experiment.mkdir(parents=True)
     for name in ("prepare_source_universe.py", "verify_source_prepare.py"):
         shutil.copyfile(EXPERIMENT / name, bundle_experiment / name)
+    archives: list[Path] = []
+    archive_refs: list[str] = []
+    archive_specs = []
+    for archive_id, folds in (("folds_0_3", [0, 3]), ("folds_1_2_4", [1, 2, 4])):
+        archive = root / f"{archive_id}.tar"
+        archive.write_bytes(f"exact-runtime-archive-{archive_id}".encode())
+        archive_sha = verifier.sha256_file(archive)
+        archives.append(archive)
+        archive_refs.append(f"s3://approved-inputs/{archive_id}.tar")
+        archive_specs.append(
+            {"archive_id": archive_id, "folds": folds, "sha256": archive_sha}
+        )
+    inputs["spec"]["runtime_archives"] = archive_specs
+    inputs["spec"]["self_sha256"] = None
+    inputs["spec"]["self_sha256"] = verifier.sha256_bytes(
+        verifier.canonical_json_bytes(inputs["spec"])
+    )
     spec_path = bundle_experiment / "source_prepare_spec_v1.json"
     write_json(spec_path, inputs["spec"])
     builder_revision = inputs["builder_revision"]
@@ -402,15 +448,6 @@ def make_verifier_inputs(
     bundle_manifest_path = root / "bundle_manifest.json"
     write_json(bundle_manifest_path, bundle_manifest)
 
-    archives: list[Path] = []
-    archive_refs: list[str] = []
-    archive_shas: list[str] = []
-    for fold in range(5):
-        archive = root / f"runtime-{fold}.tar"
-        archive.write_bytes(f"exact-runtime-archive-{fold}".encode())
-        archives.append(archive)
-        archive_refs.append(f"s3://approved-inputs/runtime-fold-{fold}.tar")
-        archive_shas.append(verifier.sha256_file(archive))
     output_ref = "s3://approved-output/exp689/source-prepare"
     terminal = {
         "schema_version": "exp689_source_prepare_terminal_v1",
@@ -430,7 +467,10 @@ def make_verifier_inputs(
         "runtime_dirs": inputs["runtime_dirs"],
         "runtime_archives": archives,
         "runtime_archive_refs": archive_refs,
-        "runtime_archive_sha256": archive_shas,
+        "exclusion_670_path": inputs["exclusion_670_path"],
+        "exclusion_672_path": inputs["exclusion_672_path"],
+        "exclusion_670_sha256": inputs["exclusion_670_sha256"],
+        "exclusion_672_sha256": inputs["exclusion_672_sha256"],
         "bundle_root": bundle_root,
         "bundle_manifest_path": bundle_manifest_path,
         "bundle_manifest_sha256": verifier.sha256_file(bundle_manifest_path),
@@ -450,7 +490,7 @@ def test_independent_verifier_emits_self_hashed_acceptance(tmp_path: Path) -> No
     acceptance = verifier.verify(**arguments)
     assert acceptance["decision"] == "ACCEPT"
     assert acceptance["source_row_count"] == 300
-    assert len(acceptance["runtime_archives"]) == 5
+    assert len(acceptance["runtime_archives"]) == 2
     assert len(acceptance["output_inventory"]) == 303
     verifier._self_hash(acceptance, "acceptance")
     assert json.loads(arguments["acceptance_path"].read_text()) == acceptance
@@ -465,6 +505,73 @@ def test_verifier_rejects_output_byte_tamper(tmp_path: Path) -> None:
     with pytest.raises(verifier.VerificationError, match="JPEG SHA mismatch"):
         verifier.verify(**arguments)
     assert not arguments["acceptance_path"].exists()
+
+
+def test_verifier_rejects_alternate_runtime_archive(tmp_path: Path) -> None:
+    inputs = make_inputs(tmp_path)
+    prepared = run_prepare(tmp_path, inputs)
+    arguments = make_verifier_inputs(tmp_path, inputs, prepared)
+    arguments["runtime_archives"][0].write_bytes(b"alternate-self-declared-archive")
+    with pytest.raises(verifier.VerificationError, match="exact frozen runtime archive SHA"):
+        verifier.verify(**arguments)
+
+
+def test_verifier_rejects_self_blessed_alternate_valid_selection(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    inputs = make_inputs(tmp_path)
+    validation = inputs["runtime_dirs"][0] / "validation.jsonl"
+    validation_rows = read_jsonl(validation)
+    alternate = make_row(0, "direct", 99)
+    validation_rows.append(alternate)
+    write_jsonl(validation, validation_rows)
+    inputs["spec"]["folds"]["0"]["validation_rows"] = len(validation_rows)
+    inputs["spec"]["folds"]["0"]["validation_sha256"] = source.sha256_file(validation)
+    audit_path = inputs["runtime_dirs"][0] / "runtime_audit.json"
+    audit = json.loads(audit_path.read_text())
+    audit.pop("contract_sha256")
+    audit["output_sha256"]["validation.jsonl"] = source.sha256_file(validation)
+    audit["contract_sha256"] = source.sha256_bytes(source.canonical_json_bytes(audit))
+    write_json(audit_path, audit)
+    inputs["spec"]["folds"]["0"]["source_runtime_contract_sha256"] = audit[
+        "contract_sha256"
+    ]
+    original_select = source._select_rows
+
+    def malicious_select(
+        rows: list[dict[str, Any]], exclusions: set[str], spec: dict[str, Any]
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        selected, report = original_select(rows, exclusions, spec)
+        selected_ids = {str(row["id"]) for row in selected}
+        raw = next(
+            row
+            for row in rows
+            if int(row["fold"]) == 0
+            and str(row["id"]) not in selected_ids
+            and source._cue_flags(row)["fuel_name"]
+        )
+        forged = dict(raw)
+        forged["_component_size"] = 1
+        forged["_cues"] = source._cue_flags(forged)
+        forged["_stratum"] = "direct_included_fuel"
+        selected[0] = forged
+        report["selected"][0] = {
+            "row_token": source.sha256_text(str(forged["id"])),
+            "component_token": source.sha256_text(str(forged["semantic_component"])),
+            "fold": 0,
+            "stratum": forged["_stratum"],
+            "component_size": 1,
+            "cue_flags": forged["_cues"],
+        }
+        return selected, report
+
+    monkeypatch.setattr(source, "_select_rows", malicious_select)
+    prepared = run_prepare(tmp_path, inputs)
+    arguments = make_verifier_inputs(tmp_path, inputs, prepared)
+    with pytest.raises(
+        verifier.VerificationError, match="independent ID/component/stratum mismatch"
+    ):
+        verifier.verify(**arguments)
 
 
 def test_verifier_rejects_non_whitelisted_teacher_file(tmp_path: Path) -> None:
@@ -484,6 +591,51 @@ def test_verifier_rejects_non_whitelisted_teacher_file(tmp_path: Path) -> None:
     write_json(arguments["bundle_manifest_path"], manifest)
     arguments["bundle_manifest_sha256"] = verifier.sha256_file(arguments["bundle_manifest_path"])
     with pytest.raises(verifier.VerificationError, match="exact source-prep whitelist"):
+        verifier.verify(**arguments)
+
+
+def test_verifier_rejects_forged_unverified_ocr_source(tmp_path: Path) -> None:
+    inputs = make_inputs(tmp_path)
+    prepared = run_prepare(tmp_path, inputs)
+    rows_path = prepared / "source_rows.jsonl"
+    rows = read_jsonl(rows_path)
+    forged = "FORGED OCR TARGET"
+    rows[0]["sources"].append(
+        {
+            "source_index": len(rows[0]["sources"]),
+            "source_kind": "ocr",
+            "text": forged,
+            "text_sha256": source.sha256_text(forged),
+        }
+    )
+    rows[0]["source_card_sha256"] = source.sha256_bytes(
+        source.canonical_json_bytes(
+            {"sources": rows[0]["sources"], "first_image": rows[0]["first_image"]}
+        )
+    )
+    write_jsonl(rows_path, rows)
+    contract_path = prepared / "source_contract.json"
+    contract = json.loads(contract_path.read_text())
+    contract["source_rows_sha256"] = source.sha256_file(rows_path)
+    contract["candidate_generator_sha256"] = source.sha256_bytes(
+        source.canonical_json_bytes(
+            {
+                "description_clause_limit": inputs["spec"]["description_clause_limit"],
+                "ocr_policy": inputs["spec"]["ocr_policy"],
+                "source_cards": [row["source_card_sha256"] for row in rows],
+                "candidate_ids": [
+                    candidate["candidate_id"]
+                    for row in rows
+                    for candidate in row["evidence_candidates"]
+                ],
+            }
+        )
+    )
+    contract["self_sha256"] = None
+    contract = source.with_self_hash(contract)
+    write_json(contract_path, contract)
+    arguments = make_verifier_inputs(tmp_path, inputs, prepared)
+    with pytest.raises(verifier.VerificationError, match="OCR or invented source"):
         verifier.verify(**arguments)
 
 
