@@ -15,9 +15,34 @@ EXPERIMENT = ROOT / "experiments" / "689_qwen35_4b_grounded_transaction_graph_kd
 sys.path.insert(0, str(EXPERIMENT))
 
 import build_fold0_validation_diagnostic_bundle as bundle_builder
+import build_fold0_validation_diagnostic_preset as preset_builder
 import diagnose_fold0_validation_binding as diagnostic
 import extract_source_archive_transport as transport
 import verify_fold0_validation_binding as independent
+
+
+def _preset_args() -> object:
+    return type(
+        "Args",
+        (),
+        {
+            "region": "ix-m5-sm11",
+            "bucket": "approved-bucket",
+            "revision": "a" * 40,
+            "bundle_key": "/team/689/fold0_diag/code/bundle.tar.gz",
+            "bundle_sha256": "1" * 64,
+            "manifest_key": "/team/689/fold0_diag/code/manifest.json",
+            "manifest_sha256": "2" * 64,
+            "manifest_self_sha256": "3" * 64,
+            "source_f03_key": "/team/689/source/f03.tar.gz",
+            "source_f03_sha256": transport.PROFILES["source_f03"]["sha256"],
+            "source_f03_size_bytes": transport.PROFILES["source_f03"][
+                "size_bytes"
+            ],
+            "output_prefix": "/team/689/fold0_diag/output/unique",
+            "output": Path("unused.yaml"),
+        },
+    )()
 
 
 def _add(archive: tarfile.TarFile, name: str, payload: bytes) -> None:
@@ -244,3 +269,30 @@ def test_diagnostic_bundle_whitelist_is_exact_and_prepare_free() -> None:
         "source_prepare_spec_v1.json",
     }
     assert all("prepare_source_universe.py" not in path for path in bundle_builder.FILES)
+
+
+def test_diagnostic_preset_is_cpu_only_three_input_single_output() -> None:
+    preset = preset_builder.build(_preset_args())
+    assert "flavor: 8cpu-128ram" in preset
+    assert "gpu" not in preset.lower()
+    assert preset.count("    - type: s3msk") == 4
+    assert "      name: fold0_bind_report" in preset
+    assert len("fold0_bind_report") <= 20
+    assert "source_f124" not in preset
+    assert "prepare_source_universe" not in preset
+    assert "teacher" not in preset.lower()
+    assert "student" not in preset.lower()
+    assert "--source-f03-size-bytes" not in preset
+    assert "stat -c%s /work/input/source_f03/source_f03.tar.gz" in preset
+    assert "sha256sum /work/input/code/" in preset
+
+
+def test_diagnostic_preset_rejects_source_or_output_substitution() -> None:
+    args = _preset_args()
+    args.source_f03_size_bytes += 1
+    with pytest.raises(ValueError, match="frozen profile"):
+        preset_builder.build(args)
+    args = _preset_args()
+    args.output_prefix = args.source_f03_key + "/nested"
+    with pytest.raises(ValueError, match="disjoint"):
+        preset_builder.build(args)
