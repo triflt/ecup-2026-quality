@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib.metadata
 import json
+import re
 import struct
 import time
 import zlib
@@ -66,6 +67,48 @@ IMAGE_MANIFEST_FIELDS = {
     "media_type",
     "width",
     "height",
+}
+REMOTE_SMOKE_ACCEPTANCE_FIELDS = {
+    "schema_version",
+    "experiment_id",
+    "scope",
+    "status",
+    "decision",
+    "technical_only",
+    "quality_evaluated",
+    "student_gpu_authorized",
+    "terminal_job_metadata_bound",
+    "approved_remote_output_bound",
+    "full_teacher_technical_gate_open",
+    "commit_sha",
+    "code_bundle_sha256",
+    "code_bundle_members",
+    "runner_sha256",
+    "prompt_sha256",
+    "source_sha256",
+    "image_manifest_sha256",
+    "pixel_set_sha256",
+    "accepted_smoke_self_sha256",
+    "model_contract_sha256",
+    "model_contract_self_sha256",
+    "model_registry_input_identity_sha256",
+    "model_tree_sha256",
+    "processor_sha256",
+    "runner_output_inventory",
+    "runner_output_inventory_sha256",
+    "remote_receipt_self_sha256",
+    "remote_receipt_sha256",
+    "remote_output_ref_sha256",
+    "runtime_seconds",
+    "peak_cuda_bytes",
+    "labels_read",
+    "sealed_rows",
+    "public_used",
+    "jobs_launched_by_verifier",
+    "uploads_by_verifier",
+    "presets_built_by_verifier",
+    "bundles_built_by_verifier",
+    "self_sha256",
 }
 
 
@@ -310,31 +353,77 @@ def validate_smoke_acceptance(
     if sha256_file(acceptance_path) != expected_sha256:
         raise ContractError("accepted smoke file SHA mismatch")
     acceptance = load_json(acceptance_path, "accepted teacher smoke")
+    expect_exact_keys(
+        acceptance,
+        REMOTE_SMOKE_ACCEPTANCE_FIELDS,
+        "accepted remote teacher smoke",
+    )
     validate_self_hash(acceptance, "accepted teacher smoke")
-    if acceptance.get("schema_version") != "exp689_teacher_run_acceptance_v1":
+    if acceptance.get("schema_version") != "exp689_teacher_remote_acceptance_v1":
         raise ContractError("accepted teacher smoke: schema mismatch")
     required = {
         "experiment_id": "689",
         "scope": "technical_smoke",
         "status": "accepted",
-        "decision": "TECHNICAL_SMOKE_PASS_NOT_QUALITY",
-        "rows": 12,
-        "model_id": MODEL_ID,
-        "model_revision": MODEL_REVISION,
+        "decision": "OPEN_FULL_TEACHER",
+        "technical_only": True,
+        "quality_evaluated": False,
+        "student_gpu_authorized": False,
+        "terminal_job_metadata_bound": True,
+        "approved_remote_output_bound": True,
+        "full_teacher_technical_gate_open": True,
+        "accepted_smoke_self_sha256": None,
         "model_tree_sha256": model_binding["model_tree_sha256"],
         "processor_sha256": model_binding["processor_sha256"],
-        "code_sha256": sha256_file(Path(__file__)),
+        "runner_sha256": sha256_file(Path(__file__)),
         "prompt_sha256": PROMPT_SHA256,
-        "quality_evaluated": False,
-        "full_teacher_authorized": False,
-        "student_gpu_authorized": False,
+        "labels_read": 0,
+        "sealed_rows": 0,
+        "public_used": False,
+        "jobs_launched_by_verifier": 0,
+        "uploads_by_verifier": 0,
+        "presets_built_by_verifier": 0,
+        "bundles_built_by_verifier": 0,
     }
     for field, expected in required.items():
         if acceptance.get(field) != expected:
             raise ContractError(f"accepted teacher smoke: {field} mismatch")
-    checks = acceptance.get("technical_checks")
-    if not isinstance(checks, dict) or not checks or not all(value is True for value in checks.values()):
-        raise ContractError("accepted teacher smoke: technical checks are incomplete")
+    if not re.fullmatch(r"[0-9a-f]{40}", acceptance["commit_sha"]):
+        raise ContractError("accepted teacher smoke: commit SHA is invalid")
+    for field in (
+        "code_bundle_sha256",
+        "source_sha256",
+        "image_manifest_sha256",
+        "pixel_set_sha256",
+        "model_contract_sha256",
+        "model_contract_self_sha256",
+        "model_registry_input_identity_sha256",
+        "runner_output_inventory_sha256",
+        "remote_receipt_self_sha256",
+        "remote_receipt_sha256",
+        "remote_output_ref_sha256",
+    ):
+        require_hex64(acceptance[field], f"accepted teacher smoke.{field}")
+    inventory = acceptance["runner_output_inventory"]
+    if not isinstance(inventory, dict) or set(inventory) != {
+        "acceptance.json",
+        "report.json",
+        "targets.jsonl",
+    }:
+        raise ContractError("accepted teacher smoke: runner output inventory mismatch")
+    for name, value in inventory.items():
+        require_hex64(value, f"accepted teacher smoke inventory.{name}")
+    if acceptance["runner_output_inventory_sha256"] != sha256_bytes(
+        canonical_json_bytes(inventory)
+    ):
+        raise ContractError("accepted teacher smoke: output inventory SHA mismatch")
+    if (
+        not isinstance(acceptance["runtime_seconds"], (int, float))
+        or acceptance["runtime_seconds"] <= 0
+        or not isinstance(acceptance["peak_cuda_bytes"], int)
+        or acceptance["peak_cuda_bytes"] <= 0
+    ):
+        raise ContractError("accepted teacher smoke: runtime/peak is invalid")
     return acceptance
 
 

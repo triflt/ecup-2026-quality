@@ -175,17 +175,83 @@ def test_accepted_smoke_gate_binds_code_prompt_model_and_processor(tmp_path: Pat
     smoke_dir, model_root, model_contract_path = build_inputs(tmp_path)
     args = smoke_args(tmp_path, smoke_dir, model_root, model_contract_path)
     teacher.run(args, backend=fake_backend)
-    acceptance_path = args.output_dir / "acceptance.json"
     model_contract = json.loads(model_contract_path.read_text(encoding="utf-8"))
+    inventory = {
+        name: common.sha256_file(args.output_dir / name)
+        for name in ("acceptance.json", "report.json", "targets.jsonl")
+    }
+    acceptance = common.with_self_hash(
+        {
+            "schema_version": "exp689_teacher_remote_acceptance_v1",
+            "experiment_id": "689",
+            "scope": "technical_smoke",
+            "status": "accepted",
+            "decision": "OPEN_FULL_TEACHER",
+            "technical_only": True,
+            "quality_evaluated": False,
+            "student_gpu_authorized": False,
+            "terminal_job_metadata_bound": True,
+            "approved_remote_output_bound": True,
+            "full_teacher_technical_gate_open": True,
+            "commit_sha": "a" * 40,
+            "code_bundle_sha256": "1" * 64,
+            "code_bundle_members": {"run_teacher.py": common.sha256_file(Path(teacher.__file__))},
+            "runner_sha256": common.sha256_file(Path(teacher.__file__)),
+            "prompt_sha256": teacher.PROMPT_SHA256,
+            "source_sha256": "2" * 64,
+            "image_manifest_sha256": "3" * 64,
+            "pixel_set_sha256": "4" * 64,
+            "accepted_smoke_self_sha256": None,
+            "model_contract_sha256": common.sha256_file(model_contract_path),
+            "model_contract_self_sha256": model_contract["self_sha256"],
+            "model_registry_input_identity_sha256": "5" * 64,
+            "model_tree_sha256": model_contract["model_tree_sha256"],
+            "processor_sha256": model_contract["processor_sha256"],
+            "runner_output_inventory": inventory,
+            "runner_output_inventory_sha256": common.sha256_bytes(
+                common.canonical_json_bytes(inventory)
+            ),
+            "remote_receipt_self_sha256": "6" * 64,
+            "remote_receipt_sha256": "7" * 64,
+            "remote_output_ref_sha256": "8" * 64,
+            "runtime_seconds": 1.25,
+            "peak_cuda_bytes": 1024,
+            "labels_read": 0,
+            "sealed_rows": 0,
+            "public_used": False,
+            "jobs_launched_by_verifier": 0,
+            "uploads_by_verifier": 0,
+            "presets_built_by_verifier": 0,
+            "bundles_built_by_verifier": 0,
+            "self_sha256": None,
+        }
+    )
+    acceptance_path = tmp_path / "remote_smoke_acceptance.json"
+    write_json(acceptance_path, acceptance)
     accepted = teacher.validate_smoke_acceptance(
         acceptance_path,
         common.sha256_file(acceptance_path),
         model_binding=model_contract,
     )
-    assert accepted["technical_checks"]["cuda_forward_all_rows"] is True
+    assert accepted["decision"] == "OPEN_FULL_TEACHER"
+    assert accepted["terminal_job_metadata_bound"] is True
     with pytest.raises(common.ContractError, match="file SHA mismatch"):
         teacher.validate_smoke_acceptance(
             acceptance_path, "0" * 64, model_binding=model_contract
+        )
+
+
+def test_full_runner_rejects_runner_local_smoke_acceptance(tmp_path: Path) -> None:
+    smoke_dir, model_root, model_contract_path = build_inputs(tmp_path)
+    args = smoke_args(tmp_path, smoke_dir, model_root, model_contract_path)
+    teacher.run(args, backend=fake_backend)
+    local_acceptance = args.output_dir / "acceptance.json"
+    model_contract = json.loads(model_contract_path.read_text(encoding="utf-8"))
+    with pytest.raises(common.ContractError, match="exact fields|required"):
+        teacher.validate_smoke_acceptance(
+            local_acceptance,
+            common.sha256_file(local_acceptance),
+            model_binding=model_contract,
         )
 
 

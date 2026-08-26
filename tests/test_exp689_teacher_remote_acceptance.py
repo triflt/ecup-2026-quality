@@ -341,6 +341,9 @@ def make_packet(tmp_path: Path, scope: str) -> dict[str, Any]:
         "expected_source_sha256": common.sha256_file(request_path),
         "expected_image_manifest_sha256": common.sha256_file(image_manifest_path),
         "expected_pixel_set_sha256": pixel_set_sha,
+        "expected_accepted_smoke_self_sha256": (
+            None if scope == "technical_smoke" else "2" * 64
+        ),
         "expected_model_contract_sha256": common.sha256_file(model_contract_path),
         "expected_model_input_identity_sha256": model_input_identity,
         "approved_output_prefix": "s3://approved-runtime/exp689/",
