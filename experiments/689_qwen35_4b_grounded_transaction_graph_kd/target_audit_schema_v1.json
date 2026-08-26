@@ -24,10 +24,12 @@
         "contradiction": {"type": ["boolean", "null"]},
         "evidence_supported": {"type": ["boolean", "null"]},
         "relation_correct": {"type": ["boolean", "null"]},
-        "sold_object_correct": {"type": ["boolean", "null"]}
+        "sold_object_correct": {"type": ["boolean", "null"]},
+        "substance_correct": {"type": ["boolean", "null"]}
       },
       "required": [
         "sold_object_correct",
+        "substance_correct",
         "relation_correct",
         "evidence_supported",
         "contradiction"

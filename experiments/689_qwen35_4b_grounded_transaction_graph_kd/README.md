@@ -75,7 +75,7 @@ candidates and cryptographic request binding.
 
 ## Frozen human-audit gate
 
-The frozen packet is copied for independent review; only the four `review`
+The frozen packet is copied for independent review; only the five `review`
 booleans may change. `evidence_supported=true` means either that selected
 evidence supports the structured target or that an unsupported/ambiguous
 abstention is correct. The preferred result is zero unsupported or incorrect
@@ -84,8 +84,9 @@ evidence, while the hard gate permits at most three.
 All conditions must hold:
 
 - exact schema and mechanical grounding `300/300`;
-- joint `sold_object + relation` correctness at least `282/300`;
-- joint correctness at least `95/100` in the critical
+- complete `sold_object + substance + relation` target-tuple correctness at
+  least `282/300`;
+- joint `sold_object + relation` correctness at least `95/100` in the critical
   device/accessory/compatibility/mention stratum;
 - evidence supported at least `297/300`;
 - `supervise=true` coverage at least `225/300` overall and `80/100` in the

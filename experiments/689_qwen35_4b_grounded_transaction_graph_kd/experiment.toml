@@ -15,7 +15,7 @@ public_rows_allowed = 0
 
 [validation]
 primary_version = "exp689_grounded_transaction_graph_target_audit_v1"
-primary_metric = "joint_sold_object_relation_accuracy"
+primary_metric = "target_tuple_accuracy"
 audit_rows = 300
 component_disjoint_from = [670, 672]
 
@@ -28,7 +28,7 @@ precedents = ["ERASER", "CLARITY", "Distilling Step-by-Step"]
 
 [acceptance]
 required_schema_grounding = 300
-minimum_joint_sold_object_relation = 282
+minimum_target_tuple_correct = 282
 minimum_critical_joint_sold_object_relation = 95
 minimum_evidence_supported = 297
 minimum_overall_coverage = 0.75

@@ -260,11 +260,13 @@ def complete_review(
     *,
     evidence_failures: int = 0,
     contradictions: int = 0,
+    substance_errors: int = 0,
 ) -> None:
     rows = read_jsonl(frozen_packet)
     for index, row in enumerate(rows):
         row["review"] = {
             "sold_object_correct": True,
+            "substance_correct": index >= substance_errors,
             "relation_correct": True,
             "evidence_supported": index >= evidence_failures,
             "contradiction": index < contradictions,
@@ -345,7 +347,7 @@ def test_frozen_enums_and_gate_thresholds_are_exact() -> None:
         "maximum_contradictions": 15,
         "minimum_critical_joint_sold_object_relation": 95,
         "minimum_evidence_supported": 297,
-        "minimum_joint_sold_object_relation": 282,
+        "minimum_target_tuple_correct": 282,
         "minimum_overall_supervised": 225,
         "minimum_rare_positive_supervised": 80,
         "required_nonduplicate_rows": 300,
@@ -362,7 +364,8 @@ def test_remote_pipeline_accepts_exact_300_and_never_authorizes_gpu(tmp_path: Pa
     assert result["status"] == "accepted"
     assert result["decision"] == "READY_FOR_SEPARATE_STUDENT_GPU_GO"
     assert result["student_gpu_authorized"] is False
-    assert result["metrics"]["joint_sold_object_relation"] == 300
+    assert result["metrics"]["target_tuple_correct"] == 300
+    assert result["metrics"]["sold_object_relation_correct"] == 300
     assert result["metrics"]["critical_joint_sold_object_relation"] == 100
     assert result["gate_checks"]["component_disjoint_from_670_672"] is True
 
@@ -461,6 +464,31 @@ def test_evidence_gate_rejects_four_unsupported_claims(tmp_path: Path) -> None:
     assert result["decision"] == "NO_GO"
     assert result["metrics"]["evidence_supported"] == 296
     assert result["gate_checks"]["evidence_supported"] is False
+    assert result["student_gpu_authorized"] is False
+
+
+@pytest.mark.parametrize(
+    ("substance_errors", "expected_status", "expected_tuple_correct"),
+    [
+        (18, "accepted", 282),
+        (19, "rejected_by_frozen_gate", 281),
+    ],
+)
+def test_target_tuple_gate_counts_substance_errors(
+    tmp_path: Path,
+    substance_errors: int,
+    expected_status: str,
+    expected_tuple_correct: int,
+) -> None:
+    packet = build_full_packet(tmp_path)
+    completed = tmp_path / "inputs" / "completed_review.jsonl"
+    complete_review(packet[5], completed, substance_errors=substance_errors)
+    result = validate_runtime(*packet[:5], packet[5], packet[6], completed)
+    assert result["status"] == expected_status
+    assert result["metrics"]["target_tuple_correct"] == expected_tuple_correct
+    assert result["metrics"]["sold_object_relation_correct"] == 300
+    assert result["gate_checks"]["target_tuple_correct"] is (substance_errors == 18)
+    assert result["gate_checks"]["critical_joint_sold_object_relation"] is True
     assert result["student_gpu_authorized"] is False
 
 

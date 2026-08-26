@@ -57,7 +57,7 @@
     "maximum_contradictions": 15,
     "minimum_critical_joint_sold_object_relation": 95,
     "minimum_evidence_supported": 297,
-    "minimum_joint_sold_object_relation": 282,
+    "minimum_target_tuple_correct": 282,
     "minimum_overall_supervised": 225,
     "minimum_rare_positive_supervised": 80,
     "required_nonduplicate_rows": 300,
@@ -70,7 +70,7 @@
     "authorized": false,
     "requires_fresh_independent_go_after_audit": true
   },
-  "target_audit_schema_sha256": "f557e318fdbeb9b9c72a796bd50755e86207eaae288106ddfd406577cda1c075",
+  "target_audit_schema_sha256": "f208b9c30d1a62e2cfd619fa6ddca4480d3354f09fc7c06a8c790e7fca47abe8",
   "teacher_output_policy": {
     "allowed_generated_fields": [
       "audit_id",
@@ -100,5 +100,5 @@
     "free_text_allowed": false,
     "selection_only_from_candidate_indices": true
   },
-  "self_sha256": "d252002a305d578fb83028c46d1a57e8d2613ed32c581d071c132f9f3cc89408"
+  "self_sha256": "1a4116590e13f4560fbc904848a3d2421d528cde495c51265d9a3405fff1dee2"
 }

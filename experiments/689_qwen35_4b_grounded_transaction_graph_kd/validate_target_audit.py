@@ -28,6 +28,7 @@ from build_target_audit import (
 
 REVIEW_FIELDS = {
     "sold_object_correct",
+    "substance_correct",
     "relation_correct",
     "evidence_supported",
     "contradiction",
@@ -284,11 +285,13 @@ def validate(
         seen_source_cards.add(source_card)
 
         counts["schema_grounding"] += 1
-        joint = review["sold_object_correct"] and review["relation_correct"]
-        counts["joint"] += int(joint)
+        sold_object_relation = review["sold_object_correct"] and review["relation_correct"]
+        target_tuple = sold_object_relation and review["substance_correct"]
+        counts["sold_object_relation"] += int(sold_object_relation)
+        counts["target_tuple"] += int(target_tuple)
         if frozen["stratum"] == spec["audit"]["critical_stratum"]:
             counts["critical_rows"] += 1
-            counts["critical_joint"] += int(joint)
+            counts["critical_joint"] += int(sold_object_relation)
         counts["evidence_supported"] += int(review["evidence_supported"])
         counts["contradictions"] += int(review["contradiction"])
         if frozen["target"]["supervise"]:
@@ -303,8 +306,8 @@ def validate(
     gates = spec["gates"]
     gate_checks = {
         "schema_grounding": counts["schema_grounding"] == gates["required_schema_grounding"],
-        "joint_sold_object_relation": (
-            counts["joint"] >= gates["minimum_joint_sold_object_relation"]
+        "target_tuple_correct": (
+            counts["target_tuple"] >= gates["minimum_target_tuple_correct"]
         ),
         "critical_joint_sold_object_relation": (
             counts["critical_joint"]
@@ -335,7 +338,8 @@ def validate(
             "review_rows": len(completed_rows),
             "metrics": {
                 "schema_grounding": counts["schema_grounding"],
-                "joint_sold_object_relation": counts["joint"],
+                "target_tuple_correct": counts["target_tuple"],
+                "sold_object_relation_correct": counts["sold_object_relation"],
                 "critical_joint_sold_object_relation": counts["critical_joint"],
                 "evidence_supported": counts["evidence_supported"],
                 "unsupported_or_incorrect_evidence": 300 - counts["evidence_supported"],

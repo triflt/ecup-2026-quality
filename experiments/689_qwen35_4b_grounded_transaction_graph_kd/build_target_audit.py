@@ -1013,6 +1013,7 @@ def make_target_row(
         },
         "review": {
             "sold_object_correct": None,
+            "substance_correct": None,
             "relation_correct": None,
             "evidence_supported": None,
             "contradiction": None,
