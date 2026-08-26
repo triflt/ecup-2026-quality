@@ -17,18 +17,43 @@ EXPERIMENT_ID = "693"
 SOURCE_EXPERIMENT_ID = "641"
 FLAMMABLE = "Легковоспламеняющиеся"
 AUXILIARY_COEFFICIENT = 0.10
+AUXILIARY_COMPONENTS = ("sold_object", "substance", "relation", "evidence_pointer")
+AUXILIARY_COMPONENT_COEFFICIENT = AUXILIARY_COEFFICIENT / len(AUXILIARY_COMPONENTS)
 MODES = ("hard_bce_control", "causal_candidate")
 
 
-def structured_target(row: SimpleNamespace) -> str:
+def structured_targets(row: SimpleNamespace) -> dict[str, str]:
+    """Physical attributes only; the verdict remains the dataset hard label."""
+    import json
+
     evidence = dict(row.teacher_evidence)
-    payload = {
-        "verdict": evidence["verdict"],
-        "sold_object": evidence["sold_object"],
-        "substance": evidence["substance"],
-        "relation": evidence["relation"],
+    targets = {
+        field: json.dumps(
+            {"value": evidence[field]["value"]},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        for field in ("sold_object", "substance", "relation")
     }
-    return json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    pointer = {
+        field: {
+            "source": evidence[field].get("source", "unknown"),
+            "quote": evidence[field].get("quote", ""),
+        }
+        for field in ("sold_object", "substance", "relation")
+    }
+    targets["evidence_pointer"] = json.dumps(
+        pointer, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return targets
+
+
+def component_prompt(row: SimpleNamespace, instruction: str) -> str:
+    context, separator, _ = control.base_prompt(row).rpartition("\n")
+    if not separator:
+        raise ValueError("base prompt lacks a separable output instruction")
+    return context + "\n" + instruction
 
 
 def structured_auxiliary_loss(
@@ -54,36 +79,51 @@ def structured_auxiliary_loss(
     if not selected:
         return None
     aux_rows, aux_images = zip(*selected, strict=True)
-    answers = [structured_target(row) for row in aux_rows]
-    prompt = "Верни только компактный JSON с ключами verdict, sold_object, substance, relation."
-    conversations = [
-        control.messages(
-            row,
-            image,
-            prompt_text=control.base_prompt(row) + "\n" + prompt,
-            answer=answer,
-        )
-        for row, image, answer in zip(aux_rows, aux_images, answers, strict=True)
-    ]
-    batch = control._processor_batch(processor, conversations, add_generation_prompt=False)
-    labels = torch.full_like(batch["input_ids"], -100)
-    for row_index, answer in enumerate(answers):
-        active = torch.nonzero(batch["attention_mask"][row_index]).flatten().tolist()
-        active_ids = batch["input_ids"][row_index, active].tolist()
-        target_ids = processor.tokenizer.encode(answer, add_special_tokens=False)
-        start = control._locate_last(active_ids, target_ids)
-        for local_index, token_id in enumerate(target_ids):
-            labels[row_index, active[start + local_index]] = int(token_id)
-    device_batch = {key: value.to(model.device) for key, value in batch.items()}
-    return model(**device_batch, labels=labels.to(model.device), use_cache=False).loss
+    component_losses: dict[str, Any] = {}
+    prompts = {
+        "sold_object": "Верни только JSON физического продаваемого объекта.",
+        "substance": "Верни только JSON физического вещества/топлива.",
+        "relation": "Верни только JSON физической связи объекта и вещества.",
+        "evidence_pointer": "Верни только JSON указателей source/quote для трёх атрибутов.",
+    }
+    targets_by_row = [structured_targets(row) for row in aux_rows]
+    for component in AUXILIARY_COMPONENTS:
+        answers = [targets[component] for targets in targets_by_row]
+        conversations = [
+            control.messages(
+                row,
+                image,
+                prompt_text=component_prompt(row, prompts[component]),
+                answer=answer,
+            )
+            for row, image, answer in zip(aux_rows, aux_images, answers, strict=True)
+        ]
+        batch = control._processor_batch(processor, conversations, add_generation_prompt=False)
+        labels = torch.full_like(batch["input_ids"], -100)
+        for row_index, answer in enumerate(answers):
+            active = torch.nonzero(batch["attention_mask"][row_index]).flatten().tolist()
+            active_ids = batch["input_ids"][row_index, active].tolist()
+            target_ids = processor.tokenizer.encode(answer, add_special_tokens=False)
+            start = control._locate_last(active_ids, target_ids)
+            for local_index, token_id in enumerate(target_ids):
+                labels[row_index, active[start + local_index]] = int(token_id)
+        device_batch = {key: value.to(model.device) for key, value in batch.items()}
+        component_losses[component] = model(
+            **device_batch, labels=labels.to(model.device), use_cache=False
+        ).loss
+    return component_losses
 
 
-def combine_losses(hard: Any, auxiliary: Any | None, *, mode: str) -> Any:
+def combine_losses(hard: Any, auxiliary: dict[str, Any] | None, *, mode: str) -> Any:
     if mode == "hard_bce_control":
         return hard
     if mode != "causal_candidate":
         raise ValueError("unknown mode")
-    return hard if auxiliary is None else hard + AUXILIARY_COEFFICIENT * auxiliary
+    if auxiliary is None:
+        return hard
+    if tuple(auxiliary) != AUXILIARY_COMPONENTS:
+        raise ValueError("causal auxiliary components differ from frozen contract")
+    return hard + AUXILIARY_COMPONENT_COEFFICIENT * sum(auxiliary.values())
 
 
 def run(args: Any) -> dict[str, Any]:
@@ -134,6 +174,15 @@ def run(args: Any) -> dict[str, Any]:
             "auxiliary_coefficient": (
                 AUXILIARY_COEFFICIENT if args.mode == "causal_candidate" else 0.0
             ),
+            "auxiliary_component_coefficients": {
+                component: (
+                    AUXILIARY_COMPONENT_COEFFICIENT
+                    if args.mode == "causal_candidate"
+                    else 0.0
+                )
+                for component in AUXILIARY_COMPONENTS
+            },
+            "causal_verdict_target": "dataset_hard_gold_only",
             "auxiliary_training_only": True,
             "teacher_outer_safe_required": True,
             "exp691_binding": teacher_binding,

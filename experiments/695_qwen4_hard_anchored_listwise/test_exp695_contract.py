@@ -31,7 +31,7 @@ def test_rank_auxiliary_is_bounded_and_hard_is_not_downweighted():
     candidate = inspect.getsource(TRAIN.candidate_loss)
     assert "torch.minimum(raw, hard.detach() * RANK_CAP_FRACTION)" in source
     assert "return hard + bounded_listwise_loss" in candidate
-    assert TRAIN.RANK_COEFFICIENT == 0.20
+    assert TRAIN.RANK_COEFFICIENT == 0.50
 
 
 def test_both_arms_receive_identical_same_stratum_pair_batches():

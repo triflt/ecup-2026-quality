@@ -20,7 +20,7 @@ from exp691_consumer import load_fold
 EXPERIMENT_ID = "695"
 SOURCE_EXPERIMENT_ID = "641"
 FLAMMABLE = "Легковоспламеняющиеся"
-RANK_COEFFICIENT = 0.20
+RANK_COEFFICIENT = 0.50
 RANK_CAP_FRACTION = 0.25
 MODES = ("hard_bce_control", "rank_candidate")
 

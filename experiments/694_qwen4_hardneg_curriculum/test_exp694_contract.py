@@ -43,7 +43,7 @@ def rows():
     ]
 
 
-def test_curriculum_changes_only_order_and_survives_parent_shuffle():
+def test_paired_curriculum_order_survives_parent_shuffle():
     source = rows()
     arranged = TRAIN.arrange_for_frozen_shuffle(source)
     indices = list(range(len(arranged)))
@@ -53,6 +53,10 @@ def test_curriculum_changes_only_order_and_survives_parent_shuffle():
     assert sorted(row["id"] for row in arranged) == sorted(row["id"] for row in source)
 
 
-def test_teacher_signal_is_flammable_only_and_not_a_loss():
+def test_teacher_signal_is_flammable_only_and_weights_hard_gold_bce():
     assert callable(TRAIN.load_fold)
-    assert "teacher" not in TRAIN.control.primary_loss.__name__
+    values = {row["id"]: TRAIN.frozen_hard_example_weight(type("R", (), row)()) for row in rows()}
+    assert values["b"] == 1.0
+    assert values["n1"] == TRAIN.MAX_HARD_EXAMPLE_WEIGHT
+    assert 1.0 < values["n2"] < TRAIN.MAX_HARD_EXAMPLE_WEIGHT
+    assert values["p"] > 1.0

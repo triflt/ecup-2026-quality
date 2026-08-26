@@ -183,11 +183,20 @@ def test_actual_exp691_evidence_shape_drives_closed_aux_target(tmp_path: Path):
         acceptance_path=acceptance_path,
         expected_acceptance_file_sha256=acceptance_sha,
     )
-    target = TRAIN.structured_target(SimpleNamespace(**enriched[0]))
-    assert '"sold_object":{"quote":"баллон"' in target
-    assert '"verdict":1' in target
+    targets = TRAIN.structured_targets(SimpleNamespace(**enriched[0]))
+    assert tuple(targets) == TRAIN.AUXILIARY_COMPONENTS
+    assert targets["sold_object"] == '{"value":"баллон"}'
+    assert '"sold_object":{"quote":"баллон"' in targets["evidence_pointer"]
+    assert all("verdict" not in target for target in targets.values())
     assert TRAIN.combine_losses(3.0, 2.0, mode="hard_bce_control") == 3.0
-    assert TRAIN.combine_losses(3.0, 2.0, mode="causal_candidate") == 3.2
+    assert (
+        TRAIN.combine_losses(
+            3.0,
+            {component: 2.0 for component in TRAIN.AUXILIARY_COMPONENTS},
+            mode="causal_candidate",
+        )
+        == 3.2
+    )
 
 
 def test_causal_acceptance_requires_exact_file_sha(tmp_path: Path):
@@ -265,6 +274,93 @@ def test_average_precision_matches_canonical_sklearn_tie_fixtures():
     assert EVAL.average_precision([1, 0, 1, 0], [0.5, 0.5, 0.2, 0.1]) == pytest.approx(7 / 12)
 
 
+def test_label_policy_slice_reports_all_three_fp_and_blocks_regression():
+    rows = [
+        {
+            "fold": index % 5,
+            "label": 0,
+            "category": TRAIN.FLAMMABLE,
+            "name": f"Топливный элемент для зажигалки {index}",
+            "baseline": 0,
+            "control": 0,
+            "candidate": int(index == 0),
+            "control_score": -1.0,
+            "candidate_score": 1.0 if index == 0 else -1.0,
+            "singleton": False,
+            "slices": ["ignition_products"],
+        }
+        for index in range(EVAL.LABEL_POLICY_ROWS)
+    ]
+    rows.extend(
+        [
+            {
+                "fold": fold,
+                "label": 1,
+                "category": "БАД",
+                "name": "",
+                "baseline": 1,
+                "control": 1,
+                "candidate": 1,
+                "control_score": 1.0,
+                "candidate_score": 1.0,
+                "singleton": False,
+                "slices": [],
+            }
+            for fold in range(5)
+        ]
+    )
+    report = EVAL.build_report(rows)
+    policy = report["pooled"]["label_policy_slice"]
+    assert policy == {
+        "rows": 25,
+        "labels_zero": 25,
+        "fp": {"baseline": 0, "control": 0, "candidate": 1},
+    }
+    assert report["gate"]["label_policy_fp_nonincrease"] is False
+    assert report["decision"] == "REJECT_CANDIDATE"
+    assert "ignition_products" in report["pooled"]["evidence_slices"]
+
+
+def test_label_policy_contract_rejects_nonzero_gold_without_relabeling():
+    rows = [
+        {
+            "fold": index % 5,
+            "label": int(index == 0),
+            "category": TRAIN.FLAMMABLE,
+            "name": f"топливо для зажигалки {index}",
+            "baseline": 0,
+            "control": 0,
+            "candidate": 0,
+            "control_score": -1.0,
+            "candidate_score": -1.0,
+            "singleton": False,
+            "slices": [],
+        }
+        for index in range(EVAL.LABEL_POLICY_ROWS)
+    ]
+    with pytest.raises(ValueError, match="25/25 label=0"):
+        EVAL.build_report(rows)
+
+
+def test_exp692_evidence_slice_definitions_are_reused_exactly():
+    row = {"name": "Топливо для зажигалки", "description": "угольный розжиг"}
+    evidence = {
+        "evidence": {
+            "sold_object": {"source": "text"},
+            "substance": {"source": "text"},
+            "relation": {"source": "text", "value": "sold_separately"},
+            "abstain": False,
+            "grounded": True,
+        }
+    }
+    assert EVAL.evidence_slices(row, evidence) == {
+        "fuel_sold_separately",
+        "text_sufficient",
+        "ignition_products",
+        "charcoal_fire_starting",
+    }
+
+
 def evaluation_fixture(root: Path, *, validation_has_label: bool = False) -> tuple[Path, ...]:
     runtime = root / "runtime"
     baseline = root / "baseline"
@@ -330,4 +426,14 @@ def test_labels_are_joined_from_cross_fold_registry_only_after_both_arms_frozen(
 def test_outer_validation_label_is_rejected_even_after_arms_are_frozen(tmp_path: Path):
     paths = evaluation_fixture(tmp_path, validation_has_label=True)
     with pytest.raises(ValueError, match="label-free"):
+        EVAL.aligned_rows(*paths)
+
+
+def test_validation_name_must_match_frozen_train_registry(tmp_path: Path):
+    paths = evaluation_fixture(tmp_path)
+    validation_path = paths[0] / "fold0" / "validation.jsonl"
+    value = json.loads(validation_path.read_text(encoding="utf-8"))
+    value["name"] = "топливо для зажигалки"
+    write_jsonl(validation_path, [value])
+    with pytest.raises(ValueError, match="cross-fold registry"):
         EVAL.aligned_rows(*paths)

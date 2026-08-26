@@ -17,11 +17,15 @@ folds = [0, 1, 2, 3, 4]
 seed = 42
 hard_bce_coefficient = 1.0
 auxiliary_coefficient = 0.10
+auxiliary_components = ["sold_object", "substance", "relation", "evidence_pointer"]
+auxiliary_component_coefficient = 0.025
+causal_verdict_target = "dataset_hard_gold_only"
 kd_category = "Легковоспламеняющиеся"
 hard_bce_scope = "all_categories"
 bad_production_replay = "frozen_byte_identical"
 teacher_fold_schema = "exp691_fold_report_v1"
 teacher_acceptance_schema = "exp692_qwen27_routed_acceptance_v1"
+label_policy_slice = "NAME casefold contains both топлив and зажигал; exact 25/25 label=0"
 
 [execution]
 gpus = 1

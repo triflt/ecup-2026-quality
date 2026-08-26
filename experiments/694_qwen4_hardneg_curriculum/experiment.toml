@@ -6,8 +6,8 @@ job_name_prefix = "qwen4-hardneg-"
 
 [hypothesis]
 parent = "641_qwen35_4b_class_only_lora"
-changed_factor = "outer_safe_teacher_guided_training_order"
-mechanism = "Move flammable hard negatives and missed positives into early high-LR updates while retaining full hard BCE."
+changed_factor = "outer_safe_teacher_disagreement_confidence_weight"
+mechanism = "Increase hard-gold BCE weight for outer-safe teacher-disagreement flammable rows while retaining full all-row hard BCE."
 falsification = "Reject if pooled Macro or flammable AP/F1 fails to improve, or BAD replay is not exact."
 precedents = ["hard-example mining", "curriculum learning"]
 
@@ -18,10 +18,15 @@ seed = 42
 hard_bce_coefficient = 1.0
 kd_category = "Легковоспламеняющиеся"
 hard_bce_scope = "all_categories"
-teacher_loss = "none"
+teacher_soft_target_loss = "none"
+teacher_signal_usage = "sample_weight_only"
+hard_example_weight_min = 1.0
+hard_example_weight_max = 2.0
+paired_order = "identical_teacher_guided_curriculum"
 bad_production_replay = "frozen_byte_identical"
 teacher_fold_schema = "exp691_fold_report_v1"
 teacher_acceptance_schema = "exp692_qwen27_routed_acceptance_v1"
+label_policy_slice = "NAME casefold contains both топлив and зажигал; exact 25/25 label=0"
 
 [execution]
 gpus = 1

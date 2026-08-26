@@ -10,10 +10,12 @@ submission or Public stage is authorized by this directory.
 One H100 job runs paired hard-BCE control and candidate sequentially for all
 five semantic-family folds and evaluates each fold inline. Both arms use the
 same Qwen3.5-4B revision, seed, all-row hard BCE, source rows, shuffle, update
-count and threshold. The only candidate change is an auxiliary causal target on
-flammable rows: teacher hard verdict plus closed `sold_object`, `substance`,
-`relation`, and evidence identifiers. Auxiliary output is training-only and is
-never used at inference. BAD predictions in production replay are copied from
+count and threshold. The only candidate change is four separate physical
+auxiliary targets on flammable rows: `sold_object`, `substance`, `relation`, and
+an evidence pointer. Each component has its own loss. Teacher verdict is never
+an auxiliary target: the verdict target remains the dataset hard gold label in
+the full all-row BCE. Auxiliary output is training-only and is never used at
+inference. BAD predictions in production replay are copied from
 the frozen production baseline and must be byte-identical.
 
 This is a student-stage successor to 689, not a repeat of 681/685/686: it uses
@@ -25,3 +27,8 @@ into student training.
 Precedent: Distilling Step-by-Step. Transfer mechanism: a compact model keeps
 the calibrated hard-label objective while learning a closed, grounded causal
 decomposition that separates the sold object from a mentioned fuel.
+
+The evaluator binds exp692 evidence bytes, reports its frozen evidence slices,
+semantic singletons and paired bootstrap probability. It also verifies the
+frozen 25/25 label-zero NAME slice containing both `топлив` and `зажигал`,
+reports baseline/control/candidate FP, and rejects any candidate FP increase.
