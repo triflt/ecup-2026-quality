@@ -111,6 +111,8 @@ def smoke_args(root: Path, smoke_dir: Path, model_root: Path, model_contract: Pa
         model_contract=model_contract,
         accepted_smoke=None,
         accepted_smoke_sha256=None,
+        accepted_smoke_gate=None,
+        accepted_smoke_gate_sha256=None,
         output_dir=root / "teacher_output",
     )
 
@@ -166,8 +168,14 @@ def test_smoke_runner_emits_contract_bound_non_authorizing_artifacts(tmp_path: P
 
 
 def test_full_runner_refuses_without_exact_accepted_smoke() -> None:
-    args = Namespace(scope="full", accepted_smoke=None, accepted_smoke_sha256=None)
-    with pytest.raises(common.ContractError, match="accepted smoke path and SHA"):
+    args = Namespace(
+        scope="full",
+        accepted_smoke=None,
+        accepted_smoke_sha256=None,
+        accepted_smoke_gate=None,
+        accepted_smoke_gate_sha256=None,
+    )
+    with pytest.raises(common.ContractError, match="remote smoke acceptance and promotion"):
         teacher.run(args)
 
 
@@ -202,6 +210,7 @@ def test_accepted_smoke_gate_binds_code_prompt_model_and_processor(tmp_path: Pat
             "image_manifest_sha256": "3" * 64,
             "pixel_set_sha256": "4" * 64,
             "accepted_smoke_self_sha256": None,
+            "accepted_smoke_promotion_gate_self_sha256": None,
             "model_contract_sha256": common.sha256_file(model_contract_path),
             "model_contract_self_sha256": model_contract["self_sha256"],
             "model_registry_input_identity_sha256": "5" * 64,

@@ -89,6 +89,7 @@ REMOTE_SMOKE_ACCEPTANCE_FIELDS = {
     "image_manifest_sha256",
     "pixel_set_sha256",
     "accepted_smoke_self_sha256",
+    "accepted_smoke_promotion_gate_self_sha256",
     "model_contract_sha256",
     "model_contract_self_sha256",
     "model_registry_input_identity_sha256",
@@ -108,6 +109,48 @@ REMOTE_SMOKE_ACCEPTANCE_FIELDS = {
     "uploads_by_verifier",
     "presets_built_by_verifier",
     "bundles_built_by_verifier",
+    "self_sha256",
+}
+SMOKE_PROMOTION_GATE_FIELDS = {
+    "schema_version",
+    "experiment_id",
+    "scope",
+    "status",
+    "decision",
+    "independent_integrator_required",
+    "remote_acceptance_sha256",
+    "remote_acceptance_self_sha256",
+    "smoke_commit_sha",
+    "teacher_code_bundle_sha256",
+    "teacher_code_bundle_members",
+    "runner_sha256",
+    "prompt_sha256",
+    "source_sha256",
+    "image_manifest_sha256",
+    "pixel_set_sha256",
+    "model_contract_sha256",
+    "model_contract_self_sha256",
+    "model_registry_input_identity_sha256",
+    "model_tree_sha256",
+    "processor_sha256",
+    "terminal_metadata_sha256",
+    "terminal_metadata_self_sha256",
+    "terminal_state",
+    "remote_receipt_sha256",
+    "remote_receipt_self_sha256",
+    "remote_output_ref_sha256",
+    "runner_output_inventory",
+    "runner_output_inventory_sha256",
+    "verifier_bundle_sha256",
+    "verifier_bundle_members",
+    "verifier_sha256",
+    "gate_builder_sha256",
+    "labels_read",
+    "sealed_rows",
+    "public_used",
+    "quality_evaluated",
+    "full_teacher_authorized",
+    "student_gpu_authorized",
     "self_sha256",
 }
 
@@ -373,6 +416,7 @@ def validate_smoke_acceptance(
         "approved_remote_output_bound": True,
         "full_teacher_technical_gate_open": True,
         "accepted_smoke_self_sha256": None,
+        "accepted_smoke_promotion_gate_self_sha256": None,
         "model_tree_sha256": model_binding["model_tree_sha256"],
         "processor_sha256": model_binding["processor_sha256"],
         "runner_sha256": sha256_file(Path(__file__)),
@@ -425,6 +469,86 @@ def validate_smoke_acceptance(
     ):
         raise ContractError("accepted teacher smoke: runtime/peak is invalid")
     return acceptance
+
+
+def validate_smoke_promotion_gate(
+    gate_path: Path,
+    expected_gate_sha256: str,
+    *,
+    acceptance_path: Path,
+    acceptance: dict[str, Any],
+    model_binding: dict[str, Any],
+) -> dict[str, Any]:
+    require_hex64(expected_gate_sha256, "accepted smoke promotion-gate SHA")
+    if sha256_file(gate_path) != expected_gate_sha256:
+        raise ContractError("accepted smoke promotion-gate file SHA mismatch")
+    gate = load_json(gate_path, "accepted teacher smoke promotion gate")
+    expect_exact_keys(
+        gate,
+        SMOKE_PROMOTION_GATE_FIELDS,
+        "accepted teacher smoke promotion gate",
+    )
+    validate_self_hash(gate, "accepted teacher smoke promotion gate")
+    acceptance_file_sha = sha256_file(acceptance_path)
+    expected = {
+        "schema_version": "exp689_teacher_smoke_promotion_gate_v1",
+        "experiment_id": "689",
+        "scope": "technical_smoke_to_full_teacher",
+        "status": "accepted",
+        "decision": "OPEN_FULL_TEACHER",
+        "independent_integrator_required": True,
+        "remote_acceptance_sha256": acceptance_file_sha,
+        "remote_acceptance_self_sha256": acceptance["self_sha256"],
+        "smoke_commit_sha": acceptance["commit_sha"],
+        "teacher_code_bundle_sha256": acceptance["code_bundle_sha256"],
+        "teacher_code_bundle_members": acceptance["code_bundle_members"],
+        "runner_sha256": sha256_file(Path(__file__)),
+        "prompt_sha256": PROMPT_SHA256,
+        "source_sha256": acceptance["source_sha256"],
+        "image_manifest_sha256": acceptance["image_manifest_sha256"],
+        "pixel_set_sha256": acceptance["pixel_set_sha256"],
+        "model_contract_sha256": acceptance["model_contract_sha256"],
+        "model_contract_self_sha256": acceptance["model_contract_self_sha256"],
+        "model_registry_input_identity_sha256": acceptance[
+            "model_registry_input_identity_sha256"
+        ],
+        "model_tree_sha256": model_binding["model_tree_sha256"],
+        "processor_sha256": model_binding["processor_sha256"],
+        "terminal_state": "SUCCESS",
+        "remote_receipt_sha256": acceptance["remote_receipt_sha256"],
+        "remote_receipt_self_sha256": acceptance["remote_receipt_self_sha256"],
+        "remote_output_ref_sha256": acceptance["remote_output_ref_sha256"],
+        "runner_output_inventory": acceptance["runner_output_inventory"],
+        "runner_output_inventory_sha256": acceptance[
+            "runner_output_inventory_sha256"
+        ],
+        "labels_read": 0,
+        "sealed_rows": 0,
+        "public_used": False,
+        "quality_evaluated": False,
+        "full_teacher_authorized": True,
+        "student_gpu_authorized": False,
+    }
+    for field, value in expected.items():
+        if gate[field] != value:
+            raise ContractError(f"accepted teacher smoke promotion gate: {field} mismatch")
+    for field in (
+        "terminal_metadata_sha256",
+        "terminal_metadata_self_sha256",
+        "verifier_bundle_sha256",
+        "verifier_sha256",
+        "gate_builder_sha256",
+    ):
+        require_hex64(gate[field], f"accepted teacher smoke promotion gate.{field}")
+    verifier_members = gate["verifier_bundle_members"]
+    if (
+        not isinstance(verifier_members, dict)
+        or verifier_members.get("verify_teacher_run.py") != gate["verifier_sha256"]
+        or verifier_members.get("build_teacher_smoke_promotion_gate.py")
+        != gate["gate_builder_sha256"]
+    ):
+        raise ContractError("accepted teacher smoke promotion gate verifier bundle mismatch")
+    return gate
 
 
 def load_requests(path: Path, *, scope: str) -> list[dict[str, Any]]:
@@ -759,11 +883,19 @@ def run(
     if args.scope not in {"technical_smoke", "full"}:
         raise ContractError("teacher scope must be technical_smoke or full")
     if args.scope == "full" and (
-        args.accepted_smoke is None or args.accepted_smoke_sha256 is None
+        args.accepted_smoke is None
+        or args.accepted_smoke_sha256 is None
+        or args.accepted_smoke_gate is None
+        or args.accepted_smoke_gate_sha256 is None
     ):
-        raise ContractError("full teacher run requires exact accepted smoke path and SHA")
+        raise ContractError(
+            "full teacher run requires exact remote smoke acceptance and promotion gate"
+        )
     if args.scope == "technical_smoke" and (
-        args.accepted_smoke is not None or args.accepted_smoke_sha256 is not None
+        args.accepted_smoke is not None
+        or args.accepted_smoke_sha256 is not None
+        or args.accepted_smoke_gate is not None
+        or args.accepted_smoke_gate_sha256 is not None
     ):
         raise ContractError("technical smoke must not consume a prior smoke gate")
     remote_root = args.remote_root.resolve(strict=True)
@@ -807,12 +939,26 @@ def run(
     model_contract = load_json(model_contract_path, "teacher model contract")
     model_binding = validate_base_model_tree(model_root, model_contract)
     smoke_gate: dict[str, Any] | None = None
+    smoke_promotion_gate: dict[str, Any] | None = None
     if args.scope == "full":
         smoke_path = require_remote_path(
             remote_root, args.accepted_smoke, context="accepted teacher smoke", must_exist=True
         )
         smoke_gate = validate_smoke_acceptance(
             smoke_path, args.accepted_smoke_sha256, model_binding=model_binding
+        )
+        promotion_path = require_remote_path(
+            remote_root,
+            args.accepted_smoke_gate,
+            context="accepted teacher smoke promotion gate",
+            must_exist=True,
+        )
+        smoke_promotion_gate = validate_smoke_promotion_gate(
+            promotion_path,
+            args.accepted_smoke_gate_sha256,
+            acceptance_path=smoke_path,
+            acceptance=smoke_gate,
+            model_binding=model_binding,
         )
 
     images, pixel_set_sha = load_images(image_root, image_manifest_path, requests)
@@ -865,6 +1011,9 @@ def run(
             "pixel_set_sha256": pixel_set_sha,
             "input_contract_self_sha256": input_contract["self_sha256"],
             "accepted_smoke_self_sha256": smoke_gate["self_sha256"] if smoke_gate else None,
+            "accepted_smoke_promotion_gate_self_sha256": (
+                smoke_promotion_gate["self_sha256"] if smoke_promotion_gate else None
+            ),
             "selection_payload_sha256": selection_payload_sha,
             "targets_sha256": sha256_file(targets_path),
             "rows": len(targets),
@@ -945,6 +1094,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-contract", type=Path, required=True)
     parser.add_argument("--accepted-smoke", type=Path)
     parser.add_argument("--accepted-smoke-sha256")
+    parser.add_argument("--accepted-smoke-gate", type=Path)
+    parser.add_argument("--accepted-smoke-gate-sha256")
     parser.add_argument("--output-dir", type=Path, required=True)
     return parser.parse_args()
 

@@ -64,6 +64,7 @@ REPORT_FIELDS = {
     "pixel_set_sha256",
     "input_contract_self_sha256",
     "accepted_smoke_self_sha256",
+    "accepted_smoke_promotion_gate_self_sha256",
     "selection_payload_sha256",
     "targets_sha256",
     "rows",
@@ -295,6 +296,7 @@ def validate_runner_artifacts(
     expected_image_manifest_sha256: str,
     expected_pixel_set_sha256: str,
     expected_accepted_smoke_self_sha256: str | None,
+    expected_accepted_smoke_promotion_gate_self_sha256: str | None,
     model_contract: dict[str, Any],
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, str], dict[str, int]]:
     inventory, sizes = validate_output_inventory(output_dir)
@@ -360,9 +362,15 @@ def validate_runner_artifacts(
         ):
             raise ContractError(f"teacher runner {document_name}: runtime/peak invalid")
     if scope == "technical_smoke":
-        if expected_accepted_smoke_self_sha256 is not None:
+        if (
+            expected_accepted_smoke_self_sha256 is not None
+            or expected_accepted_smoke_promotion_gate_self_sha256 is not None
+        ):
             raise ContractError("technical smoke may not consume an accepted smoke gate")
-        if report["accepted_smoke_self_sha256"] is not None:
+        if (
+            report["accepted_smoke_self_sha256"] is not None
+            or report["accepted_smoke_promotion_gate_self_sha256"] is not None
+        ):
             raise ContractError("technical smoke report pre-claims an accepted smoke gate")
     else:
         require_hex64(
@@ -371,6 +379,15 @@ def validate_runner_artifacts(
         )
         if report["accepted_smoke_self_sha256"] != expected_accepted_smoke_self_sha256:
             raise ContractError("full teacher report accepted-smoke binding mismatch")
+        require_hex64(
+            expected_accepted_smoke_promotion_gate_self_sha256,
+            "expected accepted-smoke promotion-gate self SHA",
+        )
+        if (
+            report["accepted_smoke_promotion_gate_self_sha256"]
+            != expected_accepted_smoke_promotion_gate_self_sha256
+        ):
+            raise ContractError("full teacher report promotion-gate binding mismatch")
     if report["schema_version"] != "exp689_teacher_run_report_v1":
         raise ContractError("teacher runner report schema mismatch")
     if report["image_manifest_sha256"] != expected_image_manifest_sha256:
@@ -565,6 +582,7 @@ def verify(
     expected_image_manifest_sha256: str,
     expected_pixel_set_sha256: str,
     expected_accepted_smoke_self_sha256: str | None,
+    expected_accepted_smoke_promotion_gate_self_sha256: str | None,
     expected_model_contract_sha256: str,
     expected_model_input_identity_sha256: str,
     approved_output_prefix: str,
@@ -621,6 +639,9 @@ def verify(
         expected_image_manifest_sha256=expected_image_manifest_sha256,
         expected_pixel_set_sha256=expected_pixel_set_sha256,
         expected_accepted_smoke_self_sha256=expected_accepted_smoke_self_sha256,
+        expected_accepted_smoke_promotion_gate_self_sha256=(
+            expected_accepted_smoke_promotion_gate_self_sha256
+        ),
         model_contract=model_contract,
     )
     receipt = load_json(resolved["teacher remote receipt"], "teacher remote receipt")
@@ -669,6 +690,9 @@ def verify(
             "image_manifest_sha256": expected_image_manifest_sha256,
             "pixel_set_sha256": expected_pixel_set_sha256,
             "accepted_smoke_self_sha256": expected_accepted_smoke_self_sha256,
+            "accepted_smoke_promotion_gate_self_sha256": (
+                expected_accepted_smoke_promotion_gate_self_sha256
+            ),
             "model_contract_sha256": expected_model_contract_sha256,
             "model_contract_self_sha256": model_contract["self_sha256"],
             "model_registry_input_identity_sha256": expected_model_input_identity_sha256,
@@ -718,6 +742,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--expected-image-manifest-sha256", required=True)
     parser.add_argument("--expected-pixel-set-sha256", required=True)
     parser.add_argument("--expected-accepted-smoke-self-sha256")
+    parser.add_argument("--expected-accepted-smoke-promotion-gate-self-sha256")
     parser.add_argument("--expected-model-contract-sha256", required=True)
     parser.add_argument("--expected-model-input-identity-sha256", required=True)
     parser.add_argument("--approved-output-prefix", required=True)
@@ -744,6 +769,9 @@ def main() -> None:
         expected_image_manifest_sha256=args.expected_image_manifest_sha256,
         expected_pixel_set_sha256=args.expected_pixel_set_sha256,
         expected_accepted_smoke_self_sha256=args.expected_accepted_smoke_self_sha256,
+        expected_accepted_smoke_promotion_gate_self_sha256=(
+            args.expected_accepted_smoke_promotion_gate_self_sha256
+        ),
         expected_model_contract_sha256=args.expected_model_contract_sha256,
         expected_model_input_identity_sha256=args.expected_model_input_identity_sha256,
         approved_output_prefix=args.approved_output_prefix,

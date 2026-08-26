@@ -20,6 +20,8 @@ sys.path.insert(0, str(EXPERIMENT))
 import build_target_audit as common
 import build_teacher_model_contract as model_builder
 import build_teacher_smoke as smoke_builder
+import build_teacher_smoke_promotion_gate as promotion
+import run_teacher as teacher_runner
 import verify_teacher_run as verifier
 
 
@@ -50,7 +52,7 @@ def make_bundle(root: Path) -> tuple[Path, str, dict[str, str]]:
     members = {
         "build_target_audit.py": b"build-contract",
         "frozen_target_audit_spec.json": b"{}\n",
-        "run_teacher.py": b"frozen-runner",
+        "run_teacher.py": (EXPERIMENT / "run_teacher.py").read_bytes(),
         "target_audit_schema_v1.json": b"{}\n",
     }
     with zipfile.ZipFile(bundle_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
@@ -58,6 +60,14 @@ def make_bundle(root: Path) -> tuple[Path, str, dict[str, str]]:
             archive.writestr(name, payload)
     member_shas = {name: common.sha256_bytes(payload) for name, payload in sorted(members.items())}
     return bundle_path, common.sha256_file(bundle_path), member_shas
+
+
+def make_verifier_bundle(root: Path) -> tuple[Path, str]:
+    path = root / "teacher_verifier_bundle.zip"
+    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for name in sorted(promotion.VERIFIER_BUNDLE_MEMBERS):
+            archive.write(EXPERIMENT / name, arcname=name)
+    return path, common.sha256_file(path)
 
 
 def valid_target(request: dict[str, Any]) -> dict[str, Any]:
@@ -142,6 +152,9 @@ def make_runner_output(
             "pixel_set_sha256": pixel_set_sha,
             "input_contract_self_sha256": "1" * 64,
             "accepted_smoke_self_sha256": None if scope == "technical_smoke" else "2" * 64,
+            "accepted_smoke_promotion_gate_self_sha256": (
+                None if scope == "technical_smoke" else "9" * 64
+            ),
             "selection_payload_sha256": selection_sha,
             "targets_sha256": common.sha256_file(targets_path),
             "rows": len(targets),
@@ -297,7 +310,7 @@ def make_packet(tmp_path: Path, scope: str) -> dict[str, Any]:
     model_contract_path, model_contract = make_model_contract(tmp_path)
     bundle_path, bundle_sha, bundle_members = make_bundle(tmp_path)
     runner_sha = bundle_members["run_teacher.py"]
-    prompt_sha = common.sha256_text("frozen-prompt")
+    prompt_sha = teacher_runner.PROMPT_SHA256
     output_dir, inventory, sizes, pixel_set_sha = make_runner_output(
         tmp_path,
         scope=scope,
@@ -344,6 +357,9 @@ def make_packet(tmp_path: Path, scope: str) -> dict[str, Any]:
         "expected_accepted_smoke_self_sha256": (
             None if scope == "technical_smoke" else "2" * 64
         ),
+        "expected_accepted_smoke_promotion_gate_self_sha256": (
+            None if scope == "technical_smoke" else "9" * 64
+        ),
         "expected_model_contract_sha256": common.sha256_file(model_contract_path),
         "expected_model_input_identity_sha256": model_input_identity,
         "approved_output_prefix": "s3://approved-runtime/exp689/",
@@ -369,6 +385,115 @@ def test_remote_verifier_accepts_exact_smoke_and_full(
     assert result["student_gpu_authorized"] is False
     assert result["full_teacher_technical_gate_open"] is (scope == "technical_smoke")
     common.validate_self_hash(result, "remote acceptance")
+
+
+def test_independent_promotion_gate_binds_raw_terminal_receipt_and_bundles(
+    tmp_path: Path,
+) -> None:
+    packet = make_packet(tmp_path, "technical_smoke")
+    acceptance = verifier.verify(**packet)
+    acceptance_path = packet["acceptance_output_path"]
+    receipt = json.loads(packet["receipt_path"].read_text(encoding="utf-8"))
+    output_ref_sha = common.sha256_bytes(
+        common.canonical_json_bytes(receipt["output_ref"])
+    )
+    terminal = common.with_self_hash(
+        {
+            "schema_version": "exp689_teacher_terminal_metadata_v1",
+            "job_identity_sha256": receipt["job_identity_sha256"],
+            "terminal_state": "SUCCESS",
+            "exit_code": 0,
+            "finished_at_utc": receipt["finished_at_utc"],
+            "receipt_sha256": common.sha256_file(packet["receipt_path"]),
+            "output_ref_sha256": output_ref_sha,
+            "state_source": "remote_compute_remote_api_independent",
+            "self_sha256": None,
+        }
+    )
+    terminal_path = tmp_path / "terminal_metadata.json"
+    write_json(terminal_path, terminal)
+    verifier_bundle, verifier_bundle_sha = make_verifier_bundle(tmp_path)
+    gate_path = tmp_path / "promotion_gate.json"
+    gate = promotion.build(
+        remote_acceptance_path=acceptance_path,
+        expected_remote_acceptance_sha256=common.sha256_file(acceptance_path),
+        remote_receipt_path=packet["receipt_path"],
+        terminal_metadata_path=terminal_path,
+        teacher_code_bundle_path=packet["code_bundle_path"],
+        model_contract_path=packet["model_contract_path"],
+        verifier_bundle_path=verifier_bundle,
+        expected_verifier_bundle_sha256=verifier_bundle_sha,
+        expected_verifier_sha256=common.sha256_file(EXPERIMENT / "verify_teacher_run.py"),
+        expected_gate_builder_sha256=common.sha256_file(
+            EXPERIMENT / "build_teacher_smoke_promotion_gate.py"
+        ),
+        expected_commit=packet["expected_commit"],
+        output_path=gate_path,
+    )
+    assert gate["decision"] == "OPEN_FULL_TEACHER"
+    assert gate["terminal_state"] == "SUCCESS"
+    assert gate["remote_acceptance_self_sha256"] == acceptance["self_sha256"]
+    validated = teacher_runner.validate_smoke_promotion_gate(
+        gate_path,
+        common.sha256_file(gate_path),
+        acceptance_path=acceptance_path,
+        acceptance=acceptance,
+        model_binding={
+            "model_tree_sha256": acceptance["model_tree_sha256"],
+            "processor_sha256": acceptance["processor_sha256"],
+        },
+    )
+    assert validated["self_sha256"] == gate["self_sha256"]
+
+
+def test_promotion_gate_rejects_self_blessed_acceptance_without_raw_receipt_binding(
+    tmp_path: Path,
+) -> None:
+    packet = make_packet(tmp_path, "technical_smoke")
+    acceptance = verifier.verify(**packet)
+    acceptance["remote_receipt_sha256"] = "f" * 64
+    acceptance = common.with_self_hash({**acceptance, "self_sha256": None})
+    write_json(packet["acceptance_output_path"], acceptance)
+    terminal_path = tmp_path / "terminal_metadata.json"
+    receipt = json.loads(packet["receipt_path"].read_text(encoding="utf-8"))
+    terminal = common.with_self_hash(
+        {
+            "schema_version": "exp689_teacher_terminal_metadata_v1",
+            "job_identity_sha256": receipt["job_identity_sha256"],
+            "terminal_state": "SUCCESS",
+            "exit_code": 0,
+            "finished_at_utc": receipt["finished_at_utc"],
+            "receipt_sha256": common.sha256_file(packet["receipt_path"]),
+            "output_ref_sha256": common.sha256_bytes(
+                common.canonical_json_bytes(receipt["output_ref"])
+            ),
+            "state_source": "remote_compute_remote_api_independent",
+            "self_sha256": None,
+        }
+    )
+    write_json(terminal_path, terminal)
+    verifier_bundle, verifier_bundle_sha = make_verifier_bundle(tmp_path)
+    with pytest.raises(common.ContractError, match="receipt file SHA mismatch"):
+        promotion.build(
+            remote_acceptance_path=packet["acceptance_output_path"],
+            expected_remote_acceptance_sha256=common.sha256_file(
+                packet["acceptance_output_path"]
+            ),
+            remote_receipt_path=packet["receipt_path"],
+            terminal_metadata_path=terminal_path,
+            teacher_code_bundle_path=packet["code_bundle_path"],
+            model_contract_path=packet["model_contract_path"],
+            verifier_bundle_path=verifier_bundle,
+            expected_verifier_bundle_sha256=verifier_bundle_sha,
+            expected_verifier_sha256=common.sha256_file(
+                EXPERIMENT / "verify_teacher_run.py"
+            ),
+            expected_gate_builder_sha256=common.sha256_file(
+                EXPERIMENT / "build_teacher_smoke_promotion_gate.py"
+            ),
+            expected_commit=packet["expected_commit"],
+            output_path=tmp_path / "forbidden_gate.json",
+        )
 
 
 def rewrite_receipt(packet: dict[str, Any], mutate: Any) -> None:
