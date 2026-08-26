@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
 
 
 def load(name: str):
@@ -17,61 +21,203 @@ def load(name: str):
     return module
 
 
+CONSUMER = load("exp691_consumer")
 TRAIN = load("train_fold")
 EVAL = load("evaluate")
 
 
-def teacher_row(**overrides):
-    row = {
-        "id": "a",
-        "global_index": 1,
-        "category": TRAIN.FLAMMABLE,
-        "label": 1,
-        "teacher_outer_fold": 2,
-        "teacher_verdict": 1,
-        "sold_object": "fuel_consumable",
-        "substance": "gas",
-        "relation": "primary_sold_object",
-        "evidence_ids": ["e1"],
-    }
-    row.update(overrides)
-    return row
-
-
-def test_teacher_is_flammable_outer_train_only():
-    assert (
-        TRAIN.validate_teacher_contract(
-            {
-                "teacher_contract": {
-                    "schema": "qwen27_all_outer_safe_v1",
-                    "teacher_recipe": "qwen27-all",
-                    "outer_fold": 2,
-                    "train_scope": "outer_train_only",
-                    "outer_validation_labels_read": 0,
-                    "target_category": TRAIN.FLAMMABLE,
-                    "artifact_sha256": "a" * 64,
-                }
-            },
-            2,
-        )
-        == "a" * 64
+def write_jsonl(path: Path, rows: list[dict]) -> None:
+    path.write_text(
+        "".join(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in rows),
+        encoding="utf-8",
     )
-    TRAIN.validate_teacher_rows([teacher_row()], [{"id": "b", "global_index": 2}], 2)
-    try:
-        TRAIN.validate_teacher_rows(
-            [teacher_row(category="БАД")], [{"id": "b", "global_index": 2}], 2
+
+
+def teacher_fixture(
+    root: Path, *, with_acceptance: bool
+) -> tuple[list[dict], str, Path | None, str | None]:
+    runtime_sha = "a" * 64
+    train = [
+        {"global_index": 1, "id": "fuel", "fold": 1, "category": TRAIN.FLAMMABLE, "label": 1},
+        {"global_index": 2, "id": "bad", "fold": 2, "category": "БАД", "label": 0},
+    ]
+    directory = root / "fold0"
+    directory.mkdir(parents=True)
+    targets = [
+        {
+            "global_index": row["global_index"],
+            "id": row["id"],
+            "fold": row["fold"],
+            "category": row["category"],
+            "occurrence_index": index,
+            "score": 2.0 - index,
+        }
+        for index, row in enumerate(train)
+    ]
+    targets_path = directory / "teacher_targets.jsonl"
+    write_jsonl(targets_path, targets)
+    evidence = {
+        "sold_object": {"value": "баллон", "source": "text", "quote": "баллон"},
+        "substance": {"value": "газ", "source": "text", "quote": "газ"},
+        "relation": {"value": "included", "source": "text", "quote": "в комплекте"},
+        "verdict": 1,
+        "confidence": 0.9,
+        "abstain": False,
+        "grounded": True,
+        "parse_valid": True,
+    }
+    evidence_rows = [
+        {
+            "global_index": 1,
+            "id": "fuel",
+            "fold": 1,
+            "category": TRAIN.FLAMMABLE,
+            "evidence": evidence,
+            "raw_response": "{}",
+        }
+    ]
+    evidence_path = directory / "evidence.jsonl"
+    write_jsonl(evidence_path, evidence_rows)
+    report = {
+        "schema_version": CONSUMER.FOLD_SCHEMA,
+        "experiment_id": "691",
+        "scope": "all",
+        "fold": 0,
+        "runtime_contract_sha256": runtime_sha,
+        "validation_labels_loaded_after_adapter_frozen": True,
+        "public_used": False,
+        "sealed_rows": 0,
+        "decision": "FOLD_COMPLETE",
+        "teacher_targets_sha256": CONSUMER.sha256_file(targets_path),
+        "teacher_target_rows": len(targets),
+        "evidence_rows": len(evidence_rows),
+        "evidence_grounded": 1,
+    }
+    report["report_sha256"] = CONSUMER.canonical_sha256(report)
+    (directory / "report.json").write_text(json.dumps(report), encoding="utf-8")
+    if not with_acceptance:
+        return train, runtime_sha, None, None
+    hexes = "12345"
+    bindings = []
+    report_hashes = []
+    for fold in range(5):
+        report_self = report["report_sha256"] if fold == 0 else hexes[fold] * 64
+        report_hashes.append(report_self)
+        bindings.append(
+            {
+                "fold": fold,
+                "fold_report_file_sha256": (
+                    CONSUMER.sha256_file(directory / "report.json")
+                    if fold == 0
+                    else hexes[fold] * 64
+                ),
+                "fold_report_self_sha256": report_self,
+                "predictions_sha256": hexes[fold] * 64,
+                "teacher_targets_sha256": (
+                    report["teacher_targets_sha256"] if fold == 0 else hexes[fold] * 64
+                ),
+                "evidence_sha256": (
+                    CONSUMER.sha256_file(evidence_path) if fold == 0 else hexes[fold] * 64
+                ),
+                "evidence_rows": 1 if fold == 0 else 0,
+            }
         )
-    except ValueError as error:
-        assert "outside flammable" in str(error)
-    else:
-        raise AssertionError("BAD teacher target was accepted")
+    acceptance = {
+        "schema_version": CONSUMER.ACCEPTANCE_SCHEMA,
+        "experiment_id": "692",
+        "teacher_experiment_id": "691",
+        "teacher_scope": "all",
+        "folds": {str(fold): {} for fold in range(5)},
+        "pooled": {},
+        "gate": {
+            "fold_wins": 5,
+            "flammable_ap_delta": 0.1,
+            "flammable_f1_delta": 0.1,
+            "flammable_fn_nonincrease": True,
+            "bad_byte_identical": True,
+        },
+        "artifact_bindings": bindings,
+        "teacher_fold_report_self_sha256": report_hashes,
+        "runtime_labels_read_after_teacher_terminal": True,
+        "public_used": False,
+        "sealed_rows": 0,
+        "decision": "OPEN_THREE_STUDENT_METHODS",
+    }
+    acceptance["acceptance_sha256"] = CONSUMER.canonical_sha256(acceptance)
+    acceptance_path = root / "student_consumer_acceptance.json"
+    acceptance_path.write_text(json.dumps(acceptance), encoding="utf-8")
+    return train, runtime_sha, acceptance_path, CONSUMER.sha256_file(acceptance_path)
 
 
-def test_hard_anchor_is_full_and_aux_is_additive():
+def test_actual_exp691_targets_merge_only_into_flammable(tmp_path: Path):
+    train, runtime_sha, acceptance_path, acceptance_sha = teacher_fixture(
+        tmp_path, with_acceptance=True
+    )
+    assert acceptance_path is not None and acceptance_sha is not None
+    enriched, binding = CONSUMER.load_fold(
+        tmp_path,
+        fold=0,
+        train=train,
+        runtime_contract_sha256=runtime_sha,
+        require_evidence=False,
+        acceptance_path=acceptance_path,
+        expected_acceptance_file_sha256=acceptance_sha,
+    )
+    assert enriched[0]["teacher_score"] == 2.0
+    assert "teacher_score" not in enriched[1]
+    assert binding["teacher_targets_sha256"]
+    assert binding["evidence_sha256"] is None
+
+
+def test_actual_exp691_evidence_shape_drives_closed_aux_target(tmp_path: Path):
+    train, runtime_sha, acceptance_path, acceptance_sha = teacher_fixture(
+        tmp_path, with_acceptance=True
+    )
+    assert acceptance_path is not None and acceptance_sha is not None
+    enriched, _ = CONSUMER.load_fold(
+        tmp_path,
+        fold=0,
+        train=train,
+        runtime_contract_sha256=runtime_sha,
+        require_evidence=True,
+        acceptance_path=acceptance_path,
+        expected_acceptance_file_sha256=acceptance_sha,
+    )
+    target = TRAIN.structured_target(SimpleNamespace(**enriched[0]))
+    assert '"sold_object":{"quote":"баллон"' in target
+    assert '"verdict":1' in target
     assert TRAIN.combine_losses(3.0, 2.0, mode="hard_bce_control") == 3.0
     assert TRAIN.combine_losses(3.0, 2.0, mode="causal_candidate") == 3.2
-    target = TRAIN.structured_target(SimpleNamespace(**teacher_row()))
-    assert '"sold_object":"fuel_consumable"' in target
+
+
+def test_causal_acceptance_requires_exact_file_sha(tmp_path: Path):
+    train, runtime_sha, acceptance_path, _ = teacher_fixture(tmp_path, with_acceptance=True)
+    assert acceptance_path is not None
+    with pytest.raises(ValueError, match="acceptance file SHA-256 mismatch"):
+        CONSUMER.load_fold(
+            tmp_path,
+            fold=0,
+            train=train,
+            runtime_contract_sha256=runtime_sha,
+            require_evidence=True,
+            acceptance_path=acceptance_path,
+            expected_acceptance_file_sha256="0" * 64,
+        )
+
+
+def test_rejected_exp692_acceptance_cannot_open_any_student(tmp_path: Path):
+    _, _, acceptance_path, _ = teacher_fixture(tmp_path, with_acceptance=True)
+    assert acceptance_path is not None
+    value = json.loads(acceptance_path.read_text(encoding="utf-8"))
+    value.pop("acceptance_sha256")
+    value["decision"] = "REJECT_TEACHER_TARGETS"
+    value["acceptance_sha256"] = CONSUMER.canonical_sha256(value)
+    acceptance_path.write_text(json.dumps(value), encoding="utf-8")
+    with pytest.raises(ValueError, match="routed acceptance contract mismatch"):
+        CONSUMER.verify_routed_acceptance(
+            acceptance_path,
+            expected_file_sha256=CONSUMER.sha256_file(acceptance_path),
+        )
 
 
 def test_evaluator_reports_required_metrics_and_bad_exact():
@@ -112,3 +258,76 @@ def test_evaluator_reports_required_metrics_and_bad_exact():
     assert report["corrected"] == 1
     assert report["singleton_delta"] == 1
     assert "tie_aware_ap" in report and "macro" in report
+
+
+def test_average_precision_matches_canonical_sklearn_tie_fixtures():
+    assert EVAL.average_precision([1, 1, 0], [0.5, 0.5, 0.5]) == pytest.approx(2 / 3)
+    assert EVAL.average_precision([1, 0, 1, 0], [0.5, 0.5, 0.2, 0.1]) == pytest.approx(7 / 12)
+
+
+def evaluation_fixture(root: Path, *, validation_has_label: bool = False) -> tuple[Path, ...]:
+    runtime = root / "runtime"
+    baseline = root / "baseline"
+    control = root / "control"
+    candidate = root / "candidate"
+    rows = [
+        {
+            "global_index": fold,
+            "id": f"row-{fold}",
+            "fold": fold,
+            "category": TRAIN.FLAMMABLE if fold % 2 else "БАД",
+            "label": fold % 2,
+        }
+        for fold in range(5)
+    ]
+    for fold in range(5):
+        runtime_fold = runtime / f"fold{fold}"
+        runtime_fold.mkdir(parents=True)
+        write_jsonl(runtime_fold / "train.jsonl", [row for row in rows if row["fold"] != fold])
+        validation = {key: value for key, value in rows[fold].items() if key != "label"}
+        if validation_has_label and fold == 0:
+            validation["label"] = rows[fold]["label"]
+        write_jsonl(runtime_fold / "validation.jsonl", [validation])
+        prediction = {
+            "global_index": fold,
+            "id": rows[fold]["id"],
+            "fold": fold,
+            "category": rows[fold]["category"],
+            "score": float(rows[fold]["label"] * 2 - 1),
+            "prediction": rows[fold]["label"],
+        }
+        baseline_fold = baseline / f"fold{fold}"
+        baseline_fold.mkdir(parents=True)
+        write_jsonl(baseline_fold / "predictions.jsonl", [prediction])
+        for arm in (control, candidate):
+            arm_fold = arm / f"fold{fold}"
+            arm_fold.mkdir(parents=True)
+            write_jsonl(arm_fold / "predictions.jsonl", [prediction])
+            (arm_fold / "output_contract.json").write_text(
+                json.dumps(
+                    {
+                        "outer_fold": fold,
+                        "decision": "GO_EVALUATE",
+                        "technical_smoke": False,
+                    }
+                ),
+                encoding="utf-8",
+            )
+    return runtime, baseline, control, candidate
+
+
+def test_labels_are_joined_from_cross_fold_registry_only_after_both_arms_frozen(
+    tmp_path: Path,
+):
+    paths = evaluation_fixture(tmp_path)
+    rows = EVAL.aligned_rows(*paths)
+    assert [row["label"] for row in rows] == [0, 1, 0, 1, 0]
+    (paths[3] / "fold0" / "output_contract.json").unlink()
+    with pytest.raises(ValueError, match="paired arm is not frozen"):
+        EVAL.aligned_rows(*paths)
+
+
+def test_outer_validation_label_is_rejected_even_after_arms_are_frozen(tmp_path: Path):
+    paths = evaluation_fixture(tmp_path, validation_has_label=True)
+    with pytest.raises(ValueError, match="label-free"):
+        EVAL.aligned_rows(*paths)

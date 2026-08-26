@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -20,28 +19,27 @@ def sha256_bytes(values: list[int]) -> str:
     return hashlib.sha256(bytes(values)).hexdigest()
 
 
-def tie_aware_ap(labels: list[int], scores: list[float]) -> float:
-    positives = sum(labels)
+def average_precision(labels: list[int], scores: list[float]) -> float:
+    """Exact exp691/sklearn threshold-tie average precision."""
+    if len(labels) != len(scores) or not labels:
+        raise ValueError("labels and scores must be nonempty and aligned")
+    positives = sum(int(value) for value in labels)
     if positives == 0:
         return 0.0
-    groups: dict[float, list[int]] = defaultdict(list)
-    for label, score in zip(labels, scores, strict=True):
-        groups[float(score)].append(int(label))
-    seen = 0
-    true_seen = 0
-    contribution = 0.0
-    for score in sorted(groups, reverse=True):
-        group = groups[score]
-        size = len(group)
-        pos = sum(group)
-        if pos:
-            # Expected precision of a positive under every permutation of a tie block.
-            for rank in range(1, size + 1):
-                expected_before = (rank - 1) * (pos - 1) / max(1, size - 1)
-                contribution += (pos / size) * (true_seen + 1 + expected_before) / (seen + rank)
-        seen += size
-        true_seen += pos
-    return contribution / positives
+    order = sorted(range(len(scores)), key=lambda index: (-float(scores[index]), index))
+    true_positives = 0
+    total = 0.0
+    cursor = 0
+    while cursor < len(order):
+        end = cursor + 1
+        score = float(scores[order[cursor]])
+        while end < len(order) and float(scores[order[end]]) == score:
+            end += 1
+        group_positives = sum(int(labels[order[index]]) for index in range(cursor, end))
+        true_positives += group_positives
+        total += (true_positives / end) * group_positives
+        cursor = end
+    return total / positives
 
 
 def classification(labels: list[int], predictions: list[int]) -> dict[str, float | int]:
@@ -85,11 +83,13 @@ def evaluate_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     )
     return {
         "tie_aware_ap": {
-            "control": tie_aware_ap(
-                [r["label"] for r in flammable], [r["control_score"] for r in flammable]
+            "control": average_precision(
+                [row["label"] for row in flammable],
+                [row["control_score"] for row in flammable],
             ),
-            "candidate": tie_aware_ap(
-                [r["label"] for r in flammable], [r["candidate_score"] for r in flammable]
+            "candidate": average_precision(
+                [row["label"] for row in flammable],
+                [row["candidate_score"] for row in flammable],
             ),
         },
         "macro": {
@@ -107,38 +107,86 @@ def evaluate_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def verify_paired_arms_frozen(control_root: Path, candidate_root: Path) -> None:
+    """Fail before opening any label registry unless both arms are complete."""
+    for fold in range(5):
+        for root in (control_root, candidate_root):
+            directory = root / f"fold{fold}"
+            predictions = directory / "predictions.jsonl"
+            contract_path = directory / "output_contract.json"
+            if not predictions.is_file() or not contract_path.is_file():
+                raise ValueError(f"paired arm is not frozen for fold {fold}")
+            contract = json.loads(contract_path.read_text(encoding="utf-8"))
+            if (
+                int(contract.get("outer_fold", -1)) != fold
+                or contract.get("decision") != "GO_EVALUATE"
+                or contract.get("technical_smoke") is not False
+            ):
+                raise ValueError(f"paired arm contract is not evaluable for fold {fold}")
+
+
+def build_label_registry(runtime_root: Path) -> tuple[dict[int, int], dict[int, tuple[str, str]]]:
+    labels: dict[int, int] = {}
+    identities: dict[int, tuple[str, str]] = {}
+    for fold in range(5):
+        for row in read_jsonl(runtime_root / f"fold{fold}" / "train.jsonl"):
+            key = int(row["global_index"])
+            label = int(row["label"])
+            identity = (str(row["id"]), str(row["category"]))
+            if label not in (0, 1):
+                raise ValueError("cross-fold registry contains a non-binary label")
+            if key in labels and (labels[key] != label or identities[key] != identity):
+                raise ValueError("cross-fold label registry conflict")
+            labels[key] = label
+            identities[key] = identity
+    return labels, identities
+
+
 def aligned_rows(
-    runtime_root: Path, baseline_root: Path, control_root: Path, candidate_root: Path
+    runtime_root: Path,
+    baseline_root: Path,
+    control_root: Path,
+    candidate_root: Path,
 ) -> list[dict[str, Any]]:
+    verify_paired_arms_frozen(control_root, candidate_root)
+    # This is intentionally after the paired-artifact gate above.
+    labels, identities = build_label_registry(runtime_root)
     output = []
     for fold in range(5):
-        truth = {
-            int(row["global_index"]): row
-            for row in read_jsonl(runtime_root / f"fold_{fold}" / "validation.jsonl")
-        }
-        streams = []
-        for root in (baseline_root, control_root, candidate_root):
-            path = root / f"fold_{fold}" / "predictions.jsonl"
-            streams.append({int(row["global_index"]): row for row in read_jsonl(path)})
+        validation_rows = read_jsonl(runtime_root / f"fold{fold}" / "validation.jsonl")
+        if any("label" in row for row in validation_rows):
+            raise ValueError("outer validation runtime must remain label-free")
+        truth = {int(row["global_index"]): row for row in validation_rows}
+        paths = (
+            baseline_root / f"fold{fold}" / "predictions.jsonl",
+            control_root / f"fold{fold}" / "predictions.jsonl",
+            candidate_root / f"fold{fold}" / "predictions.jsonl",
+        )
+        streams = [{int(row["global_index"]): row for row in read_jsonl(path)} for path in paths]
         if any(set(stream) != set(truth) for stream in streams):
             raise ValueError(f"prediction alignment mismatch in fold {fold}")
         baseline, control, candidate = streams
         for key, source in truth.items():
-            category = str(source["category"])
+            identity = (str(source["id"]), str(source["category"]))
+            if identities.get(key) != identity or key not in labels:
+                raise ValueError("outer validation identity is absent from cross-fold registry")
+            category = identity[1]
             baseline_prediction = int(baseline[key]["prediction"])
             output.append(
                 {
                     "fold": fold,
-                    "label": int(source["label"]),
+                    "label": labels[key],
                     "category": category,
                     "component_size": int(source.get("component_size", 1)),
                     "baseline": baseline_prediction,
-                    "control": baseline_prediction
-                    if category == BAD
-                    else int(control[key]["prediction"]),
-                    "candidate": baseline_prediction
-                    if category == BAD
-                    else int(candidate[key]["prediction"]),
+                    "control": (
+                        baseline_prediction if category == BAD else int(control[key]["prediction"])
+                    ),
+                    "candidate": (
+                        baseline_prediction
+                        if category == BAD
+                        else int(candidate[key]["prediction"])
+                    ),
                     "control_score": float(control[key]["score"]),
                     "candidate_score": float(candidate[key]["score"]),
                 }
@@ -161,13 +209,15 @@ def main() -> None:
     )
     report = {
         "folds": {
-            str(fold): evaluate_rows([r for r in rows if r["fold"] == fold]) for fold in range(5)
+            str(fold): evaluate_rows([row for row in rows if row["fold"] == fold])
+            for fold in range(5)
         },
         "pooled": evaluate_rows(rows),
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
-        json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
     )
 
 

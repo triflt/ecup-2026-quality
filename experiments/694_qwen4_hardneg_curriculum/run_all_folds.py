@@ -11,9 +11,19 @@ MODES = ("hard_bce_control", "hardneg_candidate")
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="One job: paired train+eval for all five folds.")
-    for name in ("runtime-root", "baseline-root", "images", "model-root", "vendor", "output-root"):
+    for name in (
+        "runtime-root",
+        "teacher-root",
+        "baseline-root",
+        "images",
+        "model-root",
+        "vendor",
+        "output-root",
+    ):
         parser.add_argument(f"--{name}", type=Path, required=True)
     parser.add_argument("--model-revision", required=True)
+    parser.add_argument("--teacher-acceptance", type=Path, required=True)
+    parser.add_argument("--teacher-acceptance-sha256", required=True)
     parser.add_argument(
         "--runtime-backend", choices=("verified_fast_path", "legacy_eager"), default="legacy_eager"
     )
@@ -31,7 +41,13 @@ def main() -> None:
                 "--fold",
                 str(fold),
                 "--runtime-dir",
-                str(args.runtime_root / f"fold_{fold}"),
+                str(args.runtime_root / f"fold{fold}"),
+                "--teacher-root",
+                str(args.teacher_root),
+                "--teacher-acceptance",
+                str(args.teacher_acceptance),
+                "--teacher-acceptance-sha256",
+                args.teacher_acceptance_sha256,
                 "--images",
                 str(args.images),
                 "--model-root",
@@ -41,7 +57,7 @@ def main() -> None:
                 "--vendor",
                 str(args.vendor),
                 "--output-dir",
-                str(args.output_root / arm / f"fold_{fold}"),
+                str(args.output_root / arm / f"fold{fold}"),
                 "--runtime-backend",
                 args.runtime_backend,
                 "--micro-batch-size-override",

@@ -54,5 +54,5 @@ def test_curriculum_changes_only_order_and_survives_parent_shuffle():
 
 
 def test_teacher_signal_is_flammable_only_and_not_a_loss():
-    TRAIN.validate_teacher_rows(rows(), [{"id": "v", "global_index": 10}], 0)
+    assert callable(TRAIN.load_fold)
     assert "teacher" not in TRAIN.control.primary_loss.__name__

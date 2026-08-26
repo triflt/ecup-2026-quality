@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-MODES = ("hard_bce_control", "causal_candidate")
+MODES = ("causal_candidate", "hard_bce_control")
 
 
 def checked_empty(path: Path) -> None:
@@ -18,6 +18,9 @@ def checked_empty(path: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="One job: paired train+eval for all five folds.")
     parser.add_argument("--runtime-root", type=Path, required=True)
+    parser.add_argument("--teacher-root", type=Path, required=True)
+    parser.add_argument("--teacher-acceptance", type=Path, required=True)
+    parser.add_argument("--teacher-acceptance-sha256", required=True)
     parser.add_argument("--baseline-root", type=Path, required=True)
     parser.add_argument("--images", type=Path, required=True)
     parser.add_argument("--model-root", type=Path, required=True)
@@ -32,14 +35,20 @@ def main() -> None:
     checked_empty(args.output_root)
     for fold in range(5):
         for mode in MODES:
-            arm = "control" if mode == MODES[0] else "candidate"
+            arm = "control" if mode == "hard_bce_control" else "candidate"
             command = [
                 sys.executable,
                 str(HERE / "train_fold.py"),
                 "--fold",
                 str(fold),
                 "--runtime-dir",
-                str(args.runtime_root / f"fold_{fold}"),
+                str(args.runtime_root / f"fold{fold}"),
+                "--teacher-root",
+                str(args.teacher_root),
+                "--teacher-acceptance",
+                str(args.teacher_acceptance),
+                "--teacher-acceptance-sha256",
+                args.teacher_acceptance_sha256,
                 "--images",
                 str(args.images),
                 "--model-root",
@@ -49,7 +58,7 @@ def main() -> None:
                 "--vendor",
                 str(args.vendor),
                 "--output-dir",
-                str(args.output_root / arm / f"fold_{fold}"),
+                str(args.output_root / arm / f"fold{fold}"),
                 "--runtime-backend",
                 args.runtime_backend,
                 "--micro-batch-size-override",

@@ -11,64 +11,23 @@ if str(SHARED) not in sys.path:
     sys.path.insert(0, str(SHARED))
 
 import train_lora as control
+from exp691_consumer import load_fold
 
 EXPERIMENT_ID = "693"
 SOURCE_EXPERIMENT_ID = "641"
 FLAMMABLE = "Легковоспламеняющиеся"
 AUXILIARY_COEFFICIENT = 0.10
 MODES = ("hard_bce_control", "causal_candidate")
-TARGET_FIELDS = ("teacher_verdict", "sold_object", "substance", "relation", "evidence_ids")
-
-
-def validate_teacher_contract(audit: dict[str, Any], fold: int) -> str:
-    teacher = audit.get("teacher_contract", {})
-    expected = {
-        "schema": "qwen27_all_outer_safe_v1",
-        "teacher_recipe": "qwen27-all",
-        "outer_fold": fold,
-        "train_scope": "outer_train_only",
-        "outer_validation_labels_read": 0,
-        "target_category": FLAMMABLE,
-    }
-    if any(teacher.get(key) != value for key, value in expected.items()):
-        raise ValueError("teacher artifact contract is missing or not outer-safe")
-    digest = teacher.get("artifact_sha256")
-    if (
-        not isinstance(digest, str)
-        or len(digest) != 64
-        or any(c not in "0123456789abcdef" for c in digest)
-    ):
-        raise ValueError("teacher artifact SHA-256 is invalid")
-    return digest
-
-
-def validate_teacher_rows(
-    train: list[dict[str, Any]], validation: list[dict[str, Any]], fold: int
-) -> None:
-    validation_keys = {(str(row["id"]), int(row["global_index"])) for row in validation}
-    for row in validation:
-        if any(field in row for field in TARGET_FIELDS):
-            raise ValueError("outer-validation row contains forbidden teacher targets")
-    for row in train:
-        if row["category"] != FLAMMABLE:
-            if any(field in row for field in TARGET_FIELDS):
-                raise ValueError("KD target is present outside flammable")
-            continue
-        missing = [field for field in TARGET_FIELDS if field not in row]
-        if missing:
-            raise ValueError(f"flammable train row lacks teacher fields: {missing}")
-        if (str(row["id"]), int(row["global_index"])) in validation_keys:
-            raise ValueError("teacher target overlaps outer validation")
-        if int(row.get("teacher_outer_fold", -1)) != fold:
-            raise ValueError("teacher target is not bound to this outer fold")
-        if int(row["teacher_verdict"]) not in (0, 1):
-            raise ValueError("teacher verdict must be hard binary")
-        if not isinstance(row["evidence_ids"], list):
-            raise TypeError("evidence_ids must be a closed list")
 
 
 def structured_target(row: SimpleNamespace) -> str:
-    payload = {field: getattr(row, field) for field in TARGET_FIELDS}
+    evidence = dict(row.teacher_evidence)
+    payload = {
+        "verdict": evidence["verdict"],
+        "sold_object": evidence["sold_object"],
+        "substance": evidence["substance"],
+        "relation": evidence["relation"],
+    }
     return json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
@@ -77,20 +36,32 @@ def structured_auxiliary_loss(
 ):
     import torch
 
-    selected = [
-        (row, image) for row, image in zip(rows, images, strict=True) if row.category == FLAMMABLE
-    ]
+    selected = []
+    for row, image in zip(rows, images, strict=True):
+        evidence = getattr(row, "teacher_evidence", {})
+        if (
+            row.category == FLAMMABLE
+            and evidence.get("parse_valid") is True
+            and evidence.get("grounded") is True
+            and evidence.get("abstain") is False
+            and all(
+                evidence.get(field, {}).get("source") != "unknown"
+                and evidence.get(field, {}).get("value") != "unknown"
+                for field in ("sold_object", "substance", "relation")
+            )
+        ):
+            selected.append((row, image))
     if not selected:
         return None
     aux_rows, aux_images = zip(*selected, strict=True)
     answers = [structured_target(row) for row in aux_rows]
-    prompt = (
-        "Верни только компактный JSON с ключами teacher_verdict, sold_object, "
-        "substance, relation, evidence_ids."
-    )
+    prompt = "Верни только компактный JSON с ключами verdict, sold_object, substance, relation."
     conversations = [
         control.messages(
-            row, image, prompt_text=control.base_prompt(row) + "\n" + prompt, answer=answer
+            row,
+            image,
+            prompt_text=control.base_prompt(row) + "\n" + prompt,
+            answer=answer,
         )
         for row, image, answer in zip(aux_rows, aux_images, answers, strict=True)
     ]
@@ -120,14 +91,21 @@ def run(args: Any) -> dict[str, Any]:
         raise ValueError("unknown mode")
     original_load = control.load_runtime
     original_loss = control.primary_loss
-
-    teacher_binding: dict[str, str] = {}
+    teacher_binding: dict[str, Any] = {}
 
     def load_runtime(runtime_dir: Path, spec_id: str, fold: int):
         train, validation, audit = original_load(runtime_dir, spec_id, fold)
-        teacher_binding["artifact_sha256"] = validate_teacher_contract(audit, fold)
-        validate_teacher_rows(train, validation, fold)
-        return train, validation, audit
+        enriched, binding = load_fold(
+            args.teacher_root,
+            fold=fold,
+            train=train,
+            runtime_contract_sha256=audit["contract_sha256"],
+            require_evidence=args.mode == "causal_candidate",
+            acceptance_path=args.teacher_acceptance,
+            expected_acceptance_file_sha256=args.teacher_acceptance_sha256,
+        )
+        teacher_binding.update(binding)
+        return enriched, validation, audit
 
     def primary_loss(model, processor, rows, images, zero_token, one_token):
         hard = original_loss(model, processor, rows, images, zero_token, one_token)
@@ -153,18 +131,19 @@ def run(args: Any) -> dict[str, Any]:
             "hard_bce_scope": "all_categories",
             "hard_bce_coefficient": 1.0,
             "kd_category": FLAMMABLE,
-            "auxiliary_coefficient": AUXILIARY_COEFFICIENT
-            if args.mode == "causal_candidate"
-            else 0.0,
+            "auxiliary_coefficient": (
+                AUXILIARY_COEFFICIENT if args.mode == "causal_candidate" else 0.0
+            ),
             "auxiliary_training_only": True,
             "teacher_outer_safe_required": True,
-            "teacher_artifact_sha256": teacher_binding["artifact_sha256"],
+            "exp691_binding": teacher_binding,
         }
     )
     report.pop("contract_sha256", None)
     report["contract_sha256"] = control.canonical_sha256(report)
     (args.output_dir / "output_contract.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
     )
     return report
 
@@ -172,5 +151,8 @@ def run(args: Any) -> dict[str, Any]:
 if __name__ == "__main__":
     parser = control.parser_for(SOURCE_EXPERIMENT_ID)
     parser.add_argument("--mode", choices=MODES, required=True)
+    parser.add_argument("--teacher-root", type=Path, required=True)
+    parser.add_argument("--teacher-acceptance", type=Path, required=True)
+    parser.add_argument("--teacher-acceptance-sha256", required=True)
     parsed = parser.parse_args()
     print(json.dumps(run(parsed), ensure_ascii=False, indent=2, sort_keys=True))

@@ -1,7 +1,8 @@
 # Experiment 694 — qwen4-hardneg
 
-Status: CPU-tested, launch blocked on the immutable `qwen27-all` outer-safe
-teacher artifact. One H100 job runs all five folds sequentially, each with a
+Status: CPU-tested against the actual experiment-691 fold-specific
+`teacher_targets.jsonl`, fold report, and authoritative exp692 routed acceptance. Evidence is
+not opened by this method. One H100 job runs all five folds sequentially, each with a
 plain hard-BCE control followed by the candidate and inline evaluation.
 
 Both arms use every BAD and flammable training occurrence exactly once, full
@@ -16,4 +17,6 @@ This is not experiment 681 (no soft-label loss) or 685/686 (no pairwise/rank
 loss). Precedent: hard-example mining and curriculum learning. Transfer
 mechanism: spend early, high-learning-rate updates on flammable boundary errors
 identified by a stronger teacher without changing the supervised objective.
-
+The consumer binds target bytes to `exp691_fold_report_v1`, binds each fold
+to exact `exp692_qwen27_routed_acceptance_v1`, and attaches `score` only to flammable
+training occurrences.

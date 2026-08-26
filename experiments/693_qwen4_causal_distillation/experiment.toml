@@ -1,7 +1,7 @@
 [experiment]
 id = "693"
 slug = "qwen4_causal_distillation"
-status = "prepared_waiting_teacher_schema"
+status = "prepared_waiting_exp692_routed_acceptance"
 job_name_prefix = "qwen4-causal-"
 
 [hypothesis]
@@ -20,6 +20,8 @@ auxiliary_coefficient = 0.10
 kd_category = "Легковоспламеняющиеся"
 hard_bce_scope = "all_categories"
 bad_production_replay = "frozen_byte_identical"
+teacher_fold_schema = "exp691_fold_report_v1"
+teacher_acceptance_schema = "exp692_qwen27_routed_acceptance_v1"
 
 [execution]
 gpus = 1
@@ -28,4 +30,3 @@ jobs = 1
 upload_authorized = false
 submit_authorized = false
 public_authorized = false
-

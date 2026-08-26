@@ -1,7 +1,8 @@
 # Experiment 695 — qwen4-rank
 
-Status: CPU-tested, launch blocked on the immutable `qwen27-all` outer-safe
-teacher artifact. One H100 job runs paired control/candidate training and
+Status: CPU-tested against the actual experiment-691 fold-specific
+`teacher_targets.jsonl`, fold report, and authoritative exp692 routed acceptance. Evidence is
+not opened by this method. One H100 job runs paired control/candidate training and
 inline evaluation for all five folds sequentially.
 
 Both arms see the same all-category rows in the same order with the same model
@@ -16,4 +17,6 @@ This does not duplicate 685/686: those objectives rank opposite-label pairs;
 all-category support. Precedent: learning-to-rank distillation with a supervised
 anchor. Transfer mechanism: preserve classification calibration while learning
 teacher ordering within positive and negative flammable strata.
-
+The consumer binds target bytes to `exp691_fold_report_v1`, binds each fold
+to exact `exp692_qwen27_routed_acceptance_v1`, and attaches `score` only to flammable
+training occurrences.

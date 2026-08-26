@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import math
 import random
 import sys
 from pathlib import Path
@@ -11,8 +10,12 @@ from typing import Any
 SHARED = Path(__file__).resolve().parents[1] / "645_qwen_scale_2x3_gate"
 if str(SHARED) not in sys.path:
     sys.path.insert(0, str(SHARED))
+CONSUMER = Path(__file__).resolve().parents[1] / "693_qwen4_causal_distillation"
+if str(CONSUMER) not in sys.path:
+    sys.path.insert(0, str(CONSUMER))
 
 import train_lora as control
+from exp691_consumer import load_fold
 
 EXPERIMENT_ID = "695"
 SOURCE_EXPERIMENT_ID = "641"
@@ -20,45 +23,6 @@ FLAMMABLE = "Легковоспламеняющиеся"
 RANK_COEFFICIENT = 0.20
 RANK_CAP_FRACTION = 0.25
 MODES = ("hard_bce_control", "rank_candidate")
-
-
-def validate_teacher_contract(audit: dict[str, Any], fold: int) -> str:
-    teacher = audit.get("teacher_contract", {})
-    expected = {
-        "schema": "qwen27_all_outer_safe_v1",
-        "teacher_recipe": "qwen27-all",
-        "outer_fold": fold,
-        "train_scope": "outer_train_only",
-        "outer_validation_labels_read": 0,
-        "target_category": FLAMMABLE,
-    }
-    if any(teacher.get(key) != value for key, value in expected.items()):
-        raise ValueError("teacher artifact contract is missing or not outer-safe")
-    digest = teacher.get("artifact_sha256")
-    if (
-        not isinstance(digest, str)
-        or len(digest) != 64
-        or any(c not in "0123456789abcdef" for c in digest)
-    ):
-        raise ValueError("teacher artifact SHA-256 is invalid")
-    return digest
-
-
-def validate_teacher_rows(
-    train: list[dict[str, Any]], validation: list[dict[str, Any]], fold: int
-) -> None:
-    for row in validation:
-        if "teacher_score" in row:
-            raise ValueError("outer-validation row contains a forbidden teacher score")
-    for row in train:
-        if row["category"] == FLAMMABLE:
-            score = float(row.get("teacher_score", float("nan")))
-            if not math.isfinite(score):
-                raise ValueError("flammable train row lacks a finite teacher score")
-            if int(row.get("teacher_outer_fold", -1)) != fold:
-                raise ValueError("teacher score is not bound to this outer fold")
-        elif "teacher_score" in row:
-            raise ValueError("KD signal is present outside flammable")
 
 
 def within_stratum_pairs(rows: list[SimpleNamespace]) -> list[tuple[int, int, float]]:
@@ -139,12 +103,20 @@ def run(args: Any) -> dict[str, Any]:
     original_load = control.load_runtime
     original_loss = control.primary_loss
 
-    teacher_binding: dict[str, str] = {}
+    teacher_binding: dict[str, Any] = {}
 
     def load_runtime(runtime_dir: Path, spec_id: str, fold: int):
         train, validation, audit = original_load(runtime_dir, spec_id, fold)
-        teacher_binding["artifact_sha256"] = validate_teacher_contract(audit, fold)
-        validate_teacher_rows(train, validation, fold)
+        train, binding = load_fold(
+            args.teacher_root,
+            fold=fold,
+            train=train,
+            runtime_contract_sha256=audit["contract_sha256"],
+            require_evidence=False,
+            acceptance_path=args.teacher_acceptance,
+            expected_acceptance_file_sha256=args.teacher_acceptance_sha256,
+        )
+        teacher_binding.update(binding)
         return arrange_matched_batches(train), validation, audit
 
     control.load_runtime = load_runtime
@@ -167,7 +139,7 @@ def run(args: Any) -> dict[str, Any]:
             "rank_cap_fraction_of_hard": RANK_CAP_FRACTION,
             "lambda_grid": False,
             "teacher_outer_safe_required": True,
-            "teacher_artifact_sha256": teacher_binding["artifact_sha256"],
+            "exp691_binding": teacher_binding,
         }
     )
     report.pop("contract_sha256", None)
@@ -181,5 +153,8 @@ def run(args: Any) -> dict[str, Any]:
 if __name__ == "__main__":
     parser = control.parser_for(SOURCE_EXPERIMENT_ID)
     parser.add_argument("--mode", choices=MODES, required=True)
+    parser.add_argument("--teacher-root", type=Path, required=True)
+    parser.add_argument("--teacher-acceptance", type=Path, required=True)
+    parser.add_argument("--teacher-acceptance-sha256", required=True)
     parsed = parser.parse_args()
     print(json.dumps(run(parsed), ensure_ascii=False, indent=2, sort_keys=True))
