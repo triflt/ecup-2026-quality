@@ -45,6 +45,7 @@ def test_builder_emits_cpu_only_exact_remote_verifier(tmp_path: Path) -> None:
     preset = builder.build(args)
     assert "flavor: 8cpu-128ram" in preset
     assert preset.count("    - type: s3msk") == 5
+    assert "name: arch_audit_accept" in preset
     assert args.verifier_sha256 in preset
     assert args.report_sha256 in preset
     assert args.receipt_sha256 in preset

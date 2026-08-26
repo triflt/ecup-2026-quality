@@ -187,7 +187,7 @@ def build(args: argparse.Namespace) -> str:
         [
             "  output:",
             "    - type: s3msk",
-            "      name: archive_audit_acceptance",
+            "      name: arch_audit_accept",
             "      src: /work/output",
             f"      dst: {json.dumps(output_dst)}",
             f"      bucket: {json.dumps(output_bucket)}",
