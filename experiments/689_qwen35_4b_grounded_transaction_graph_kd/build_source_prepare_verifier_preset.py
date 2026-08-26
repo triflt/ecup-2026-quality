@@ -1,4 +1,4 @@
-"""Build a credential-free remote compute CPU preset for exp689 source PREPARE."""
+"""Build a credential-free remote-first CPU verifier preset for exp689 PREPARE."""
 
 from __future__ import annotations
 
@@ -8,74 +8,44 @@ import re
 import shlex
 from pathlib import Path, PurePosixPath
 
+from build_source_prepare_preset import ALLOWED_REGIONS, input_lines, safe_extract, safe_key
+
 EXPERIMENT = "experiments/689_qwen35_4b_grounded_transaction_graph_kd"
-ALLOWED_REGIONS = {"ix-m5-sm11", "ix-m5-sm12"}
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
 
-def safe_key(value: str) -> str:
-    path = PurePosixPath(value)
-    if (
-        not path.is_absolute()
-        or ".." in path.parts
-        or len(path.parts) < 3
-        or any(character.isspace() for character in value)
-        or "?" in value
-        or "#" in value
-        or "\\" in value
-    ):
-        raise ValueError(f"unsafe S3 key: {value}")
-    return value
+def s3_ref(bucket: str, key: str) -> str:
+    key = safe_key(key)
+    return f"s3://{bucket}{key}"
 
 
-def safe_extract(archive: str, destination: str, expected_sha256: str) -> str:
-    program = (
-        "import pathlib,sys,tarfile;"
-        "a=pathlib.Path(sys.argv[1]);d=pathlib.Path(sys.argv[2]);"
-        "t=tarfile.open(a);m=t.getmembers();p=[pathlib.PurePosixPath(x.name) for x in m];"
-        "n=[x.as_posix().removeprefix('./') for x in p];"
-        "bad=[x.name for x,y,z in zip(m,p,n) if y.is_absolute() or '..' in y.parts "
-        "or any(q=='__MACOSX' or q=='.DS_Store' or q.startswith('._') for q in y.parts) "
-        "or not z or not (x.isfile() or x.isdir())];"
-        "bad and (_ for _ in ()).throw(ValueError('unsafe tar members'));"
-        "len(n)!=len(set(n)) and (_ for _ in ()).throw(ValueError('duplicate tar members'));"
-        "d.mkdir(parents=True,exist_ok=False);t.extractall(d,members=m)"
-    )
-    return (
-        f'test "$(sha256sum {shlex.quote(archive)} | cut -d\' \' -f1)" = '
-        f'"{expected_sha256}" && python3 -c {shlex.quote(program)} '
-        f"{shlex.quote(archive)} {shlex.quote(destination)}"
-    )
-
-
-def input_lines(name: str, bucket: str, key: str, dst: str, filename: str) -> list[str]:
-    path = PurePosixPath(key)
+def directory_input_lines(name: str, bucket: str, key: str, dst: str) -> list[str]:
     return [
         "    - type: s3msk",
         f"      name: {json.dumps(name)}",
-        f"      src: {json.dumps(path.parent.as_posix())}",
-        f"      file: {json.dumps(path.name)}",
-        f"      dst: {json.dumps(str(PurePosixPath(dst) / filename))}",
+        f"      src: {json.dumps(safe_key(key))}",
+        f"      dst: {json.dumps(dst)}",
         f"      bucket: {json.dumps(bucket)}",
     ]
 
 
 def build(args: argparse.Namespace) -> str:
     if args.region not in ALLOWED_REGIONS:
-        raise ValueError("source PREPARE region is not approved")
+        raise ValueError("source PREPARE verifier region is not approved")
     if not HEX40.fullmatch(args.revision):
         raise ValueError("revision must be exact lowercase Git SHA")
-    frozen_hashes = (
+    hashes = (
         args.bundle_sha256,
         args.manifest_sha256,
         args.source_f03_sha256,
         args.source_f124_sha256,
         args.exclusion_670_sha256,
         args.exclusion_672_sha256,
+        args.terminal_metadata_sha256,
     )
-    if any(not HEX64.fullmatch(value) for value in frozen_hashes):
-        raise ValueError("all input hashes must be exact lowercase SHA-256")
+    if any(not HEX64.fullmatch(value) for value in hashes):
+        raise ValueError("all verifier inputs require exact lowercase SHA-256")
     keys = tuple(
         safe_key(value)
         for value in (
@@ -85,6 +55,8 @@ def build(args: argparse.Namespace) -> str:
             args.source_f124_key,
             args.exclusion_670_key,
             args.exclusion_672_key,
+            args.prepared_prefix,
+            args.terminal_metadata_key,
             args.output_prefix,
         )
     )
@@ -95,46 +67,63 @@ def build(args: argparse.Namespace) -> str:
         source_f124_key,
         exclusion_670_key,
         exclusion_672_key,
+        prepared_prefix,
+        terminal_metadata_key,
         output_prefix,
     ) = keys
-    bundle_path = "/work/input/code/source_prepare_bundle.tar.gz"
-    source_f03_path = "/work/input/source_f03/source_f03.tar.gz"
-    source_f124_path = "/work/input/source_f124/source_f124.tar.gz"
+    approved_ref = s3_ref(args.bucket, prepared_prefix)
+    source_f03_ref = s3_ref(args.bucket, source_f03_key)
+    source_f124_ref = s3_ref(args.bucket, source_f124_key)
     segments = [
-        safe_extract(bundle_path, "/work/code", args.bundle_sha256),
+        safe_extract(
+            "/work/input/code/source_prepare_bundle.tar.gz",
+            "/work/code",
+            args.bundle_sha256,
+        ),
         (
-            f'test "$(sha256sum /work/input/manifest/bundle_manifest.json | cut -d\' \' -f1)" '
+            "test \"$(sha256sum /work/input/manifest/bundle_manifest.json | cut -d' ' -f1)\" "
             f'= "{args.manifest_sha256}"'
         ),
-        safe_extract(source_f03_path, "/work/source_f03", args.source_f03_sha256),
-        safe_extract(source_f124_path, "/work/source_f124", args.source_f124_sha256),
-        (
-            f"PYTHONPATH=/work/code/{EXPERIMENT} python3 -c "
-            + shlex.quote(
-                "from pathlib import Path;import verify_source_prepare as v;"
-                f"v._validate_bundle(Path('/work/code'),Path('/work/input/manifest/bundle_manifest.json'),"
-                f"'{args.manifest_sha256}','{args.revision}')"
-            )
+        safe_extract(
+            "/work/input/source_f03/source_f03.tar.gz",
+            "/work/source_f03",
+            args.source_f03_sha256,
+        ),
+        safe_extract(
+            "/work/input/source_f124/source_f124.tar.gz",
+            "/work/source_f124",
+            args.source_f124_sha256,
         ),
         (
             f"PYTHONPATH=/work/code/{EXPERIMENT} python3 -u /work/code/{EXPERIMENT}/"
-            "prepare_source_universe.py "
+            "verify_source_prepare.py "
+            "--prepare-dir /work/input/prepared/prepared "
             "--runtime-dir /work/source_f03/experiments/641_qwen35_4b_class_only_lora/.local/runtime/fold0 "
             "--runtime-dir /work/source_f124/runtime/fold1 "
             "--runtime-dir /work/source_f124/runtime/fold2 "
             "--runtime-dir /work/source_f03/experiments/641_qwen35_4b_class_only_lora/.local/runtime/fold3 "
             "--runtime-dir /work/source_f124/runtime/fold4 "
+            "--runtime-archive /work/input/source_f03/source_f03.tar.gz "
+            "--runtime-archive /work/input/source_f124/source_f124.tar.gz "
+            f"--runtime-archive-ref {shlex.quote(source_f03_ref)} "
+            f"--runtime-archive-ref {shlex.quote(source_f124_ref)} "
             "--exclusion-670 /work/input/exclusion_670/exp670.csv "
             "--exclusion-672 /work/input/exclusion_672/exp672.json "
             f"--exclusion-670-sha256 {args.exclusion_670_sha256} "
             f"--exclusion-672-sha256 {args.exclusion_672_sha256} "
-            f"--builder-revision {args.revision} --output-dir /work/output/prepared"
+            "--bundle-root /work/code "
+            "--bundle-manifest /work/input/manifest/bundle_manifest.json "
+            f"--bundle-manifest-sha256 {args.manifest_sha256} "
+            f"--builder-revision {args.revision} "
+            f"--terminal-metadata /work/input/terminal/{PurePosixPath(terminal_metadata_key).name} "
+            f"--terminal-metadata-sha256 {args.terminal_metadata_sha256} "
+            f"--approved-s3-output-ref {shlex.quote(approved_ref)} "
+            "--acceptance /work/output/source_prepare_acceptance.json"
         ),
     ]
-    command = " && ".join(segments)
     lines = [
         "job:",
-        "  generate_name: exp689-source-prepare",
+        "  generate_name: exp689-source-verify",
         "  time_limit: 2h",
         "  flavor: 8cpu-128ram",
         f"  region: {args.region}",
@@ -145,24 +134,40 @@ def build(args: argparse.Namespace) -> str:
         "  args:",
         "    - -lc",
         "    - >-",
-        f"      {command}",
+        f"      {' && '.join(segments)}",
         "  input:",
     ]
-    specs = (
+    file_specs = (
         ("code", bundle_key, "/work/input/code", "source_prepare_bundle.tar.gz"),
         ("manifest", manifest_key, "/work/input/manifest", "bundle_manifest.json"),
         ("source_f03", source_f03_key, "/work/input/source_f03", "source_f03.tar.gz"),
-        ("source_f124", source_f124_key, "/work/input/source_f124", "source_f124.tar.gz"),
+        (
+            "source_f124",
+            source_f124_key,
+            "/work/input/source_f124",
+            "source_f124.tar.gz",
+        ),
         ("exclusion_670", exclusion_670_key, "/work/input/exclusion_670", "exp670.csv"),
         ("exclusion_672", exclusion_672_key, "/work/input/exclusion_672", "exp672.json"),
+        (
+            "terminal",
+            terminal_metadata_key,
+            "/work/input/terminal",
+            PurePosixPath(terminal_metadata_key).name,
+        ),
     )
-    for name, key, dst, filename in specs:
+    for name, key, dst, filename in file_specs:
         lines.extend(input_lines(name, args.bucket, key, dst, filename))
+    lines.extend(
+        directory_input_lines(
+            "prepared", args.bucket, prepared_prefix, "/work/input/prepared"
+        )
+    )
     lines.extend(
         [
             "  output:",
             "    - type: s3msk",
-            "      name: source_prepare",
+            "      name: source_prepare_acceptance",
             "      src: /work/output",
             f"      dst: {json.dumps(output_prefix)}",
             f"      bucket: {json.dumps(args.bucket)}",
@@ -190,11 +195,14 @@ def main() -> None:
     parser.add_argument("--exclusion-670-sha256", required=True)
     parser.add_argument("--exclusion-672-key", required=True)
     parser.add_argument("--exclusion-672-sha256", required=True)
+    parser.add_argument("--prepared-prefix", required=True)
+    parser.add_argument("--terminal-metadata-key", required=True)
+    parser.add_argument("--terminal-metadata-sha256", required=True)
     parser.add_argument("--output-prefix", required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():
-        raise FileExistsError("refusing to overwrite clean preset")
+        raise FileExistsError("refusing to overwrite clean verifier preset")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(build(args), encoding="utf-8")
 
