@@ -1,0 +1,27 @@
+id = 687
+name = "qwen35_4b_gradient_conflict_probe"
+status = "TERMINAL_ACCEPT_PROBE_REJECT_PCGRAD"
+parent_experiment = 686
+outer_fold = 3
+changed_factor = "train_only_gradient_conflict_measurement"
+gpu_jobs = 0
+public_submissions = 0
+deployable_candidate = false
+
+[hypothesis]
+mechanism = "rank-gradient conflicts with hard-BCE gradient and cancels hard descent"
+falsification = "low conflict rate or low retained non-conflicting rank signal"
+
+[resources]
+flavor = "h100-1x"
+region_primary = "ix-m5-sm11"
+region_fallback = "ix-m5-sm12"
+time_limit = "3h"
+
+[data_boundary]
+outer_train_labels = true
+outer_validation_transport_checksum_verified = true
+outer_validation_rows_consumed_by_probe = false
+outer_validation_labels = false
+sealed_rows = false
+public = false
