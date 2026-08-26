@@ -47,12 +47,13 @@ def safe_extract(archive: str, destination: str, expected_sha256: str) -> str:
 
 
 def input_lines(name: str, bucket: str, key: str, dst: str, filename: str) -> list[str]:
+    path = PurePosixPath(key)
     return [
         "    - type: s3msk",
         f"      name: {json.dumps(name)}",
-        f"      src: {json.dumps(key)}",
-        f"      file: {json.dumps(filename)}",
-        f"      dst: {json.dumps(dst)}",
+        f"      src: {json.dumps(path.parent.as_posix())}",
+        f"      file: {json.dumps(path.name)}",
+        f"      dst: {json.dumps(str(PurePosixPath(dst) / filename))}",
         f"      bucket: {json.dumps(bucket)}",
     ]
 
@@ -135,14 +136,14 @@ def build(args: argparse.Namespace) -> str:
         "  flavor: 8cpu-128ram",
         f"  region: {args.region}",
         "  image: odsai/ecup26-quality-baseline:1.0",
-        "  preemption: false",
+        "  preemption: forbidden",
         "  work_dir: /work",
         "  entrypoint: /bin/bash",
         "  args:",
         "    - -lc",
         "    - >-",
         f"      {command}",
-        "  inputs:",
+        "  input:",
     ]
     specs = (
         ("code", bundle_key, "/work/input/code", "source_prepare_bundle.tar.gz"),
@@ -156,7 +157,7 @@ def build(args: argparse.Namespace) -> str:
         lines.extend(input_lines(name, args.bucket, key, dst, filename))
     lines.extend(
         [
-            "  outputs:",
+            "  output:",
             "    - type: s3msk",
             "      name: source_prepare",
             "      src: /work/output",

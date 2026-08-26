@@ -34,13 +34,13 @@ def make_args(tmp_path: Path) -> Namespace:
         region="ix-m5-sm11",
         bucket="approved-bucket",
         revision="a" * 40,
-        bundle_key="/owner/ecup/689/code.tar.gz",
+        bundle_key="/owner/ecup/689/source_prepare_bundle.tar.gz",
         bundle_sha256="1" * 64,
-        manifest_key="/owner/ecup/689/manifest.json",
+        manifest_key="/owner/ecup/689/bundle_manifest.json",
         manifest_sha256="2" * 64,
-        source_f03_key="/owner/ecup/source/f03.tar.gz",
+        source_f03_key="/owner/ecup/source/source_f03.tar.gz",
         source_f03_sha256="3" * 64,
-        source_f124_key="/owner/ecup/source/f124.tar.gz",
+        source_f124_key="/owner/ecup/source/source_f124.tar.gz",
         source_f124_sha256="4" * 64,
         exclusion_670_key="/owner/ecup/689/exp670.csv",
         exclusion_670_sha256="5" * 64,
@@ -56,11 +56,15 @@ def test_preset_is_secret_free_cpu_only_and_exact_scope(tmp_path: Path) -> None:
     assert "flavor: 8cpu-128ram" in text
     assert "region: ix-m5-sm11" in text
     assert text.count("    - type: s3msk") == 7
+    assert "  input:\n" in text and "  output:\n" in text
+    assert "  inputs:\n" not in text and "  outputs:\n" not in text
     assert "access_key" not in text and "secret_key" not in text
     assert "run_teacher" not in text and "train" not in text.lower()
     assert "prepare_source_universe.py" in text
     assert "source_prepare_bundle.tar.gz" in text
     assert "on_job_status=succeeded" in text
+    assert 'src: "/owner/ecup/689"' in text
+    assert 'dst: "/work/input/code/source_prepare_bundle.tar.gz"' in text
 
 
 @pytest.mark.parametrize(
