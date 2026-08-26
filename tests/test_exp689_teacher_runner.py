@@ -65,9 +65,9 @@ def valid_target(request: dict[str, Any]) -> dict[str, Any]:
         "audit_id": request["audit_id"],
         "record_id": request["record_id"],
         "request_row_sha256": request["request_row_sha256"],
-        "sold_object": "unknown",
-        "substance": "unknown",
-        "relation": "unknown",
+        "sold_object": "device",
+        "substance": "none",
+        "relation": "absent",
         "object_evidence_candidate_ids": [evidence_id],
         "substance_evidence_candidate_ids": [evidence_id],
         "relation_evidence_candidate_ids": [evidence_id],
@@ -86,6 +86,7 @@ def fake_backend(
         "cuda_device_name": "NVIDIA H100 80GB HBM3",
         "cuda_forward_rows": 12,
         "pixel_tensor_rows": 12,
+        "visible_image_regions": 60,
         "cpu_offload": False,
         "disk_offload": False,
         "base_only": True,
@@ -231,6 +232,34 @@ def test_image_hash_failure_is_fail_closed(tmp_path: Path) -> None:
     requests = read_jsonl(smoke_dir / "teacher_request.jsonl")
     with pytest.raises(common.ContractError, match="encoded image SHA mismatch"):
         teacher.load_images(smoke_dir, smoke_dir / "image_manifest.jsonl", requests)
+
+
+def test_multimodal_content_exposes_exact_full_and_2x2_regions(tmp_path: Path) -> None:
+    smoke_dir = tmp_path / "smoke"
+    smoke.build(remote_root=tmp_path, output_dir=smoke_dir)
+    requests = read_jsonl(smoke_dir / "teacher_request.jsonl")
+    request = requests[0]
+    images, _ = teacher.load_images(
+        smoke_dir, smoke_dir / "image_manifest.jsonl", requests
+    )
+    image = images[0]
+    try:
+        content, visible = teacher.multimodal_content(request, image)
+        assert len(visible) == 5
+        assert [item["type"] for item in content] == [
+            "image", "text", "image", "text", "image", "text",
+            "image", "text", "image", "text", "text",
+        ]
+        assert [item["image"].size for item in content if item["type"] == "image"] == [
+            (64, 64), (32, 32), (32, 32), (32, 32), (32, 32)
+        ]
+        for region, label in zip(teacher.IMAGE_REGIONS, content[1:10:2], strict=True):
+            assert f"IMAGE_REGION={region}" in label["text"]
+    finally:
+        for visible_image in visible[1:]:
+            visible_image.close()
+        for loaded_image in images:
+            loaded_image.close()
 
 
 def test_base_model_contract_rejects_adapter_or_class_lora_artifact(tmp_path: Path) -> None:

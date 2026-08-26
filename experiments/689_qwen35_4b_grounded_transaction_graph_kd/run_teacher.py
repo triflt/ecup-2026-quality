@@ -35,9 +35,10 @@ from build_target_audit import (
 MODEL_ID = "Qwen/Qwen3.6-27B"
 MODEL_REVISION = "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9"
 MAX_NEW_TOKENS = 160
+IMAGE_REGIONS = ("full", "q00", "q01", "q10", "q11")
 PROMPT_VERSION = "exp689_extraction_only_image_grounding_v1"
 SYSTEM_PROMPT = """You are an extraction-only annotation engine.
-Use ONLY the supplied listing text/OCR and the visible first image. Do not use prior knowledge.
+Use ONLY the supplied listing text/OCR and the visible full first image plus its deterministic 2x2 crops. Do not use prior knowledge.
 UNKNOWN is preferred whenever the supplied evidence is insufficient or ambiguous.
 Return exactly one JSON object and nothing else: no markdown, free text, reasoning, chain-of-thought, verdict, confidence, score, probability, rank, label, or family ID.
 Use only the closed enum values and candidate IDs printed in the request. Bind separate nonempty evidence ID lists for sold_object, substance, and relation when support_status is supported. For unsupported or ambiguous, set supervise=false and all three evidence lists empty.
@@ -352,9 +353,50 @@ def _quadrant_rgb(image: Any, region: str) -> bytes:
     if region == "full":
         return image.tobytes()
     width, height = image.size
-    col = 0 if region[2] == "0" else width // 2
-    row = 0 if region[1] == "0" else height // 2
-    return image.crop((col, row, col + width // 2, row + height // 2)).tobytes()
+    middle_x, middle_y = width // 2, height // 2
+    left, right = (0, middle_x) if region[2] == "0" else (middle_x, width)
+    top, bottom = (0, middle_y) if region[1] == "0" else (middle_y, height)
+    return image.crop((left, top, right, bottom)).tobytes()
+
+
+def multimodal_content(request: dict[str, Any], image: Any) -> tuple[list[dict[str, Any]], list[Any]]:
+    """Expose every deterministic image region as a separately visible input."""
+    by_region = {
+        candidate["image_region"]: candidate
+        for candidate in request["evidence_candidates"]
+        if candidate["evidence_kind"] == "image_region"
+    }
+    if set(by_region) != set(IMAGE_REGIONS):
+        raise ContractError("teacher request does not contain exact full+2x2 image evidence")
+    width, height = image.size
+    middle_x, middle_y = width // 2, height // 2
+    boxes = {
+        "full": (0, 0, width, height),
+        "q00": (0, 0, middle_x, middle_y),
+        "q01": (middle_x, 0, width, middle_y),
+        "q10": (0, middle_y, middle_x, height),
+        "q11": (middle_x, middle_y, width, height),
+    }
+    visible_images: list[Any] = []
+    content: list[dict[str, Any]] = []
+    for region in IMAGE_REGIONS:
+        visible = image if region == "full" else image.crop(boxes[region])
+        visible_images.append(visible)
+        candidate = by_region[region]
+        content.extend(
+            (
+                {"type": "image", "image": visible},
+                {
+                    "type": "text",
+                    "text": (
+                        f"IMAGE_REGION={region}; candidate_id={candidate['candidate_id']}; "
+                        f"evidence_sha256={candidate['evidence_sha256']}"
+                    ),
+                },
+            )
+        )
+    content.append({"type": "text", "text": row_prompt(request)})
+    return content, visible_images
 
 
 def load_images(
@@ -515,28 +557,26 @@ def _cuda_backend(
     model.eval()
     raw_outputs: list[str] = []
     pixel_rows = 0
+    visible_image_regions = 0
     started = time.monotonic()
     for request, image in zip(requests, images, strict=True):
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "image", "image": image},
-                    {"type": "text", "text": row_prompt(request)},
-                ],
-            }
-        ]
-        batch = processor.apply_chat_template(
-            [messages],
-            add_generation_prompt=True,
-            tokenize=True,
-            return_dict=True,
-            return_tensors="pt",
-            padding=True,
-            truncation=True,
-            max_length=4096,
-            enable_thinking=False,
-        )
+        content, visible_images = multimodal_content(request, image)
+        messages = [{"role": "user", "content": content}]
+        try:
+            batch = processor.apply_chat_template(
+                [messages],
+                add_generation_prompt=True,
+                tokenize=True,
+                return_dict=True,
+                return_tensors="pt",
+                padding=True,
+                truncation=True,
+                max_length=4096,
+                enable_thinking=False,
+            )
+        finally:
+            for visible in visible_images[1:]:
+                visible.close()
         pixel_tensors = [
             value
             for key, value in batch.items()
@@ -545,6 +585,7 @@ def _cuda_backend(
         if not pixel_tensors:
             raise RuntimeError("processor did not produce image pixel tensors")
         pixel_rows += 1
+        visible_image_regions += len(IMAGE_REGIONS)
         device_batch = {
             key: value.to("cuda:0") if hasattr(value, "to") else value
             for key, value in batch.items()
@@ -567,6 +608,7 @@ def _cuda_backend(
         "cuda_device_name": device_name,
         "cuda_forward_rows": len(raw_outputs),
         "pixel_tensor_rows": pixel_rows,
+        "visible_image_regions": visible_image_regions,
         "cpu_offload": False,
         "disk_offload": False,
         "base_only": True,
@@ -585,6 +627,7 @@ def _validate_backend_report(report: dict[str, Any], row_count: int) -> None:
         "cuda_device_name",
         "cuda_forward_rows",
         "pixel_tensor_rows",
+        "visible_image_regions",
         "cpu_offload",
         "disk_offload",
         "base_only",
@@ -600,6 +643,8 @@ def _validate_backend_report(report: dict[str, Any], row_count: int) -> None:
         raise ContractError("teacher backend did not use exactly one H100")
     if report["cuda_forward_rows"] != row_count or report["pixel_tensor_rows"] != row_count:
         raise ContractError("teacher backend did not consume every row and image")
+    if report["visible_image_regions"] != row_count * len(IMAGE_REGIONS):
+        raise ContractError("teacher backend did not expose full+2x2 regions for every row")
     if report["cpu_offload"] is not False or report["disk_offload"] is not False:
         raise ContractError("teacher backend used forbidden offload")
     if report["base_only"] is not True or report["class_lora_present"] is not False:
@@ -709,6 +754,7 @@ def run(
         "no_cpu_or_disk_offload": True,
         "cuda_forward_all_rows": True,
         "pixel_tensor_all_rows": True,
+        "full_and_2x2_visible_all_rows": True,
         "closed_schema_all_rows": True,
         "request_binding_all_rows": True,
         "evidence_binding_all_rows": True,
@@ -789,10 +835,8 @@ def run(
             "quality_evaluated": False,
             "full_teacher_authorized": False,
             "student_gpu_authorized": False,
-            "jobs_launched": 0,
-            "uploads": 0,
-            "presets_built": 0,
-            "bundles_built": 0,
+            "terminal_job_metadata_bound": False,
+            "approved_remote_output_bound": False,
             "self_sha256": None,
         }
     )
