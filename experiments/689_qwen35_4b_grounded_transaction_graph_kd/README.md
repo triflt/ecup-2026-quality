@@ -49,6 +49,28 @@ references remain caller-supplied; tracked files contain no account, bucket,
 endpoint, credential, personal path or internal artifact literal. This commit
 does not provide teacher smoke/full job builders.
 
+## Controlled source-transport retry
+
+The archive diagnostic is immutable and deliberately remains diagnostic-only:
+its `prepare_retry_authorized` field must be `false`. It can identify an exact
+AppleDouble-only transport cause, but it cannot authorize PREPARE by itself.
+
+A controlled retry requires a separate
+`exp689_source_prepare_transport_retry_gate_v1` issued by the independent
+integrator. The gate binds the accepted diagnostic and verifier provenance,
+both frozen source archives, exact code/bundle/manifest, the full source spec,
+selector and exclusion/runtime identities, fresh output prefixes, and one-job
+limit. Teacher, model, review, student GPU and Public use remain forbidden.
+
+Because a preset cannot contain its gate file SHA while that same gate contains
+the final preset file SHA without a cryptographic cycle, the gate binds a
+non-launchable canonical preset semantic contract. The sealed preset embeds the
+exact contract and gate file/self hashes. A self-hashed materialization receipt
+then binds the final preset bytes to both documents. Runtime validates the
+diagnostic, contract and independent gate before reading archive payloads. A
+missing or mismatched gate fails before extraction; there is no fallback from
+the diagnostic document to authorization.
+
 ## Deterministic sample and exact claim
 
 Prepare is a separate CPU-only remote stage. It selects 100 rows from each

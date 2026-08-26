@@ -53,6 +53,116 @@ ACCEPTANCE_FIELDS = {
     "student_gpu_authorized",
     "self_sha256",
 }
+TRANSPORT_RETRY_GATE_FIELDS = {
+    "schema_version",
+    "experiment_id",
+    "scope",
+    "issuer_role",
+    "decision",
+    "diagnostic_acceptance_file_sha256",
+    "diagnostic_acceptance_self_sha256",
+    "diagnostic_verifier_terminal_metadata_sha256",
+    "frozen_archives",
+    "retry_code_commit",
+    "retry_code_bundle_sha256",
+    "retry_bundle_manifest_file_sha256",
+    "retry_bundle_manifest_self_sha256",
+    "retry_preset_builder_sha256",
+    "retry_preset_contract_file_sha256",
+    "retry_preset_contract_sha256",
+    "source_prepare_spec_file_sha256",
+    "source_prepare_spec_self_sha256",
+    "selector_contract_sha256",
+    "exclusion_bindings",
+    "runtime_bindings",
+    "output_prefix",
+    "transport_report_prefix",
+    "controlled_prepare_retry_authorized",
+    "max_jobs",
+    "teacher_authorized",
+    "model_authorized",
+    "review_authorized",
+    "student_gpu_authorized",
+    "public_used",
+    "self_sha256",
+}
+SOURCE_PREPARE_SPEC_FILE_SHA256 = (
+    "804e3b9802d8a9d2e766f32151d8398e4e20df8a998c5aee455ca5456f262ac0"
+)
+SOURCE_PREPARE_SPEC_SELF_SHA256 = (
+    "c41f1d11e956af0262688810c1b1770a201feb49515b12b0239232dab3c65cf3"
+)
+EXCLUSION_BINDINGS = {
+    "exp670_audit_csv_sha256": (
+        "012def05a7370608cb959aa9a0d73326bc48b1f6d93cb1c9faea2bb7a8842b7a"
+    ),
+    "exp672_private_manifest_sha256": (
+        "303b46c24af4aa781792884919d57bfcfb813386eb71056b91544d67bb0f28fd"
+    ),
+}
+RUNTIME_BINDINGS = {
+    "0": {
+        "source_runtime_contract_sha256": "38802115365cef7e3a0c1a82abc5efc5ce92a41e0046f1ddad4ab9e02647c568",
+        "validation_sha256": "109807781797f51ec8c1d98d0385aef2e9edd0d89183c4a44aab76e2a26f56bc",
+        "validation_rows": 943,
+    },
+    "1": {
+        "source_runtime_contract_sha256": "3d62eed9817bbbdb0ff4d55dd511904b4fa1dfef5db44deddb104dda0c60f576",
+        "validation_sha256": "f6111b8977957e93469c033980853512dc865bfeebc6a9256b7fb082338895cc",
+        "validation_rows": 943,
+    },
+    "2": {
+        "source_runtime_contract_sha256": "321b5e5165110fc729598956d121208ab14aee12af38e8f0b3ab81ddbd52f5e8",
+        "validation_sha256": "47b59ecd0a0eb50136052f24883ba07a2af75ddae5eb989fcf2a8dc1bf889a44",
+        "validation_rows": 944,
+    },
+    "3": {
+        "source_runtime_contract_sha256": "e08a51c2db16163953c45841f3dd1e7b30b293a7265b2bbd8084d1479c20ea36",
+        "validation_sha256": "bbbbae3f4ddb38bf3af238cd53dd8fc1b851b04598101ab7b57809e73c7a2257",
+        "validation_rows": 943,
+    },
+    "4": {
+        "source_runtime_contract_sha256": "22cad9c7a1510a73b6ec606826839328329a9c0469f2fb00c45fd24ed9dcf33f",
+        "validation_sha256": "1d1e089269041217aa7f197ce6a79ca6fcd849becc124780fe6511b92bdeca0c",
+        "validation_rows": 943,
+    },
+}
+SELECTOR_SPEC_FIELDS = (
+    "category",
+    "execution_scope",
+    "exclusions",
+    "folds",
+    "forbidden_field_tokens",
+    "image_transform",
+    "input_data_sha256",
+    "input_registry_sha256",
+    "opaque_token_scheme",
+    "ocr_policy",
+    "quota_per_fold_per_stratum",
+    "runtime_archives",
+    "singleton_cue_free_per_fold",
+    "strata",
+    "validation_fields",
+)
+PRESET_CONTRACT_FIELDS = {
+    "schema_version",
+    "experiment_id",
+    "scope",
+    "retry_attempt",
+    "job",
+    "bucket",
+    "revision",
+    "inputs",
+    "outputs",
+    "command_plan",
+    "max_jobs",
+    "teacher_authorized",
+    "model_authorized",
+    "review_authorized",
+    "student_gpu_authorized",
+    "public_used",
+    "self_sha256",
+}
 
 
 def canonical_json_bytes(value: Any) -> bytes:
@@ -67,6 +177,145 @@ def sha256_file(path: Path) -> str:
         for block in iter(lambda: stream.read(1 << 20), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def validate_source_prepare_spec(path: Path) -> tuple[dict[str, Any], str]:
+    if sha256_file(path) != SOURCE_PREPARE_SPEC_FILE_SHA256:
+        raise ValueError("source PREPARE spec file SHA mismatch")
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise TypeError("source PREPARE spec must be an object")
+    copy = dict(value)
+    actual_self = copy.get("self_sha256")
+    copy["self_sha256"] = None
+    if (
+        actual_self != SOURCE_PREPARE_SPEC_SELF_SHA256
+        or hashlib.sha256(canonical_json_bytes(copy)).hexdigest() != actual_self
+    ):
+        raise ValueError("source PREPARE spec self-hash mismatch")
+    if value.get("schema_version") != "exp689_source_prepare_spec_v1":
+        raise ValueError("source PREPARE spec schema mismatch")
+    selector = {field: value[field] for field in SELECTOR_SPEC_FIELDS}
+    return value, hashlib.sha256(canonical_json_bytes(selector)).hexdigest()
+
+
+def validate_retry_preset_contract(
+    path: Path,
+    *,
+    expected_file_sha256: str,
+    expected_self_sha256: str,
+) -> dict[str, Any]:
+    if not HEX64.fullmatch(expected_file_sha256) or not HEX64.fullmatch(
+        expected_self_sha256
+    ):
+        raise ValueError("retry preset contract requires exact hashes")
+    if sha256_file(path) != expected_file_sha256:
+        raise ValueError("retry preset contract file SHA mismatch")
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict) or set(value) != PRESET_CONTRACT_FIELDS:
+        raise ValueError("retry preset contract exact schema mismatch")
+    copy = dict(value)
+    actual_self = copy["self_sha256"]
+    copy["self_sha256"] = None
+    if (
+        actual_self != expected_self_sha256
+        or hashlib.sha256(canonical_json_bytes(copy)).hexdigest() != actual_self
+    ):
+        raise ValueError("retry preset contract self-hash mismatch")
+    if (
+        value["schema_version"]
+        != "exp689_source_prepare_retry_preset_contract_v1"
+        or value["experiment_id"] != "689"
+        or value["scope"] != "source_prepare_transport_retry_only"
+        or value["retry_attempt"] != 1
+        or value["job"].get("gpu_count") != 0
+        or value["max_jobs"] != 1
+        or value["teacher_authorized"] is not False
+        or value["model_authorized"] is not False
+        or value["review_authorized"] is not False
+        or value["student_gpu_authorized"] is not False
+        or value["public_used"] is not False
+    ):
+        raise ValueError("retry preset contract authorization mismatch")
+    expected_commands = [
+        "safe_extract_exact_retry_bundle",
+        "validate_exact_bundle_manifest",
+        "validate_diagnostic_acceptance_false",
+        "validate_independent_transport_retry_gate_true",
+        "extract_frozen_f03_skipping_exact_apple_metadata",
+        "extract_frozen_f124_skipping_zero_apple_metadata",
+        "run_unchanged_prepare_source_universe",
+    ]
+    job = value["job"]
+    inputs = value["inputs"]
+    outputs = value["outputs"]
+    if (
+        set(job)
+        != {
+            "flavor",
+            "time_limit",
+            "region",
+            "image",
+            "preemption",
+            "gpu_count",
+        }
+        or job["flavor"] != "8cpu-128ram"
+        or job["time_limit"] != "2h"
+        or job["region"] not in {"ix-m5-sm11", "ix-m5-sm12"}
+        or job["image"] != "odsai/ecup26-quality-baseline:1.0"
+        or job["preemption"] != "forbidden"
+        or set(inputs)
+        != {
+            "bundle",
+            "manifest",
+            "source_f03",
+            "source_f124",
+            "exclusion_670",
+            "exclusion_672",
+            "diagnostic_acceptance",
+            "diagnostic_verifier_terminal_metadata_sha256",
+            "preset_builder_sha256",
+            "preset_contract_key",
+            "transport_retry_gate_key",
+        }
+        or set(outputs) != {"source_prepare", "transport_reports"}
+        or value["command_plan"] != expected_commands
+        or not isinstance(value["bucket"], str)
+        or not value["bucket"]
+        or not re.fullmatch(r"[0-9a-f]{40}", value["revision"])
+    ):
+        raise ValueError("retry preset contract semantic schema mismatch")
+    for name in (
+        "bundle",
+        "source_f03",
+        "source_f124",
+        "exclusion_670",
+        "exclusion_672",
+    ):
+        if set(inputs[name]) != {"key", "sha256"}:
+            raise ValueError("retry preset contract input schema mismatch")
+    if set(inputs["manifest"]) != {"key", "sha256", "self_sha256"} or set(
+        inputs["diagnostic_acceptance"]
+    ) != {"key", "sha256", "self_sha256"}:
+        raise ValueError("retry preset contract self-hashed input schema mismatch")
+    path_values = [
+        *(item["key"] for item in inputs.values() if isinstance(item, dict)),
+        inputs["preset_contract_key"],
+        inputs["transport_retry_gate_key"],
+        *outputs.values(),
+    ]
+    for raw in path_values:
+        if not isinstance(raw, str):
+            raise TypeError("retry preset contract S3 key must be a string")
+        parsed = PurePosixPath(raw)
+        if (
+            not parsed.is_absolute()
+            or ".." in parsed.parts
+            or any(character.isspace() for character in raw)
+            or any(character in raw for character in "?#\\")
+        ):
+            raise ValueError("retry preset contract contains an unsafe S3 key")
+    return value
 
 
 def validate_diagnostic_acceptance(
@@ -130,6 +379,150 @@ def validate_diagnostic_acceptance(
         or not HEX64.fullmatch(value["report_self_sha256"])
     ):
         raise ValueError("diagnostic acceptance frozen lineage/decision mismatch")
+    return value
+
+
+def validate_transport_retry_gate(
+    path: Path,
+    *,
+    expected_file_sha256: str,
+    expected_self_sha256: str,
+    diagnostic_acceptance: dict[str, Any],
+    diagnostic_acceptance_file_sha256: str,
+    expected_verifier_terminal_metadata_sha256: str,
+    expected_retry_code_commit: str,
+    expected_retry_code_bundle_sha256: str,
+    expected_retry_bundle_manifest_file_sha256: str,
+    expected_retry_bundle_manifest_self_sha256: str,
+    expected_retry_preset_builder_sha256: str,
+    retry_preset_contract: dict[str, Any],
+    retry_preset_contract_file_sha256: str,
+    expected_retry_preset_contract_sha256: str,
+    source_prepare_spec_path: Path,
+    expected_output_prefix: str,
+    expected_transport_report_prefix: str,
+) -> dict[str, Any]:
+    """Require the independent authorization that the diagnostic cannot issue."""
+
+    exact_hex = (
+        expected_file_sha256,
+        expected_self_sha256,
+        diagnostic_acceptance_file_sha256,
+        expected_verifier_terminal_metadata_sha256,
+        expected_retry_code_bundle_sha256,
+        expected_retry_bundle_manifest_file_sha256,
+        expected_retry_bundle_manifest_self_sha256,
+        expected_retry_preset_builder_sha256,
+        retry_preset_contract_file_sha256,
+        expected_retry_preset_contract_sha256,
+    )
+    if any(not HEX64.fullmatch(value) for value in exact_hex):
+        raise ValueError("transport retry gate requires exact SHA-256 bindings")
+    if not re.fullmatch(r"[0-9a-f]{40}", expected_retry_code_commit):
+        raise ValueError("transport retry gate requires an exact code commit")
+    if sha256_file(path) != expected_file_sha256:
+        raise ValueError("transport retry gate file SHA mismatch")
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict) or set(value) != TRANSPORT_RETRY_GATE_FIELDS:
+        raise ValueError("transport retry gate exact schema mismatch")
+    copy = dict(value)
+    actual_self = copy["self_sha256"]
+    copy["self_sha256"] = None
+    if (
+        actual_self != expected_self_sha256
+        or hashlib.sha256(canonical_json_bytes(copy)).hexdigest() != actual_self
+    ):
+        raise ValueError("transport retry gate self-hash mismatch")
+    expected_archives = {
+        archive_id: {
+            "sha256": profile["sha256"],
+            "size_bytes": profile["size_bytes"],
+        }
+        for archive_id, profile in PROFILES.items()
+    }
+    _, selector_contract_sha256 = validate_source_prepare_spec(
+        source_prepare_spec_path
+    )
+    contract_inputs = retry_preset_contract["inputs"]
+    if (
+        retry_preset_contract["revision"] != expected_retry_code_commit
+        or contract_inputs["bundle"]["sha256"]
+        != expected_retry_code_bundle_sha256
+        or contract_inputs["manifest"]["sha256"]
+        != expected_retry_bundle_manifest_file_sha256
+        or contract_inputs["manifest"]["self_sha256"]
+        != expected_retry_bundle_manifest_self_sha256
+        or contract_inputs["source_f03"]["sha256"]
+        != PROFILES["source_f03"]["sha256"]
+        or contract_inputs["source_f124"]["sha256"]
+        != PROFILES["source_f124"]["sha256"]
+        or contract_inputs["exclusion_670"]["sha256"]
+        != EXCLUSION_BINDINGS["exp670_audit_csv_sha256"]
+        or contract_inputs["exclusion_672"]["sha256"]
+        != EXCLUSION_BINDINGS["exp672_private_manifest_sha256"]
+        or contract_inputs["diagnostic_acceptance"]["sha256"]
+        != diagnostic_acceptance_file_sha256
+        or contract_inputs["diagnostic_acceptance"]["self_sha256"]
+        != diagnostic_acceptance["self_sha256"]
+        or contract_inputs["diagnostic_verifier_terminal_metadata_sha256"]
+        != expected_verifier_terminal_metadata_sha256
+        or contract_inputs["preset_builder_sha256"]
+        != expected_retry_preset_builder_sha256
+        or retry_preset_contract["outputs"]["source_prepare"]
+        != expected_output_prefix
+        or retry_preset_contract["outputs"]["transport_reports"]
+        != expected_transport_report_prefix
+    ):
+        raise ValueError("retry preset contract frozen input/output mismatch")
+    if (
+        diagnostic_acceptance["prepare_retry_authorized"] is not False
+        or value["schema_version"]
+        != "exp689_source_prepare_transport_retry_gate_v1"
+        or value["experiment_id"] != "689"
+        or value["scope"] != "source_prepare_transport_retry_only"
+        or value["issuer_role"] != "independent_integrator"
+        or value["decision"] != "OPEN_CONTROLLED_SOURCE_PREPARE_RETRY"
+        or value["diagnostic_acceptance_file_sha256"]
+        != diagnostic_acceptance_file_sha256
+        or value["diagnostic_acceptance_self_sha256"]
+        != diagnostic_acceptance["self_sha256"]
+        or value["diagnostic_verifier_terminal_metadata_sha256"]
+        != expected_verifier_terminal_metadata_sha256
+        or value["frozen_archives"] != expected_archives
+        or value["retry_code_commit"] != expected_retry_code_commit
+        or value["retry_code_bundle_sha256"]
+        != expected_retry_code_bundle_sha256
+        or value["retry_bundle_manifest_file_sha256"]
+        != expected_retry_bundle_manifest_file_sha256
+        or value["retry_bundle_manifest_self_sha256"]
+        != expected_retry_bundle_manifest_self_sha256
+        or value["retry_preset_builder_sha256"]
+        != expected_retry_preset_builder_sha256
+        or value["retry_preset_contract_file_sha256"]
+        != retry_preset_contract_file_sha256
+        or value["retry_preset_contract_sha256"]
+        != expected_retry_preset_contract_sha256
+        or retry_preset_contract["self_sha256"]
+        != expected_retry_preset_contract_sha256
+        or value["source_prepare_spec_file_sha256"]
+        != SOURCE_PREPARE_SPEC_FILE_SHA256
+        or value["source_prepare_spec_self_sha256"]
+        != SOURCE_PREPARE_SPEC_SELF_SHA256
+        or value["selector_contract_sha256"] != selector_contract_sha256
+        or value["exclusion_bindings"] != EXCLUSION_BINDINGS
+        or value["runtime_bindings"] != RUNTIME_BINDINGS
+        or value["output_prefix"] != expected_output_prefix
+        or value["transport_report_prefix"]
+        != expected_transport_report_prefix
+        or value["controlled_prepare_retry_authorized"] is not True
+        or value["max_jobs"] != 1
+        or value["teacher_authorized"] is not False
+        or value["model_authorized"] is not False
+        or value["review_authorized"] is not False
+        or value["student_gpu_authorized"] is not False
+        or value["public_used"] is not False
+    ):
+        raise ValueError("transport retry gate frozen authorization mismatch")
     return value
 
 
