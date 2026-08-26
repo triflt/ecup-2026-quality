@@ -1,28 +1,17 @@
-# Experiment 689 — grounded transaction-graph KD
+# Experiment 689 — image-grounded transaction-graph KD
 
 Status: `PREREGISTERED_REMOTE_TARGET_AUDIT_ONLY`. Student GPU: `NO_GO`.
 Jobs, uploads, presets and bundles: `0`.
 
-## Hypothesis and parent lane
+## Hypothesis and frozen target
 
-The hypothesis is that an auxiliary transaction graph can transfer the
-distinction between what is sold, what substance is present, and how an item is
-related to that substance more safely than free-form rationale distillation.
-This is the structured-evidence lane preregistered in experiment 685. It is not
-a continuation of terminally rejected experiment 688, and no student training
-parent is selected by this packet.
+The preregistered hypothesis is that a grounded transaction graph can transfer
+the distinction between what is sold, what substance is present, and how the
+item relates to that substance without copying free-form teacher reasoning or
+outcome scores. This packet freezes only the 300-row target audit. It does not
+select or authorize a student-training parent.
 
-The mechanism has precedent in ERASER's extractive-rationale evaluation and
-CLARITY's evidence-to-concept structure. Distilling Step-by-Step motivates
-auxiliary supervision, but experiment 689 deliberately removes its free-form
-rationale channel: the teacher can return only closed graph enums and indices
-of deterministic evidence candidates already present in its request.
-
-No classification label, verdict, logit, probability, rank, family identifier
-or free chain-of-thought is exposed to or accepted from the teacher. This stage
-tests target quality only. It cannot authorize a model, GPU job or submission.
-
-## Frozen target ontology
+The closed target enums are:
 
 - `sold_object`: `device`, `fuel_consumable`, `accessory`, `kit`, `other`,
   `unknown`;
@@ -31,79 +20,87 @@ tests target quality only. It cannot authorize a model, GPU job or submission.
 - `relation`: `primary_sold_object`, `included`, `compatible_external`,
   `mentioned_only`, `negated`, `absent`, `unknown`.
 
-A teacher response has no free-text field. It contains only the request binding,
-the three enums, sorted unique `evidence_candidate_indices`, `support_status`
-and `supervise`. A `supported` response must select at least one existing
-candidate and sets `supervise=true`. `unsupported` and `ambiguous` must select
-no candidates and set `supervise=false`. The materializer never accepts or
-creates an evidence span or an ontology code outside the frozen schema.
+Teacher output contains no free text, confidence, verdict, label, logit,
+probability, rank, family ID or chain-of-thought. Each of `sold_object`,
+`substance`, and `relation` binds its own sorted list of existing deterministic
+evidence candidate IDs. A supported row requires a nonempty list for all three
+targets and `supervise=true`. `unsupported` or `ambiguous` requires all three
+lists empty and `supervise=false`; no code or evidence may be invented.
 
-The exact schema is frozen in
-`target_audit_schema_v1.json`; thresholds, enums, selection salt and teacher
-surface are additionally bound by `frozen_target_audit_spec.json`.
+## Image-aware source contract
 
-## Remote-only source and disjoint sample
+Every source row includes its first-image reference, encoded-content SHA,
+decoded-RGB SHA and decoded dimensions. The teacher request includes that image
+binding plus deterministic candidates for the full decoded image and its four
+2×2 quadrants, alongside exact text/OCR spans. A text/OCR-only scientific packet
+is forbidden.
 
-The scripts read no workstation competition file and contain no S3 bucket,
-account, endpoint, credential or personal path. A future CPU-only remote compute job
-must receive every input as a native mounted artifact below a caller-provided
-`--remote-root`; every output must remain below that same root. S3 object choice,
-remote compute input names and output publication are external runtime configuration.
+The tracked prepare stage does not fetch images. It accepts only source rows
+whose immutable source contract says all 300 first images were verified and
+that image fetch, decode and hash failures are all zero. Any future remote
+source runner must stop on any such failure. The source contract also binds
+runtime, data, registry, builder revision, eligibility universe, stratum
+derivation, first-image membership, image transform, and candidate-generator
+SHAs.
 
-The remote source JSONL contains opaque row/component/family tokens, a fixed
-stratum, source text with hashes, and deterministic exact-span candidates. Its
-self-hashed contract must state that labels and score-like fields are absent and
-that sealed and Public row counts are zero. Separate self-hashed exclusion
-manifests for experiments 670 and 672 contain only sorted SHA-256 row, component
-and family tokens. Any overlap in any of those three namespaces is excluded.
-The approved runtime sources must be supplied with their exact expected SHA-256;
-the builder additionally requires 300 unique experiment-670 components, 40
-unique experiment-672 components, zero intersection and union size 340. Their
-locations, SHAs and source-field locators are runtime parameters, never tracked
-literals.
+The teacher-selection contract binds request/output SHAs, model ID and revision,
+prompt, decoding, inference bundle, and job metadata. Model and runtime
+references remain caller-supplied; tracked files contain no account, bucket,
+endpoint, credential, personal path or internal artifact literal. This commit
+does not provide teacher smoke/full job builders.
 
-Selection is immutable SHA-256 ordering followed by a global one-row-per-
-component and one-row-per-exact-source rule. It takes exactly:
+## Deterministic sample and exact claim
 
-1. 100 `direct_included_fuel` rows;
-2. 100 `device_accessory_compatible_mention` rows;
-3. 100 `singleton_new_family_ambiguous` rows.
+Prepare is a separate CPU-only remote stage. It selects 100 rows from each
+stratum by frozen SHA ordering, with one selected row per component and exact
+source:
 
-The teacher request strips stratum and all row/component/family tokens. It sees
-only an audit ID, an opaque record ID, the source fields, deterministic evidence
-candidates and cryptographic request binding.
+1. S2 — `direct_included_fuel`;
+2. S1 — `device_accessory_compatible_mention`;
+3. S3 — `singleton_new_family_ambiguous`.
 
-## Frozen human-audit gate
+Runtime exclusion sources must contain 300 and 40 unique component identities,
+respectively, with zero intersection and union size 340. The selected packet
+must have zero component overlap with that union. This packet deliberately
+claims only component disjointness from experiments 670/672; it does not claim
+family disjointness without corresponding evidence.
 
-The frozen packet is copied for independent review; only the five `review`
-booleans may change. `evidence_supported=true` means either that selected
-evidence supports the structured target or that an unsupported/ambiguous
-abstention is correct. The preferred result is zero unsupported or incorrect
-evidence, while the hard gate permits at most three.
+## Dual-blind review and adjudication
 
-All conditions must hold:
+The frozen target packet contains no review fields. Reviewer A and reviewer B
+produce separate immutable 300-row overlays. Each self-hashed reviewer contract
+binds the packet, review rubric, overlay, opaque reviewer ID, start/completion
+timestamps, row count, and blindness to the other reviewer, outcome labels, and
+prior audits. Reviewer A and reviewer B must be different actors.
 
-- exact schema and mechanical grounding `300/300`;
-- complete `sold_object + substance + relation` target-tuple correctness at
-  least `282/300`;
-- joint `sold_object + relation` correctness at least `95/100` in the critical
-  device/accessory/compatibility/mention stratum;
-- evidence supported at least `297/300`;
-- `supervise=true` coverage at least `225/300` overall and `80/100` in the
-  direct/included-fuel stratum;
-- contradictions at most `15/300`;
-- exact record/source nonduplication, unique selected components and zero
-  row/component/family overlap with the 670/672 exclusions.
+Each overlay records the six review flags plus exactly one evidence slice:
+`text_sufficient`, `image_helpful`, or `image_required`. If any row differs
+between reviewers, a distinct adjudicator must provide an overlay containing
+exactly all disagreement rows and no others. Adjudication is forbidden when
+there are no disagreements.
 
-Even an accepted audit emits `READY_FOR_SEPARATE_STUDENT_GPU_GO` with
-`student_gpu_authorized=false`. A fresh independent gate must later freeze the
-student parent, data split, objective weight and paired control before any GPU
-work. No target is currently approved for training.
+All frozen gates must pass:
 
-## Exact remote commands
+- schema and grounding `300/300`;
+- strict target tuple (`sold_object + substance + relation`) at least `282/300`;
+- object+relation at least S1 `95/100`, S2 `90/100`, and S3 `90/100`;
+- supported evidence at least `297/300`, coverage at least `225/300` overall
+  and `80/100` in direct/included fuel, contradictions at most `15/300`;
+- exact whole-review agreement at least `0.90` and relation Cohen kappa at
+  least `0.80`; raw per-attribute agreement and relation Gwet AC1 are reported;
+- at least 30 final `image_required` rows, at least 27 strict passes in that
+  slice, and zero unsupported visual claims there;
+- exact record/source nonduplication and the component-disjointness claim above.
 
-The following commands are templates for a future CPU-only remote compute runtime. All
-paths are runtime parameters and must resolve below the same remote root.
+Strict row pass means all three target fields correct, evidence supported, no
+contradiction, and no unsupported visual claim. Even acceptance emits only
+`READY_FOR_SEPARATE_STUDENT_GPU_GO` with `student_gpu_authorized=false`; a fresh
+independent gate is still required.
+
+## Remote command surfaces
+
+All paths below are examples supplied by the runtime and must resolve under the
+same `--remote-root`. Prepare consumes already verified image-aware source rows:
 
 ```bash
 python3 experiments/689_qwen35_4b_grounded_transaction_graph_kd/build_target_audit.py prepare \
@@ -124,8 +121,8 @@ python3 experiments/689_qwen35_4b_grounded_transaction_graph_kd/build_target_aud
   --output-dir /work/exp689/outputs/prepared
 ```
 
-The teacher runs against only `prepared/teacher_request.jsonl` and must produce
-contract-bound closed selections. Materialization is then:
+Teacher inference is external to this commit. After its exact output and
+contract exist, materialization is:
 
 ```bash
 python3 experiments/689_qwen35_4b_grounded_transaction_graph_kd/build_target_audit.py materialize \
@@ -137,7 +134,7 @@ python3 experiments/689_qwen35_4b_grounded_transaction_graph_kd/build_target_aud
   --output-dir /work/exp689/outputs/frozen_audit
 ```
 
-After a separate reviewer fills only the review booleans in a distinct copy:
+After two blind overlays, and optionally exact disagreements-only adjudication:
 
 ```bash
 python3 experiments/689_qwen35_4b_grounded_transaction_graph_kd/validate_target_audit.py \
@@ -149,13 +146,17 @@ python3 experiments/689_qwen35_4b_grounded_transaction_graph_kd/validate_target_
   --teacher-selections /work/exp689/inputs/teacher_selections.jsonl \
   --teacher-selection-contract /work/exp689/inputs/teacher_selection_contract.json \
   --frozen-packet /work/exp689/outputs/frozen_audit/target_audit.jsonl \
-  --completed-review /work/exp689/inputs/completed_review.jsonl \
+  --review-a /work/exp689/inputs/review_a.jsonl \
+  --review-a-contract /work/exp689/inputs/review_a_contract.json \
+  --review-b /work/exp689/inputs/review_b.jsonl \
+  --review-b-contract /work/exp689/inputs/review_b_contract.json \
   --packet-contract /work/exp689/outputs/frozen_audit/target_audit_contract.json \
   --exclusion-670 /work/exp689/inputs/exclusion_670.csv \
   --exclusion-672 /work/exp689/inputs/exclusion_672.json \
   --output /work/exp689/outputs/target_audit_acceptance.json
 ```
 
-Every output path is immutable: an existing output directory or result is a
-hard failure. No local fallback, implicit data discovery, preset generation,
-artifact upload or GPU launch exists in these entrypoints.
+When disagreements exist, both `--adjudication` and
+`--adjudication-contract` are additionally required. Existing outputs are never
+overwritten. There is no local fallback, implicit data discovery, preset
+generation, artifact upload or job launch in these entrypoints.

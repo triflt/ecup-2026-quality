@@ -3,36 +3,68 @@
     "evidence_candidate": {
       "additionalProperties": false,
       "properties": {
+        "candidate_id": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
         "candidate_index": {"minimum": 0, "type": "integer"},
-        "char_end": {"minimum": 1, "type": "integer"},
-        "char_start": {"minimum": 0, "type": "integer"},
+        "char_end": {"minimum": 1, "type": ["integer", "null"]},
+        "char_start": {"minimum": 0, "type": ["integer", "null"]},
+        "evidence_kind": {"enum": ["text_span", "image_region"], "type": "string"},
         "evidence_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-        "source_index": {"minimum": 0, "type": "integer"}
+        "image_region": {"enum": ["full", "q00", "q01", "q10", "q11", null]},
+        "source_index": {"minimum": 0, "type": ["integer", "null"]}
       },
       "required": [
+        "candidate_id",
         "candidate_index",
+        "evidence_kind",
         "source_index",
         "char_start",
         "char_end",
+        "image_region",
         "evidence_sha256"
+      ],
+      "type": "object"
+    },
+    "first_image": {
+      "additionalProperties": false,
+      "properties": {
+        "content_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "decoded_rgb_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "height": {"minimum": 2, "type": "integer"},
+        "media_type": {"enum": ["image/jpeg", "image/png", "image/webp"]},
+        "reference": {"minLength": 1, "type": "string"},
+        "width": {"minimum": 2, "type": "integer"}
+      },
+      "required": [
+        "reference",
+        "content_sha256",
+        "decoded_rgb_sha256",
+        "media_type",
+        "width",
+        "height"
       ],
       "type": "object"
     },
     "review": {
       "additionalProperties": false,
       "properties": {
-        "contradiction": {"type": ["boolean", "null"]},
-        "evidence_supported": {"type": ["boolean", "null"]},
-        "relation_correct": {"type": ["boolean", "null"]},
-        "sold_object_correct": {"type": ["boolean", "null"]},
-        "substance_correct": {"type": ["boolean", "null"]}
+        "contradiction": {"type": "boolean"},
+        "evidence_slice": {
+          "enum": ["text_sufficient", "image_helpful", "image_required"]
+        },
+        "evidence_supported": {"type": "boolean"},
+        "relation_correct": {"type": "boolean"},
+        "sold_object_correct": {"type": "boolean"},
+        "substance_correct": {"type": "boolean"},
+        "unsupported_visual_claim": {"type": "boolean"}
       },
       "required": [
         "sold_object_correct",
         "substance_correct",
         "relation_correct",
         "evidence_supported",
-        "contradiction"
+        "unsupported_visual_claim",
+        "contradiction",
+        "evidence_slice"
       ],
       "type": "object"
     },
@@ -50,8 +82,8 @@
     "target": {
       "additionalProperties": false,
       "properties": {
-        "evidence_candidate_indices": {
-          "items": {"minimum": 0, "type": "integer"},
+        "object_evidence_candidate_ids": {
+          "items": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
           "type": "array",
           "uniqueItems": true
         },
@@ -66,6 +98,11 @@
             "unknown"
           ],
           "type": "string"
+        },
+        "relation_evidence_candidate_ids": {
+          "items": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+          "type": "array",
+          "uniqueItems": true
         },
         "sold_object": {
           "enum": ["device", "fuel_consumable", "accessory", "kit", "other", "unknown"],
@@ -82,6 +119,11 @@
           ],
           "type": "string"
         },
+        "substance_evidence_candidate_ids": {
+          "items": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+          "type": "array",
+          "uniqueItems": true
+        },
         "supervise": {"type": "boolean"},
         "support_status": {
           "enum": ["supported", "unsupported", "ambiguous"],
@@ -92,26 +134,29 @@
         "sold_object",
         "substance",
         "relation",
-        "evidence_candidate_indices",
+        "object_evidence_candidate_ids",
+        "substance_evidence_candidate_ids",
+        "relation_evidence_candidate_ids",
         "support_status",
         "supervise"
       ],
       "type": "object"
     }
   },
-  "$id": "exp689_target_audit_row_v1",
+  "$id": "exp689_target_audit_row_v2",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "audit_id": {"pattern": "^G689-[0-9]{3}$", "type": "string"},
     "evidence_candidates": {
       "items": {"$ref": "#/$defs/evidence_candidate"},
+      "minItems": 5,
       "type": "array"
     },
+    "first_image": {"$ref": "#/$defs/first_image"},
     "record_id": {"minLength": 1, "type": "string"},
     "request_row_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "review": {"$ref": "#/$defs/review"},
-    "schema_version": {"const": "exp689_target_audit_row_v1"},
+    "schema_version": {"const": "exp689_target_audit_row_v2"},
     "source_card_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
     "sources": {"items": {"$ref": "#/$defs/source"}, "minItems": 1, "type": "array"},
     "stratum": {
@@ -132,10 +177,10 @@
     "source_card_sha256",
     "request_row_sha256",
     "sources",
+    "first_image",
     "evidence_candidates",
-    "target",
-    "review"
+    "target"
   ],
-  "title": "Experiment 689 grounded transaction-graph target-audit row",
+  "title": "Experiment 689 image-aware grounded transaction-graph target-audit row",
   "type": "object"
 }

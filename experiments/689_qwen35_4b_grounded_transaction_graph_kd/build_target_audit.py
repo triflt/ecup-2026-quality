@@ -13,6 +13,7 @@ from typing import Any
 EXPERIMENT = Path(__file__).resolve().parent
 SPEC_PATH = EXPERIMENT / "frozen_target_audit_spec.json"
 SCHEMA_PATH = EXPERIMENT / "target_audit_schema_v1.json"
+RUBRIC_PATH = EXPERIMENT / "review_rubric_v1.json"
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 SOURCE_KINDS = ("name", "description", "ocr")
 
@@ -146,6 +147,8 @@ def load_spec() -> dict[str, Any]:
         raise ContractError("frozen spec: execution scope is not remote-only")
     if spec.get("target_audit_schema_sha256") != sha256_file(SCHEMA_PATH):
         raise ContractError("frozen spec: target-audit schema SHA mismatch")
+    if spec.get("review_contract", {}).get("rubric_sha256") != sha256_file(RUBRIC_PATH):
+        raise ContractError("frozen spec: review-rubric SHA mismatch")
     return spec
 
 
@@ -159,9 +162,22 @@ def validate_source_contract(
             "execution_scope",
             "source_rows_sha256",
             "source_row_count",
+            "runtime_sha256",
+            "data_sha256",
+            "registry_sha256",
+            "builder_revision_sha256",
+            "eligibility_universe_sha256",
+            "stratum_derivation_sha256",
+            "image_membership_sha256",
+            "image_transform_sha256",
+            "candidate_generator_sha256",
             "opaque_token_scheme",
             "label_fields_present",
             "score_fields_present",
+            "first_image_rows_verified",
+            "image_fetch_failures",
+            "image_decode_failures",
+            "image_hash_mismatches",
             "sealed_rows",
             "public_rows",
             "self_sha256",
@@ -169,7 +185,7 @@ def validate_source_contract(
         "source contract",
     )
     validate_self_hash(contract, "source contract")
-    if contract["schema_version"] != "exp689_source_contract_v1":
+    if contract["schema_version"] != "exp689_source_contract_v2":
         raise ContractError("source contract: schema version mismatch")
     if contract["execution_scope"] != "remote_remote_compute":
         raise ContractError("source contract: execution_scope must be remote_remote_compute")
@@ -177,12 +193,31 @@ def validate_source_contract(
         raise ContractError("source contract: source rows SHA mismatch")
     if contract["source_row_count"] != row_count:
         raise ContractError("source contract: source row count mismatch")
+    for field in (
+        "runtime_sha256",
+        "data_sha256",
+        "registry_sha256",
+        "builder_revision_sha256",
+        "eligibility_universe_sha256",
+        "stratum_derivation_sha256",
+        "image_membership_sha256",
+        "image_transform_sha256",
+        "candidate_generator_sha256",
+    ):
+        require_hex64(contract[field], f"source contract.{field}")
     if contract["opaque_token_scheme"] != "sha256_utf8_v1":
         raise ContractError("source contract: opaque token scheme mismatch")
     if contract["label_fields_present"] is not False:
         raise ContractError("source contract: outcome labels are forbidden")
     if contract["score_fields_present"] is not False:
         raise ContractError("source contract: verdict/logit/probability/rank fields are forbidden")
+    if contract["first_image_rows_verified"] != row_count:
+        raise ContractError("source contract: every source row needs a verified first image")
+    if any(
+        contract[field] != 0
+        for field in ("image_fetch_failures", "image_decode_failures", "image_hash_mismatches")
+    ):
+        raise ContractError("source contract: image fetch/decode/hash failures must be zero")
     if contract["sealed_rows"] != 0 or contract["public_rows"] != 0:
         raise ContractError("source contract: sealed and Public rows must both be zero")
 
@@ -332,6 +367,7 @@ def validate_source_row(row: dict[str, Any], spec: dict[str, Any], index: int) -
             "stratum",
             "source_card_sha256",
             "sources",
+            "first_image",
             "evidence_candidates",
         },
         context,
@@ -364,39 +400,109 @@ def validate_source_row(row: dict[str, Any], spec: dict[str, Any], index: int) -
             raise ContractError(f"{context}: source text must be nonempty")
         if source["text_sha256"] != sha256_text(source["text"]):
             raise ContractError(f"{context}: source text SHA mismatch")
-    if row["source_card_sha256"] != sha256_bytes(canonical_json_bytes(sources)):
+    first_image = row["first_image"]
+    if not isinstance(first_image, dict):
+        raise ContractError(f"{context}: first_image must be an object")
+    expect_exact_keys(
+        first_image,
+        {
+            "reference",
+            "content_sha256",
+            "decoded_rgb_sha256",
+            "media_type",
+            "width",
+            "height",
+        },
+        f"{context}.first_image",
+    )
+    if not isinstance(first_image["reference"], str) or not first_image["reference"].strip():
+        raise ContractError(f"{context}: first-image reference must be nonempty")
+    for field in ("content_sha256", "decoded_rgb_sha256"):
+        require_hex64(first_image[field], f"{context}.first_image.{field}")
+    if first_image["media_type"] not in {"image/jpeg", "image/png", "image/webp"}:
+        raise ContractError(f"{context}: unsupported first-image media type")
+    if (
+        not isinstance(first_image["width"], int)
+        or not isinstance(first_image["height"], int)
+        or first_image["width"] < 2
+        or first_image["height"] < 2
+    ):
+        raise ContractError(f"{context}: decoded first-image dimensions are invalid")
+    source_identity = {"sources": sources, "first_image": first_image}
+    if row["source_card_sha256"] != sha256_bytes(canonical_json_bytes(source_identity)):
         raise ContractError(f"{context}: source-card SHA mismatch")
 
     candidates = row["evidence_candidates"]
     if not isinstance(candidates, list):
         raise ContractError(f"{context}: evidence_candidates must be a list")
     seen_spans: set[tuple[int, int, int]] = set()
+    seen_candidate_ids: set[str] = set()
+    image_regions: set[str] = set()
     for candidate_index, candidate in enumerate(candidates):
         if not isinstance(candidate, dict):
             raise ContractError(f"{context}: candidate {candidate_index} must be an object")
         expect_exact_keys(
             candidate,
-            {"candidate_index", "source_index", "char_start", "char_end", "evidence_sha256"},
+            {
+                "candidate_id",
+                "candidate_index",
+                "evidence_kind",
+                "source_index",
+                "char_start",
+                "char_end",
+                "image_region",
+                "evidence_sha256",
+            },
             f"{context}.evidence_candidates[{candidate_index}]",
         )
         if candidate["candidate_index"] != candidate_index:
             raise ContractError(f"{context}: candidate indices must be consecutive")
-        source_index = candidate["source_index"]
-        start = candidate["char_start"]
-        end = candidate["char_end"]
-        if not isinstance(source_index, int) or not 0 <= source_index < len(sources):
-            raise ContractError(f"{context}: candidate source index is invalid")
-        if not isinstance(start, int) or not isinstance(end, int) or not 0 <= start < end:
-            raise ContractError(f"{context}: candidate offsets are invalid")
-        text = sources[source_index]["text"]
-        if end > len(text) or not text[start:end].strip():
-            raise ContractError(f"{context}: candidate span is empty or out of bounds")
-        if candidate["evidence_sha256"] != sha256_text(text[start:end]):
-            raise ContractError(f"{context}: candidate evidence SHA mismatch")
-        span = (source_index, start, end)
-        if span in seen_spans:
-            raise ContractError(f"{context}: duplicate evidence span")
-        seen_spans.add(span)
+        require_hex64(candidate["candidate_id"], f"{context}.candidate_id")
+        require_hex64(candidate["evidence_sha256"], f"{context}.evidence_sha256")
+        candidate_copy = dict(candidate)
+        candidate_copy["candidate_id"] = None
+        if candidate["candidate_id"] != sha256_bytes(canonical_json_bytes(candidate_copy)):
+            raise ContractError(f"{context}: candidate ID is not deterministic")
+        if candidate["candidate_id"] in seen_candidate_ids:
+            raise ContractError(f"{context}: duplicate candidate ID")
+        seen_candidate_ids.add(candidate["candidate_id"])
+        if candidate["evidence_kind"] == "text_span":
+            source_index = candidate["source_index"]
+            start = candidate["char_start"]
+            end = candidate["char_end"]
+            if candidate["image_region"] is not None:
+                raise ContractError(f"{context}: text candidate cannot bind an image region")
+            if not isinstance(source_index, int) or not 0 <= source_index < len(sources):
+                raise ContractError(f"{context}: candidate source index is invalid")
+            if not isinstance(start, int) or not isinstance(end, int) or not 0 <= start < end:
+                raise ContractError(f"{context}: candidate offsets are invalid")
+            text = sources[source_index]["text"]
+            if end > len(text) or not text[start:end].strip():
+                raise ContractError(f"{context}: candidate span is empty or out of bounds")
+            if candidate["evidence_sha256"] != sha256_text(text[start:end]):
+                raise ContractError(f"{context}: candidate evidence SHA mismatch")
+            span = (source_index, start, end)
+            if span in seen_spans:
+                raise ContractError(f"{context}: duplicate evidence span")
+            seen_spans.add(span)
+        elif candidate["evidence_kind"] == "image_region":
+            if any(
+                candidate[field] is not None
+                for field in ("source_index", "char_start", "char_end")
+            ):
+                raise ContractError(f"{context}: image candidate cannot bind text offsets")
+            region = candidate["image_region"]
+            if region not in spec["image_contract"]["evidence_regions"]:
+                raise ContractError(f"{context}: unknown image evidence region")
+            if region in image_regions:
+                raise ContractError(f"{context}: duplicate image evidence region")
+            if region == "full" and candidate["evidence_sha256"] != first_image["decoded_rgb_sha256"]:
+                raise ContractError(f"{context}: full-image evidence SHA mismatch")
+            image_regions.add(region)
+        else:
+            raise ContractError(f"{context}: unknown evidence kind")
+    if image_regions != set(spec["image_contract"]["evidence_regions"]):
+        raise ContractError(f"{context}: full image and all four quadrants are required")
 
 
 def request_row_hash(row: dict[str, Any]) -> str:
@@ -407,11 +513,12 @@ def request_row_hash(row: dict[str, Any]) -> str:
 
 def make_teacher_request(row: dict[str, Any], audit_id: str) -> dict[str, Any]:
     request = {
-        "schema_version": "exp689_teacher_request_row_v1",
+        "schema_version": "exp689_teacher_request_row_v2",
         "audit_id": audit_id,
         "record_id": row["record_id"],
         "source_card_sha256": row["source_card_sha256"],
         "sources": row["sources"],
+        "first_image": row["first_image"],
         "evidence_candidates": row["evidence_candidates"],
         "request_row_sha256": None,
     }
@@ -431,12 +538,13 @@ def validate_teacher_request(
             "record_id",
             "source_card_sha256",
             "sources",
+            "first_image",
             "evidence_candidates",
             "request_row_sha256",
         },
         context,
     )
-    if row["schema_version"] != "exp689_teacher_request_row_v1":
+    if row["schema_version"] != "exp689_teacher_request_row_v2":
         raise ContractError(f"{context}: schema version mismatch")
     if row["audit_id"] != f"G689-{index:03d}":
         raise ContractError(f"{context}: audit ID/order mismatch")
@@ -453,6 +561,7 @@ def validate_teacher_request(
         "stratum": "direct_included_fuel",
         "source_card_sha256": row["source_card_sha256"],
         "sources": row["sources"],
+        "first_image": row["first_image"],
         "evidence_candidates": row["evidence_candidates"],
     }
     validate_source_row(synthetic, spec if spec is not None else load_spec(), index)
@@ -905,6 +1014,12 @@ def validate_teacher_selection_contract(
             "schema_version",
             "execution_scope",
             "teacher_request_sha256",
+            "teacher_model_id",
+            "teacher_model_revision",
+            "prompt_sha256",
+            "decoding_sha256",
+            "inference_bundle_sha256",
+            "job_metadata_sha256",
             "selection_rows_sha256",
             "selection_row_count",
             "output_policy",
@@ -915,17 +1030,27 @@ def validate_teacher_selection_contract(
         "teacher selection contract",
     )
     validate_self_hash(contract, "teacher selection contract")
-    if contract["schema_version"] != "exp689_teacher_selection_contract_v1":
+    if contract["schema_version"] != "exp689_teacher_selection_contract_v2":
         raise ContractError("teacher selection contract: schema version mismatch")
     if contract["execution_scope"] != "remote_remote_compute":
         raise ContractError("teacher selection contract: execution scope mismatch")
     if contract["teacher_request_sha256"] != manifest["teacher_request_sha256"]:
         raise ContractError("teacher selection contract: request lineage mismatch")
+    for field in ("teacher_model_id", "teacher_model_revision"):
+        if not isinstance(contract[field], str) or not contract[field].strip():
+            raise ContractError(f"teacher selection contract: {field} must be nonempty")
+    for field in (
+        "prompt_sha256",
+        "decoding_sha256",
+        "inference_bundle_sha256",
+        "job_metadata_sha256",
+    ):
+        require_hex64(contract[field], f"teacher selection contract.{field}")
     if contract["selection_rows_sha256"] != sha256_file(selection_rows_path):
         raise ContractError("teacher selection contract: selection rows SHA mismatch")
     if contract["selection_row_count"] != 300:
         raise ContractError("teacher selection contract: row count must equal 300")
-    if contract["output_policy"] != "closed_enums_and_candidate_indices_only_v1":
+    if contract["output_policy"] != "closed_enums_and_separate_candidate_ids_only_v2":
         raise ContractError("teacher selection contract: output policy mismatch")
     if contract["free_text_fields"] != 0 or contract["forbidden_fields_present"] is not False:
         raise ContractError("teacher selection contract: forbidden or free-text output detected")
@@ -937,7 +1062,7 @@ def validate_teacher_selection(
     context = f"teacher selection row {index}"
     expected_fields = set(spec["teacher_output_policy"]["allowed_generated_fields"])
     expect_exact_keys(row, expected_fields, context)
-    if row["schema_version"] != "exp689_teacher_selection_row_v1":
+    if row["schema_version"] != "exp689_teacher_selection_row_v2":
         raise ContractError(f"{context}: schema version mismatch")
     for field in ("audit_id", "record_id", "request_row_sha256"):
         if row[field] != request[field]:
@@ -945,21 +1070,35 @@ def validate_teacher_selection(
     for field in ("sold_object", "substance", "relation", "support_status"):
         if row[field] not in spec["enums"][field]:
             raise ContractError(f"{context}: invalid {field}")
-    indices = row["evidence_candidate_indices"]
-    if not isinstance(indices, list) or any(not isinstance(item, int) for item in indices):
-        raise ContractError(f"{context}: evidence indices must be integers")
-    if indices != sorted(set(indices)):
-        raise ContractError(f"{context}: evidence indices must be sorted and unique")
-    if any(not 0 <= item < len(request["evidence_candidates"]) for item in indices):
-        raise ContractError(f"{context}: selected a nonexistent evidence candidate")
+    known_candidate_ids = {
+        candidate["candidate_id"] for candidate in request["evidence_candidates"]
+    }
+    evidence_lists: list[list[str]] = []
+    for field in (
+        "object_evidence_candidate_ids",
+        "substance_evidence_candidate_ids",
+        "relation_evidence_candidate_ids",
+    ):
+        candidate_ids = row[field]
+        if not isinstance(candidate_ids, list) or any(
+            not isinstance(item, str) for item in candidate_ids
+        ):
+            raise ContractError(f"{context}: {field} must be a string list")
+        if candidate_ids != sorted(set(candidate_ids)):
+            raise ContractError(f"{context}: {field} must be sorted and unique")
+        if any(item not in known_candidate_ids for item in candidate_ids):
+            raise ContractError(f"{context}: selected a nonexistent evidence candidate ID")
+        evidence_lists.append(candidate_ids)
     if not isinstance(row["supervise"], bool):
         raise ContractError(f"{context}: supervise must be boolean")
     if row["support_status"] == "supported":
-        if row["supervise"] is not True or not indices:
-            raise ContractError(f"{context}: supported rows require supervision and evidence")
-    elif row["supervise"] is not False or indices:
+        if row["supervise"] is not True or any(not values for values in evidence_lists):
+            raise ContractError(
+                f"{context}: supported rows require supervision and evidence for every target"
+            )
+    elif row["supervise"] is not False or any(evidence_lists):
         raise ContractError(
-            f"{context}: unsupported or ambiguous rows must abstain with no evidence indices"
+            f"{context}: unsupported or ambiguous rows must abstain with no evidence IDs"
         )
 
 
@@ -995,28 +1134,26 @@ def make_target_row(
     request: dict[str, Any], binding: dict[str, Any], selection: dict[str, Any]
 ) -> dict[str, Any]:
     return {
-        "schema_version": "exp689_target_audit_row_v1",
+        "schema_version": "exp689_target_audit_row_v2",
         "audit_id": request["audit_id"],
         "record_id": request["record_id"],
         "stratum": binding["stratum"],
         "source_card_sha256": request["source_card_sha256"],
         "request_row_sha256": request["request_row_sha256"],
         "sources": request["sources"],
+        "first_image": request["first_image"],
         "evidence_candidates": request["evidence_candidates"],
         "target": {
             "sold_object": selection["sold_object"],
             "substance": selection["substance"],
             "relation": selection["relation"],
-            "evidence_candidate_indices": selection["evidence_candidate_indices"],
+            "object_evidence_candidate_ids": selection["object_evidence_candidate_ids"],
+            "substance_evidence_candidate_ids": selection[
+                "substance_evidence_candidate_ids"
+            ],
+            "relation_evidence_candidate_ids": selection["relation_evidence_candidate_ids"],
             "support_status": selection["support_status"],
             "supervise": selection["supervise"],
-        },
-        "review": {
-            "sold_object_correct": None,
-            "substance_correct": None,
-            "relation_correct": None,
-            "evidence_supported": None,
-            "contradiction": None,
         },
     }
 
@@ -1060,7 +1197,7 @@ def materialize(
     write_jsonl(packet_path, rows)
     packet_contract = with_self_hash(
         {
-            "schema_version": "exp689_target_audit_contract_v1",
+            "schema_version": "exp689_target_audit_contract_v2",
             "experiment_id": "689",
             "execution_scope": "remote_remote_compute",
             "frozen_spec_sha256": sha256_file(SPEC_PATH),
@@ -1073,7 +1210,7 @@ def materialize(
             "target_audit_rows": len(rows),
             "selected_counts_by_stratum": manifest["selected_counts_by_stratum"],
             "gates": spec["gates"],
-            "human_review_fields_empty": True,
+            "embedded_review_fields": 0,
             "student_gpu_authorized": False,
             "self_sha256": None,
         }
