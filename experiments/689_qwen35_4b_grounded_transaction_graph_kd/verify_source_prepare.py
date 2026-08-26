@@ -24,6 +24,10 @@ ALLOWED_BUNDLE_PATHS = {
     "experiments/689_qwen35_4b_grounded_transaction_graph_kd/source_prepare_spec_v1.json",
     "experiments/689_qwen35_4b_grounded_transaction_graph_kd/verify_source_prepare.py",
 }
+TRANSPORT_BUNDLE_PATH = (
+    "experiments/689_qwen35_4b_grounded_transaction_graph_kd/"
+    "extract_source_archive_transport.py"
+)
 SOURCE_CONTRACT_FIELDS = {
     "schema_version", "execution_scope", "source_rows_sha256", "source_row_count",
     "runtime_sha256", "data_sha256", "registry_sha256", "builder_revision_sha256",
@@ -412,12 +416,19 @@ def _validate_bundle(
         "bundle manifest",
     )
     _self_hash(manifest, "bundle manifest")
-    if manifest["schema_version"] != "exp689_source_prepare_bundle_manifest_v1":
+    if manifest["schema_version"] == "exp689_source_prepare_bundle_manifest_v1":
+        allowed_paths = ALLOWED_BUNDLE_PATHS
+    elif (
+        manifest["schema_version"]
+        == "exp689_source_prepare_bundle_manifest_v2_transport"
+    ):
+        allowed_paths = ALLOWED_BUNDLE_PATHS | {TRANSPORT_BUNDLE_PATH}
+    else:
         raise VerificationError("bundle manifest: schema mismatch")
     if manifest["builder_revision"] != builder_revision:
         raise VerificationError("bundle manifest: builder revision mismatch")
     files = manifest["files"]
-    if not isinstance(files, list) or [item.get("path") for item in files] != sorted(ALLOWED_BUNDLE_PATHS):
+    if not isinstance(files, list) or [item.get("path") for item in files] != sorted(allowed_paths):
         raise VerificationError("bundle manifest: exact source-prep whitelist required")
     for index, item in enumerate(files):
         _exact_keys(item, {"path", "sha256", "size_bytes"}, f"bundle file {index}")

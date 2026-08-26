@@ -59,7 +59,14 @@ def write_json(path: Path, value: dict[str, Any]) -> None:
     )
 
 
-def build(repo: Path, revision: str, output_dir: Path) -> dict[str, Any]:
+def build(
+    repo: Path,
+    revision: str,
+    output_dir: Path,
+    *,
+    files: tuple[str, ...] = FILES,
+    manifest_schema: str = "exp689_source_prepare_bundle_manifest_v1",
+) -> dict[str, Any]:
     if not HEX40.fullmatch(revision):
         raise ValueError("revision must be an exact lowercase Git commit")
     if output_dir.exists():
@@ -71,7 +78,7 @@ def build(repo: Path, revision: str, output_dir: Path) -> dict[str, Any]:
 
     entries: list[dict[str, Any]] = []
     blobs: dict[str, bytes] = {}
-    for relative in FILES:
+    for relative in files:
         blob = git_blob(repo, revision, relative)
         blobs[relative] = blob
         destination = payload_root / relative
@@ -81,7 +88,7 @@ def build(repo: Path, revision: str, output_dir: Path) -> dict[str, Any]:
             {"path": relative, "sha256": sha256_bytes(blob), "size_bytes": len(blob)}
         )
     manifest = {
-        "schema_version": "exp689_source_prepare_bundle_manifest_v1",
+        "schema_version": manifest_schema,
         "builder_revision": revision,
         "files": entries,
         "self_sha256": None,
@@ -96,7 +103,7 @@ def build(repo: Path, revision: str, output_dir: Path) -> dict[str, Any]:
         gzip.GzipFile(filename="", mode="wb", fileobj=compressed, mtime=0) as gzip_stream,
         tarfile.open(fileobj=gzip_stream, mode="w", format=tarfile.PAX_FORMAT) as archive,
     ):
-        for relative in FILES:
+        for relative in files:
             blob = blobs[relative]
             info = tarfile.TarInfo(relative)
             info.size = len(blob)
