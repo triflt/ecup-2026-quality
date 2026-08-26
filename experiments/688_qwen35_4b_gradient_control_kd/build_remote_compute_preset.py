@@ -19,7 +19,9 @@ if str(HERE) not in sys.path:
 from train_gradient_control import (
     CONTROL_MODE,
     MODEL_REVISION,
+    TERMINAL_PARENT_TRANSPORT_ADAPTER,
     load_terminal_probe_selection,
+    require_terminal_parent_lineage,
     sha256_file,
 )
 
@@ -248,7 +250,20 @@ def _train_command(args: argparse.Namespace, mode: str, output_dir: str) -> str:
     )
 
 
-def _command(args: argparse.Namespace, selected_mode: str) -> str:
+def _legacy_parent_stage_command(args: argparse.Namespace, adapter: str) -> str:
+    if adapter != TERMINAL_PARENT_TRANSPORT_ADAPTER:
+        raise ValueError("unsupported terminal parent transport adapter")
+    return (
+        f"PYTHONPATH=/work/code/{EXP686_DIR} python3 -u "
+        f"/work/code/{EXP686_DIR}/stage_training_input.py --source /work/pair_raw "
+        f"--output /work/pair_clean --fold 3 --expected-pair-acceptance-sha256 "
+        f"{args.expected_pair_acceptance_sha256} "
+        f"--expected-pair-runtime-contract-sha256 "
+        f"{args.expected_pair_runtime_contract_sha256}"
+    )
+
+
+def _command(args: argparse.Namespace, selected_mode: str, adapter: str) -> str:
     parent_archive = f"/work/input/parent_code/{args.parent_bundle_file}"
     probe_archive = f"/work/input/probe_code/{args.probe_bundle_file}"
     exp688_archive = f"/work/input/exp688_code/{args.exp688_bundle_file}"
@@ -301,16 +316,7 @@ def _command(args: argparse.Namespace, selected_mode: str) -> str:
         ),
         "mkdir -p /work/vendor /work/images",
         "python3 -m zipfile -e /work/input/vendor/peft-0.20.0.zip /work/vendor",
-        (
-            f"PYTHONPATH=/work/code/{EXP686_DIR} python3 -u "
-            f"/work/code/{EXP686_DIR}/stage_training_input.py --source /work/pair_raw "
-            f"--output /work/pair_clean --fold 3 --expected-pair-acceptance-sha256 "
-            f"{args.expected_pair_acceptance_sha256} "
-            f"--expected-pair-runtime-contract-sha256 "
-            f"{args.expected_pair_runtime_contract_sha256} "
-            f"--expected-r0-code-acceptance-sha256 "
-            f"{args.expected_r0_code_acceptance_sha256}"
-        ),
+        _legacy_parent_stage_command(args, adapter),
         _train_command(args, CONTROL_MODE, "/work/output/control"),
         _train_command(args, selected_mode, "/work/output/candidate"),
         (
@@ -388,7 +394,6 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         args.exp688_bundle_sha256,
         args.expected_pair_acceptance_sha256,
         args.expected_pair_runtime_contract_sha256,
-        args.expected_r0_code_acceptance_sha256,
         args.vendor_sha256,
         args.probe_report_file_sha256,
         args.probe_acceptance_file_sha256,
@@ -417,7 +422,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         args.exp688_bundle_src, f"{approved_prefix}/experiments/688/code"
     )
     args.pair_src = _safe_s3(
-        args.pair_src, f"{approved_prefix}/experiments/686"
+        args.pair_src, f"{approved_prefix}/experiments/685/r0/fold3"
     )
     args.vendor_src = _safe_s3(args.vendor_src, approved_prefix)
     args.probe_artifact_src = _safe_s3(
@@ -456,6 +461,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     if sha256_file(args.probe_acceptance) != args.probe_acceptance_file_sha256:
         raise ValueError("terminal exp687 acceptance file SHA mismatch")
     selection = load_terminal_probe_selection(args.probe_report, args.probe_acceptance)
+    parent_transport_adapter = require_terminal_parent_lineage(selection)
     frozen_input_bindings = {
         "pair_runtime_contract_sha256": args.expected_pair_runtime_contract_sha256,
         "pair_runtime_acceptance_sha256": args.expected_pair_acceptance_sha256,
@@ -479,7 +485,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     if mismatch:
         raise ValueError(f"terminal selector/preset input mismatch: {mismatch}")
     selected_mode = selection["selected_candidate_mode"]
-    command = _command(args, selected_mode)
+    command = _command(args, selected_mode, parent_transport_adapter)
     clean_payload = _preset(args, command)
     _write_new(args.clean_output, clean_payload)
     return {
@@ -508,7 +514,6 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--pair-src", required=True)
     result.add_argument("--expected-pair-acceptance-sha256", required=True)
     result.add_argument("--expected-pair-runtime-contract-sha256", required=True)
-    result.add_argument("--expected-r0-code-acceptance-sha256", required=True)
     result.add_argument("--vendor-src", required=True)
     result.add_argument("--vendor-sha256", required=True)
     result.add_argument("--probe-artifact-src", required=True)

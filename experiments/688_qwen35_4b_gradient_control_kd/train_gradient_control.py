@@ -57,6 +57,25 @@ CANDIDATE_BY_PROBE_DECISION = {
     "OPEN_ASYMMETRIC_PCGRAD_SCREEN": PCGRAD_MODE,
     "ROUTE_MAGNITUDE_CONTROL": NORM_CAP_MODE,
 }
+TERMINAL_PARENT_TRANSPORT_ADAPTER = "exp686_9899_legacy_stage_input"
+TERMINAL_EXP687_PARENT_LINEAGE = {
+    "pair_runtime_contract_sha256": (
+        "a11590eb7133227d148eaf05072b3a104b4e171025fa69879aa8715dd3d71a38"
+    ),
+    "pair_runtime_acceptance_sha256": (
+        "c51eb01f115c6cb06d0d5bf04866c6ea39fd940e72a3471db9e4f3b34015c684"
+    ),
+    "source_runtime_contract_sha256": (
+        "e08a51c2db16163953c45841f3dd1e7b30b293a7265b2bbd8084d1479c20ea36"
+    ),
+    "parent_code_bundle_sha256": (
+        "ba5527b65548fd68fafa6eaf8d6fedfc906b6469d32c2e08fdc56ebccf9fd999"
+    ),
+    "parent_code_revision": "9899e2039d0063a8d503eade07be12cf7f1db729",
+    "parent_code_acceptance_sha256": (
+        "1bba866b58be1498bd1a32a00ea65c96852f5a1ac1883fb39181c2962541d0c3"
+    ),
+}
 EXPECTED_RUNTIME_PACKAGES = {
     "torch": "2.10.0+cu128",
     "transformers": "5.14.1",
@@ -85,6 +104,19 @@ DIAGNOSTIC_FIELDS = {
     "clip_grad_norm_return",
     "clip_max_norm",
 }
+
+
+def require_terminal_parent_lineage(value: dict[str, Any]) -> str:
+    mismatch = {
+        field: {"expected": expected, "actual": value.get(field)}
+        for field, expected in TERMINAL_EXP687_PARENT_LINEAGE.items()
+        if value.get(field) != expected
+    }
+    if mismatch:
+        raise ValueError(
+            f"terminal experiment-687 parent lineage mismatch: {mismatch}"
+        )
+    return TERMINAL_PARENT_TRANSPORT_ADAPTER
 
 
 def sha256_file(path: Path) -> str:
@@ -470,6 +502,7 @@ def load_terminal_probe_selection(
         value = report.get(field)
         if not _is_lower_hex(value, 40) and not _is_lower_hex(value, 64):
             raise ValueError(f"invalid experiment-687 provenance field: {field}")
+    parent_transport_adapter = require_terminal_parent_lineage(report)
 
     acceptance = json.loads(acceptance_path.read_text(encoding="utf-8"))
     acceptance_body = dict(acceptance)
@@ -501,6 +534,7 @@ def load_terminal_probe_selection(
         raise ValueError("terminal experiment 687 does not open an exp688 candidate")
     return {
         "selected_candidate_mode": selected,
+        "parent_transport_adapter": parent_transport_adapter,
         "probe_scientific_decision": report["decision"],
         "probe_report_sha256": report_sha,
         "probe_acceptance_sha256": acceptance_sha,

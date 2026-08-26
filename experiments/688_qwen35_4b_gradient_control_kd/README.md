@@ -106,3 +106,10 @@ drift. `train_gradient_control.py --help` exposes the one-step
 `--technical-smoke` path. No preset instance is built by this packet. The local
 submit path must inject credentials only in memory through stdin and must never
 persist, print or hash the secret-bearing payload.
+
+The current fold3 smoke has one explicit parent-transport adapter. It accepts
+only the exact terminal experiment-687 lineage for the frozen experiment-686
+`9899e20` parent bundle and fold3 pair contract, then invokes that parent's
+legacy `stage_training_input.py` interface. It does not pass the later R0-code
+acceptance option, which that immutable parent does not implement. No generic
+fallback to another parent revision, pair contract or source fold is allowed.

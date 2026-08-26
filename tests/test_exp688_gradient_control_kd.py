@@ -275,6 +275,20 @@ class GradientControlKDTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "fold3 only"):
             TRAIN._load_frozen_inputs(args)
 
+    def test_terminal_selector_allows_only_exact_legacy_parent_lineage(self):
+        lineage = dict(TRAIN.TERMINAL_EXP687_PARENT_LINEAGE)
+        self.assertEqual(
+            TRAIN.require_terminal_parent_lineage(lineage),
+            TRAIN.TERMINAL_PARENT_TRANSPORT_ADAPTER,
+        )
+        for field in TRAIN.TERMINAL_EXP687_PARENT_LINEAGE:
+            drifted = dict(lineage)
+            drifted[field] = "0" * len(str(drifted[field]))
+            with self.subTest(field=field), self.assertRaisesRegex(
+                ValueError, "parent lineage mismatch"
+            ):
+                TRAIN.require_terminal_parent_lineage(drifted)
+
     def test_current_inputs_reject_mismatched_selector_provenance(self):
         with tempfile.TemporaryDirectory() as directory:
             code_bundle = Path(directory) / "code.tar.gz"
@@ -621,9 +635,12 @@ class GradientControlKDTests(unittest.TestCase):
             vendor_sha256="9" * 64,
             expected_pair_acceptance_sha256="a" * 64,
             expected_pair_runtime_contract_sha256="b" * 64,
-            expected_r0_code_acceptance_sha256="c" * 64,
         )
-        command = PRESET._command(args, TRAIN.PCGRAD_MODE)
+        command = PRESET._command(
+            args,
+            TRAIN.PCGRAD_MODE,
+            TRAIN.TERMINAL_PARENT_TRANSPORT_ADAPTER,
+        )
         self.assertEqual(command.count("train_gradient_control.py"), 2)
         self.assertEqual(command.count("--technical-smoke"), 4)
         self.assertIn("--mode paired_hard_control", command)
@@ -631,7 +648,18 @@ class GradientControlKDTests(unittest.TestCase):
         self.assertIn("--output-dir /work/output/control", command)
         self.assertIn("--output-dir /work/output/candidate", command)
         self.assertIn("verify_paired_smoke.py", command)
+        self.assertIn("stage_training_input.py", command)
+        self.assertNotIn("--expected-r0-code-acceptance-sha256", command)
         self.assertNotIn("compute job submit", command)
+        with self.assertRaisesRegex(ValueError, "unsupported.*adapter"):
+            PRESET._command(args, TRAIN.PCGRAD_MODE, "future_parent")
+        destinations = {action.dest for action in PRESET.parser()._actions}
+        self.assertNotIn("expected_r0_code_acceptance_sha256", destinations)
+        with self.assertRaisesRegex(ValueError, "escapes frozen scope"):
+            PRESET._safe_s3(
+                "/approved/user/ecup/experiments/686/pair/fold3",
+                "/approved/user/ecup/experiments/685/r0/fold3",
+            )
 
     def test_tracked_preset_builder_cannot_read_or_serialize_credentials(self):
         source = inspect.getsource(PRESET)
@@ -686,7 +714,6 @@ class GradientControlKDTests(unittest.TestCase):
                 exp688_bundle_sha256="3" * 64,
                 expected_pair_acceptance_sha256="4" * 64,
                 expected_pair_runtime_contract_sha256="5" * 64,
-                expected_r0_code_acceptance_sha256="6" * 64,
                 vendor_sha256="7" * 64,
                 probe_report_file_sha256="8" * 64,
                 probe_acceptance_file_sha256="8" * 64,
@@ -699,7 +726,7 @@ class GradientControlKDTests(unittest.TestCase):
                 parent_bundle_src="/approved/user/ecup/experiments/686/code/x",
                 probe_bundle_src="/approved/user/ecup/experiments/687/code/x",
                 exp688_bundle_src="/approved/user/ecup/experiments/688/code/x",
-                pair_src="/approved/user/ecup/experiments/686/pair/x",
+                pair_src="/approved/user/ecup/experiments/685/r0/fold3/x",
                 vendor_src="/approved/user/ecup/vendor/x",
                 probe_artifact_src=(
                     "/approved/user/ecup/experiments/687/probe/fold3/x"
@@ -734,16 +761,27 @@ class GradientControlKDTests(unittest.TestCase):
                 clean_output=root / "clean.yml",
                 expected_region="test-region",
                 approved_prefix="/approved/user/ecup",
-                parent_bundle_sha256="1" * 64,
+                parent_bundle_sha256=TRAIN.TERMINAL_EXP687_PARENT_LINEAGE[
+                    "parent_code_bundle_sha256"
+                ],
                 probe_bundle_sha256="2" * 64,
                 exp688_bundle_sha256="3" * 64,
-                expected_pair_acceptance_sha256="4" * 64,
-                expected_pair_runtime_contract_sha256="5" * 64,
-                expected_r0_code_acceptance_sha256="6" * 64,
+                expected_pair_acceptance_sha256=(
+                    TRAIN.TERMINAL_EXP687_PARENT_LINEAGE[
+                        "pair_runtime_acceptance_sha256"
+                    ]
+                ),
+                expected_pair_runtime_contract_sha256=(
+                    TRAIN.TERMINAL_EXP687_PARENT_LINEAGE[
+                        "pair_runtime_contract_sha256"
+                    ]
+                ),
                 vendor_sha256="7" * 64,
                 probe_report_file_sha256="8" * 64,
                 probe_acceptance_file_sha256="8" * 64,
-                parent_code_revision="9" * 40,
+                parent_code_revision=TRAIN.TERMINAL_EXP687_PARENT_LINEAGE[
+                    "parent_code_revision"
+                ],
                 probe_code_revision="a" * 40,
                 exp688_code_revision="b" * 40,
                 parent_bundle_file="parent.tar.gz",
@@ -752,7 +790,7 @@ class GradientControlKDTests(unittest.TestCase):
                 parent_bundle_src="/approved/user/ecup/experiments/686/code/x",
                 probe_bundle_src="/approved/user/ecup/experiments/687/code/x",
                 exp688_bundle_src="/approved/user/ecup/experiments/688/code/x",
-                pair_src="/approved/user/ecup/experiments/686/pair/x",
+                pair_src="/approved/user/ecup/experiments/685/r0/fold3/x",
                 vendor_src="/approved/user/ecup/vendor/x",
                 probe_artifact_src=(
                     "/approved/user/ecup/experiments/687/probe/fold3/x"
@@ -766,15 +804,15 @@ class GradientControlKDTests(unittest.TestCase):
                 probe_report=root / "gradient_conflict_report.json",
                 probe_acceptance=root / "acceptance.json",
             )
-            parent_acceptance = {"acceptance_sha256": "c" * 64}
+            parent_acceptance = {
+                "acceptance_sha256": TRAIN.TERMINAL_EXP687_PARENT_LINEAGE[
+                    "parent_code_acceptance_sha256"
+                ]
+            }
             probe_acceptance = {"acceptance_sha256": "d" * 64}
             selection = {
                 "selected_candidate_mode": TRAIN.PCGRAD_MODE,
-                "pair_runtime_contract_sha256": "5" * 64,
-                "pair_runtime_acceptance_sha256": "4" * 64,
-                "parent_code_bundle_sha256": "1" * 64,
-                "parent_code_revision": "9" * 40,
-                "parent_code_acceptance_sha256": "c" * 64,
+                **TRAIN.TERMINAL_EXP687_PARENT_LINEAGE,
                 "probe_code_bundle_sha256": "e" * 64,
                 "probe_code_revision": "a" * 40,
                 "probe_code_acceptance_sha256": "d" * 64,
