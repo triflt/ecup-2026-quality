@@ -136,7 +136,7 @@ def make_runtime_inputs(
             "runtime_sha256": token("runtime"),
             "data_sha256": token("data"),
             "registry_sha256": token("registry"),
-            "builder_revision_sha256": token("builder-revision"),
+            "builder_revision_sha256": build.sha256_text("a" * 40),
             "eligibility_universe_sha256": token("eligibility-universe"),
             "stratum_derivation_sha256": token("stratum-derivation"),
             "image_membership_sha256": token("first-image-membership"),
@@ -156,6 +156,72 @@ def make_runtime_inputs(
     )
     source_contract_path = inputs / "source_contract.json"
     write_json(source_contract_path, source_contract)
+
+    output_inventory = [
+        {
+            "path": "source_rows.jsonl",
+            "size_bytes": source_rows.stat().st_size,
+            "sha256": build.sha256_file(source_rows),
+        },
+        {
+            "path": "source_contract.json",
+            "size_bytes": source_contract_path.stat().st_size,
+            "sha256": build.sha256_file(source_contract_path),
+        },
+        {
+            "path": "images/image_manifest.jsonl",
+            "size_bytes": 0,
+            "sha256": token("synthetic-image-manifest"),
+        },
+    ] + [
+        {
+            "path": f"images/G689-{index:03d}.jpg",
+            "size_bytes": 0,
+            "sha256": token(f"synthetic-image-{index:03d}"),
+        }
+        for index in range(1, 301)
+    ]
+    source_prepare_acceptance = build.with_self_hash(
+        {
+            "schema_version": "exp689_source_prepare_acceptance_v1",
+            "decision": "ACCEPT",
+            "builder_revision": "a" * 40,
+            "builder_revision_sha256": build.sha256_text("a" * 40),
+            "builder_source_sha256": token("source-prepare-builder"),
+            "bundle_manifest_sha256": token("source-prepare-bundle"),
+            "source_prepare_spec_sha256": token("source-prepare-spec"),
+            "runtime_archives": [
+                {
+                    "fold": fold,
+                    "reference": f"s3://approved-input/runtime-{fold}.tar",
+                    "sha256": token(f"runtime-archive-{fold}"),
+                    "size_bytes": 1,
+                }
+                for fold in range(5)
+            ],
+            "runtime_bindings_sha256": token("runtime-bindings"),
+            "source_contract_sha256": build.sha256_file(source_contract_path),
+            "source_contract_self_sha256": source_contract["self_sha256"],
+            "source_rows_sha256": build.sha256_file(source_rows),
+            "source_row_count": len(rows),
+            "output_inventory_sha256": build.sha256_bytes(
+                build.canonical_json_bytes(output_inventory)
+            ),
+            "output_inventory": output_inventory,
+            "terminal_metadata_sha256": token("source-prepare-terminal"),
+            "terminal_job_id": "synthetic-source-prepare",
+            "terminal_status": "SUCCESS",
+            "terminal_finished_at": "2026-08-26T01:00:00Z",
+            "approved_s3_output_ref": "s3://approved-output/exp689-source-prepare",
+            "label_fields_present": False,
+            "score_fields_present": False,
+            "sealed_rows": 0,
+            "public_rows": 0,
+            "self_sha256": None,
+        }
+    )
+    source_prepare_acceptance_path = inputs / "source_prepare_acceptance.json"
+    write_json(source_prepare_acceptance_path, source_prepare_acceptance)
 
     values_670 = [f"old-670-component-{index:03d}" for index in range(300)]
     values_672 = [f"old-672-component-{index:03d}" for index in range(40)]
@@ -212,6 +278,10 @@ def make_runtime_inputs(
         "root": root,
         "source_rows": source_rows,
         "source_contract": source_contract_path,
+        "source_prepare_acceptance": source_prepare_acceptance_path,
+        "source_prepare_acceptance_sha256": build.sha256_file(
+            source_prepare_acceptance_path
+        ),
         "exclusion_670": exclusion_670,
         "exclusion_672": exclusion_672,
         "exclusion_670_sha256": build.sha256_file(exclusion_670),
@@ -227,6 +297,8 @@ def prepare_runtime(paths: dict[str, Any], name: str = "prepared") -> tuple[Path
         remote_root=paths["root"],
         source_rows_path=paths["source_rows"],
         source_contract_path=paths["source_contract"],
+        source_prepare_acceptance_path=paths["source_prepare_acceptance"],
+        source_prepare_acceptance_sha256=paths["source_prepare_acceptance_sha256"],
         exclusion_670_path=paths["exclusion_670"],
         exclusion_672_path=paths["exclusion_672"],
         exclusion_670_sha256=paths["exclusion_670_sha256"],
@@ -582,11 +654,46 @@ def test_unsupported_teacher_response_must_clear_all_three_evidence_lists(
     def mutate(rows: list[dict[str, Any]]) -> None:
         rows[0]["support_status"] = "ambiguous"
         rows[0]["supervise"] = False
+        rows[0]["sold_object"] = "unknown"
+        rows[0]["substance"] = "unknown"
+        rows[0]["relation"] = "unknown"
         rows[0]["object_evidence_candidate_ids"] = []
         rows[0]["substance_evidence_candidate_ids"] = []
 
     selection_path, selection_contract = make_selections(tmp_path, request_path, mutate=mutate)
     with pytest.raises(build.ContractError, match="must abstain"):
+        materialize_runtime(
+            paths, manifest_path, request_path, selection_path, selection_contract
+        )
+
+
+def test_supported_teacher_response_cannot_mask_unknown_target(tmp_path: Path) -> None:
+    paths = make_runtime_inputs(tmp_path)
+    manifest_path, request_path = prepare_runtime(paths)
+
+    def mutate(rows: list[dict[str, Any]]) -> None:
+        rows[0]["substance"] = "unknown"
+
+    selection_path, selection_contract = make_selections(tmp_path, request_path, mutate=mutate)
+    with pytest.raises(build.ContractError, match="all three semantic targets"):
+        materialize_runtime(
+            paths, manifest_path, request_path, selection_path, selection_contract
+        )
+
+
+def test_unsupported_teacher_response_cannot_keep_invented_targets(tmp_path: Path) -> None:
+    paths = make_runtime_inputs(tmp_path)
+    manifest_path, request_path = prepare_runtime(paths)
+
+    def mutate(rows: list[dict[str, Any]]) -> None:
+        rows[0]["support_status"] = "unsupported"
+        rows[0]["supervise"] = False
+        rows[0]["object_evidence_candidate_ids"] = []
+        rows[0]["substance_evidence_candidate_ids"] = []
+        rows[0]["relation_evidence_candidate_ids"] = []
+
+    selection_path, selection_contract = make_selections(tmp_path, request_path, mutate=mutate)
+    with pytest.raises(build.ContractError, match="unknown semantic targets"):
         materialize_runtime(
             paths, manifest_path, request_path, selection_path, selection_contract
         )
@@ -699,3 +806,24 @@ def test_paths_outside_remote_root_are_rejected(tmp_path: Path) -> None:
     outside.write_text("{}\n", encoding="utf-8")
     with pytest.raises(build.ContractError, match="below --remote-root"):
         build.require_remote_path(remote_root, outside, context="source rows", must_exist=True)
+
+
+def test_prepare_requires_exact_source_prepare_acceptance_sha(tmp_path: Path) -> None:
+    paths = make_runtime_inputs(tmp_path)
+    paths["source_prepare_acceptance_sha256"] = "0" * 64
+    with pytest.raises(build.ContractError, match="exact file SHA mismatch"):
+        prepare_runtime(paths)
+
+
+def test_prepare_recomputes_acceptance_source_rows_binding(tmp_path: Path) -> None:
+    paths = make_runtime_inputs(tmp_path)
+    acceptance = json.loads(paths["source_prepare_acceptance"].read_text())
+    acceptance["source_rows_sha256"] = "f" * 64
+    acceptance["self_sha256"] = None
+    acceptance = build.with_self_hash(acceptance)
+    write_json(paths["source_prepare_acceptance"], acceptance)
+    paths["source_prepare_acceptance_sha256"] = build.sha256_file(
+        paths["source_prepare_acceptance"]
+    )
+    with pytest.raises(build.ContractError, match="source-rows file binding mismatch"):
+        prepare_runtime(paths)

@@ -15,6 +15,8 @@ SPEC_PATH = EXPERIMENT / "frozen_target_audit_spec.json"
 SCHEMA_PATH = EXPERIMENT / "target_audit_schema_v1.json"
 RUBRIC_PATH = EXPERIMENT / "review_rubric_v1.json"
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
+HEX40 = re.compile(r"^[0-9a-f]{40}$")
+S3_REFERENCE = re.compile(r"^s3://[^/?#]+/[^?#]+$")
 SOURCE_KINDS = ("name", "description", "ocr")
 
 
@@ -220,6 +222,164 @@ def validate_source_contract(
         raise ContractError("source contract: image fetch/decode/hash failures must be zero")
     if contract["sealed_rows"] != 0 or contract["public_rows"] != 0:
         raise ContractError("source contract: sealed and Public rows must both be zero")
+
+
+def validate_source_prepare_acceptance(
+    acceptance: dict[str, Any],
+    *,
+    acceptance_path: Path,
+    expected_acceptance_sha256: str,
+    source_rows_path: Path,
+    source_contract_path: Path,
+    source_contract: dict[str, Any],
+) -> None:
+    """Require an independently emitted ACCEPT and recompute its local bindings."""
+    expect_exact_keys(
+        acceptance,
+        {
+            "schema_version",
+            "decision",
+            "builder_revision",
+            "builder_revision_sha256",
+            "builder_source_sha256",
+            "bundle_manifest_sha256",
+            "source_prepare_spec_sha256",
+            "runtime_archives",
+            "runtime_bindings_sha256",
+            "source_contract_sha256",
+            "source_contract_self_sha256",
+            "source_rows_sha256",
+            "source_row_count",
+            "output_inventory_sha256",
+            "output_inventory",
+            "terminal_metadata_sha256",
+            "terminal_job_id",
+            "terminal_status",
+            "terminal_finished_at",
+            "approved_s3_output_ref",
+            "label_fields_present",
+            "score_fields_present",
+            "sealed_rows",
+            "public_rows",
+            "self_sha256",
+        },
+        "source prepare acceptance",
+    )
+    require_hex64(expected_acceptance_sha256, "source prepare acceptance expected SHA")
+    if sha256_file(acceptance_path) != expected_acceptance_sha256:
+        raise ContractError("source prepare acceptance: exact file SHA mismatch")
+    validate_self_hash(acceptance, "source prepare acceptance")
+    if acceptance["schema_version"] != "exp689_source_prepare_acceptance_v1":
+        raise ContractError("source prepare acceptance: schema version mismatch")
+    if acceptance["decision"] != "ACCEPT":
+        raise ContractError("source prepare acceptance: exact ACCEPT required")
+    if not isinstance(acceptance["builder_revision"], str) or not HEX40.fullmatch(
+        acceptance["builder_revision"]
+    ):
+        raise ContractError("source prepare acceptance: invalid builder revision")
+    for field in (
+        "builder_revision_sha256",
+        "builder_source_sha256",
+        "bundle_manifest_sha256",
+        "source_prepare_spec_sha256",
+        "runtime_bindings_sha256",
+        "source_contract_sha256",
+        "source_contract_self_sha256",
+        "source_rows_sha256",
+        "output_inventory_sha256",
+        "terminal_metadata_sha256",
+    ):
+        require_hex64(acceptance[field], f"source prepare acceptance.{field}")
+    if acceptance["builder_revision_sha256"] != sha256_text(
+        acceptance["builder_revision"]
+    ):
+        raise ContractError("source prepare acceptance: builder revision SHA mismatch")
+    if acceptance["builder_revision_sha256"] != source_contract["builder_revision_sha256"]:
+        raise ContractError("source prepare acceptance: source-contract builder mismatch")
+    if acceptance["source_contract_sha256"] != sha256_file(source_contract_path):
+        raise ContractError("source prepare acceptance: source-contract file binding mismatch")
+    if acceptance["source_contract_self_sha256"] != source_contract["self_sha256"]:
+        raise ContractError("source prepare acceptance: source-contract self binding mismatch")
+    if acceptance["source_rows_sha256"] != sha256_file(source_rows_path):
+        raise ContractError("source prepare acceptance: source-rows file binding mismatch")
+    if acceptance["source_rows_sha256"] != source_contract["source_rows_sha256"]:
+        raise ContractError("source prepare acceptance: source-rows contract mismatch")
+    if acceptance["source_row_count"] != source_contract["source_row_count"]:
+        raise ContractError("source prepare acceptance: source-row count mismatch")
+    archives = acceptance["runtime_archives"]
+    if not isinstance(archives, list) or len(archives) != 5:
+        raise ContractError("source prepare acceptance: exactly five runtime archives required")
+    for fold, archive in enumerate(archives):
+        if not isinstance(archive, dict):
+            raise ContractError(f"source prepare acceptance: archive {fold} must be an object")
+        expect_exact_keys(
+            archive,
+            {"fold", "reference", "sha256", "size_bytes"},
+            f"source prepare acceptance archive {fold}",
+        )
+        if archive["fold"] != fold or not isinstance(archive["size_bytes"], int) or archive[
+            "size_bytes"
+        ] < 0:
+            raise ContractError(f"source prepare acceptance: archive {fold} metadata mismatch")
+        require_hex64(archive["sha256"], f"source prepare acceptance archive {fold}.sha256")
+        if not isinstance(archive["reference"], str) or not S3_REFERENCE.fullmatch(
+            archive["reference"]
+        ):
+            raise ContractError(f"source prepare acceptance: archive {fold} ref is not approved S3")
+    inventory = acceptance["output_inventory"]
+    if not isinstance(inventory, list) or len(inventory) != 303:
+        raise ContractError("source prepare acceptance: exact 303-file output inventory required")
+    if acceptance["output_inventory_sha256"] != sha256_bytes(
+        canonical_json_bytes(inventory)
+    ):
+        raise ContractError("source prepare acceptance: output inventory SHA mismatch")
+    inventory_by_path: dict[str, dict[str, Any]] = {}
+    for index, item in enumerate(inventory):
+        if not isinstance(item, dict):
+            raise ContractError(f"source prepare inventory {index}: must be an object")
+        expect_exact_keys(item, {"path", "size_bytes", "sha256"}, f"source prepare inventory {index}")
+        if (
+            not isinstance(item["path"], str)
+            or item["path"] in inventory_by_path
+            or not isinstance(item["size_bytes"], int)
+            or item["size_bytes"] < 0
+        ):
+            raise ContractError(f"source prepare inventory {index}: invalid path/size")
+        require_hex64(item["sha256"], f"source prepare inventory {index}.sha256")
+        inventory_by_path[item["path"]] = item
+    expected_paths = {
+        "source_rows.jsonl",
+        "source_contract.json",
+        "images/image_manifest.jsonl",
+    } | {f"images/G689-{index:03d}.jpg" for index in range(1, 301)}
+    if set(inventory_by_path) != expected_paths:
+        raise ContractError("source prepare acceptance: output inventory paths mismatch")
+    for name, actual_path in (
+        ("source_rows.jsonl", source_rows_path),
+        ("source_contract.json", source_contract_path),
+    ):
+        item = inventory_by_path[name]
+        if item["size_bytes"] != actual_path.stat().st_size or item["sha256"] != sha256_file(
+            actual_path
+        ):
+            raise ContractError(f"source prepare acceptance: recomputed {name} binding mismatch")
+    if acceptance["terminal_status"] != "SUCCESS":
+        raise ContractError("source prepare acceptance: terminal SUCCESS required")
+    if not all(
+        isinstance(acceptance[field], str) and acceptance[field].strip()
+        for field in ("terminal_job_id", "terminal_finished_at")
+    ):
+        raise ContractError("source prepare acceptance: terminal metadata incomplete")
+    if not isinstance(acceptance["approved_s3_output_ref"], str) or not S3_REFERENCE.fullmatch(
+        acceptance["approved_s3_output_ref"]
+    ):
+        raise ContractError("source prepare acceptance: approved S3 output ref invalid")
+    if acceptance["label_fields_present"] is not False or acceptance[
+        "score_fields_present"
+    ] is not False:
+        raise ContractError("source prepare acceptance: labels/scores must be absent")
+    if acceptance["sealed_rows"] != 0 or acceptance["public_rows"] != 0:
+        raise ContractError("source prepare acceptance: sealed/Public rows must be zero")
 
 
 def validate_exclusion_manifest(
@@ -740,6 +900,8 @@ def prepare(
     remote_root: Path,
     source_rows_path: Path,
     source_contract_path: Path,
+    source_prepare_acceptance_path: Path,
+    source_prepare_acceptance_sha256: str,
     exclusion_670_path: Path,
     exclusion_672_path: Path,
     exclusion_670_sha256: str,
@@ -772,6 +934,27 @@ def prepare(
         exclusion_670_token_mode=exclusion_670_token_mode,
         exclusion_672_token_mode=exclusion_672_token_mode,
     )
+    resolved_source_rows = require_remote_path(
+        remote_root, source_rows_path, context="source rows", must_exist=True
+    )
+    resolved_source_contract = require_remote_path(
+        remote_root, source_contract_path, context="source contract", must_exist=True
+    )
+    resolved_acceptance = require_remote_path(
+        remote_root,
+        source_prepare_acceptance_path,
+        context="source prepare acceptance",
+        must_exist=True,
+    )
+    acceptance = load_json(resolved_acceptance, "source prepare acceptance")
+    validate_source_prepare_acceptance(
+        acceptance,
+        acceptance_path=resolved_acceptance,
+        expected_acceptance_sha256=source_prepare_acceptance_sha256,
+        source_rows_path=resolved_source_rows,
+        source_contract_path=resolved_source_contract,
+        source_contract=source_contract,
+    )
     output_dir = require_remote_path(
         remote_root, output_dir, context="prepare output", must_exist=False
     )
@@ -785,10 +968,32 @@ def prepare(
         for index, row in enumerate(selected, 1)
     ]
     bindings = make_bindings(selected, requests)
+    teacher_images: list[dict[str, Any]] = []
+    for request in requests:
+        first_image = request["first_image"]
+        relative = Path(first_image["reference"])
+        if relative.is_absolute() or ".." in relative.parts:
+            raise ContractError("teacher image reference must remain a safe relative path")
+        teacher_images.append(
+            {
+                "schema_version": "exp689_teacher_image_manifest_row_v1",
+                "audit_id": request["audit_id"],
+                "reference": first_image["reference"],
+                "relative_path": first_image["reference"],
+                "content_sha256": first_image["content_sha256"],
+                "decoded_rgb_sha256": first_image["decoded_rgb_sha256"],
+                "pixel_sha256": first_image["decoded_rgb_sha256"],
+                "media_type": first_image["media_type"],
+                "width": first_image["width"],
+                "height": first_image["height"],
+            }
+        )
 
     output_dir.mkdir(parents=True)
     request_path = output_dir / "teacher_request.jsonl"
+    teacher_image_manifest_path = output_dir / "teacher_image_manifest.jsonl"
     write_jsonl(request_path, requests)
+    write_jsonl(teacher_image_manifest_path, teacher_images)
     manifest = with_self_hash(
         {
             "schema_version": "exp689_selection_manifest_v1",
@@ -796,6 +1001,8 @@ def prepare(
             "execution_scope": "remote_remote_compute",
             "source_contract_self_sha256": source_contract["self_sha256"],
             "source_rows_sha256": source_contract["source_rows_sha256"],
+            "source_prepare_acceptance_sha256": source_prepare_acceptance_sha256,
+            "source_prepare_acceptance_self_sha256": acceptance["self_sha256"],
             "exclusion_670_binding": exclusions["670"],
             "exclusion_672_binding": exclusions["672"],
             "selection_salt": spec["audit"]["selection_salt"],
@@ -807,6 +1014,8 @@ def prepare(
             "selected_bindings": bindings,
             "teacher_request_sha256": sha256_file(request_path),
             "teacher_request_rows": len(requests),
+            "teacher_image_manifest_sha256": sha256_file(teacher_image_manifest_path),
+            "teacher_image_manifest_rows": len(teacher_images),
             "teacher_visible_family_tokens": 0,
             "teacher_visible_outcome_fields": 0,
             "student_gpu_authorized": False,
@@ -826,6 +1035,8 @@ def validate_selection_manifest(manifest: dict[str, Any], spec: dict[str, Any]) 
             "execution_scope",
             "source_contract_self_sha256",
             "source_rows_sha256",
+            "source_prepare_acceptance_sha256",
+            "source_prepare_acceptance_self_sha256",
             "exclusion_670_binding",
             "exclusion_672_binding",
             "selection_salt",
@@ -835,6 +1046,8 @@ def validate_selection_manifest(manifest: dict[str, Any], spec: dict[str, Any]) 
             "selected_bindings",
             "teacher_request_sha256",
             "teacher_request_rows",
+            "teacher_image_manifest_sha256",
+            "teacher_image_manifest_rows",
             "teacher_visible_family_tokens",
             "teacher_visible_outcome_fields",
             "student_gpu_authorized",
@@ -847,6 +1060,14 @@ def validate_selection_manifest(manifest: dict[str, Any], spec: dict[str, Any]) 
         raise ContractError("selection manifest: schema version mismatch")
     if manifest["experiment_id"] != "689" or manifest["execution_scope"] != "remote_remote_compute":
         raise ContractError("selection manifest: experiment or execution scope mismatch")
+    require_hex64(
+        manifest["source_prepare_acceptance_sha256"],
+        "selection manifest.source_prepare_acceptance_sha256",
+    )
+    require_hex64(
+        manifest["source_prepare_acceptance_self_sha256"],
+        "selection manifest.source_prepare_acceptance_self_sha256",
+    )
     if manifest["selection_salt"] != spec["audit"]["selection_salt"]:
         raise ContractError("selection manifest: selection salt mismatch")
     if manifest["selection_strategy"] != "sha256_rank_then_component_and_exact_source_unique_v1":
@@ -878,6 +1099,12 @@ def validate_selection_manifest(manifest: dict[str, Any], spec: dict[str, Any]) 
         raise ContractError("selection manifest: stratum counts mismatch")
     if manifest["teacher_request_rows"] != spec["audit"]["total_rows"]:
         raise ContractError("selection manifest: request row count mismatch")
+    require_hex64(
+        manifest["teacher_image_manifest_sha256"],
+        "selection manifest.teacher_image_manifest_sha256",
+    )
+    if manifest["teacher_image_manifest_rows"] != spec["audit"]["total_rows"]:
+        raise ContractError("selection manifest: teacher image row count mismatch")
     if manifest["teacher_visible_family_tokens"] != 0:
         raise ContractError("selection manifest: family tokens leaked to teacher")
     if manifest["teacher_visible_outcome_fields"] != 0:
@@ -1091,15 +1318,25 @@ def validate_teacher_selection(
         evidence_lists.append(candidate_ids)
     if not isinstance(row["supervise"], bool):
         raise ContractError(f"{context}: supervise must be boolean")
+    semantic_targets = (row["sold_object"], row["substance"], row["relation"])
     if row["support_status"] == "supported":
+        if "unknown" in semantic_targets:
+            raise ContractError(
+                f"{context}: supported rows require all three semantic targets"
+            )
         if row["supervise"] is not True or any(not values for values in evidence_lists):
             raise ContractError(
                 f"{context}: supported rows require supervision and evidence for every target"
             )
-    elif row["supervise"] is not False or any(evidence_lists):
-        raise ContractError(
-            f"{context}: unsupported or ambiguous rows must abstain with no evidence IDs"
-        )
+    else:
+        if semantic_targets != ("unknown", "unknown", "unknown"):
+            raise ContractError(
+                f"{context}: unsupported or ambiguous rows require unknown semantic targets"
+            )
+        if row["supervise"] is not False or any(evidence_lists):
+            raise ContractError(
+                f"{context}: unsupported or ambiguous rows must abstain with no evidence IDs"
+            )
 
 
 def load_teacher_selections(
@@ -1227,6 +1464,8 @@ def parse_args() -> argparse.Namespace:
     prepare_parser.add_argument("--remote-root", type=Path, required=True)
     prepare_parser.add_argument("--source-rows", type=Path, required=True)
     prepare_parser.add_argument("--source-contract", type=Path, required=True)
+    prepare_parser.add_argument("--source-prepare-acceptance", type=Path, required=True)
+    prepare_parser.add_argument("--source-prepare-acceptance-sha256", required=True)
     prepare_parser.add_argument("--exclusion-670", type=Path, required=True)
     prepare_parser.add_argument("--exclusion-672", type=Path, required=True)
     prepare_parser.add_argument("--exclusion-670-sha256", required=True)
@@ -1274,6 +1513,8 @@ def main() -> None:
             remote_root=args.remote_root,
             source_rows_path=args.source_rows,
             source_contract_path=args.source_contract,
+            source_prepare_acceptance_path=args.source_prepare_acceptance,
+            source_prepare_acceptance_sha256=args.source_prepare_acceptance_sha256,
             exclusion_670_path=args.exclusion_670,
             exclusion_672_path=args.exclusion_672,
             exclusion_670_sha256=args.exclusion_670_sha256,
