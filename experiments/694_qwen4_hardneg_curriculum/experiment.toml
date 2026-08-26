@@ -1,0 +1,31 @@
+[experiment]
+id = "694"
+slug = "qwen4_hardneg_curriculum"
+status = "prepared_waiting_teacher_schema"
+job_name_prefix = "qwen4-hardneg-"
+
+[hypothesis]
+parent = "641_qwen35_4b_class_only_lora"
+changed_factor = "outer_safe_teacher_guided_training_order"
+mechanism = "Move flammable hard negatives and missed positives into early high-LR updates while retaining full hard BCE."
+falsification = "Reject if pooled Macro or flammable AP/F1 fails to improve, or BAD replay is not exact."
+precedents = ["hard-example mining", "curriculum learning"]
+
+[training]
+model = "Qwen/Qwen3.5-4B"
+folds = [0, 1, 2, 3, 4]
+seed = 42
+hard_bce_coefficient = 1.0
+kd_category = "Легковоспламеняющиеся"
+hard_bce_scope = "all_categories"
+teacher_loss = "none"
+bad_production_replay = "frozen_byte_identical"
+
+[execution]
+gpus = 1
+gpu_type = "H100"
+jobs = 1
+upload_authorized = false
+submit_authorized = false
+public_authorized = false
+

@@ -1,0 +1,32 @@
+[experiment]
+id = "695"
+slug = "qwen4_hard_anchored_listwise"
+status = "prepared_waiting_teacher_schema"
+job_name_prefix = "qwen4-rank-"
+
+[hypothesis]
+parent = "641_qwen35_4b_class_only_lora"
+changed_factor = "bounded_within_stratum_teacher_listwise_auxiliary"
+mechanism = "Learn teacher order only within equal hard-label flammable strata while retaining full hard BCE."
+falsification = "Reject if boundary protection fails, pooled Macro/AP does not improve, or BAD replay is not exact."
+precedents = ["ListNet", "hard-anchored ranking distillation"]
+
+[training]
+model = "Qwen/Qwen3.5-4B"
+folds = [0, 1, 2, 3, 4]
+seed = 42
+hard_bce_coefficient = 1.0
+rank_coefficient = 0.20
+rank_cap_fraction_of_hard = 0.25
+rank_scope = "flammable_same_hard_label_only"
+hard_bce_scope = "all_categories"
+bad_production_replay = "frozen_byte_identical"
+
+[execution]
+gpus = 1
+gpu_type = "H100"
+jobs = 1
+upload_authorized = false
+submit_authorized = false
+public_authorized = false
+

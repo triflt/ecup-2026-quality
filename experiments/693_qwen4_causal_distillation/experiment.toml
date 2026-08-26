@@ -1,0 +1,31 @@
+[experiment]
+id = "693"
+slug = "qwen4_causal_distillation"
+status = "prepared_waiting_teacher_schema"
+job_name_prefix = "qwen4-causal-"
+
+[hypothesis]
+parent = "641_qwen35_4b_class_only_lora"
+changed_factor = "flammable_closed_structured_causal_auxiliary"
+mechanism = "Preserve all-row hard BCE while adding training-only closed grounded causal targets on flammable rows."
+falsification = "Reject if pooled Macro does not improve, BAD replay is not exact, or flammable FN/corrections regress materially."
+precedents = ["Distilling Step-by-Step", "689_grounded_transaction_graph"]
+
+[training]
+model = "Qwen/Qwen3.5-4B"
+folds = [0, 1, 2, 3, 4]
+seed = 42
+hard_bce_coefficient = 1.0
+auxiliary_coefficient = 0.10
+kd_category = "Легковоспламеняющиеся"
+hard_bce_scope = "all_categories"
+bad_production_replay = "frozen_byte_identical"
+
+[execution]
+gpus = 1
+gpu_type = "H100"
+jobs = 1
+upload_authorized = false
+submit_authorized = false
+public_authorized = false
+
