@@ -150,7 +150,7 @@ python3 experiments/689_qwen35_4b_grounded_transaction_graph_kd/validate_target_
   --frozen-packet /work/exp689/outputs/frozen_audit/target_audit.jsonl \
   --completed-review /work/exp689/inputs/completed_review.jsonl \
   --packet-contract /work/exp689/outputs/frozen_audit/target_audit_contract.json \
-  --exclusion-670 /work/exp689/inputs/exclusion_670.json \
+  --exclusion-670 /work/exp689/inputs/exclusion_670.csv \
   --exclusion-672 /work/exp689/inputs/exclusion_672.json \
   --output /work/exp689/outputs/target_audit_acceptance.json
 ```
