@@ -530,7 +530,7 @@ def preset_args(output_dir: Path):
         image="example/image:immutable",
         h100_flavor="gpu-h100-1-80",
         time_limit="20h0m",
-        preemption="never",
+        preemption="forbidden",
         input_bucket="example-input-bucket",
         output_bucket="example-output-bucket",
         code_bundle_src="/example/code",
@@ -567,6 +567,10 @@ def test_real_preset_builder_emits_exactly_three_secret_free_job_shapes(tmp_path
         assert "type: model_registry" in payload
         assert PRESET.MODEL_REVISION in payload
         assert f"--method {method}" in payload
+        assert 'preemption: "forbidden"' in payload
+        assert "--submission-limit-minutes" not in payload
+        assert 'file: "acceptance.json"' in payload
+        assert 'dst: "/work/input/acceptance/acceptance.json"' in payload
         assert "upload_policies" not in payload
         assert payload.count("type: s3msk") == 7
         assert "project:" not in payload
@@ -598,6 +602,34 @@ def test_remote_archive_extraction_rejects_path_escape(tmp_path: Path):
             tmp_path / "output",
             hashlib.sha256(archive.read_bytes()).hexdigest(),
         )
+
+
+def test_remote_entrypoint_uses_verified_archive_root_layouts():
+    source = Path(REMOTE.__file__).read_text(encoding="utf-8")
+    assert 'runtime = work / "runtime_bundle" / "runtime"' in source
+    assert 'baseline = work / "baseline_bundle"' in source
+    assert 'vendor = work / "vendor_bundle"' in source
+    assert 'baseline_bundle" / "baseline"' not in source
+    assert 'vendor_bundle" / "vendor"' not in source
+    assert 'vendor / "peft" / "__init__.py"' in source
+    assert "--submission-limit-minutes" not in source
+
+
+def test_train_contract_records_measured_cuda_peak(monkeypatch):
+    calls: list[str] = []
+    cuda = SimpleNamespace(
+        is_available=lambda: True,
+        reset_peak_memory_stats=lambda: calls.append("reset"),
+        max_memory_allocated=lambda: 123456,
+    )
+    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=cuda))
+    TRAIN.reset_cuda_peak_memory()
+    peak = TRAIN.measured_cuda_peak_memory_bytes()
+    assert calls == ["reset"]
+    assert isinstance(peak, int) and peak == 123456
+    assert '"peak_gpu_memory_bytes": peak_gpu_memory_bytes' in __import__("inspect").getsource(
+        TRAIN.run
+    )
 
 
 def test_fold_output_is_committed_by_atomic_rename(tmp_path: Path):

@@ -23,6 +23,19 @@ MAX_HARD_EXAMPLE_WEIGHT = 2.0
 MODES = ("hard_bce_control", "hardneg_candidate")
 
 
+def reset_cuda_peak_memory() -> None:
+    import torch
+
+    if torch.cuda.is_available():
+        torch.cuda.reset_peak_memory_stats()
+
+
+def measured_cuda_peak_memory_bytes() -> int:
+    import torch
+
+    return int(torch.cuda.max_memory_allocated()) if torch.cuda.is_available() else 0
+
+
 def curriculum_key(row: dict[str, Any]) -> tuple[int, float, int]:
     if row["category"] != FLAMMABLE:
         stage, hardness = 3, 0.0
@@ -117,8 +130,10 @@ def run(args: Any) -> dict[str, Any]:
     control.load_runtime = load_runtime
     if args.mode == "hardneg_candidate":
         control.primary_loss = weighted_hard_bce_loss
+    reset_cuda_peak_memory()
     try:
         report = control.run(SOURCE_EXPERIMENT_ID, args)
+        peak_gpu_memory_bytes = measured_cuda_peak_memory_bytes()
     finally:
         control.load_runtime = original_load
         control.primary_loss = original_loss
@@ -142,6 +157,7 @@ def run(args: Any) -> dict[str, Any]:
             ),
             "teacher_outer_safe_required": True,
             "exp691_binding": teacher_binding,
+            "peak_gpu_memory_bytes": peak_gpu_memory_bytes,
         }
     )
     report.pop("contract_sha256", None)

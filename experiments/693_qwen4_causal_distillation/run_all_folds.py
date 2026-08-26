@@ -31,7 +31,6 @@ def main() -> None:
     parser.add_argument("--teacher-acceptance-sha256", required=True)
     parser.add_argument("--runtime-bundle-sha256", required=True)
     parser.add_argument("--baseline-bundle-sha256", required=True)
-    parser.add_argument("--submission-limit-minutes", type=float)
     parser.add_argument("--baseline-root", type=Path, required=True)
     parser.add_argument("--images", type=Path, required=True)
     parser.add_argument("--model-root", type=Path, required=True)
@@ -113,10 +112,6 @@ def main() -> None:
         "--output",
         str(args.output_root / "evaluation.json"),
     ]
-    if args.submission_limit_minutes is not None:
-        evaluation_command.extend(
-            ["--submission-limit-minutes", str(args.submission_limit_minutes)]
-        )
     subprocess.run(evaluation_command, check=True)
 
 

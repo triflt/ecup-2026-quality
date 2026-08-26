@@ -587,7 +587,6 @@ def main(*, frozen_method: str) -> None:
     parser.add_argument("--baseline-root", type=Path, required=True)
     parser.add_argument("--control-root", type=Path, required=True)
     parser.add_argument("--candidate-root", type=Path, required=True)
-    parser.add_argument("--submission-limit-minutes", type=float)
     parser.add_argument("--runtime-bundle-sha256", required=True)
     parser.add_argument("--baseline-bundle-sha256", required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -620,7 +619,9 @@ def main(*, frozen_method: str) -> None:
     metrics = build_report(
         rows,
         resource_observations=resource_observations,
-        submission_limit_minutes=args.submission_limit_minutes,
+        # Paired train/eval runtime is not deployment inference runtime. Resource
+        # acceptance remains pending until the later package inference measurement.
+        submission_limit_minutes=None,
     )
     report = bind_evaluation_provenance(
         metrics,

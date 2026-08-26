@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+import inspect
 import random
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location("exp694_train", HERE / "train_fold.py")
@@ -60,3 +62,18 @@ def test_teacher_signal_is_flammable_only_and_weights_hard_gold_bce():
     assert values["n1"] == TRAIN.MAX_HARD_EXAMPLE_WEIGHT
     assert 1.0 < values["n2"] < TRAIN.MAX_HARD_EXAMPLE_WEIGHT
     assert values["p"] > 1.0
+
+
+def test_train_contract_records_measured_cuda_peak(monkeypatch):
+    calls: list[str] = []
+    cuda = SimpleNamespace(
+        is_available=lambda: True,
+        reset_peak_memory_stats=lambda: calls.append("reset"),
+        max_memory_allocated=lambda: 234567,
+    )
+    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=cuda))
+    TRAIN.reset_cuda_peak_memory()
+    peak = TRAIN.measured_cuda_peak_memory_bytes()
+    assert calls == ["reset"]
+    assert isinstance(peak, int) and peak == 234567
+    assert '"peak_gpu_memory_bytes": peak_gpu_memory_bytes' in inspect.getsource(TRAIN.run)

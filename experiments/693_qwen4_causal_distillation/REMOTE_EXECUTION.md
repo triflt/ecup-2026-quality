@@ -18,8 +18,8 @@ authorized submitter must pass that same value through the CLI `-p` argument.
 Frozen archive layouts are:
 
 - runtime bundle: `runtime/fold0` through `runtime/fold4`;
-- baseline bundle: `baseline/fold0/predictions.jsonl` through fold4;
-- PEFT vendor bundle: `vendor/peft/__init__.py`;
+- baseline bundle: `fold0/predictions.jsonl` through fold4 at archive root;
+- PEFT vendor bundle: `peft/__init__.py` at archive root;
 - qwen27-all terminal output: `fold0` through `fold4` at the mounted root;
 - exp692 output: the exact routed-acceptance file named by the builder argument.
 
@@ -33,3 +33,7 @@ uploads, dry-runs or submits.
 Final `evaluation.json` is method-bound and self-hashed. It binds the exact
 teacher acceptance file/self hashes, runtime and baseline bundle hashes, and an
 ordered list of ten output-contract/prediction bindings.
+Paired training runtime and peak memory remain observations only: the job time
+limit is never passed as a deployment-inference limit. Consequently a
+science-passing candidate stays `STAGE_PENDING_RESOURCE_EVIDENCE` until a later
+package inference measurement supplies the real submission-limit evidence.

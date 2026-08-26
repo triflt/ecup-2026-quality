@@ -24,6 +24,19 @@ RANK_COEFFICIENT = 0.50
 MODES = ("hard_bce_control", "rank_candidate")
 
 
+def reset_cuda_peak_memory() -> None:
+    import torch
+
+    if torch.cuda.is_available():
+        torch.cuda.reset_peak_memory_stats()
+
+
+def measured_cuda_peak_memory_bytes() -> int:
+    import torch
+
+    return int(torch.cuda.max_memory_allocated()) if torch.cuda.is_available() else 0
+
+
 def within_stratum_pairs(rows: list[SimpleNamespace]) -> list[tuple[int, int, float]]:
     pairs: list[tuple[int, int, float]] = []
     for left in range(len(rows)):
@@ -120,8 +133,10 @@ def run(args: Any) -> dict[str, Any]:
     control.load_runtime = load_runtime
     if args.mode == "rank_candidate":
         control.primary_loss = candidate_loss
+    reset_cuda_peak_memory()
     try:
         report = control.run(SOURCE_EXPERIMENT_ID, args)
+        peak_gpu_memory_bytes = measured_cuda_peak_memory_bytes()
     finally:
         control.load_runtime = original_load
         control.primary_loss = original_loss
@@ -138,6 +153,7 @@ def run(args: Any) -> dict[str, Any]:
             "lambda_grid": False,
             "teacher_outer_safe_required": True,
             "exp691_binding": teacher_binding,
+            "peak_gpu_memory_bytes": peak_gpu_memory_bytes,
         }
     )
     report.pop("contract_sha256", None)

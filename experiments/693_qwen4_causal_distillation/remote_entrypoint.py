@@ -127,7 +127,6 @@ def main() -> None:
     parser.add_argument("--vendor-sha256", required=True)
     parser.add_argument("--model-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--submission-limit-minutes", type=float, required=True)
     args = parser.parse_args()
     if args.output.exists() and any(args.output.iterdir()):
         raise FileExistsError("refusing to overwrite nonempty job output")
@@ -140,13 +139,13 @@ def main() -> None:
         extract_archive(args.baseline_archive, work / "baseline_bundle", args.baseline_sha256)
         extract_archive(args.vendor_archive, work / "vendor_bundle", args.vendor_sha256)
         runtime = work / "runtime_bundle" / "runtime"
-        baseline = work / "baseline_bundle" / "baseline"
-        vendor = work / "vendor_bundle" / "vendor"
+        baseline = work / "baseline_bundle"
+        vendor = work / "vendor_bundle"
         require_fivefold(runtime, "runtime_audit.json")
         require_fivefold(baseline, "predictions.jsonl")
         require_fivefold(args.teacher_root, "report.json")
         if not (vendor / "peft" / "__init__.py").is_file():
-            raise ValueError("PEFT vendor archive lacks vendor/peft/__init__.py")
+            raise ValueError("PEFT vendor archive lacks peft/__init__.py at archive root")
         if sha256_file(args.acceptance) != args.acceptance_sha256:
             raise ValueError("exp692 acceptance file SHA-256 mismatch")
         command = [
@@ -179,8 +178,6 @@ def main() -> None:
             str(args.output),
             "--runtime-backend",
             "legacy_eager",
-            "--submission-limit-minutes",
-            str(args.submission_limit_minutes),
         ]
         env = dict(os.environ)
         env["PYTHONPATH"] = ":".join(

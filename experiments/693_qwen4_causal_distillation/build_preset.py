@@ -142,8 +142,7 @@ def render(args: argparse.Namespace, *, job_name: str, method: str) -> str:
         f"--acceptance-sha256 {args.acceptance_sha256} "
         f"--vendor-archive {shlex.quote(vendor_archive)} "
         f"--vendor-sha256 {args.vendor_bundle_sha256} "
-        "--model-root /hf_models --output /work/output "
-        f"--submission-limit-minutes {time_limit_minutes(args.time_limit)}"
+        "--model-root /hf_models --output /work/output"
     )
     lines = [
         "job:",
@@ -227,7 +226,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--image", required=True)
     result.add_argument("--h100-flavor", required=True)
     result.add_argument("--time-limit", required=True)
-    result.add_argument("--preemption", choices=("never", "any"), required=True)
+    result.add_argument("--preemption", choices=("allowed", "forbidden"), required=True)
     result.add_argument("--input-bucket", required=True)
     result.add_argument("--output-bucket", required=True)
     result.add_argument("--code-bundle-src", required=True)

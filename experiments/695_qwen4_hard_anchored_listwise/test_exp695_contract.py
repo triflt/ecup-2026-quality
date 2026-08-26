@@ -50,3 +50,18 @@ def test_both_arms_receive_identical_same_stratum_pair_batches():
     assert observed[:2][0]["label"] == observed[:2][1]["label"] == 0
     assert observed[2:4][0]["label"] == observed[2:4][1]["label"] == 1
     assert sorted(row["global_index"] for row in arranged) == list(range(5))
+
+
+def test_train_contract_records_measured_cuda_peak(monkeypatch):
+    calls: list[str] = []
+    cuda = SimpleNamespace(
+        is_available=lambda: True,
+        reset_peak_memory_stats=lambda: calls.append("reset"),
+        max_memory_allocated=lambda: 345678,
+    )
+    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=cuda))
+    TRAIN.reset_cuda_peak_memory()
+    peak = TRAIN.measured_cuda_peak_memory_bytes()
+    assert calls == ["reset"]
+    assert isinstance(peak, int) and peak == 345678
+    assert '"peak_gpu_memory_bytes": peak_gpu_memory_bytes' in inspect.getsource(TRAIN.run)
