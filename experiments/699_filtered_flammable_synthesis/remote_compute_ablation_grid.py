@@ -84,7 +84,7 @@ def load_spec(path: Path, *, detected_gpus: int | None = None) -> list[Job]:
         if (
             isinstance(synthetic_repeat, bool)
             or not isinstance(synthetic_repeat, int)
-            or synthetic_repeat not in {1, 4}
+            or synthetic_repeat not in {1, 2, 4}
         ):
             raise ValueError(f"invalid synthetic_repeat for {name}")
         architecture = raw.get("architecture")

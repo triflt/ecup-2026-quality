@@ -93,14 +93,17 @@ def test_two_epoch_job_is_explicit_and_bounded(tmp_path: Path) -> None:
         grid.load_spec(path, detected_gpus=8)
 
 
-def test_synthetic_repeat_four_is_explicit_and_bounded(tmp_path: Path) -> None:
-    row = job("exp699-repeat4", 6, 0)
+@pytest.mark.parametrize("repeat", [2, 4])
+def test_synthetic_repeat_is_explicit_and_bounded(
+    tmp_path: Path, repeat: int
+) -> None:
+    row = job(f"exp699-repeat{repeat}", 6, 0)
     row["cap"] = 10
-    row["synthetic_repeat"] = 4
+    row["synthetic_repeat"] = repeat
     path = tmp_path / "grid.json"
     write_spec(path, [row])
     value = grid.command(grid.load_spec(path, detected_gpus=8)[0])
-    assert value[value.index("--synthetic-repeat") + 1] == "4"
+    assert value[value.index("--synthetic-repeat") + 1] == str(repeat)
     row["synthetic_repeat"] = 3
     write_spec(path, [row])
     with pytest.raises(ValueError, match="synthetic_repeat"):

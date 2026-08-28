@@ -642,6 +642,25 @@ def test_balanced_v2_cap10_append_adds_ten_per_label(tmp_path: Path) -> None:
     assert repeat_report["synthetic_occurrences"] == 40
     assert repeat_report["expected_optimizer_steps"] == 309
 
+    repeat2_output = tmp_path / "append-repeat2"
+    repeat2_report = append_builder.build_append_runtime(
+        parent_dir=parent,
+        ranked_path=ranked,
+        output_dir=repeat2_output,
+        fold=0,
+        source="v2",
+        mode="positive_only",
+        cap=10,
+        synthetic_repeat=2,
+    )
+    repeat2_train, _, _ = trainer.load_runtime(repeat2_output, 0)
+    repeated2 = [row for row in repeat2_train if row.get("synthetic")]
+    assert len(repeated2) == 20
+    assert len({row["semantic_component"] for row in repeated2}) == 10
+    assert {row["synthetic_repeat_index"] for row in repeated2} == {0, 1}
+    assert repeat2_report["synthetic_occurrences"] == 20
+    assert repeat2_report["expected_optimizer_steps"] == 307
+
 
 def test_submission_runtime_patch_keeps_q3_and_matches_q35_parent_preprocessing() -> None:
     source = (

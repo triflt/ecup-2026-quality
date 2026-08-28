@@ -15,7 +15,7 @@ def main() -> None:
     parser.add_argument("--mode", choices=("positive_only", "balanced"), required=True)
     parser.add_argument("--cap", type=int, choices=(5, 10, 19, 40, 80), required=True)
     parser.add_argument("--epochs", type=int, choices=(1, 2), default=1)
-    parser.add_argument("--synthetic-repeat", type=int, choices=(1, 4), default=1)
+    parser.add_argument("--synthetic-repeat", type=int, choices=(1, 2, 4), default=1)
     parser.add_argument("--fold", type=int, choices=range(5), required=True)
     parser.add_argument("--data-root", type=Path, required=True)
     parser.add_argument("--run-root", type=Path, required=True)

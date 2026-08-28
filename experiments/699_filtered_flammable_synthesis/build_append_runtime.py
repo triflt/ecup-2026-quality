@@ -70,6 +70,7 @@ def build_append_runtime(
     allowed = {
         ("v2", "positive_only", 5, 1),
         ("v2", "positive_only", 10, 1),
+        ("v2", "positive_only", 10, 2),
         ("v2", "positive_only", 10, 4),
         ("v2", "positive_only", 19, 1),
         ("v2", "balanced", 10, 1),
@@ -187,7 +188,7 @@ def main() -> None:
     parser.add_argument("--mode", choices=("positive_only", "balanced"), required=True)
     parser.add_argument("--cap", type=int, choices=(5, 10, 19, 40, 80), required=True)
     parser.add_argument("--epochs", type=int, choices=(1, 2), default=1)
-    parser.add_argument("--synthetic-repeat", type=int, choices=(1, 4), default=1)
+    parser.add_argument("--synthetic-repeat", type=int, choices=(1, 2, 4), default=1)
     args = parser.parse_args()
     print(
         __import__("json").dumps(

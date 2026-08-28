@@ -123,7 +123,7 @@ def load_runtime(
         appended_negative = int(audit.get("appended_negative_occurrences", -1))
         composition_valid = (
             audit.get("mode") == "positive_only_append"
-            and synthetic_repeat in {1, 4}
+            and synthetic_repeat in {1, 2, 4}
             and synthetic_occurrences == cap * synthetic_repeat
             and appended_positive == cap * synthetic_repeat
             and appended_negative == 0
