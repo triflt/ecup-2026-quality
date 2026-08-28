@@ -20,8 +20,8 @@ occurrences. После full-fivefold победы cap10 отдельно про
 эпохой. Он прошёл frozen full-fivefold с победой на 5/5 folds. Full refit и
 production-package smoke завершились успешно; submission ZIP готов к Public
 upload. Cap5, cap19, Qwen3-VL-2B,
-balanced80, v1-cap40, TF-IDF и nested OOF reweighting закрыты как слабые или
-нестабильные.
+balanced80, v1-cap40, TF-IDF, nested OOF reweighting и двухэпохный Qwen3.5
+закрыты как слабые или нестабильные.
 
 ## СКОЛЬКО РАБОТАЛО
 
@@ -53,6 +53,18 @@ Full-refit/package acceptance:
 - ZIP SHA-256: `f1976370793e2627225cf38b95d1b9bdbe8832dd2c9801d4afc65b3a2920a4f3`;
 - real packaged-pipeline smoke: `8/8` rows, `labels/sealed/Public = 0`.
 
+Two-epoch screen on the exact same folds 0/3 was rejected against the accepted
+one-epoch candidate:
+
+- routed Macro delta: `+0.02034326` vs `+0.03941484`;
+- flammable F1: `0.86713287` vs `0.90370370`;
+- flammable FP/FN: `13/6` vs `6/7`;
+- corrections/regressions: `47/12` vs `54/7`;
+- AP delta: `+0.03936205` vs `-0.01107883`.
+
+The AP and one-FN improvement do not offset the materially worse Macro/F1,
+false-positive count and correction/regression profile.
+
 AP improvement alone is not treated as a win when Macro/F1/FN are worse.
 
 ## ОШИБКИ
@@ -71,9 +83,8 @@ the frozen solution-140 weights and was not promoted.
 1. Transfer the accepted ZIP to the local ignored upload directory after the
    required explicit corporate-artifact download approval.
 2. Submit this justified candidate to Public after the action-time confirmation.
-3. Compare the two-epoch, balanced10, repeat2 and repeat4 twofold screens, and
-   run full fivefold only for a mechanism that improves the accepted cap10
-   profile.
+3. Compare balanced10, repeat2 and repeat4 twofold screens, and run full
+   fivefold only for a mechanism that improves the accepted cap10 profile.
 
 Public data is not used for filtering, training, threshold selection or
 ensemble-weight selection.
