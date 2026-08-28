@@ -1,0 +1,116 @@
+{
+  "schema": "exp699_retrieval_pair_verifier_preregister_v1",
+  "self_hash_algorithm": "sha256_canonical_json_without_self_sha256",
+  "self_sha256": "d1358a630c5a83aa4765cef764701400182d40b537e7e4706c2259920caea689",
+  "created_at": "2026-08-28T19:10:00+03:00",
+  "experiment": 699,
+  "stage": "frozen_before_pair_verifier_metrics",
+  "candidate_name": "solution140_flammable_category_pair_verifier_v1",
+  "hypothesis": "Hybrid retrieval has enough recall, but donor labels transfer only when a category-aware verifier proves that query and donor share the flammable decision semantics; otherwise the frozen solution140 decision is retained.",
+  "target_error_cohort": {
+    "solution140_flammable_fp": 10,
+    "solution140_flammable_fn": 5,
+    "soft_cache_v1_regressions": 23,
+    "mechanism": "correct false donor transfer caused by fuel-or-gas, empty-equipment, packaging, marking and unreliable-family contradictions"
+  },
+  "source_bindings": {
+    "retrieval_source_manifest_self_sha256": "b06f3e3d98637239b227ae946ca690c2c65dc72addfd71fe8fb8801bd24767a0",
+    "solution140_run_sha256": "9318db4cc0f26eabaa73ae9856dbf9daffd06787a162e6f5db71f249f6db7146",
+    "component_outputs_sha256": "bc20bb68bed78f67621e0d02f57a780b4475434df05ae3525d5d23b610c17df8",
+    "topology_sha256": "7e16f6665ca4fb552e65145fe52b578ae3706dcd274027754851e24c827b90c1",
+    "topology_self_sha256": "9ce30230c0c3b132504be65066e793d00c5d61e1e4cbcc5b001de1ff933e5e14",
+    "qwen_train_embeddings_sha256": "63e42fcb83316ec213e455250277e4370aa85363b741c8de001ed1bf7e34b695",
+    "soft_cache_v1_evaluation_sha256": "d56498c62a52bd63a728d9b27a96b6eaaa1df952898a63134c9e2de01147d1d3"
+  },
+  "screen": {
+    "folds": [0, 3],
+    "labels_enter_after_retrieval": true,
+    "candidate_generation_top_k": 30,
+    "candidate_channels": [
+      "exact_text",
+      "normalized_text",
+      "tfidf",
+      "bm25",
+      "qwen_2048_cosine",
+      "exact_image",
+      "near_image"
+    ],
+    "connected_safe_rule": "candidate donor must be outside the query fold and outside the query connected-component from the frozen union topology",
+    "public_used": false,
+    "sealed_used": false
+  },
+  "pair_verifier": {
+    "model": "sklearn_logistic_regression",
+    "solver": "liblinear",
+    "random_state": 42,
+    "class_weight": "balanced",
+    "max_iter": 1000,
+    "target": "query_and_donor_have_the_same_flammable_label",
+    "features": [
+      "solution140_flammable_score_and_prediction",
+      "retrieval_channel_scores_and_ranks",
+      "qwen_cosine",
+      "sparse_text_similarity",
+      "exact_and_normalized_text_match",
+      "exact_and_near_image_match",
+      "category_match",
+      "critical_flammable_cue_agreement",
+      "fuel_or_gas_contradiction",
+      "empty_equipment_contradiction",
+      "packaging_or_kit_contradiction",
+      "donor_flammable_label",
+      "donor_family_reliability"
+    ],
+    "training_scope": "outer-train pairs only for each screen fold",
+    "pair_sampling": "deterministic balanced positives and negatives with per-query weight normalization"
+  },
+  "frozen_decision_rule": {
+    "compatible_probability_min": 0.8,
+    "accepted_neighbors_max": 5,
+    "accepted_neighbors_min": 3,
+    "weighted_label_agreement_min": 0.9,
+    "soft_mix_alpha": 0.15,
+    "query_only_probability_low": 0.2,
+    "query_only_probability_high": 0.8,
+    "abstention": "retain exact solution140 flammable score and decision",
+    "hard_override": "only exact-text AND exact-image duplicates with at least two donors, unanimous donor label and donor-component agreement exactly 1.0; the connected-safe screen excludes same-component donors so this production-only rule cannot create screen leakage",
+    "bad_route": "byte_identical_solution140",
+    "fusion_thresholds_and_priors": "byte_identical_solution140"
+  },
+  "controls": {
+    "query_only": "same outer-train scope and query-side features, with no donor-label evidence",
+    "donor_label_permutation": "fixed seed 42 permutation within donor fold and category",
+    "soft_cache_v1": "frozen negative reference, never tuned"
+  },
+  "stop_gate": {
+    "required_on_each_fold": [
+      "corrections_minus_regressions_nonnegative"
+    ],
+    "pooled_requirements": [
+      "at_least_one_useful_surviving_final_decision_change",
+      "flammable_fn_nonincrease",
+      "candidate_final_macro_greater_than_query_only_final_macro",
+      "donor_label_permutation_has_no_positive_net_or_positive_macro_delta",
+      "bad_predictions_exact_array_identity"
+    ],
+    "on_fail": "terminal_reject_pair_verifier_v1_without_parameter_tuning",
+    "on_pass": "run_same_frozen_recipe_on_all_five_folds_then_build_one_deterministic_exploratory_package"
+  },
+  "expected_decision_changes": {
+    "flammable_fp_corrected_min": 2,
+    "flammable_fn_corrected_min": 1,
+    "regressions_max": 1,
+    "interpretation": "expectation_only_not_a_tuning_target"
+  },
+  "compute": {
+    "gpu_hours": 0,
+    "screen_wall_clock_budget_minutes": 45,
+    "full_five_fold_budget_minutes": 120
+  },
+  "packaging_and_public": {
+    "package_only_after_screen_pass": true,
+    "status_if_built": "ExploratoryReadyNotSubmitted",
+    "ods_submit_authorized": false,
+    "fresh_user_confirmation_required": true
+  }
+}
