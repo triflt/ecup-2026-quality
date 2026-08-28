@@ -1,0 +1,21 @@
+{
+  "schema": "exp700_metrics_v1",
+  "status": "REJECTED_AT_SCREEN",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "public_used": false,
+  "screen_folds": [0, 3],
+  "runtime_seconds": 4.186292868107557,
+  "baseline_macro_f1": 0.9568949027529112,
+  "candidate_macro_f1": 0.953456840762009,
+  "baseline_flammable_f1": 0.948905109489051,
+  "candidate_flammable_f1": 0.9420289855072463,
+  "baseline_flammable_fp": 4,
+  "candidate_flammable_fp": 5,
+  "baseline_flammable_fn": 3,
+  "candidate_flammable_fn": 3,
+  "corrections": 0,
+  "regressions": 1,
+  "original_fn_corrected": 0,
+  "decision": "REJECT_SCREEN_NO_FN_SIGNAL"
+}
