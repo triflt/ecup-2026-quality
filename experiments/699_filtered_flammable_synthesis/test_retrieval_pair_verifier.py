@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
+import json
 from pathlib import Path
 
 import numpy as np
@@ -147,6 +149,21 @@ def test_final_comparison_counts_exact_changes() -> None:
     candidate = np.asarray([0, 0, 1, 0], dtype=np.int8)
     result = pair.comparison(labels, baseline, candidate, np.ones(4, dtype=bool))
     assert result == {"changed": 3, "corrections": 2, "regressions": 1, "net": 1}
+
+
+def test_legacy_self_hash_is_verified_without_weakening_current_contracts() -> None:
+    payload = {"schema": "legacy", "rows": 2}
+    payload["self_sha256"] = hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    assert pair.verify_legacy_self_hash(payload) == payload["self_sha256"]
+    tampered = dict(payload, rows=3)
+    try:
+        pair.verify_legacy_self_hash(tampered)
+    except ValueError as error:
+        assert str(error) == "legacy self-hash mismatch"
+    else:
+        raise AssertionError("tampered legacy contract was accepted")
 
 
 def test_frozen_constants_match_preregister() -> None:

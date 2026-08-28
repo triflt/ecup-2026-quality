@@ -99,6 +99,17 @@ def verify_self_hash(payload: dict[str, Any]) -> str:
     return declared
 
 
+def verify_legacy_self_hash(payload: dict[str, Any]) -> str:
+    """Verify the accepted legacy compact-contract format without an algorithm field."""
+    copied = dict(payload)
+    declared = str(copied.pop("self_sha256", ""))
+    if "self_hash_algorithm" in copied:
+        raise ValueError("legacy contract unexpectedly declares self-hash algorithm")
+    if canonical_sha256(copied) != declared:
+        raise ValueError("legacy self-hash mismatch")
+    return declared
+
+
 def write_self_hashed(path: Path, payload: dict[str, Any]) -> tuple[str, str]:
     payload = dict(payload)
     payload["self_hash_algorithm"] = "sha256_canonical_json_without_self_sha256"
@@ -1051,7 +1062,7 @@ def main() -> None:
     component_rows = load_component_rows(args.component_outputs)
     registry, runtime_rows, component_rows = align_sources(topology, runtime_rows, component_rows)
     component_audit = json.loads(args.component_audit.read_text())
-    component_audit_self = verify_self_hash(component_audit)
+    component_audit_self = verify_legacy_self_hash(component_audit)
     if (
         component_audit.get("schema") != "exp699_component_output_audit_v1"
         or component_audit.get("public_used") is not False
