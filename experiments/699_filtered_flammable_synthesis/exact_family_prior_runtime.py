@@ -10,14 +10,15 @@ import soft_cache_runtime as base
 
 SCHEMA = "exp699_exact_family_prior_runtime_v1"
 PREREGISTER_SELF_SHA256 = (
-    "e3ba6d28ec7122413febec4ac5e21a7c7774362ea0006708f3f740c2e91869e2"
+    "4eeac3aa45049a5529d0f86585ce5140e925a728aca677684cd009619829e02e"
 )
 FAMILY_PRIORITY = ("exact_text", "image_exact", "normalized_text")
 MINIMUM_DONORS = {
     "exact_text": 1,
-    "image_exact": 1,
+    "image_exact": 2,
     "normalized_text": 2,
 }
+MAXIMUM_DONORS = 20
 
 
 def _select_unanimous_family(
@@ -27,6 +28,8 @@ def _select_unanimous_family(
         donors = sorted(set(int(value) for value in channels[channel]))
         if len(donors) < MINIMUM_DONORS[channel]:
             continue
+        if len(donors) > MAXIMUM_DONORS:
+            return None
         labels = np.asarray(donor_labels, dtype=np.int8)[donors]
         unique = np.unique(labels)
         if len(unique) != 1:

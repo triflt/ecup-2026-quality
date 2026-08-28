@@ -12,7 +12,7 @@ from typing import Any
 
 FIXED_ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 PREREGISTER_SELF_SHA256 = (
-    "e3ba6d28ec7122413febec4ac5e21a7c7774362ea0006708f3f740c2e91869e2"
+    "4eeac3aa45049a5529d0f86585ce5140e925a728aca677684cd009619829e02e"
 )
 
 
@@ -74,7 +74,7 @@ def main() -> None:
     if args.output_dir.exists() or args.output_zip.exists():
         raise FileExistsError("refusing to overwrite exact-family package")
     preregister, preregister_self = load_self_hashed(
-        args.preregister, "exp699_exact_family_prior_preregister_v1"
+        args.preregister, "exp699_exact_family_prior_preregister_v2"
     )
     if (
         preregister_self != PREREGISTER_SELF_SHA256

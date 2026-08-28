@@ -1,5 +1,5 @@
 {
-  "schema": "exp699_exact_family_prior_package_terminal_v1",
+  "schema": "exp699_exact_family_prior_package_terminal_v2",
   "experiment": 699,
   "decision": "EXPLORATORY_READY_NOT_SUBMITTED",
   "public_used": false,
@@ -15,15 +15,15 @@
     "interpretation": "Several remaining false negatives are rare label anomalies inside predominantly negative product cohorts; broad similarity transfer is therefore unsafe."
   },
   "candidate": {
-    "name": "solution140_flammable_exact_family_prior_v1",
-    "mechanism": "unanimous exact full text, exact first-image bytes, or two-donor digit-masked full-text recurrence; conflicting families abstain",
+    "name": "solution140_flammable_exact_family_prior_v2",
+    "mechanism": "unanimous exact full text, at least two exact first-image bytes, or two-donor digit-masked full-text recurrence; families larger than 20 and conflicting families abstain",
     "route": "flammable_only",
     "bad_route": "byte_identical_solution140",
-    "package_sha256": "6e3498adfac3fdb9d3d6ec3a8b2aa7c75dbd320051a06251b841583187fbaef5",
-    "package_size": 56095157,
-    "manifest_file_sha256": "8cea7adbee08377289d21cc931be81f0d540dee0337b96107a86a1ee5bbbf01b",
-    "manifest_self_sha256": "29494e3110851bad669fcce93720ea601da0fa3e8ba9491c9fa6f85e20c96e26",
-    "preregister_self_sha256": "e3ba6d28ec7122413febec4ac5e21a7c7774362ea0006708f3f740c2e91869e2"
+    "package_sha256": "a0a736c7cc0ad3aa8386114b570cd976da675d9a703db017d7d14ad4b8e46943",
+    "package_size": 56095170,
+    "manifest_file_sha256": "cf9ac13d4068126c0b00866013b60ed02f51181b45649684c0fd6dd139547307",
+    "manifest_self_sha256": "d91615b6f4a3b3d1e6fbcc29daf5d6a5c7fdc06bc6fd1d1effa2cfd73e9e6410",
+    "preregister_self_sha256": "4eeac3aa45049a5529d0f86585ce5140e925a728aca677684cd009619829e02e"
   },
   "verification": {
     "archive_integrity": "PASS",
@@ -34,6 +34,13 @@
     "targeted_gate_rows": 100,
     "targeted_forced_baseline_changes": 100,
     "bad_route_changed": false
+  },
+  "safety_audit": {
+    "exact_text_conflict_groups": 1,
+    "normalized_text_conflict_groups": 1,
+    "exact_image_conflict_groups": 3,
+    "maximum_exact_image_group_observed": 76,
+    "v2_response": "Require two exact-image donors and abstain on any selected family larger than 20."
   },
   "limitations": [
     "Family-pure OOF intentionally hides same-family recurrence, so this candidate has no honest local gain estimate.",

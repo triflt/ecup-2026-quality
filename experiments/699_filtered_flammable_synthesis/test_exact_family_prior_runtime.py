@@ -66,6 +66,32 @@ def test_normalized_text_requires_two_donors() -> None:
     ) == ("normalized_text", [0, 1], 1)
 
 
+def test_exact_image_requires_two_and_large_groups_abstain() -> None:
+    labels = np.ones(21, dtype=np.int8)
+    assert (
+        runtime._select_unanimous_family(
+            {"exact_text": [], "image_exact": [0], "normalized_text": []},
+            labels,
+        )
+        is None
+    )
+    assert runtime._select_unanimous_family(
+        {"exact_text": [], "image_exact": [0, 1], "normalized_text": []},
+        labels,
+    ) == ("image_exact", [0, 1], 1)
+    assert (
+        runtime._select_unanimous_family(
+            {
+                "exact_text": [],
+                "image_exact": list(range(21)),
+                "normalized_text": [],
+            },
+            labels,
+        )
+        is None
+    )
+
+
 def test_no_similarity_channels_exist() -> None:
     assert runtime.FAMILY_PRIORITY == (
         "exact_text",
