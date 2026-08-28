@@ -18,7 +18,8 @@ occurrences. После full-fivefold победы cap10 отдельно про
 
 Лучший вариант — Qwen3.5-4B с source v2, positive-only append cap10 и одной
 эпохой. Он прошёл frozen full-fivefold с победой на 5/5 folds. Full refit и
-production-package smoke выполняются в remote compute. Cap5, cap19, Qwen3-VL-2B,
+production-package smoke завершились успешно; submission ZIP готов к Public
+upload. Cap5, cap19, Qwen3-VL-2B,
 balanced80, v1-cap40, TF-IDF и nested OOF reweighting закрыты как слабые или
 нестабильные.
 
@@ -26,8 +27,9 @@ balanced80, v1-cap40, TF-IDF и nested OOF reweighting закрыты как с�
 
 Один Qwen3.5-4B fold занимает 58–73 минуты на одной H100, включая обучение,
 inference и запись adapter/predictions contract. Пять cap10 folds были обучены
-и проверены; full refit и три коротких двухфолдовых механизма выполняются на
-семи H100 параллельно, восьмая зарезервирована под end-to-end package smoke.
+и проверены. Full refit занял `55.66` минуты на одной H100; production ZIP и
+его 8-row end-to-end smoke собраны автоматически после refit. Три коротких
+двухфолдовых механизма продолжают работать параллельно.
 
 ## МЕТРИКИ
 
@@ -41,6 +43,15 @@ Frozen solution-140 replay, cap10 full fivefold:
 - rare-family corrections/regressions: `67/26`;
 - singleton corrections/regressions: `59/21`;
 - flammable AP: `0.92497717 → 0.89831246`, delta `-0.02666471`.
+
+Full-refit/package acceptance:
+
+- train occurrences: `5,450 real + 10 synthetic = 5,460`;
+- optimizer steps: `342`, final mean loss `0.29048374`;
+- package decision: `GO_PUBLIC_SUBMIT`;
+- ZIP size: `44,137,261` bytes;
+- ZIP SHA-256: `f1976370793e2627225cf38b95d1b9bdbe8832dd2c9801d4afc65b3a2920a4f3`;
+- real packaged-pipeline smoke: `8/8` rows, `labels/sealed/Public = 0`.
 
 AP improvement alone is not treated as a win when Macro/F1/FN are worse.
 
@@ -57,11 +68,10 @@ the frozen solution-140 weights and was not promoted.
 
 ## ЧТО ДАЛЬШЕ
 
-1. Finish the one-epoch full refit and verify its exact output contract.
-2. Build solution 140 with only the Qwen3.5 adapter and its exact preprocessing
-   changed, then run the real production pipeline from the generated ZIP.
-3. Submit this justified candidate to Public as soon as package smoke passes.
-4. Compare the two-epoch, balanced10 and repeat4 twofold screens, and run full
+1. Transfer the accepted ZIP to the local ignored upload directory after the
+   required explicit corporate-artifact download approval.
+2. Submit this justified candidate to Public after the action-time confirmation.
+3. Compare the two-epoch, balanced10 and repeat4 twofold screens, and run full
    fivefold only for a mechanism that improves the accepted cap10 profile.
 
 Public data is not used for filtering, training, threshold selection or
