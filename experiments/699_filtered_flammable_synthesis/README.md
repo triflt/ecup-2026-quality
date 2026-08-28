@@ -11,8 +11,8 @@ frozen production route решения 140 остаются неизменным
 Синтетика отфильтрована отдельно внутри каждого outer fold без чтения его
 validation labels. Проверены дозы 5, 10 и 19 положительных synthetic
 occurrences. После full-fivefold победы cap10 отдельно проверяются три фактора:
-две эпохи, добавление 10 отрицательных примеров и четырёхкратный вес тех же
-десяти положительных примеров.
+две эпохи, добавление 10 отрицательных примеров и вес тех же десяти
+положительных примеров с multiplicity `2` и `4`.
 
 ## ЧТО ПОЛУЧИЛОСЬ
 
@@ -28,8 +28,8 @@ balanced80, v1-cap40, TF-IDF и nested OOF reweighting закрыты как с�
 Один Qwen3.5-4B fold занимает 58–73 минуты на одной H100, включая обучение,
 inference и запись adapter/predictions contract. Пять cap10 folds были обучены
 и проверены. Full refit занял `55.66` минуты на одной H100; production ZIP и
-его 8-row end-to-end smoke собраны автоматически после refit. Три коротких
-двухфолдовых механизма продолжают работать параллельно.
+его 8-row end-to-end smoke собраны автоматически после refit. Четыре
+двухфолдовых механизма продолжают работать параллельно на восьми H100.
 
 ## МЕТРИКИ
 
@@ -71,8 +71,9 @@ the frozen solution-140 weights and was not promoted.
 1. Transfer the accepted ZIP to the local ignored upload directory after the
    required explicit corporate-artifact download approval.
 2. Submit this justified candidate to Public after the action-time confirmation.
-3. Compare the two-epoch, balanced10 and repeat4 twofold screens, and run full
-   fivefold only for a mechanism that improves the accepted cap10 profile.
+3. Compare the two-epoch, balanced10, repeat2 and repeat4 twofold screens, and
+   run full fivefold only for a mechanism that improves the accepted cap10
+   profile.
 
 Public data is not used for filtering, training, threshold selection or
 ensemble-weight selection.
