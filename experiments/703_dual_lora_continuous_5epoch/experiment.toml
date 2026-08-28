@@ -1,0 +1,8 @@
+id = 703
+slug = "dual_lora_continuous_5epoch"
+status = "RUNNING"
+public_used = false
+fold = 0
+epochs = 5
+ranks = [16, 32, 64]
+architectures = ["qwen35_4b", "qwen3vl_2b"]

@@ -1,0 +1,9 @@
+{
+  "experiment_id": 703,
+  "state": "RUNNING",
+  "fold": 0,
+  "epochs": 5,
+  "arms": 6,
+  "gpu": 6,
+  "public_used": false
+}

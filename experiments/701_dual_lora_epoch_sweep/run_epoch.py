@@ -30,8 +30,8 @@ def main() -> None:
     parser.add_argument("--architecture", choices=("qwen35_4b", "qwen3vl_2b"), required=True)
     parser.add_argument("--epochs", type=int, choices=range(1, 6), required=True)
     parser.add_argument("--cache", type=Path, required=True)
-    parser.add_argument("--lora-r", type=int, choices=(16, 32), default=16)
-    parser.add_argument("--lora-alpha", type=int, choices=(32, 64), default=32)
+    parser.add_argument("--lora-r", type=int, choices=(16, 32, 64), default=16)
+    parser.add_argument("--lora-alpha", type=int, choices=(32, 64, 128), default=32)
     args = parser.parse_args()
     parent = load(args.parent)
     parent.EPOCHS = args.epochs

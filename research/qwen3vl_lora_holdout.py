@@ -51,6 +51,7 @@ SOFT_TARGETS = Path(os.environ["SOFT_TARGETS"]) if os.environ.get("SOFT_TARGETS"
 LAST_LOGIT_ONLY = os.environ.get("LAST_LOGIT_ONLY") == "1"
 FIRST_IMAGE_MAX_EDGE = int(os.environ.get("QWEN3VL_FIRST_IMAGE_MAX_EDGE", "448"))
 FIRST_IMAGE_MAX_PIXELS = int(os.environ.get("QWEN3VL_FIRST_IMAGE_MAX_PIXELS", "262144"))
+CHECKPOINT_EACH_EPOCH = os.environ.get("CHECKPOINT_EACH_EPOCH") == "1"
 
 
 RULES = {
@@ -555,6 +556,74 @@ def main():
     optimizer.zero_grad(set_to_none=True)
     step, update, running_loss = 0, 0, 0.0
     started = time.monotonic()
+
+    def evaluate_epoch_checkpoint(epoch_number):
+        epoch_output = OUTPUT / f"epoch_{epoch_number}"
+        scores = validation_scores(
+            model, processor, frame, val_positions, token_zero, token_one
+        )
+        labels_all = frame["label"].to_numpy(dtype=np.int8)
+        categories_all = frame["category"].astype(str).to_numpy()
+        report = {
+            "holdout_fold": HOLDOUT_FOLD,
+            "epoch": epoch_number,
+            "train_records": len(train_records),
+            "optimizer_updates_completed": update,
+            "download_failures": len(failures),
+            "soft_targets": SOFT_TARGETS is not None,
+            "last_logit_only": LAST_LOGIT_ONLY,
+            "first_image_max_edge": FIRST_IMAGE_MAX_EDGE,
+            "first_image_max_pixels": FIRST_IMAGE_MAX_PIXELS,
+            "categories": {},
+        }
+        macro_lora, macro_fused = [], []
+        for category in sorted(frame["category"].unique()):
+            local_mask = categories_all[val_positions] == category
+            local_positions = val_positions[local_mask]
+            labels = labels_all[local_positions]
+            local_scores = scores[local_mask]
+            lora_f1, lora_threshold = best_threshold(labels, local_scores)
+            base_rank = rank01(fused_oof_scores(oof)[local_positions])
+            lora_rank = rank01(local_scores)
+            best_fusion = None
+            for base_weight in np.linspace(0.0, 1.0, 21):
+                fused = base_weight * base_rank + (1 - base_weight) * lora_rank
+                value, threshold = best_threshold(labels, fused)
+                item = {
+                    "f1": value,
+                    "threshold": threshold,
+                    "weight_base": float(base_weight),
+                    "weight_lora": float(1 - base_weight),
+                }
+                if best_fusion is None or item["f1"] > best_fusion["f1"]:
+                    best_fusion = item
+            report["categories"][category] = {
+                "rows": int(local_mask.sum()),
+                "positive": int(labels.sum()),
+                "lora_f1": lora_f1,
+                "lora_threshold": lora_threshold,
+                "best_fusion": best_fusion,
+            }
+            macro_lora.append(lora_f1)
+            macro_fused.append(best_fusion["f1"])
+        report["macro_lora"] = float(np.mean(macro_lora))
+        report["macro_fused"] = float(np.mean(macro_fused))
+        report["runtime_minutes"] = (time.monotonic() - started) / 60
+        epoch_output.mkdir(parents=True, exist_ok=False)
+        model.save_pretrained(epoch_output / "adapter")
+        pd.DataFrame({
+            "id": ids[val_positions],
+            "category": categories_all[val_positions],
+            "label": labels_all[val_positions],
+            "fold": HOLDOUT_FOLD,
+            "lora_score": scores,
+        }).to_csv(epoch_output / "lora_holdout_predictions.csv", index=False)
+        (epoch_output / "lora_holdout_report.json").write_text(
+            json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        print(json.dumps({"epoch_checkpoint": report}, ensure_ascii=False), flush=True)
+        model.train()
+
     for epoch in range(EPOCHS):
         random.Random(SEED + epoch).shuffle(train_records)
         for start in range(0, len(train_records), BATCH_SIZE):
@@ -607,6 +676,11 @@ def main():
                         "elapsed_min": (time.monotonic() - started) / 60,
                         "max_cuda_gib": torch.cuda.max_memory_allocated() / 1024**3,
                     }), flush=True)
+        if CHECKPOINT_EACH_EPOCH and not FULL_TRAIN:
+            evaluate_epoch_checkpoint(epoch + 1)
+
+    if CHECKPOINT_EACH_EPOCH and not FULL_TRAIN:
+        return
 
     if FULL_TRAIN:
         save_adapter(model)
