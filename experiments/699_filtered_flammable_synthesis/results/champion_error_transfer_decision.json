@@ -1,0 +1,175 @@
+{
+  "schema": "exp699_champion_error_transfer_decision_v1",
+  "self_hash_algorithm": "sha256_canonical_json_without_self_sha256",
+  "self_sha256": "5e2d37ffe7d2e41b9c7c1877a08b35868dc3f379af1c8e82d2910d0e9377b9dc",
+  "generated_at": "2026-08-28T15:59:18+03:00",
+  "experiment": 699,
+  "baseline": {
+    "experiment": 140,
+    "filename": "quality-qwen3vl-qwen35-dual-lora-prior-submit.zip",
+    "public_f1": 0.8923976821312729
+  },
+  "decision": "TERMINAL_REJECT_SYNTHETIC_AUGMENTATION_LANE",
+  "public_candidate": null,
+  "old_public_probe": {
+    "filename": "solution140_q35_v2p10_e1_448e0eb4.zip",
+    "score": 0.8365012615643398,
+    "delta_vs_140": -0.0558964205669331,
+    "evidence": "verified_filename_level_ods_row",
+    "artifact_sha_binding": "unverified",
+    "decision": "do_not_resubmit"
+  },
+  "variants": {
+    "B_cap5_thumbnail448": {
+      "causal_status": "diagnostic_only_training_order_and_rng_confounded",
+      "screen_folds": [0, 3],
+      "gpu_hours": 2.1096493,
+      "macro_delta": 0.03094863,
+      "per_fold_macro_delta": [0.06219227, 0.00095795],
+      "flammable_f1": 0.88888889,
+      "flammable_ap_delta": 0.00363974,
+      "final_corrections_regressions": [50, 13],
+      "decision_survival": {
+        "head_flips": 154,
+        "survived_head_flips": 38,
+        "final_flips": 63,
+        "final_flips_without_head_sign_flip": 25
+      },
+      "cohorts": {
+        "singleton_corrections_regressions": [16, 11],
+        "rare_le2_corrections_regressions": [19, 13],
+        "repeated_corrections_regressions": [34, 2]
+      },
+      "decision": "reject_tiny_fold3_and_low_survival"
+    },
+    "C_cap10_area262144": {
+      "causal_status": "diagnostic_only_multiple_factors_and_training_order_rng_confounded",
+      "screen_folds": [0, 3],
+      "gpu_hours": 2.3223339,
+      "macro_delta": 0.039414837,
+      "per_fold_macro_delta": [0.06349712, 0.016264275],
+      "flammable_f1": 0.903704,
+      "flammable_ap_delta": -0.011079,
+      "final_corrections_regressions": [54, 7],
+      "decision_survival": {
+        "head_flips": 154,
+        "survived_head_flips": 38,
+        "final_flips": 61,
+        "final_flips_without_head_sign_flip": 23
+      },
+      "cohorts": {
+        "singleton_corrections_regressions": [19, 6],
+        "rare_le2_corrections_regressions": [22, 7],
+        "repeated_corrections_regressions": [35, 1]
+      },
+      "decision": "reject_confounded_and_same_lineage_as_failed_public_candidate"
+    },
+    "D_cap10_flammable_only_route": {
+      "causal_status": "route_isolated_but_parent_training_confounded",
+      "screen_folds": [0, 3],
+      "additional_gpu_hours": 0.0,
+      "macro_delta": 0.034585665,
+      "per_fold_macro_delta": [0.057040998, 0.013063891],
+      "flammable_f1": 0.903704,
+      "flammable_ap_delta": -0.011079,
+      "final_corrections_regressions": [11, 1],
+      "bad_predictions_byte_identical": true,
+      "decision_survival": {
+        "head_flips": 19,
+        "survived_head_flips": 6,
+        "final_flips": 12,
+        "final_flips_without_head_sign_flip": 6
+      },
+      "cohorts": {
+        "singleton_corrections_regressions": [4, 1],
+        "rare_le2_corrections_regressions": [6, 1],
+        "repeated_corrections_regressions": [7, 0]
+      },
+      "decision": "reject_after_matched_order_found_no_flammable_decision_gain"
+    },
+    "conflict_weighting": {
+      "causal_status": "paired_screen",
+      "screen_folds": [0, 3],
+      "gpu_hours": 2.3621667,
+      "macro_delta": -0.007843,
+      "flammable_f1_before_after": [0.964029, 0.948905],
+      "flammable_fn_before_after": [1, 3],
+      "final_corrections_regressions": [4, 8],
+      "decision": "terminal_reject"
+    },
+    "two_row_relabel": {
+      "causal_status": "diagnostic_only_post_oof_selection",
+      "screen_folds": [0, 1],
+      "gpu_hours": 2.4045,
+      "standalone_macro_delta": 0.000567,
+      "flammable_ap_delta": 0.001639,
+      "flammable_f1_fn_fp_changed": false,
+      "production_fold0_macro_delta": 0.0,
+      "production_fold0_prediction_changes": 0,
+      "decision": "reject_for_shipping"
+    },
+    "matched_order_synth10_vs_equal_real10": {
+      "causal_status": "exact_one_factor_fold3",
+      "screen_folds": [3],
+      "gpu_hours": 2.2723667,
+      "parity": {
+        "same_initialization": true,
+        "same_real_slots": true,
+        "same_permutation": true,
+        "same_rng_state": true,
+        "same_lr_trace": true,
+        "same_optimizer_steps": 307,
+        "only_difference": "ten_extra_positive_payloads"
+      },
+      "before_prior": {
+        "macro_delta": 0.00078188,
+        "flammable_f1_before_after": [0.92957746, 0.92957746],
+        "flammable_tp_fp_fn_before_after": [[33, 4, 1], [33, 4, 1]],
+        "qwen35_flammable_ap_delta": -0.00343261,
+        "fused_flammable_ap_delta": -0.00557375,
+        "final_corrections_regressions": [3, 0],
+        "flammable_final_changes": 0
+      },
+      "after_prior": {
+        "macro_delta": 0.00051364,
+        "flammable_f1_before_after": [0.95652174, 0.95652174],
+        "flammable_fn_before_after": [1, 1],
+        "final_corrections_regressions": [2, 0]
+      },
+      "decision_survival": {
+        "qwen35_threshold_flips": 41,
+        "survived_final_threshold_flips": 0,
+        "final_bad_corrections_from_continuous_rank_movement": 3
+      },
+      "cohorts": {
+        "singleton_corrections_regressions": [2, 0],
+        "rare_le2_corrections_regressions": [3, 0],
+        "repeated_corrections_regressions": [1, 0]
+      },
+      "report_file_sha256": "44c9fb50040bd11a00312cb374b0550b5f30e11e28eb1043931a18c010741a46",
+      "report_self_sha256": "9f4357f1ab1f04ed97f193b0aab72340da27862fe82e40386a0603bd92a3621e",
+      "decision": "terminal_reject_no_target_class_decision_gain_and_ap_worse",
+      "fold0_confirmation_launched": false
+    }
+  },
+  "known_gpu_hours_for_decision_packet_lanes": 11.4710166,
+  "tfidf_synthetic": {
+    "gpu_hours": 0.0,
+    "routed_fold_wins": 0,
+    "decision": "terminal_reject_component_gain_did_not_survive_final_route"
+  },
+  "single_recommended_next_action": {
+    "action": "build_cpu_only_family_pure_oof_transfer_audit",
+    "description": "Using frozen existing OOF predictions only, select rows by a label-blind semantic-family purity rule so no family crosses train and validation, then compare solution140 and every available exp699 route on final flammable FP/FN, decision survival, singleton and rare cohorts. Do not train or submit until this audit explains whether family leakage caused the local-to-Public inversion.",
+    "target_error_cohort": "solution140_final_flammable_fp_fn_and_rare_singleton_families",
+    "gpu_hours": 0.0,
+    "public_probe": false
+  },
+  "forbidden_continuations": [
+    "fold0_matched_order_confirmation",
+    "exp699_full_fivefold_retraining",
+    "exp699_refit_or_package",
+    "exp699_public_resubmission",
+    "threshold_or_weight_tuning_against_public"
+  ]
+}

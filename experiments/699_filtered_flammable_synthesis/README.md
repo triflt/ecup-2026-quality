@@ -16,12 +16,19 @@ occurrences. После full-fivefold победы cap10 отдельно про
 
 ## ЧТО ПОЛУЧИЛОСЬ
 
-Лучший вариант — Qwen3.5-4B с source v2, positive-only append cap10 и одной
-эпохой. Он прошёл frozen full-fivefold с победой на 5/5 folds. Full refit и
-production-package smoke завершились успешно; submission ZIP готов к Public
-upload. Cap5, cap19, Qwen3-VL-2B,
-balanced80, balanced10, repeat2, repeat4, v1-cap40, TF-IDF, nested OOF
-reweighting и двухэпохный Qwen3.5 закрыты как слабые или нестабильные.
+Эксперимент закрыт отрицательно. Исторический cap10-кандидат прошёл локальный
+frozen full-fivefold с победой на 5/5 folds, но на Public получил
+`0.83650126`, то есть `-0.05589642` относительно решения 140. Повторно
+отправлять этот ZIP нельзя.
+
+Последующий matched-order тест устранил главный causal confound: synth10
+сравнивался с десятью дополнительными real-positive exposures при одинаковых
+initialization, 4892 real slots, permutation, RNG, LR trace и 307 optimizer
+steps. На fold3 синта не изменила ни одного финального flammable-решения и
+ухудшила flammable AP. Fold0 confirmation, новый refit, package и Public
+закрыты. Cap5, cap19, Qwen3-VL-2B, balanced80, balanced10, repeat2, repeat4,
+v1-cap40, TF-IDF, weighting конфликтов, двухстрочный relabel, nested OOF
+reweighting и двухэпохный Qwen3.5 также закрыты.
 
 ## СКОЛЬКО РАБОТАЛО
 
@@ -30,9 +37,35 @@ inference и запись adapter/predictions contract. Пять cap10 folds б�
 и проверены. Full refit занял `55.66` минуты на одной H100; production ZIP и
 его 8-row end-to-end smoke собраны автоматически после refit. Balanced10 и
 repeat2 и repeat4 завершены на folds 0/3. Все GPU screens терминальны; remote compute
-остаётся готовым на восьми H100 для следующего направления после Public-сигнала.
+остаётся готовым на восьми H100 для следующего направления. Финальный decision
+packet дополнительно использовал `11.4710` H100-hours на B/C, weighting,
+relabel и matched-order causal arms; matched-order pair заняла `68.20/68.15`
+минуты на двух H100.
 
 ## МЕТРИКИ
+
+Public:
+
+- solution140 baseline: `0.89239768`;
+- `solution140_q35_v2p10_e1_448e0eb4.zip`: `0.83650126`;
+- delta: `-0.05589642`;
+- ODS filename-to-score binding подтверждён; exact uploaded-bytes-to-local-SHA
+  binding остаётся `UNVERIFIED`, потому что hash-bearing upload receipt не был
+  сохранён.
+
+Matched-order fold3, synth10 против equal-dose real10, exact frozen route:
+
+- Macro до prior: `0.95270890 → 0.95349078`, delta `+0.00078188`;
+- flammable F1: точная ничья `0.92957746`;
+- flammable TP/FP/FN: точная ничья `33/4/1`;
+- Qwen3.5 flammable AP: `0.92951924 → 0.92608663`, delta `-0.00343261`;
+- fused flammable AP: `0.97234051 → 0.96676676`, delta `-0.00557375`;
+- final corrections/regressions: `3/0`, но все три относятся к BAD;
+- flammable final decision changes: `0`;
+- после prior Macro delta `+0.00051364`, flammable F1/FN снова без изменений;
+- 41 Qwen3.5 threshold flips дали `0` surviving final threshold flips.
+
+Решение matched-order gate: `REJECT_MATCHED_SYNTH_FOLD3`.
 
 Frozen solution-140 replay, cap10 full fivefold:
 
@@ -96,6 +129,12 @@ AP improvement alone is not treated as a win when Macro/F1/FN are worse.
 
 ## ОШИБКИ
 
+Главная ошибка первоначального вывода — считать 5/5 локальных побед causal
+доказательством пользы синты. Append менял длину shuffled dataset, optimizer
+trajectory и preflight RNG. Public показал сильную инверсию, а matched-order
+контроль подтвердил отсутствие улучшения целевой flammable boundary. Поэтому
+старые B/C/D метрики считаются descriptive diagnostics, а не ship evidence.
+
 The original handoff recipe and the first local README described replacement
 of real flammable rows. That design was rejected. The implemented append arm
 proves `augmentation_arm=synth_append` and keeps the full real training
@@ -113,11 +152,12 @@ evaluated without retraining or any scientific change.
 
 ## ЧТО ДАЛЬШЕ
 
-1. Transfer the accepted ZIP to the local ignored upload directory after the
-   required explicit corporate-artifact download approval.
-2. Submit this justified candidate to Public after the action-time confirmation.
-3. Use the Public result to calibrate trust in the frozen evaluator; only then
-   decide whether to explore a new mechanism or OOF-only fusion reweighting.
+Единственное рекомендованное продолжение — CPU-only family-pure OOF transfer
+audit на уже существующих predictions. Строки должны выбираться label-blind по
+semantic-family purity так, чтобы одна семья не пересекала train/validation.
+Нужно заново сравнить solution140 и доступные exp699 routes по финальным
+flammable FP/FN, decision survival, singleton и rare cohorts. До объяснения
+local-to-Public inversion новые exp699 training/package/Public запрещены.
 
 Public data is not used for filtering, training, threshold selection or
 ensemble-weight selection.
