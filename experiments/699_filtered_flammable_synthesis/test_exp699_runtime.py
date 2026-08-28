@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 ROOT = Path(__file__).parent
 
 
@@ -154,6 +156,92 @@ def test_remote_candidate_artifact_exact_binding(tmp_path: Path) -> None:
         "micro_batch": 4,
         "accumulation": 4,
     }
+
+
+def test_evaluator_accepts_exact_twenty_occurrence_append_contract(
+    tmp_path: Path,
+) -> None:
+    import numpy as np
+
+    root = tmp_path / "artifact"
+    fold_root = root / "fold0"
+    fold_root.mkdir(parents=True)
+    predictions = fold_root / "predictions.jsonl"
+    write_jsonl(
+        predictions,
+        [
+            {
+                "global_index": 101,
+                "id": "a",
+                "fold": 0,
+                "category": "Легковоспламеняющиеся",
+                "score": 0.25,
+                "prediction": 1,
+            }
+        ],
+    )
+    adapter = fold_root / "adapter.zip"
+    adapter.write_bytes(b"adapter")
+    contract = {
+        "experiment_id": "699",
+        "architecture": "qwen35_4b",
+        "fold": 0,
+        "source": "v2",
+        "mode": "balanced_append",
+        "cap": 10,
+        "augmentation_arm": "synth_append",
+        "synthetic_occurrences": 20,
+        "train_occurrences": 4912,
+        "effective_batch": 16,
+        "epochs": 1,
+        "validation_labels_read": 0,
+        "sealed_rows_used": 0,
+        "public_rows_used": 0,
+        "decision": "GO_EVALUATE",
+        "optimizer_steps": 307,
+        "loss_contract": "binary_bce_last_token",
+        "runtime_minutes": 1.0,
+        "peak_gpu_bytes": 10,
+        "artifacts": {
+            "predictions.jsonl": hashlib.sha256(predictions.read_bytes()).hexdigest(),
+            "adapter.zip": hashlib.sha256(adapter.read_bytes()).hexdigest(),
+        },
+    }
+    contract["contract_sha256"] = evaluator.canonical_sha256(contract)
+    contract_path = fold_root / "output_contract.json"
+    contract_path.write_text(json.dumps(contract), encoding="utf-8")
+    spec = {
+        "architecture": "qwen35_4b",
+        "source": "v2",
+        "mode": "balanced_append",
+        "cap": 10,
+        "path": root,
+    }
+    scores, audit = evaluator.load_candidate(
+        spec,
+        np.asarray(["a"]),
+        np.asarray([0]),
+        np.asarray(["Легковоспламеняющиеся"]),
+        np.asarray([101]),
+        evaluation_folds=(0,),
+    )
+    assert scores.tolist() == [0.25]
+    assert audit["rows"] == 1
+
+    contract["synthetic_occurrences"] = 21
+    contract["contract_sha256"] = evaluator.canonical_sha256(
+        {key: value for key, value in contract.items() if key != "contract_sha256"}
+    )
+    contract_path.write_text(json.dumps(contract), encoding="utf-8")
+    with pytest.raises(ValueError, match="append contract mismatch"):
+        evaluator.load_candidate(
+            spec,
+            np.asarray(["a"]),
+            np.asarray([0]),
+            np.asarray(["Легковоспламеняющиеся"]),
+            np.asarray([101]),
+            evaluation_folds=(0,),
+        )
 
 
 def test_full_fivefold_candidate_artifact_binding(tmp_path: Path) -> None:

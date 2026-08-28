@@ -132,7 +132,7 @@ def load_candidate(
             if (
                 contract.get("augmentation_arm") != "synth_append"
                 or int(contract.get("synthetic_occurrences", -1))
-                not in {5, 10, 19, 40, 160}
+                not in {5, 10, 19, 20, 40, 160}
                 or int(contract.get("optimizer_steps", -1)) != expected_steps
             ):
                 raise ValueError(f"fold{fold} append contract mismatch")
