@@ -1,6 +1,6 @@
 {
   "schema": "ecup_quality_transfer_ledger_v1",
-  "updated_at": "2026-08-28T16:38:00+03:00",
+  "updated_at": "2026-08-28T18:10:00+03:00",
   "baseline": {
     "experiment_id": "140",
     "filename": "quality-qwen3vl-qwen35-dual-lora-prior-submit.zip",
@@ -333,6 +333,29 @@
       "public": null,
       "decision": "accept_topology_for_graph_aware_oracle_reject_mixed_oof_as_sole_ship_gate",
       "interpretation": "Cross-fold recurrence is substantial, but the rejected synthetic candidate's local net lift is larger on novel-family rows than on recurrence rows; recurrence leakage alone does not explain the Public inversion."
+    },
+    {
+      "experiment_id": "699-retrieval-soft-cache-v1",
+      "change_type": "graph_aware_soft_cache_residual_flammable_only",
+      "local_evidence": {
+        "evaluation_scope": "frozen_end_to_end_route_folds0_3",
+        "final_changed": 28,
+        "corrections": 5,
+        "regressions": 23,
+        "net": -18,
+        "all_changes_direction": "positive_to_negative",
+        "decision": "negative_exploratory_but_packaged_by_explicit_user_request"
+      },
+      "public": {
+        "filename": "solution140_flammable_soft_cache_v1.zip",
+        "score": 0.671170060647897,
+        "baseline_score": 0.8923976821312729,
+        "delta": -0.22122762148337594,
+        "evidence": "verified_filename_level_ods_row",
+        "artifact_sha_binding": "unverified"
+      },
+      "decision": "terminal_reject_never_resubmit_or_tune",
+      "interpretation": "The local negative direction transferred and amplified dramatically on Public. Broad donor-label transfer is unsafe; retrieval may be used only for abstention or exact-family evidence with an independently frozen mechanism."
     }
   ]
 }
