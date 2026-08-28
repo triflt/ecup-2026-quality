@@ -20,8 +20,8 @@ occurrences. После full-fivefold победы cap10 отдельно про
 эпохой. Он прошёл frozen full-fivefold с победой на 5/5 folds. Full refit и
 production-package smoke завершились успешно; submission ZIP готов к Public
 upload. Cap5, cap19, Qwen3-VL-2B,
-balanced80, balanced10, repeat4, v1-cap40, TF-IDF, nested OOF reweighting и
-двухэпохный Qwen3.5 закрыты как слабые или нестабильные.
+balanced80, balanced10, repeat2, repeat4, v1-cap40, TF-IDF, nested OOF
+reweighting и двухэпохный Qwen3.5 закрыты как слабые или нестабильные.
 
 ## СКОЛЬКО РАБОТАЛО
 
@@ -29,8 +29,8 @@ balanced80, balanced10, repeat4, v1-cap40, TF-IDF, nested OOF reweighting и
 inference и запись adapter/predictions contract. Пять cap10 folds были обучены
 и проверены. Full refit занял `55.66` минуты на одной H100; production ZIP и
 его 8-row end-to-end smoke собраны автоматически после refit. Balanced10 и
-repeat4 завершены на folds 0/3; repeat2 остаётся единственным активным screen
-на двух из восьми H100.
+repeat2 и repeat4 завершены на folds 0/3. Все GPU screens терминальны; remote compute
+остаётся готовым на восьми H100 для следующего направления после Public-сигнала.
 
 ## МЕТРИКИ
 
@@ -84,6 +84,14 @@ two fewer FN:
 - corrections/regressions: `54/8` vs `54/7`;
 - AP delta: `-0.07028599` vs `-0.01107883`.
 
+Repeat2 was clearly rejected:
+
+- routed Macro delta: `+0.01959174` vs `+0.03941484`;
+- flammable F1: `0.86567164` vs `0.90370370`;
+- flammable FP/FN: `8/10` vs `6/7`;
+- corrections/regressions: `48/12` vs `54/7`;
+- AP delta: `-0.08631584` vs `-0.01107883`.
+
 AP improvement alone is not treated as a win when Macro/F1/FN are worse.
 
 ## ОШИБКИ
@@ -108,8 +116,8 @@ evaluated without retraining or any scientific change.
 1. Transfer the accepted ZIP to the local ignored upload directory after the
    required explicit corporate-artifact download approval.
 2. Submit this justified candidate to Public after the action-time confirmation.
-3. Finish repeat2 on folds 0/3 and run full fivefold only if it improves the
-   accepted cap10 repeat1 profile.
+3. Use the Public result to calibrate trust in the frozen evaluator; only then
+   decide whether to explore a new mechanism or OOF-only fusion reweighting.
 
 Public data is not used for filtering, training, threshold selection or
 ensemble-weight selection.

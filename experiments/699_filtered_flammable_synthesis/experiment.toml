@@ -1,6 +1,6 @@
 id = "699"
 name = "filtered_flammable_synthesis"
-status = "cap10_public_zip_ready_balanced_repeat4_reject_repeat2_running"
+status = "cap10_public_zip_ready_all_screens_terminal"
 hypothesis = "A fold-safe, confidence-filtered and label-balanced subset of synthetic flammable examples can improve the production ensemble without the prior shift and recipe confounds in experiment 246."
 parent = "698"
 public_used = false
