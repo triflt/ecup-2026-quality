@@ -1,0 +1,20 @@
+{
+  "decision": "READY_FOR_REMOTE_RUNTIME_MATERIALIZATION_NO_GPU_LAUNCHED",
+  "experiment_id": "699",
+  "expected_optimizer_steps": 425,
+  "expected_real_occurrences": 6790,
+  "expected_real_unique": 5998,
+  "expected_synthetic_occurrences": 10,
+  "expected_train_occurrences": 6800,
+  "image_preprocessing": "PIL_thumbnail_448x448_LANCZOS_RGB_JPEG_quality92",
+  "old_refit_decision_preserved": "GO_FULL_REFIT",
+  "old_refit_occurrences_preserved": 5460,
+  "old_refit_optimizer_steps_preserved": 342,
+  "reference_full_train_report_sha256": "44a90c62781d5d51c0916f517b5ea3a11f817c835cdebcdf93a271be269bcc55",
+  "reference_training_code_sha256": "f9f508757458c6e6efa38f5e1f12913bdbf1db3acedc3b5ffbbcda3cc5234cf3",
+  "schema": "exp699_solution140_full_support_refit_pre_gpu_v1",
+  "selected_real_multiset_sha256": "0a31883f4e0b68a5fd9f6f803f660d02d67300cde30dd4f60564253e90a4af63",
+  "selected_real_ordered_indices_sha256": "2006a56d7499cf754fe9db34781117350a738fae513eec334eaa6864ad1f309d",
+  "selected_real_unique_ids_sha256": "3e9e0bbdad4d2f832521375ab1a305a42de0e8b31e12bae29bf869b87df47ba1",
+  "student_gpu_jobs_launched": 0
+}
