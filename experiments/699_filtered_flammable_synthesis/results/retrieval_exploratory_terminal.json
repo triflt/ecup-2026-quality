@@ -1,0 +1,114 @@
+{
+  "schema": "exp699_retrieval_exploratory_terminal_v1",
+  "self_hash_algorithm": "sha256_canonical_json_without_self_sha256",
+  "self_sha256": "0350c4b51612181a4482946cf77bdd3e999932e16f652bc58044d7613719cd46",
+  "experiment": 699,
+  "created_at": "2026-08-28T18:20:00+03:00",
+  "candidate": "solution140_flammable_graph_aware_soft_cache_v1",
+  "status": "ExploratoryReadyNotSubmitted",
+  "validated_champion": false,
+  "ods_submit_authorized": false,
+  "new_gpu_training": false,
+  "selection": {
+    "mechanism": "reliability-weighted flammable-only retrieval soft cache over byte-identical solution140",
+    "why_selected": "orthogonal training-free signal aimed at champion flammable FP/FN; package is required as an exploratory probe even when frozen OOF is weaker",
+    "consciously_accepted_risk": "cross-fitted OOF is strongly negative and predicts a high FN risk; Public transfer is uncertain",
+    "rejected_alternatives": {
+      "matched_order_synth10_vs_real10": "exact final-decision tie and worse AP; terminal no-signal",
+      "tfidf_synth": "0/5 routed wins and negative final Macro; low-survival rejection",
+      "targeted_relabel": "diagnostic only; no label-blind untouched confirmation",
+      "conflict_weighting": "negative exact-package final route"
+    }
+  },
+  "preregister": {
+    "file_sha256": "85ed3fa0a8916d6c25ef5ee5774b0f0dd807dbc01f47524b5e3fe27bb88e316e",
+    "self_sha256": "dbc0d666d4e9e1ce93f46034c393fcc67fe082732c6e8bd5ccf786cfb5914ff9",
+    "v2_superseded_file_sha256": "dac72fad5fb834da13308fee3cd7525da4d3da3c1096f274edeeed7c74ea26e0",
+    "scientific_recipe_changed_in_v3": false
+  },
+  "oracle": {
+    "file_sha256": "d6f4cde532fc6e668b60b5fc1d7cad002802ae458b89b46f8aa200931dc86e47",
+    "self_sha256": "f15d30cda88fdee594ea19f359fd48036b3661886cb4d6205e2fa8a2dae066fc",
+    "solution140_errors": 360,
+    "retrievable_errors_at_30": 354,
+    "flammable_fn_recall_at_30": 0.6,
+    "oracle_macro_delta_after_prior": 0.03657351899085837,
+    "interpretation": "upper_bound_only_not_expected_gain"
+  },
+  "oof": {
+    "file_sha256": "d56498c62a52bd63a728d9b27a96b6eaaa1df952898a63134c9e2de01147d1d3",
+    "self_sha256": "88b4daa9300640cd5dab0de87ed99010dfc96ff08d0bde02f12f25e09c61a4f4",
+    "rows": 11118,
+    "cache_gate_rows": 4600,
+    "final_changed_rows": 28,
+    "baseline_macro_f1": 0.9601010632698179,
+    "candidate_macro_f1": 0.9297897205184806,
+    "macro_delta": -0.03031134275133729,
+    "corrections": 5,
+    "regressions": 23,
+    "flammable_f1_before": 0.9565217391304348,
+    "flammable_f1_after": 0.8958990536277602,
+    "flammable_fp_before": 10,
+    "flammable_fp_after": 5,
+    "flammable_fn_before": 5,
+    "flammable_fn_after": 28,
+    "cohorts": {
+      "recurrence": {"changed": 6, "corrections": 2, "regressions": 4},
+      "novel_family": {"changed": 22, "corrections": 3, "regressions": 19},
+      "singleton": {"changed": 19, "corrections": 4, "regressions": 15},
+      "rare_le2": {"changed": 23, "corrections": 4, "regressions": 19},
+      "repeated": {"changed": 5, "corrections": 1, "regressions": 4}
+    }
+  },
+  "package": {
+    "remote_compute_path": "/remote_compute/home/runs/exp699/soft_cache_package_v2/solution140_flammable_soft_cache_v1.zip",
+    "archive_sha256": "98a0e02e8cde8c04fde529461ce4b813a352a15fefacec289f3d5e8843c89eae",
+    "archive_size": 56094581,
+    "members": 276,
+    "unsafe_members": 0,
+    "zip_integrity_pass": true,
+    "deterministic_rebuild_byte_identical": true,
+    "candidate_manifest_self_sha256": "a07fa39d3f899e6fd2373662ee3b37687e70c07bb44b2062ce1890d440fbbd28",
+    "source_run_sha256": "9318db4cc0f26eabaa73ae9856dbf9daffd06787a162e6f5db71f249f6db7146",
+    "candidate_run_sha256": "78918c736e47c24ddaf5bdbbc67119930d9d857a2f9bb4e2763da11865fa7e94",
+    "runtime_sha256": "510945c1c6790cfaee68935bfb2cda7b839407d4a95cad60423f1d2e59a8f7d4",
+    "cache_sha256": "309c36df7dd9c13fe1483b464d723445b15e0dbe5120b7b90a2661a0314acef1",
+    "cache_size": 11976334,
+    "donors": 4716,
+    "source_members": 273,
+    "unchanged_source_members": 272,
+    "new_members": [
+      "exp699_candidate_manifest.json",
+      "soft_cache.joblib",
+      "soft_cache_runtime.py"
+    ],
+    "only_modified_source_member": "run.py"
+  },
+  "smoke": {
+    "source": "extracted_final_zip",
+    "rows": 8,
+    "schema_decision": "ACCEPT_PACKAGE_RUNTIME_SMOKE",
+    "acceptance_self_sha256": "5b02a83bfb982968bdd510e68e01a1d4fa5fc9eb4328ca278c4c5db9bd8130ee",
+    "output_sha256": "12522154a2875388d78ed37caafd87354e17397f1c9eba4fe943ff2b7e3cb2f3",
+    "bad_output_exact_vs_solution140": true,
+    "all_output_exact_on_smoke": true,
+    "cache_gate_rows": 4,
+    "cache_changed_rows": 0
+  },
+  "exact_diff": {
+    "bad_route": "byte_identical",
+    "qwen_adapters": "byte_identical",
+    "base_models": "byte_identical",
+    "fusion_weights": "byte_identical",
+    "thresholds": "byte_identical",
+    "production_prior": "byte_identical",
+    "flammable_change": "after frozen ensemble rank score and before frozen prior, mix 0.75 base score + 0.25 weighted donor positive rate when frozen reliability gate passes"
+  },
+  "security": {
+    "local_artifact_downloads": 0,
+    "public_rows_used": 0,
+    "sealed_rows_used": 0,
+    "blocked_objects_touched": 0
+  },
+  "decision": "EXPLORATORY_READY_NOT_SUBMITTED"
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "exp699_retrieval_source_manifest_v1",
+  "self_hash_algorithm": "sha256_canonical_json_without_self_sha256",
+  "self_sha256": "b06f3e3d98637239b227ae946ca690c2c65dc72addfd71fe8fb8801bd24767a0",
+  "created_at": "2026-08-28T17:52:00+03:00",
+  "experiment": 699,
+  "stage": "frozen_before_soft_cache_metric_review",
+  "preregister": {
+    "file_sha256": "85ed3fa0a8916d6c25ef5ee5774b0f0dd807dbc01f47524b5e3fe27bb88e316e",
+    "self_sha256": "dbc0d666d4e9e1ce93f46034c393fcc67fe082732c6e8bd5ccf786cfb5914ff9"
+  },
+  "solution140_source": {
+    "run_sha256": "9318db4cc0f26eabaa73ae9856dbf9daffd06787a162e6f5db71f249f6db7146",
+    "metadata_sha256": "f1c93f797b285b31c28d3fdb981a64fd0e223552fbfc81b55869eea9ab037303",
+    "annotator_prior_sha256": "0b08c0d2397455994b61c66e32bbdff5d60445a8126ad0d889fce127df56a91e",
+    "manifest_file_sha256": "f60f100bd8cce488a0538a5e9a3df80cb775f781d8b0f29fd0976aee757485c4",
+    "manifest_self_sha256": "ce31287e20068b010dece380ec66c2090f147fe465978c3e66cf17fe13fa8bbe"
+  },
+  "component_outputs": {
+    "file_sha256": "bc20bb68bed78f67621e0d02f57a780b4475434df05ae3525d5d23b610c17df8",
+    "audit_file_sha256": "330278e39d144dedb409a34d26afc889c3bd7142776e3cf0c594f393d61421da",
+    "audit_self_sha256": "a416a7a4c3eb1afc9780bba0e1c505f615dff31805cd2da015b9660c62496f93",
+    "rows": 11118
+  },
+  "topology": {
+    "file_sha256": "7e16f6665ca4fb552e65145fe52b578ae3706dcd274027754851e24c827b90c1",
+    "self_sha256": "9ce30230c0c3b132504be65066e793d00c5d61e1e4cbcc5b001de1ff933e5e14",
+    "module_sha256": "be27901c713924eddb7b0b6a197c9dfa2d6ec44564d2e8a4a5b2f0e8916b93d1"
+  },
+  "fold_runtime_sha256": {
+    "0": "a9abfc5bc8dc8cb62c8add9f061d2ba9e9f1e0d165add23fca518519a848f4d0",
+    "1": "15abd402968a967eee4a0d7f49f6165b90124190aaf4db93b9821d2d79996390",
+    "2": "0a885fbbd4e1a581f5e336f5fcb30a2f8835a2111bd83e0304efaa03ba284fd8",
+    "3": "3381a41f8e7a8819d9831d4e6d3ba8a03580d81e741df4fbe8818fb855c7ce31",
+    "4": "e33290bb7a884bbd8f37e4b1a6c3284cedd5bea997f8e9276f38a74ab4d8d715"
+  },
+  "runtime_packages": {
+    "python": "3.12.3",
+    "numpy": "2.2.3",
+    "scipy": "1.18.0",
+    "scikit_learn": "1.9.0",
+    "pillow": "11.1.0"
+  },
+  "baseline_semantics": "cross_fitted_solution140_component_surrogate_with_exact_frozen_production_threshold_and_prior; package parity must be proven separately on actual solution140 runtime",
+  "labels_enter_after_candidate_generation": true,
+  "public_used": false,
+  "decision": "ACCEPT_INPUTS_FOR_DIAGNOSTIC_AND_PACKAGE_PARITY_BUILD"
+}
