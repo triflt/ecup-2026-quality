@@ -1,0 +1,60 @@
+{
+  "schema": "exp699_retrieval_exploratory_preregister_v1",
+  "self_hash_algorithm": "sha256_canonical_json_without_self_sha256",
+  "self_sha256": "4f6dac1be49c70ec732081775a2e95871ba5f4a35588028b490d4fc19552c791",
+  "created_at": "2026-08-28T17:13:22+03:00",
+  "experiment": 699,
+  "stage": "frozen_before_oracle_metrics",
+  "decision": "PREPARE_ONE_EXPLORATORY_SUBMISSION_REGARDLESS_OF_OOF_SIGN_UNLESS_PROHIBITED_DEFECT",
+  "candidate_name": "solution140_flammable_graph_aware_soft_cache_v1",
+  "public_used_for_recipe": false,
+  "sealed_rows": 0,
+  "route": {
+    "БАД": "solution140_byte_identical",
+    "Легковоспламеняющиеся": "solution140_plus_soft_cache"
+  },
+  "frozen_recipe": {
+    "donor_pool": "outer_train_rows_only_for_oof_and_all_labeled_train_rows_for_submission",
+    "candidate_channels": {
+      "exact_text": 2.0,
+      "normalized_text": 1.5,
+      "tfidf": 1.0,
+      "bm25": 1.0,
+      "first_image_exact_bytes": 2.0,
+      "first_image_near_hash": 1.0
+    },
+    "excluded_runtime_channel": "qwen3vl_2b_multimodal_embedding_oracle_only_not_packaged",
+    "rank_fusion": "reciprocal_rank_fusion",
+    "rrf_offset": 60,
+    "candidate_top_k": 30,
+    "cache_top_k": 5,
+    "minimum_unique_donors": 3,
+    "minimum_donor_label_agreement": 0.8,
+    "minimum_evidence_channels": 2,
+    "exact_text_can_satisfy_evidence_gate_alone": true,
+    "cache_alpha": 0.25,
+    "score_update": "0.75 * frozen_solution140_score + 0.25 * weighted_donor_positive_rate",
+    "threshold": 0.5,
+    "production_priors": "frozen_solution140_after_soft_cache"
+  },
+  "packaging_policy": {
+    "negative_or_weak_oof_is_not_a_veto": true,
+    "prohibited_defects": [
+      "label_leakage",
+      "invalid_provenance",
+      "non_determinism",
+      "runtime_or_schema_failure",
+      "factually_zero_final_decision_change",
+      "post_public_recipe_tuning"
+    ],
+    "status_after_successful_build": "ExploratoryReadyNotSubmitted",
+    "ods_submit_requires_fresh_action_time_confirmation": true
+  },
+  "required_artifacts": [
+    "decision_memo",
+    "cross_fitted_oof_metrics_and_exact_changed_decisions",
+    "build_manifest_and_sha256",
+    "exact_diff_against_solution140",
+    "runtime_and_schema_smoke"
+  ]
+}
