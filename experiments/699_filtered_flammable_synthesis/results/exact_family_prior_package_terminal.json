@@ -1,0 +1,43 @@
+{
+  "schema": "exp699_exact_family_prior_package_terminal_v1",
+  "experiment": 699,
+  "decision": "EXPLORATORY_READY_NOT_SUBMITTED",
+  "public_used": false,
+  "sealed_rows_used": 0,
+  "ods_submit_authorized": false,
+  "error_audit": {
+    "solution140_screen_fp": 4,
+    "solution140_screen_fn": 3,
+    "flammable_mixed_components": 1,
+    "flammable_mixed_rows": 2,
+    "cake_candle_cohort_positive_total": [2, 46],
+    "charcoal_cohort_positive_total": [7, 116],
+    "interpretation": "Several remaining false negatives are rare label anomalies inside predominantly negative product cohorts; broad similarity transfer is therefore unsafe."
+  },
+  "candidate": {
+    "name": "solution140_flammable_exact_family_prior_v1",
+    "mechanism": "unanimous exact full text, exact first-image bytes, or two-donor digit-masked full-text recurrence; conflicting families abstain",
+    "route": "flammable_only",
+    "bad_route": "byte_identical_solution140",
+    "package_sha256": "6e3498adfac3fdb9d3d6ec3a8b2aa7c75dbd320051a06251b841583187fbaef5",
+    "package_size": 56095157,
+    "manifest_file_sha256": "8cea7adbee08377289d21cc931be81f0d540dee0337b96107a86a1ee5bbbf01b",
+    "manifest_self_sha256": "29494e3110851bad669fcce93720ea601da0fa3e8ba9491c9fa6f85e20c96e26",
+    "preregister_self_sha256": "e3ba6d28ec7122413febec4ac5e21a7c7774362ea0006708f3f740c2e91869e2"
+  },
+  "verification": {
+    "archive_integrity": "PASS",
+    "runtime_smoke_rows": 8,
+    "runtime_smoke_output_sha256": "12522154a2875388d78ed37caafd87354e17397f1c9eba4fe943ff2b7e3cb2f3",
+    "runtime_smoke_equal_solution140": true,
+    "targeted_exact_family_rows": 100,
+    "targeted_gate_rows": 100,
+    "targeted_forced_baseline_changes": 100,
+    "bad_route_changed": false
+  },
+  "limitations": [
+    "Family-pure OOF intentionally hides same-family recurrence, so this candidate has no honest local gain estimate.",
+    "The hidden-test decision diff is unknown before ODS execution.",
+    "This is an exploratory transfer candidate, not a validated champion."
+  ]
+}
