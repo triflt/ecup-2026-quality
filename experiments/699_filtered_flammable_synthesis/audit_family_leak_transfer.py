@@ -137,6 +137,20 @@ def image_cache_path(cache: Path, row_id: str) -> Path:
     return cache / f"{hashlib.sha256(row_id.encode()).hexdigest()}.img"
 
 
+def validate_image_cache_entry(path: Path, resolved_root: Path) -> Path:
+    if not path.is_file():
+        raise ValueError(f"image cache entry is not a file: {path.name}")
+    resolved = path.resolve(strict=True)
+    allowed = resolved_root.resolve(strict=True)
+    try:
+        resolved.relative_to(allowed)
+    except ValueError as error:
+        raise ValueError(f"image cache target escapes approved root: {path.name}") from error
+    if not resolved.is_file():
+        raise ValueError(f"resolved image cache target is not a file: {path.name}")
+    return resolved
+
+
 def dct_matrix(size: int) -> np.ndarray:
     x = np.arange(size, dtype=np.float64)
     k = x[:, None]
@@ -386,10 +400,11 @@ def build_topology(args: argparse.Namespace) -> None:
 
     image_info: list[dict[str, Any]] = []
     image_manifest: list[dict[str, Any]] = []
+    symlink_entries = 0
     for index, row_id in enumerate(ids):
         path = image_cache_path(args.image_cache, row_id)
-        if not path.is_file() or path.is_symlink():
-            raise ValueError(f"image cache missing or symlinked: {path.name}")
+        resolved = validate_image_cache_entry(path, args.image_resolved_root)
+        symlink_entries += int(path.is_symlink())
         item = image_fingerprints(path)
         image_info.append(item)
         image_manifest.append(
@@ -397,6 +412,9 @@ def build_topology(args: argparse.Namespace) -> None:
                 "cache_name": path.name,
                 "file_sha256": item["file_sha256"],
                 "size": path.stat().st_size,
+                "resolved_relative_path": str(
+                    resolved.relative_to(args.image_resolved_root.resolve(strict=True))
+                ),
             }
         )
         if (index + 1) % 500 == 0 or index + 1 == len(ids):
@@ -545,6 +563,8 @@ def build_topology(args: argparse.Namespace) -> None:
             "path": str(args.image_cache),
             "unique_ids": len(ids),
             "manifest_sha256": canonical_sha256(image_manifest),
+            "resolved_root": str(args.image_resolved_root),
+            "symlink_entries": symlink_entries,
         },
         "thresholds": TOPOLOGY_THRESHOLDS,
         "rows": len(rows),
@@ -1088,6 +1108,7 @@ def build_parser() -> argparse.ArgumentParser:
     topology = subparsers.add_parser("topology")
     topology.add_argument("--fold-runtime", action="append", required=True)
     topology.add_argument("--image-cache", type=Path, required=True)
+    topology.add_argument("--image-resolved-root", type=Path, required=True)
     topology.add_argument("--output", type=Path, required=True)
     topology.set_defaults(func=build_topology)
 
