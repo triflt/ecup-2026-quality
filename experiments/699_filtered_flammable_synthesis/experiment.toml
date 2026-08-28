@@ -1,0 +1,7 @@
+id = "699"
+name = "filtered_flammable_synthesis"
+status = "cap10_full5_accept_refit_and_secondary_screens_running"
+hypothesis = "A fold-safe, confidence-filtered and label-balanced subset of synthetic flammable examples can improve the production ensemble without the prior shift and recipe confounds in experiment 246."
+parent = "698"
+public_used = false
+sealed_rows = 0
