@@ -152,12 +152,20 @@ evaluated without retraining or any scientific change.
 
 ## ЧТО ДАЛЬШЕ
 
-Единственное рекомендованное продолжение — CPU-only family-pure OOF transfer
-audit на уже существующих predictions. Строки должны выбираться label-blind по
-semantic-family purity так, чтобы одна семья не пересекала train/validation.
-Нужно заново сравнить solution140 и доступные exp699 routes по финальным
-flammable FP/FN, decision survival, singleton и rare cohorts. До объяснения
-local-to-Public inversion новые exp699 training/package/Public запрещены.
+CPU-only union-graph transfer audit завершён. Он нашёл 5,477/11,118
+recurrence-строк (49.26%) в 1,095 cross-fold components, которых не видел
+старый fold-pure `semantic_component` registry. Однако 61.33% локального net
+lift отклонённого synth-кандидата до priors и 82.14% после priors приходятся на
+novel-family строки. Поэтому family leakage существует, но не объясняет Public
+инверсию. Mixed row-wise OOF больше нельзя использовать как единственный ship
+gate.
+
+Следующий разрешённый шаг — CPU-first graph-aware hybrid retrieval oracle на
+ошибках solution140: union exact/TF-IDF/BM25/existing multimodal/image
+candidates, recall@30, end-to-end oracle gain после production priors и
+decision survival отдельно для recurrence/novel/rare/singleton/repeated. До
+доказанной oracle viability запрещены pairwise model, hard kNN override,
+новое GPU-обучение и Public.
 
 Public data is not used for filtering, training, threshold selection or
 ensemble-weight selection.

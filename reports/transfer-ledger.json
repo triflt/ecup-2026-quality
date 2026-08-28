@@ -1,6 +1,6 @@
 {
   "schema": "ecup_quality_transfer_ledger_v1",
-  "updated_at": "2026-08-28T15:59:18+03:00",
+  "updated_at": "2026-08-28T16:38:00+03:00",
   "baseline": {
     "experiment_id": "140",
     "filename": "quality-qwen3vl-qwen35-dual-lora-prior-submit.zip",
@@ -310,6 +310,29 @@
       "decision": "terminal_reject_no_target_class_decision_gain_and_ap_worse",
       "fold0_confirmation_launched": false,
       "do_not_promote": true
+    },
+    {
+      "experiment_id": "699-family-leak-transfer-audit",
+      "change_type": "label_blind_union_graph_recurrence_audit_on_frozen_oof_predictions",
+      "local_evidence": {
+        "rows": 11118,
+        "components": 5262,
+        "cross_fold_components": 1095,
+        "recurrence_row_fraction": 0.4926245727648858,
+        "old_candidate_before_prior_net_lift_recurrence_fraction": 0.38666666666666666,
+        "old_candidate_before_prior_net_lift_novel_fraction": 0.6133333333333333,
+        "old_candidate_after_prior_net_lift_recurrence_fraction": 0.17857142857142858,
+        "old_candidate_after_prior_net_lift_novel_fraction": 0.8214285714285714,
+        "decision_survival": {
+          "changed_before_prior": 127,
+          "survived_after_prior": 98,
+          "suppressed_by_prior": 29
+        },
+        "terminal_report_self_sha256": "d964ca93d440111e1c597edb92c63ad7c9bad3c8bf6b6fcf98dec9eabeaa23a7"
+      },
+      "public": null,
+      "decision": "accept_topology_for_graph_aware_oracle_reject_mixed_oof_as_sole_ship_gate",
+      "interpretation": "Cross-fold recurrence is substantial, but the rejected synthetic candidate's local net lift is larger on novel-family rows than on recurrence rows; recurrence leakage alone does not explain the Public inversion."
     }
   ]
 }

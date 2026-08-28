@@ -1,6 +1,6 @@
 id = "699"
 name = "filtered_flammable_synthesis"
-status = "terminal_reject_public_failure_and_matched_order_no_target_gain"
+status = "terminal_reject_public_failure_matched_order_no_target_gain_family_audit_complete"
 hypothesis = "A fold-safe, confidence-filtered and label-balanced subset of synthetic flammable examples can improve the production ensemble without the prior shift and recipe confounds in experiment 246."
 parent = "698"
 public_used = false
@@ -8,4 +8,6 @@ public_result_observed = true
 public_score = 0.8365012615643398
 public_delta_vs_140 = -0.0558964205669331
 matched_order_fold3_decision = "REJECT_MATCHED_SYNTH_FOLD3"
+family_leak_audit_decision = "ACCEPT_TOPOLOGY_FOR_GRAPH_AWARE_ORACLE_REJECT_MIXED_OOF_AS_SOLE_SHIP_GATE"
+family_leak_terminal_self_sha256 = "d964ca93d440111e1c597edb92c63ad7c9bad3c8bf6b6fcf98dec9eabeaa23a7"
 sealed_rows = 0
