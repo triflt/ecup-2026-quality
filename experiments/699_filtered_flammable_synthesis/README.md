@@ -20,16 +20,17 @@ occurrences. После full-fivefold победы cap10 отдельно про
 эпохой. Он прошёл frozen full-fivefold с победой на 5/5 folds. Full refit и
 production-package smoke завершились успешно; submission ZIP готов к Public
 upload. Cap5, cap19, Qwen3-VL-2B,
-balanced80, v1-cap40, TF-IDF, nested OOF reweighting и двухэпохный Qwen3.5
-закрыты как слабые или нестабильные.
+balanced80, balanced10, repeat4, v1-cap40, TF-IDF, nested OOF reweighting и
+двухэпохный Qwen3.5 закрыты как слабые или нестабильные.
 
 ## СКОЛЬКО РАБОТАЛО
 
 Один Qwen3.5-4B fold занимает 58–73 минуты на одной H100, включая обучение,
 inference и запись adapter/predictions contract. Пять cap10 folds были обучены
 и проверены. Full refit занял `55.66` минуты на одной H100; production ZIP и
-его 8-row end-to-end smoke собраны автоматически после refit. Четыре
-двухфолдовых механизма продолжают работать параллельно на восьми H100.
+его 8-row end-to-end smoke собраны автоматически после refit. Balanced10 и
+repeat4 завершены на folds 0/3; repeat2 остаётся единственным активным screen
+на двух из восьми H100.
 
 ## МЕТРИКИ
 
@@ -65,6 +66,24 @@ one-epoch candidate:
 The AP and one-FN improvement do not offset the materially worse Macro/F1,
 false-positive count and correction/regression profile.
 
+Balanced10 (10 positive + 10 synthetic negative occurrences) was also rejected
+against positive-only repeat1:
+
+- routed Macro delta: `+0.03202746` vs `+0.03941484`;
+- flammable F1: `0.88888889` vs `0.90370370`;
+- flammable FP/FN: `7/8` vs `6/7`;
+- corrections/regressions: `54/9` vs `54/7`;
+- AP delta: `+0.01037587` vs `-0.01107883`.
+
+Repeat4 (the same ten positive rows repeated four times) was rejected despite
+two fewer FN:
+
+- routed Macro delta: `+0.03757301` vs `+0.03941484`;
+- flammable F1: `0.90000000` vs `0.90370370`;
+- flammable FP/FN: `9/5` vs `6/7`;
+- corrections/regressions: `54/8` vs `54/7`;
+- AP delta: `-0.07028599` vs `-0.01107883`.
+
 AP improvement alone is not treated as a win when Macro/F1/FN are worse.
 
 ## ОШИБКИ
@@ -78,13 +97,19 @@ invalid; only evaluator schema `exp699_gpu_evaluation_v3` with
 weight search was run only after component confirmation, but was inferior to
 the frozen solution-140 weights and was not promoted.
 
+The first balanced10 evaluation was blocked before metrics because the frozen
+evaluator's technical append-count whitelist omitted the valid value `20`.
+The evaluator was extended only to accept exactly `20` (while a negative test
+rejects `21`); 31 targeted tests pass. The already trained artifacts were then
+evaluated without retraining or any scientific change.
+
 ## ЧТО ДАЛЬШЕ
 
 1. Transfer the accepted ZIP to the local ignored upload directory after the
    required explicit corporate-artifact download approval.
 2. Submit this justified candidate to Public after the action-time confirmation.
-3. Compare balanced10, repeat2 and repeat4 twofold screens, and run full
-   fivefold only for a mechanism that improves the accepted cap10 profile.
+3. Finish repeat2 on folds 0/3 and run full fivefold only if it improves the
+   accepted cap10 repeat1 profile.
 
 Public data is not used for filtering, training, threshold selection or
 ensemble-weight selection.
