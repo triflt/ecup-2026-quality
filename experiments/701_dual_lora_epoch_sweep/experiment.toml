@@ -1,0 +1,38 @@
+[experiment]
+id = "701"
+slug = "dual_lora_epoch_sweep"
+title = "Solution140 dual-LoRA 1-5 epoch sweep"
+status = "running_screen"
+entrypoint = "experiments/701_dual_lora_epoch_sweep/run_epoch.py"
+result_file = "experiments/701_dual_lora_epoch_sweep/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "grouped_text_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "140"
+changed_factor = "training epochs 1/2/3/4/5 for each LoRA independently"
+mechanism = "additional passes may improve rare decision-boundary learning without changing model or data"
+expected_macro_f1_delta = 0.003
+falsification = "no epoch yields positive frozen end-to-end gain without increasing flammable FN"
+precedents = ["checkpoint/early-stopping ablation under a frozen outer holdout"]
+
+[budget]
+planned_gpu_hours = 8.0
+planned_public_submissions = 0
+runtime_limit_minutes = 180
+
+[execution]
+arguments = ["fold0", "qwen35_4b,qwen3vl_2b", "epochs=1,2,3,4,5"]
+
+[artifacts]
+directory = "artifacts"
+publish = false
+
