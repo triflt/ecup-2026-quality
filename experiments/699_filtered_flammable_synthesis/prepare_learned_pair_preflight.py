@@ -69,16 +69,21 @@ def v1_harmful_five(path: Path, pair) -> np.ndarray:
     pair.verify_self_hash(report)
     if report.get("schema") != "exp699_soft_cache_exploratory_oof_v1":
         raise ValueError("soft-cache-v1 report schema mismatch")
-    harmful = sorted(
+    changed = sorted(
         int(row["global_index"])
+        for row in report.get("changed_decisions", [])
+        if int(row["fold"]) in SCREEN_FOLDS
+    )
+    harmful = [
+        row
         for row in report.get("changed_decisions", [])
         if int(row["fold"]) in SCREEN_FOLDS
         if int(row["baseline_after"]) == int(row["label"])
         and int(row["candidate_after"]) != int(row["label"])
-    )
-    if len(harmful) != 5:
-        raise ValueError("soft-cache-v1 screen cohort must have exactly five harmful rows")
-    return np.asarray(harmful, dtype=np.int64)
+    ]
+    if len(changed) != 5 or len(harmful) != 4:
+        raise ValueError("soft-cache-v1 screen cohort must bind five changes (four harmful)")
+    return np.asarray(changed, dtype=np.int64)
 
 
 def main() -> None:
