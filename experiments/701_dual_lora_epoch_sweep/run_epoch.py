@@ -30,6 +30,8 @@ def main() -> None:
     parser.add_argument("--architecture", choices=("qwen35_4b", "qwen3vl_2b"), required=True)
     parser.add_argument("--epochs", type=int, choices=range(1, 6), required=True)
     parser.add_argument("--cache", type=Path, required=True)
+    parser.add_argument("--lora-r", type=int, choices=(16, 32), default=16)
+    parser.add_argument("--lora-alpha", type=int, choices=(32, 64), default=32)
     args = parser.parse_args()
     parent = load(args.parent)
     parent.EPOCHS = args.epochs
@@ -41,6 +43,16 @@ def main() -> None:
         import peft
         if peft.__version__ != "0.20.0":
             raise ValueError("accepted PEFT 0.20.0 required")
+        original = peft.LoraConfig
+
+        def bound_lora_config(*values, **kwargs):
+            if kwargs.get("r") != 16 or kwargs.get("lora_alpha") != 32:
+                raise ValueError("parent LoRA contract drifted")
+            kwargs["r"] = args.lora_r
+            kwargs["lora_alpha"] = args.lora_alpha
+            return original(*values, **kwargs)
+
+        peft.LoraConfig = bound_lora_config
 
     parent.install_peft = use_accepted_vendor
 
@@ -66,7 +78,7 @@ def main() -> None:
         return []
 
     parent.predownload = accepted_cache
-    print(json.dumps({"experiment":701,"architecture":args.architecture,"epochs":args.epochs,"fold":int(os.environ.get("HOLDOUT_FOLD","0")),"public_used":False}), flush=True)
+    print(json.dumps({"experiment":int(os.environ.get("EXP_ID", "701")),"architecture":args.architecture,"epochs":args.epochs,"lora_r":args.lora_r,"lora_alpha":args.lora_alpha,"fold":int(os.environ.get("HOLDOUT_FOLD","0")),"public_used":False}), flush=True)
     parent.main()
 
 
