@@ -6,8 +6,8 @@ import time
 from pathlib import Path
 
 
-RUN = Path("/tmp/exp711-screen-fold0")
-OUTPUT = Path("/tmp/exp711-evals-fold0")
+RUN = Path("/tmp/exp711-screen-fold0-retry1")
+OUTPUT = Path("/tmp/exp711-evals-fold0-retry1")
 ROOT = Path("/remote_compute/home/repos/quality")
 PYTHON = Path("/remote_compute/home/.venv-exp699/bin/python")
 EVALUATOR = ROOT / "experiments/711_qwen_gemma_peft_ablation/evaluate_epoch.py"

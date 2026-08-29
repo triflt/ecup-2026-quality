@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT=/remote_compute/home/repos/quality
-RUN=/tmp/exp711-screen-fold0
+RUN=/tmp/exp711-screen-fold0-retry1
 PY=/remote_compute/home/.venv-exp699/bin/python
 PARENT="$ROOT/research/qwen3vl_lora_holdout.py"
 WRAPPER="$ROOT/experiments/711_qwen_gemma_peft_ablation/run_epoch.py"
@@ -10,7 +10,7 @@ DATA=/remote_compute/home/data/exp699/solution140_full_support_sources/data.csv
 OOF=/remote_compute/home/data/exp699/eval/four_head_oof.npz
 MANIFEST=/remote_compute/home/runs/exp701/shared/manifest.tsv.gz
 VENDOR=/remote_compute/home/data/exp699/vendor
-CACHE=/remote_compute/home/data/exp699/q35_solution140_thumbnail448_cache_v1
+CACHE=/tmp/exp711-hybrid-cache
 
 test ! -e "$RUN"
 mkdir -p "$RUN"
