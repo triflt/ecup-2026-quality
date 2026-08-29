@@ -1,0 +1,34 @@
+[experiment]
+id = "673"
+slug = "verified_ocr_coverage_audit"
+title = "Fail-closed OCR coverage on exact system-140 errors"
+status = "infrastructure_accepted_critical_span_recall_unmeasured"
+entrypoint = "experiments/673_verified_ocr_coverage_audit/audit_coverage.py"
+result_file = "experiments/673_verified_ocr_coverage_audit/results/metrics.json"
+
+[data]
+version = "competition_train_paddleocr_vl16_partial_v1"
+source_experiment = "660"
+
+[validation]
+primary_version = "semantic_family_v3"
+primary_metric = "critical_span_recall"
+sealed_rows_allowed = 0
+
+[hypothesis]
+changed_factor = "Consume only experiment-660 OCR_AVAILABLE rows and fail closed on every other image"
+mechanism = "Verified OCR may expose decisive packaging text that is absent from the product title and description"
+expected_macro_f1_delta = 0.0
+falsification = "This audit cannot accept H2; critical-span recall and unsupported rate require a separately frozen visual audit"
+
+[acceptance]
+minimum_critical_span_recall = 0.90
+maximum_unsupported_rate = 0.01
+
+[budget]
+planned_gpu_hours = 0.0
+planned_public_submissions = 0
+
+[artifacts]
+directory = "artifacts"
+publish = false

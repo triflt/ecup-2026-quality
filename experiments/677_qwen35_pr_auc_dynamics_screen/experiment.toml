@@ -1,0 +1,45 @@
+[experiment]
+id = "677"
+slug = "qwen35_pr_auc_dynamics_screen"
+title = "Nested PR-AUC checkpoint dynamics for Qwen3.5-4B"
+status = "technical_smoke_pending"
+entrypoint = "experiments/677_qwen35_pr_auc_dynamics_screen/train_dynamics.py"
+result_file = "experiments/677_qwen35_pr_auc_dynamics_screen/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3_nested_outer0"
+registry = "validation/registry.toml"
+folds = "validation/semantic_family_v3/folds.csv"
+primary_metric = "flammable_average_precision"
+
+[hypothesis]
+parent_experiment = "659"
+changed_factor = "optimizer stop fraction only"
+mechanism = "Select one stop fraction on donor-inner folds 1/2/3/4, then confirm it only on blind outer fold 0"
+expected_macro_f1_delta = 0.003
+falsification = "No non-final fraction wins at least three inner folds with mean flammable AP gain >=0.010 and BAD AP guard"
+precedents = [
+  "https://github.com/QwenLM/Qwen3/blob/main/docs/source/training/ms_swift.md",
+]
+
+[acceptance]
+baseline_macro_f1 = 0.0
+required_fold_wins = 3
+max_category_f1_drop = 0.002
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 12.0
+planned_public_submissions = 0
+runtime_limit_minutes = 480
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false

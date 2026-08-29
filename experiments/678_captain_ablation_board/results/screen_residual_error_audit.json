@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "experiment_id": "678",
+  "created_at": "2026-08-24T12:24:00Z",
+  "status": "complete",
+  "candidate": "fixed_equal_logit_route",
+  "scope": "residual flammable errors on frozen screen folds after applying the fixed candidate",
+  "screen_folds": [0, 3],
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "inputs": {
+    "registry_sha256": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+    "control_prediction_sha256": {
+      "0": "5164909b7b56298f074e2d21a6e40f1ed53fd2d28d599609527715760f3468ae",
+      "3": "f73d1b06f33c74c40cce03afac1537134e8da251e5e101c14616459414d0ab6a"
+    },
+    "large_prediction_sha256": {
+      "0": "b74c50947ad2ea65e8ff77cdd0567aff61c8e6ddd2299320723c2eabea5c0b40",
+      "3": "c731d3de64cd37fbc45461121d208ba5589981bb9a1971854098db2e6dc0cb81"
+    }
+  },
+  "summary": {
+    "residual_errors": 12,
+    "false_positives": 10,
+    "false_negatives": 2,
+    "semantic_components": 10,
+    "mixed_label_rows": 1,
+    "absolute_margin_below_0_5": 4
+  },
+  "by_fold": {
+    "0": {"false_positives": 6, "false_negatives": 0},
+    "3": {"false_positives": 4, "false_negatives": 2}
+  },
+  "by_family_novelty": {
+    "semantic_singleton": {"false_positives": 5, "false_negatives": 2},
+    "semantic_repeated": {"false_positives": 5, "false_negatives": 0}
+  },
+  "notable_components": [
+    {
+      "semantic_component": "f60ec45c5edf69e4531a89e8cb9025f78b3e9ec9edbe00417b83894d3bedc875",
+      "ids": ["13699", "454"],
+      "fold": 0,
+      "error": "false_positive",
+      "absolute_blend_margins": [0.1875, 0.3125],
+      "manual_description": "repeated gas-burner listing"
+    },
+    {
+      "semantic_component": "e0971d221c56895ebb8c4cae9e07544d6ff499e58377eafcaf9a18c88b7bff8f",
+      "ids": ["5417", "5801"],
+      "fold": 0,
+      "error": "false_positive",
+      "absolute_blend_margins": [3.125, 3.125],
+      "manual_description": "repeated survival/fishing kit listing"
+    },
+    {
+      "id": "6697",
+      "fold": 0,
+      "family_novelty": "semantic_singleton",
+      "error": "false_positive",
+      "absolute_blend_margin": 3.375,
+      "manual_description": "automatic gas burner"
+    },
+    {
+      "id": "703",
+      "fold": 0,
+      "family_novelty": "semantic_singleton",
+      "error": "false_positive",
+      "absolute_blend_margin": 0.0625,
+      "manual_description": "eternal match"
+    },
+    {
+      "id": "10006",
+      "fold": 3,
+      "family_novelty": "semantic_singleton",
+      "error": "false_positive",
+      "absolute_blend_margin": 4.6875,
+      "manual_description": "fire-starting rolls with match"
+    },
+    {
+      "id": "11414",
+      "fold": 3,
+      "family_novelty": "semantic_singleton",
+      "error": "false_negative",
+      "absolute_blend_margin": 6.75,
+      "manual_description": "number cake candle"
+    },
+    {
+      "id": "12021",
+      "fold": 3,
+      "family_novelty": "semantic_singleton",
+      "error": "false_positive",
+      "absolute_blend_margin": 3.5,
+      "manual_description": "greeting card with candle"
+    },
+    {
+      "id": "2915",
+      "fold": 3,
+      "family_novelty": "semantic_singleton",
+      "error": "false_positive",
+      "absolute_blend_margin": 3.8125,
+      "manual_description": "fire-starting rolls"
+    },
+    {
+      "id": "3334",
+      "fold": 0,
+      "family_novelty": "semantic_repeated",
+      "error": "false_positive",
+      "absolute_blend_margin": 0.375,
+      "mixed_label_component": true,
+      "manual_description": "ignition-stick listing in a contradictory near-duplicate component"
+    },
+    {
+      "id": "5672",
+      "fold": 3,
+      "family_novelty": "semantic_singleton",
+      "error": "false_negative",
+      "absolute_blend_margin": 4.5,
+      "manual_description": "jewelry gas burner"
+    }
+  ],
+  "interpretation": [
+    "The frozen candidate leaves a false-positive-dominated residual on the screen folds: 10 false positives versus 2 false negatives.",
+    "Several residual rule/object-role errors have large margins, so a global threshold is not a sufficient mechanism.",
+    "Both singleton and repeated families remain represented; the full five-fold slice must confirm this profile before a new hypothesis is opened.",
+    "If confirmed, the next distinct mechanism should target sold-object and rule relations with new supervision rather than revive the rejected explanation-generation pipeline unchanged."
+  ],
+  "candidate_changed_after_audit": false,
+  "diagnostic_only": true,
+  "public_used": false,
+  "sealed_rows_used": 0,
+  "decision": "NO_THRESHOLD_CHANGE_WAIT_FOR_FULL_FIVE_FOLD_RESIDUAL"
+}

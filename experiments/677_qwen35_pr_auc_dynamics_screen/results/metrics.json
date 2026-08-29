@@ -1,0 +1,17 @@
+{
+  "decision": "PREPARED_NOT_LAUNCHED_WAIT_FOR_TERMINAL_659",
+  "experiment_id": "677",
+  "gpu_jobs_launched": 0,
+  "blind_confirmation_folds": [
+    0
+  ],
+  "fold3_is_blind": false,
+  "mlc_preset_dry_run": "PENDING_V2_SCOPE_RECHECK",
+  "outer0_step_mapping_sha256": "8f611931566fa49e3a75b94b270378b213d2416ac52c0096c654c618bea90316",
+  "public_used": false,
+  "runtime_contract_sha256": "872d5f9cd771c168eec57fba35553a591953d55d45f2eab3281858a41b9522e2",
+  "runtime_manifest_sha256": "f273c110c05cd409386426381eb650ee51dddc31dfc740baef2fc2433c4be362",
+  "schema_version": 1,
+  "sealed_rows": 0,
+  "status": "prepared"
+}

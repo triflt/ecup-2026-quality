@@ -1,0 +1,48 @@
+{
+  "experiment_id": "682",
+  "status": "development_full_runtime_ready_not_trained",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "parent_full_system": "140",
+  "upstream_component": "632_seed31415",
+  "scientific_factor": "seed632 replaces original Qwen3.5 logits only for БАД",
+  "validation": {
+    "folds": [0, 1, 2, 3, 4],
+    "baseline_macro_f1": 0.9104830822677643,
+    "candidate_macro_f1": 0.9133075471136818,
+    "macro_delta": 0.0028244648459174737,
+    "mean_fold_delta": 0.0028248846311498045,
+    "winning_folds": 5,
+    "bad_f1_delta": 0.005648929691834836,
+    "flammable_f1_delta": 0.0,
+    "corrected": 72,
+    "regressed": 19,
+    "corrected_to_regressed": 3.789473684210526,
+    "all_positive_false_negatives_before": 256,
+    "all_positive_false_negatives_after": 221,
+    "flammable_false_negatives_before": 20,
+    "flammable_false_negatives_after": 20,
+    "component_bootstrap_probability_positive": 1.0,
+    "component_bootstrap_delta_ci95": [
+      0.0014630942074745858,
+      0.004480938699248996
+    ],
+    "flammable_logits_and_full_route_byte_identical": true,
+    "sealed_rows_used": 0,
+    "public_used": false,
+    "all_replay_gates_passed": true
+  },
+  "deployment": {
+    "full_refit_proven": true,
+    "full_runtime_materialized": true,
+    "development_rows": 11118,
+    "selected_records": 6116,
+    "selected_unique_rows": 5436,
+    "selected_id_multiset_sha256": "f4734df62119ca67d86e22681fb09544b8c56761c6ffaf7617875cccdb983e9f",
+    "optimizer_updates": 383,
+    "gpu_jobs_launched": 0,
+    "package_built": false,
+    "public_submission_allowed": false
+  },
+  "decision": "GO_ONE_DEVELOPMENT_ONLY_FULL_REFIT_KEEP_PACKAGE_AND_PUBLIC_CLOSED"
+}

@@ -1,0 +1,22 @@
+{
+  "blind_confirmation_folds": [
+    0
+  ],
+  "decision": "OPEN_FOUR_INNER_DYNAMICS_SCREENS",
+  "experiment_id": "677",
+  "fold3_is_blind": false,
+  "full_wave_open": true,
+  "gpu_jobs": 4,
+  "gpus_per_job": 1,
+  "inner_folds": [1, 2, 3, 4],
+  "parent_decision": "ACCEPT_FULL_COMPONENT_ROUTE",
+  "parent_experiment_id": "659",
+  "parent_passed": true,
+  "parent_result_sha256": "e2999faf11f4bbc98c9adaea5a7e8514c50d03b6571b8c62f4cced0260b4c91a",
+  "public_used": false,
+  "sealed_rows": 0,
+  "smoke_acceptance_sha256": "185c72bdcd8ce2d349f94374049b6b6fe89571b0f353db3eaeb2462175c25032",
+  "smoke_lane_open": false,
+  "technical_smoke_accepted": true,
+  "technical_smoke_only": false
+}

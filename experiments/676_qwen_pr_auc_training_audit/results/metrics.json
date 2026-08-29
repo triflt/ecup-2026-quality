@@ -1,0 +1,262 @@
+{
+  "calibration_diagnostic_not_for_selection": [
+    {
+      "after_analytic_donor_prior_shift": {
+        "f1": 0.9142857142857143,
+        "fn": 2,
+        "fp": 4,
+        "threshold": 1.6094379124341005,
+        "tp": 32
+      },
+      "at_zero": {
+        "f1": 0.825,
+        "fn": 1,
+        "fp": 13,
+        "threshold": 0.0,
+        "tp": 33
+      },
+      "fold": 0
+    },
+    {
+      "after_analytic_donor_prior_shift": {
+        "f1": 0.8985507246376812,
+        "fn": 3,
+        "fp": 4,
+        "threshold": 1.6094379124341005,
+        "tp": 31
+      },
+      "at_zero": {
+        "f1": 0.9014084507042254,
+        "fn": 2,
+        "fp": 5,
+        "threshold": 0.0,
+        "tp": 32
+      },
+      "fold": 3
+    }
+  ],
+  "confirmed_findings": [
+    "Large-model and fixed-blend ranking improve on both completed screen folds.",
+    "Rare positives are repeated five times, so sampled and natural prevalence differ.",
+    "Final-only checkpointing cannot prove that optimizer step 306 is optimal.",
+    "BF16 score ties require threshold-grouped Average Precision."
+  ],
+  "decision": "PREPARE_DONOR_INNER_PR_AUC_DYNAMICS_SCREEN_WAIT_FOR_TERMINAL_659",
+  "experiment_id": "676",
+  "flammable_average_precision": {
+    "per_fold": [
+      {
+        "average_precision": {
+          "blend": 0.9839757585415253,
+          "large": 0.9700102721463576,
+          "small": 0.7871625742261394
+        },
+        "fold": 0,
+        "positives": 34,
+        "prediction_sha256": {
+          "large": "b74c50947ad2ea65e8ff77cdd0567aff61c8e6ddd2299320723c2eabea5c0b40",
+          "small": "5164909b7b56298f074e2d21a6e40f1ed53fd2d28d599609527715760f3468ae"
+        },
+        "rows": 943
+      },
+      {
+        "average_precision": {
+          "blend": 0.9617994329117151,
+          "large": 0.9520789046452293,
+          "small": 0.921569829427697
+        },
+        "fold": 3,
+        "positives": 34,
+        "prediction_sha256": {
+          "large": "c731d3de64cd37fbc45461121d208ba5589981bb9a1971854098db2e6dc0cb81",
+          "small": "f73d1b06f33c74c40cce03afac1537134e8da251e5e101c14616459414d0ab6a"
+        },
+        "rows": 943
+      }
+    ],
+    "pooled_screen_folds": {
+      "fixed_equal_blend": 0.9670576318385774,
+      "folds": [
+        0,
+        3
+      ],
+      "large": 0.9574046386016355,
+      "positives": 68,
+      "rows": 1886,
+      "small": 0.8520128094211935
+    }
+  },
+  "metric_definition": {
+    "equivalent": "sklearn.metrics.average_precision_score",
+    "name": "average_precision",
+    "ties": "all equal scores form one threshold group"
+  },
+  "next_experiment": {
+    "acceptance": {
+      "maximum_bad_ap_drop": 0.002,
+      "mean_flammable_ap_gain": 0.01,
+      "non_final_checkpoint_wins": "at least 3 of 4 donor-inner screens"
+    },
+    "candidate_steps": [
+      51,
+      102,
+      153,
+      204,
+      255,
+      306
+    ],
+    "changed_factor": "optimizer stop step only",
+    "launch_blockers": [
+      "terminal five-fold frozen route result not yet available",
+      "GPU capacity is reserved by the active frozen route"
+    ],
+    "primary_metric": "flammable average precision",
+    "selection_data": "grouped donor-inner split inside each outer training fold"
+  },
+  "public_used": false,
+  "registry_sha256": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+  "sampling_audit": [
+    {
+      "bad_negative_occurrences": 1306,
+      "bad_positive_occurrences": 1306,
+      "diagnostic_prior_logit_shift": 1.6094379124341005,
+      "flammable_natural_positive_prevalence": 0.07834101382488479,
+      "flammable_negative_occurrences": 1600,
+      "flammable_positive_occurrences": 680,
+      "flammable_sampled_positive_prevalence": 0.2982456140350877,
+      "flammable_unique_positives": 136,
+      "flammable_unique_rows": 1736,
+      "fold": 0,
+      "runtime_contract_sha256": "23020170fa18c7f11469ab4d4ffefa5c0b26fa600d3b17b308b385322540f94f",
+      "train_occurrences": 4892,
+      "train_sha256": "3b79e512c60f4f18531da6d1b5c866ff6f1927dc6b26ac9e52b21da841744964",
+      "train_unique_rows": 4348
+    },
+    {
+      "bad_negative_occurrences": 1307,
+      "bad_positive_occurrences": 1307,
+      "diagnostic_prior_logit_shift": 1.6094379124341005,
+      "flammable_natural_positive_prevalence": 0.07834101382488479,
+      "flammable_negative_occurrences": 1600,
+      "flammable_positive_occurrences": 680,
+      "flammable_sampled_positive_prevalence": 0.2982456140350877,
+      "flammable_unique_positives": 136,
+      "flammable_unique_rows": 1736,
+      "fold": 1,
+      "runtime_contract_sha256": "509488b2d5e72c690809e3f3fb3ef54dd651935a22b065396c41ec4d6cc7fed3",
+      "train_occurrences": 4894,
+      "train_sha256": "d074bcf1945e34f918c5e8a9301aa44cf7c7273c499250ecb252c72e556b98f6",
+      "train_unique_rows": 4350
+    },
+    {
+      "bad_negative_occurrences": 1306,
+      "bad_positive_occurrences": 1306,
+      "diagnostic_prior_logit_shift": 1.6094379124341005,
+      "flammable_natural_positive_prevalence": 0.07834101382488479,
+      "flammable_negative_occurrences": 1600,
+      "flammable_positive_occurrences": 680,
+      "flammable_sampled_positive_prevalence": 0.2982456140350877,
+      "flammable_unique_positives": 136,
+      "flammable_unique_rows": 1736,
+      "fold": 2,
+      "runtime_contract_sha256": "5981db79cb9b1d5b01d55c5860a45dd32b89fdccd1f31c80dadc100b8bbb8e94",
+      "train_occurrences": 4892,
+      "train_sha256": "f50877ce65aa51ef19a0b18c85ae4529d20f551e9c3981c6d65fc65d1f6c1773",
+      "train_unique_rows": 4348
+    },
+    {
+      "bad_negative_occurrences": 1306,
+      "bad_positive_occurrences": 1306,
+      "diagnostic_prior_logit_shift": 1.6094379124341005,
+      "flammable_natural_positive_prevalence": 0.07834101382488479,
+      "flammable_negative_occurrences": 1600,
+      "flammable_positive_occurrences": 680,
+      "flammable_sampled_positive_prevalence": 0.2982456140350877,
+      "flammable_unique_positives": 136,
+      "flammable_unique_rows": 1736,
+      "fold": 3,
+      "runtime_contract_sha256": "1c42cc8c86a0d2f5c302606bab937f5008428baf698c28f63a48c90f8b3c1a37",
+      "train_occurrences": 4892,
+      "train_sha256": "404146157667adca1419d272a9bb5200a027d3ba0d15711bcfee9da07df805cf",
+      "train_unique_rows": 4348
+    },
+    {
+      "bad_negative_occurrences": 1307,
+      "bad_positive_occurrences": 1307,
+      "diagnostic_prior_logit_shift": 1.6094379124341005,
+      "flammable_natural_positive_prevalence": 0.07834101382488479,
+      "flammable_negative_occurrences": 1600,
+      "flammable_positive_occurrences": 680,
+      "flammable_sampled_positive_prevalence": 0.2982456140350877,
+      "flammable_unique_positives": 136,
+      "flammable_unique_rows": 1736,
+      "fold": 4,
+      "runtime_contract_sha256": "afe62c0556aa4f4b53837f8ad90fc7533288a720b927435cf5856a97d338f50b",
+      "train_occurrences": 4894,
+      "train_sha256": "55f90b7bb5ead8de58393e4f115d644faa43d3fefbcf9f9579bfc38bf8fc6ab8",
+      "train_unique_rows": 4350
+    }
+  ],
+  "schema_version": 1,
+  "sealed_rows": 0,
+  "status": "complete",
+  "threshold_policy": "do not infer hidden prevalence or tune from Public",
+  "training_recipe": {
+    "completed_reports": [
+      {
+        "elapsed_seconds": 14928.639570651576,
+        "fold": 0,
+        "packages": {
+          "peft": "0.20.0",
+          "torch": "2.10.0+cu128",
+          "transformers": "5.14.1"
+        },
+        "sha256": "74bc7b58994a98e154fd9adf7feff49e4adc22e4baa1b2459ef8bcd997b307b1"
+      },
+      {
+        "elapsed_seconds": 15165.65944541432,
+        "fold": 3,
+        "packages": {
+          "peft": "0.20.0",
+          "torch": "2.10.0+cu128",
+          "transformers": "5.14.1"
+        },
+        "sha256": "144a48f0807ecb4f033e75e8aea65afc515405cb7c36db5e010cd8740a525250"
+      }
+    ],
+    "effective_batch_size": 16,
+    "epochs": 1,
+    "final_checkpoint_only": true,
+    "first_image_max_pixels": 262144,
+    "gradient_accumulation": 16,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0002,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "lora_rank": 16,
+    "maximum_sequence_length": 1536,
+    "micro_batch_size": 1,
+    "missing_observability": [
+      "loss_history",
+      "learning_rate_history",
+      "gradient_norm_history",
+      "intermediate_checkpoints",
+      "inner_validation_average_precision"
+    ],
+    "model": "Qwen/Qwen3.6-27B",
+    "objective": "binary BCE on final-token logit(1)-logit(0)",
+    "optimizer_steps": 306,
+    "precision": "bf16",
+    "scheduler": "cosine_to_zero",
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj"
+    ],
+    "training_script_sha256": "f8613b1e4f5bf7254365a94cce4484e993c850abab1ade12c6cc378dec529fd5",
+    "use_rslora": true,
+    "warmup_steps": 15,
+    "weight_decay": 0.01
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schema_version": "exp673_metrics_v1",
+  "experiment_id": "673",
+  "status": "INFRASTRUCTURE_ACCEPTED_CRITICAL_SPAN_RECALL_UNMEASURED",
+  "source_experiment_id": "660",
+  "full_local_report_sha256": "e7eba272c9a689ef2477d1cb7873af5a6d68156ae9b64732c198e3f94d4c62f5",
+  "ocr_integrity": {
+    "images": 49456,
+    "available_images": 41691,
+    "unavailable_images": 7765,
+    "unavailable_payload_violations": 0
+  },
+  "exact140_errors": {
+    "rows": 484,
+    "any_available": 480,
+    "any_available_fraction": 0.9917355372,
+    "all_available": 227,
+    "partially_available": 253,
+    "all_unavailable": 4,
+    "has_novel_ocr_region": 470,
+    "has_novel_broad_policy_marker": 109
+  },
+  "singleton_errors": {
+    "rows": 352,
+    "any_available": 349,
+    "any_available_fraction": 0.9914772727,
+    "all_available": 155,
+    "partially_available": 194,
+    "all_unavailable": 3,
+    "has_novel_ocr_region": 340,
+    "has_novel_broad_policy_marker": 89
+  },
+  "error_coverage_by_category": {
+    "БАД": {"rows": 438, "any_available": 435, "all_available": 193},
+    "Легковоспламеняющиеся": {"rows": 46, "any_available": 45, "all_available": 34}
+  },
+  "error_any_available_fraction_by_fold": {
+    "0": 0.9791666667,
+    "1": 1.0,
+    "2": 1.0,
+    "3": 1.0,
+    "4": 0.9775280899
+  },
+  "critical_span_recall": null,
+  "unsupported_critical_span_rate": null,
+  "h2_accepted": false,
+  "classification_training_authorized": false,
+  "public_submissions": 0,
+  "sealed_rows_read": 0,
+  "gpu_hours": 0.0,
+  "decision": "BUILD_BLIND_VISUAL_CRITICAL_SPAN_AUDIT_674"
+}

@@ -1,0 +1,40 @@
+[experiment]
+id = 684
+slug = "stronger_flammable_teacher_lora"
+title = "Qualify a stronger offline flammable teacher LoRA"
+status = "BLOCKED_PENDING_685A_RANK_MECHANISM"
+parent_experiment = 659
+student_experiment = 685
+mechanism_gate_experiment = 685
+public_submissions = 0
+gpu_jobs = 0
+
+[teacher_control]
+model = "Qwen/Qwen3.6-27B"
+pooled_flammable_average_precision = 0.9195422256734048
+routed_flammable_f1 = 0.9075144508670521
+corrected = 25
+regressed = 3
+
+[candidates]
+ordered = ["Qwen/Qwen3.8-27B", "Qwen/Qwen3.5-122B-A10B"]
+submission_deployable = false
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+confirmation_folds = [1, 2, 4]
+primary_metric = "tie_aware_average_precision_flammable"
+minimum_screen_mean_ap_delta = 0.01
+minimum_corrections_to_regressions = 1.5
+minimum_full_fold_wins = 4
+minimum_full_mean_ap_delta = 0.01
+minimum_full_routed_flammable_f1 = 0.915
+minimum_bootstrap_probability = 0.9
+threshold_tuned = false
+public_used = false
+
+[deployment]
+teacher_in_submission = false
+teacher_adapter_in_submission = false
+teacher_runtime_in_submission = false

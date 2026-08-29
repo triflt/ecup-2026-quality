@@ -1,0 +1,24 @@
+{
+  "experiment_id": "670",
+  "status": "rejected_pre_gpu_by_irreversible_audit_gate",
+  "dataset_sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+  "code_revision": null,
+  "seed": 670,
+  "validation": {
+    "protocol": "semantic_family_v3_component_disjoint_blind_audit",
+    "audit_rows": 300,
+    "reviewed_rows_before_irreversible_rejection": 4,
+    "strict_failures_observed": 4,
+    "priority_object_relation_failures_observed": 4,
+    "unsupported_claims_observed": 4,
+    "packet_sha256": "012def05a7370608cb959aa9a0d73326bc48b1f6d93cb1c9faea2bb7a8842b7a",
+    "review_overlay_sha256": "ce347109a12fdd51bf2b327e6d7cdd58fc68ed8393e15460de786618a3041494"
+  },
+  "runtime": {
+    "gpu_hours": 0.0
+  },
+  "artifacts": [
+    "analysis/early_stop_audit.json"
+  ],
+  "decision": "NO_GO_REJECT_CAUSAL_TARGETS"
+}

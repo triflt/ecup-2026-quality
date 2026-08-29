@@ -1,0 +1,63 @@
+{
+  "schema_version": "exp674_metrics_v1",
+  "experiment_id": "674",
+  "status": "NO_GO_REJECT_VERIFIED_OCR_FEATURE_SCREEN",
+  "review_rows": 120,
+  "completed_rows": 80,
+  "critical_span_recall": 0.7536231884,
+  "scope_preservation_rate": 0.9565217391,
+  "unsupported_rate": 0.0,
+  "sealed_rows_read": 0,
+  "public_submissions": 0,
+  "gpu_hours": 0.0,
+  "blind_packet_sha256": "6607de6d12917f7e18423fdec7192172fae940bf0cb3c96576cac3e48252d043",
+  "private_manifest_sha256": "cb12490d10847bd732d52c937af8d95062dc93dd372ad27b7901576ef35948e6",
+  "partial_review_sha256": "f362d512f23fc1e05ce4bf2b75ce70a69b59c007644dbeaa0e1479296573dbfb",
+  "terminal_score_sha256": "3a6b0f2087c7a743e5b7d1f242852f4eb345589c6979ef079cd2395689043f0d",
+  "review_chunk_sha256": {
+    "041_080": "f36ee3dc75e7731b7f7075f7c504de5fd3e11f634de3a032bb73d3e0c64fab00",
+    "081_120": "5fbd51da7b18ac934eb6d927832a89460d1c611c2aefc263985f2f966d335ad2"
+  },
+  "unique_semantic_components": 120,
+  "excluded_reviewed_or_generated_row_ids": 244,
+  "strata": {
+    "bad_error_by_fold": [6, 6, 6, 6, 6],
+    "bad_correct_by_fold": [6, 6, 6, 6, 6],
+    "flammable_error_all_remaining_by_fold": [8, 8, 8, 5, 1],
+    "flammable_correct_by_fold": [6, 6, 6, 6, 6]
+  },
+  "observed": {
+    "visual_critical_rows": 69,
+    "critical_span_captured": 52,
+    "scope_relation_preserved": 66,
+    "unsupported_critical_rows": 0,
+    "relevant_rows": 68,
+    "by_category_recall": {
+      "БАД": 0.7073170732,
+      "Легковоспламеняющиеся": 0.8214285714
+    },
+    "by_baseline_state_recall": {
+      "error": 0.8484848485,
+      "correct": 0.6666666667
+    },
+    "by_fold_recall": {
+      "0": 0.6363636364,
+      "1": 0.875,
+      "2": 0.7058823529,
+      "3": 0.8666666667,
+      "4": 0.6
+    }
+  },
+  "maximum_attainable_if_all_remaining_are_perfect": {
+    "critical_span_recall": 0.8440366972,
+    "scope_preservation_rate": 0.9724770642,
+    "visual_critical_rows": 109,
+    "minimum_final_unsupported_rate": 0.0
+  },
+  "irreversible_failed_gates": ["critical_span_recall_at_least_0_90"],
+  "human_review_stopped_early": true,
+  "ocr_consumer_screen_675_authorized": false,
+  "full_training_authorized": false,
+  "public_submission_authorized": false,
+  "decision": "NO_GO_REJECT_VERIFIED_OCR_FEATURE_SCREEN"
+}
