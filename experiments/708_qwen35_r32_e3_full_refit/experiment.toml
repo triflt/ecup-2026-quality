@@ -1,0 +1,9 @@
+id = 708
+slug = "qwen35_r32_e3_full_refit"
+status = "RUNNING"
+public_used = false
+full_train = true
+epochs = 3
+lora_r = 32
+lora_alpha = 64
+gpu = 1
