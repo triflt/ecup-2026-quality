@@ -61,7 +61,7 @@
     }
   },
   "package": {
-    "remote_compute_path": "/remote_compute/home/runs/exp699/soft_cache_package_v2/solution140_flammable_soft_cache_v1.zip",
+    "remote_compute_path": "/workspace/runs/exp699/soft_cache_package_v2/solution140_flammable_soft_cache_v1.zip",
     "archive_sha256": "98a0e02e8cde8c04fde529461ce4b813a352a15fefacec289f3d5e8843c89eae",
     "archive_size": 56094581,
     "members": 276,

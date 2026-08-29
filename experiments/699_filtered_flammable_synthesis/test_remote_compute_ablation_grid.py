@@ -40,8 +40,8 @@ def job(name: str, gpu: int, fold: int) -> dict:
         "mode": "positive_only",
         "cap": 19,
         "fold": fold,
-        "run_root": f"/remote_compute/home/runs/exp699/full5/{name}",
-        "log_path": f"/remote_compute/home/runs/exp699/full5/logs/{name}.log",
+        "run_root": f"/workspace/runs/exp699/full5/{name}",
+        "log_path": f"/workspace/runs/exp699/full5/logs/{name}.log",
     }
 
 
@@ -112,11 +112,11 @@ def test_synthetic_repeat_is_explicit_and_bounded(
 
 def test_command_can_bind_immutable_code_snapshot(tmp_path: Path) -> None:
     row = job("exp699-snapshot", 6, 0)
-    row["code_root"] = "/remote_compute/home/runs/exp699/code/epochs2-v1"
+    row["code_root"] = "/workspace/runs/exp699/code/epochs2-v1"
     path = tmp_path / "grid.json"
     write_spec(path, [row])
     loaded = grid.load_spec(path, detected_gpus=8)[0]
     value = grid.command(loaded)
     assert value[2] == (
-        "/remote_compute/home/runs/exp699/code/epochs2-v1/run_remote_compute_append.py"
+        "/workspace/runs/exp699/code/epochs2-v1/run_remote_compute_append.py"
     )

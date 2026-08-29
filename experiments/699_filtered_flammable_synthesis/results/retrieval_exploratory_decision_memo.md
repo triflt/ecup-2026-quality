@@ -23,7 +23,7 @@ decisions, TF-IDF synth had 0/5 routed wins, targeted relabel lacks untouched
 confirmation, and conflict weighting was negative on the exact package route.
 
 The final ZIP is stored only in remote compute at
-`/remote_compute/home/runs/exp699/soft_cache_package_v2/solution140_flammable_soft_cache_v1.zip`.
+`/workspace/runs/exp699/soft_cache_package_v2/solution140_flammable_soft_cache_v1.zip`.
 Its SHA-256 is
 `98a0e02e8cde8c04fde529461ce4b813a352a15fefacec289f3d5e8843c89eae`
 and its size is 56,094,581 bytes. Two independent builds are byte-identical;

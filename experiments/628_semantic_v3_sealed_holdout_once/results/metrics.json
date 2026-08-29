@@ -1,9 +1,0 @@
-{
-  "experiment_id": "628",
-  "status": "skipped_by_gate",
-  "validation_complete": false,
-  "sealed_holdout_used": false,
-  "sealed_evaluation_count": 0,
-  "metrics": {},
-  "decision": "SKIPPED_SEALED_REMAINS_CLOSED"
-}

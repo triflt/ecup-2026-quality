@@ -11,12 +11,12 @@ from typing import Any
 
 SCHEMA = "exp699_remote_compute_ablation_grid_v1"
 SESSION_RE = re.compile(r"[a-z0-9][a-z0-9-]{2,79}")
-RUNS_ROOT = Path("/remote_compute/home/runs/exp699")
-REPO_ROOT = Path("/remote_compute/home/repos/quality")
-PYTHON = Path("/remote_compute/home/.venv-exp699/bin/python")
-DATA_ROOT = Path("/remote_compute/home/data/exp699")
-IMAGE_CACHE = Path("/remote_compute/home/.cache/exp699_images")
-VENDOR = Path("/remote_compute/home/data/exp699/vendor")
+RUNS_ROOT = Path("/workspace/runs/exp699")
+REPO_ROOT = Path("/workspace/repos/quality")
+PYTHON = Path("/workspace/.venv-exp699/bin/python")
+DATA_ROOT = Path("/workspace/data/exp699")
+IMAGE_CACHE = Path("/workspace/.cache/exp699_images")
+VENDOR = Path("/workspace/data/exp699/vendor")
 DEFAULT_CODE_ROOT = REPO_ROOT / "experiments/699_filtered_flammable_synthesis"
 
 
@@ -98,7 +98,7 @@ def load_spec(path: Path, *, detected_gpus: int | None = None) -> list[Job]:
         log_path = _path_under(Path(raw["log_path"]), RUNS_ROOT, "log_path")
         code_root = _path_under(
             Path(raw.get("code_root", str(DEFAULT_CODE_ROOT))),
-            Path("/remote_compute/home"),
+            Path("/workspace"),
             "code_root",
         )
         jobs.append(
