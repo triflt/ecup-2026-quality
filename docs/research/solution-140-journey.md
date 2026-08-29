@@ -18,25 +18,50 @@ baseline, category-specific fusion и точная train-only память.**
 
 ```mermaid
 flowchart TB
-    T[Название + описание + категория]
-    IA[Все изображения]
-    I1[Первое изображение · 448 px]
+    subgraph DATA["1 · ДАННЫЕ"]
+        direction LR
+        DT["Текст<br/>название · описание · категория"]
+        DA["Текст + все изображения"]
+        D1["Текст + первое изображение<br/>448 px"]
+    end
 
-    T --> S[TF-IDF LinearSVC]
-    T --> E[Qwen3-VL-Embedding-2B]
-    T --> V[Qwen3-VL-2B rsLoRA]
-    T --> Q[Qwen3.5-4B multimodal rsLoRA]
-    IA --> E
-    I1 --> V
-    I1 --> Q
+    subgraph MODELS["2 · МОДЕЛЬНЫЕ СИГНАЛЫ"]
+        direction LR
+        S["TF-IDF<br/>LinearSVC"]
+        E["Qwen3-VL Embedding<br/>2B"]
+        V["Qwen3-VL<br/>2B rsLoRA"]
+        Q["Qwen3.5<br/>4B multimodal rsLoRA"]
+    end
 
-    S --> R[Robust base rank]
+    subgraph DECISION["3 · СБОРКА РЕШЕНИЯ"]
+        direction LR
+        R["Robust base<br/>text + embedding"]
+        F{"Category-specific<br/>fusion"}
+        M["Train-only memory<br/>exact id / name"]
+    end
+
+    O["id + объяснение + бан / не бан"]
+
+    DT --> S
+    DA --> E
+    D1 --> V
+    D1 --> Q
+    S --> R
     E --> R
-    R --> F{Category fusion}
+    R --> F
     V --> F
     Q --> F
-    F --> M[Train-only exact / name memory]
-    M --> O[id + объяснение + бан / не бан]
+    F --> M --> O
+
+    classDef data fill:#E8F3FF,stroke:#3B82F6,color:#0F2A44,stroke-width:2px;
+    classDef model fill:#F2EAFE,stroke:#8B5CF6,color:#2E1065,stroke-width:2px;
+    classDef decision fill:#E8F8F1,stroke:#10B981,color:#064E3B,stroke-width:2px;
+    classDef output fill:#FFF3DB,stroke:#F59E0B,color:#78350F,stroke-width:2px;
+    class DT,DA,D1 data;
+    class S,E,V,Q model;
+    class R,F,M decision;
+    class O output;
+    linkStyle default stroke:#64748B,stroke-width:2px;
 ```
 
 - **Qwen3-VL-Embedding** видит все доступные изображения.
