@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT=/remote_compute/home/repos/quality
-RUN=/remote_compute/home/runs/exp709_retry2
+RUN=/remote_compute/home/runs/exp709_retry4
 PY=/remote_compute/home/.venv-exp699/bin/python
 PARENT="$ROOT/research/qwen3vl_lora_holdout.py"
 WRAPPER="$ROOT/experiments/709_gemma4_lora_epoch_sweep/run_epoch.py"
@@ -21,12 +21,14 @@ launch_arm() {
   local name="${architecture}_r${rank}"
   local arm="$RUN/$name"
   mkdir -p "$arm"
+  mkdir -p "/tmp/exp709-output-retry4/$name" "/tmp/exp709-imageview-retry4/$name"
+  ln -s "/tmp/exp709-output-retry4/$name" "$arm/output"
   CUDA_VISIBLE_DEVICES="$gpu" EXP_ID=709 HOLDOUT_FOLD=0 \
   ECUP_MODEL_ROOT="$model" ECUP_DATA="$DATA" ECUP_OOF="$OOF" \
   ECUP_MANIFEST="$MANIFEST" ECUP_OUTPUT_DIR="$arm/output" ECUP_VENDOR="$VENDOR" \
   TRAINING_MODE=hard MODEL_CLASS=multimodal USE_CHAT_BATCH=1 \
-  LINEAR_ONLY_TARGETS=1 \
-  EXP709_IMAGE_VIEW="$arm/images" PYTORCH_ALLOC_CONF=expandable_segments:True \
+  LINEAR_ONLY_TARGETS=1 CHECKPOINT_EACH_EPOCH=1 \
+  EXP709_IMAGE_VIEW="/tmp/exp709-imageview-retry4/$name" PYTORCH_ALLOC_CONF=expandable_segments:True \
   TOKENIZERS_PARALLELISM=false "$PY" -u "$WRAPPER" --parent "$PARENT" \
     --architecture "$architecture" --epochs 5 --cache "$CACHE" \
     --lora-r "$rank" --lora-alpha "$alpha" >"$arm/run.log" 2>&1 &
