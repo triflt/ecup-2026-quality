@@ -130,4 +130,3 @@ def test_full_candidate_slices_are_diagnostic_and_exactly_bound(tmp_path: Path) 
     payload = dict(result)
     digest = payload.pop("contract_sha256")
     assert digest == SLICES.canonical_sha256(payload)
-
