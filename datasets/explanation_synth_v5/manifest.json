@@ -1,0 +1,45 @@
+{
+  "schema_version": "ecup_explanation_synth_public_v1",
+  "dataset_version": "explanation_synth_v5",
+  "source_dataset": "competition_train_v1",
+  "source_rows": 12971,
+  "accepted_rows": 11400,
+  "rejected_rows": 1571,
+  "coverage": 0.878883663557166,
+  "cell_coverage": {
+    "БАД|0": 0.6740157480314961,
+    "БАД|1": 0.9218188353702372,
+    "Легковоспламеняющиеся|0": 0.9030920060331825,
+    "Легковоспламеняющиеся|1": 0.9949494949494949
+  },
+  "teacher": {
+    "model": "Qwen/Qwen3.5-397B-A17B-FP8",
+    "revision": "ea5b4f81096f3901c91dea97f81324302495781d",
+    "prompt_sha256": "e2a2d37d2e32378f63b2703bfa924d8e9c7c994ca7f7e13c92953e44746c2db1",
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "max_tokens": 384,
+    "thinking": false,
+    "all_gallery_images": true
+  },
+  "output": {
+    "path": "explanations.jsonl",
+    "rows": 11400,
+    "sha256": "25eb91c2e26e9a41a038719a6800fea5f09941952c88a516cd780eea42c82d51",
+    "fields": ["id", "label", "target"],
+    "target_min_chars": 53,
+    "target_p50_chars": 150,
+    "target_p95_chars": 221,
+    "target_max_chars": 300,
+    "target_truncation": 0,
+    "target_alteration": 0
+  },
+  "provenance": {
+    "origin_commit": "e25d636052f6ebcdccc252604afc8b1b0c45dee2",
+    "source_handoff_manifest_sha256": "1ca83078dbdf3ac97f12f0b47fada80445686b369c6af2303344e3b45bac0fd5",
+    "source_acceptance_receipt_sha256": "ef866fce947ddfb52dc9b8ba1b521407e0b0e35f57d46803245929b9abb23031",
+    "source_image0_manifest_sha256": "46a4307aa556f938c6c699e823c98a945732598bd63aa266260388f61085a4a7",
+    "source_files_reencoded_or_copied": false
+  },
+  "public_submissions": 0
+}
