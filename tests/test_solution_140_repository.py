@@ -4,7 +4,6 @@ import importlib.util
 import json
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 VERIFY_PATH = ROOT / "experiments/140_dual_lora_fusion/final/verify.py"
 SPEC = importlib.util.spec_from_file_location("solution_140_verify", VERIFY_PATH)
@@ -43,3 +42,14 @@ def test_solution_140_training_entrypoints_exist() -> None:
         "research/nested_multimodel_fusion.py",
     )
     assert all((ROOT / path).is_file() for path in required)
+
+
+def test_solution_140_visual_inputs_reach_all_three_qwen_components() -> None:
+    source = (
+        ROOT / "experiments/140_dual_lora_fusion/submission/run.py"
+    ).read_text(encoding="utf-8")
+    assert "conversation(row.text, row.image_paths)" in source
+    assert "paths = [row.image_paths[0] if row.image_paths else None for row in rows]" in source
+    assert 'INSTRUCT_MODEL_PATH, QWEN3VL_ADAPTER_PATH, "image_text"' in source
+    assert 'QWEN35_MODEL_PATH, QWEN35_ADAPTER_PATH, "multimodal"' in source
+    assert "qwen35_scores = compute_lora_scores(" in source
