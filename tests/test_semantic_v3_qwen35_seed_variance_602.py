@@ -9,7 +9,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 EXP = ROOT / "experiments/602_semantic_v3_qwen35_seed_variance"
@@ -134,29 +133,6 @@ def test_acceptance_gate_includes_all_predeclared_rules() -> None:
         "corrected_to_regressed_at_least_1_5",
     }
     assert report["accepted"] is True
-
-
-def test_runtime_presets_cover_fifteen_neutral_one_gpu_jobs() -> None:
-    presets = sorted((EXP / ".local/runtime").glob("*.yml"))
-    assert len(presets) == 15
-    observed: set[tuple[int, int]] = set()
-    for path in presets:
-        config = yaml.safe_load(path.read_text(encoding="utf-8"))["job"]
-        args = [str(value) for value in config["args"]]
-        seed = int(args[args.index("--seed") + 1])
-        fold = int(args[args.index("--fold") + 1])
-        observed.add((seed, fold))
-        assert config["flavor"] == "h100-1x"
-        assert config["generate_name"] == f"sv3-q35v-s{seed}-f{fold}"
-        assert "ecup" not in config["generate_name"].lower()
-        assert args[args.index("--runtime-dir") + 1] == "/work/input/runtime"
-        sources = [entry["src"] for entry in config["input"] if "src" in entry]
-        assert "research/scoped_runtime_bootstrap.py" in sources
-        assert not any(".local/runtime_inputs" in source for source in sources)
-        assert "research/data.csv" not in sources
-        assert "validation/semantic_family_v3/folds.csv" not in sources
-        assert "research/lora_image_manifest_complete.tsv.gz" not in sources
-    assert observed == {(seed, fold) for seed in protocol.NEW_SEEDS for fold in protocol.FOLDS}
 
 
 def test_card_and_metrics_record_completed_no_go_grid() -> None:

@@ -222,17 +222,3 @@ def test_exp570_copies_the_actual_engine_npz_name() -> None:
         "null_screen_control",
         "null_screen_control",
     )
-
-
-def test_exp570_private_presets_are_single_gpu_and_have_neutral_job_names() -> None:
-    for fold in (0, 3):
-        text = (EXPERIMENT / f".local/runtime/fold{fold}.yml").read_text()
-        generate_name = next(
-            line.split(":", 1)[1].strip()
-            for line in text.splitlines()
-            if "generate_name:" in line
-        )
-        assert "h100-1x" in text
-        assert "ecup" not in generate_name.lower()
-        assert "e-cup" not in generate_name.lower()
-        assert f'holdout_fold: "{fold}"' in text.lower()

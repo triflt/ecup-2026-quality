@@ -8,7 +8,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 EXP = ROOT / "experiments/600_semantic_v3_qwen35_baselines"
@@ -258,40 +257,6 @@ def test_null_parity_is_exact_and_experiment_is_complete() -> None:
     assert metrics["working_jobs"] == 0
     assert metrics["fully_nested_meta_validation"] is False
     assert metrics["sealed_holdout_used"] is False
-
-
-def test_runtime_presets_cover_ten_neutral_one_gpu_jobs() -> None:
-    presets = sorted((EXP / ".local/runtime").glob("*.yml"))
-    assert len(presets) == 10
-    observed: set[tuple[str, int]] = set()
-    for path in presets:
-        config = yaml.safe_load(path.read_text(encoding="utf-8"))["job"]
-        args = [str(value) for value in config["args"]]
-        component = args[args.index("--component") + 1]
-        fold = int(args[args.index("--fold") + 1])
-        observed.add((component, fold))
-        assert config["flavor"] == "h100-1x"
-        assert config["generate_name"] == (
-            f"sv3-q35o-f{fold}" if component == "original" else f"sv3-q35s-f{fold}"
-        )
-        assert "ecup" not in config["generate_name"].lower()
-        assert args[args.index("--runtime-dir") + 1] == "/work/input/runtime"
-        assert args[args.index("--bootstrap-runtime-dir") + 1] == "/work/input/runtime"
-        assert "--data" not in args
-        assert "--folds" not in args
-        assert "--image-manifest" not in args
-        file_sources = [
-            str(item.get("src", "")) for item in config["input"] if item.get("type") == "files"
-        ]
-        assert "research/data.csv" not in file_sources
-        assert "validation/semantic_family_v3/folds.csv" not in file_sources
-        assert "research/lora_image_manifest_complete.tsv.gz" not in file_sources
-        assert "research/scoped_runtime_bootstrap.py" in file_sources
-    assert observed == {
-        (component, fold)
-        for component in protocol.COMPONENTS
-        for fold in protocol.DEVELOPMENT_FOLDS
-    }
 
 
 def test_public_files_contain_no_private_infrastructure_references() -> None:

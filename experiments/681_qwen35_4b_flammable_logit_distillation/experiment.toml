@@ -1,19 +1,30 @@
-id = 681
-name = "qwen35_4b_flammable_logit_distillation"
-status = "TERMINAL_REJECT_AT_SCREEN"
-owner = "causal"
-parent_experiment = 680
-ranking_control_experiment = 641
-teacher_probe_experiment = 659
-teacher_scoring_experiment = 662
-model = "Qwen/Qwen3.5-4B"
-category_scope = "flammable_only"
-changed_factor = "hard_bce_to_fixed_hard_plus_teacher_soft_bce_on_680_specialist"
-temperature = 2.0
-soft_loss_weight = 0.5
-threshold_tuned = false
-outer_validation_used_for_selection = false
-hypothesis_postselected_on_prior_five_fold_probe = true
-uses_27b_at_inference = false
-public_submissions = 0
-gpu_jobs = 0
+[experiment]
+id = "681"
+slug = "qwen35_4b_flammable_logit_distillation"
+title = "Outer-safe 27B-to-4B flammable logit distillation"
+status = "terminal_reject_at_screen"
+entrypoint = "experiments/681_qwen35_4b_flammable_logit_distillation/train_fold.py"
+result_file = "experiments/681_qwen35_4b_flammable_logit_distillation/results/screen_terminal_summary.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+primary_metric = "flammable_average_precision_and_routed_macro_f1"
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false
+
+[lineage]
+parent = "680"
+ranking_control = "641"
+teacher_probe = "659"
+teacher_scoring = "662"
+public_used = false

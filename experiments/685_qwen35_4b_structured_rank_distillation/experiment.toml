@@ -3,6 +3,8 @@ id = 685
 slug = "qwen35_4b_structured_rank_distillation"
 title = "Leakage-safe structured/ranking distillation into deployable 4B LoRA"
 status = "TERMINAL_REJECT_AT_OUTER0"
+entrypoint = "experiments/685_qwen35_4b_structured_rank_distillation/train_pair_fold.py"
+result_file = "experiments/685_qwen35_4b_structured_rank_distillation/results/outer0_terminal.json"
 parent_experiment = 681
 initial_teacher_experiment = 654
 teacher_score_experiment = 662
@@ -66,3 +68,11 @@ independent_eval_in_remote_compute = true
 s3_keys_immutable = true
 submission_zip_requires_fresh_user_approval = true
 sealed_fold3_outputs_used = false
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[artifacts]
+directory = "artifacts"
+publish = false

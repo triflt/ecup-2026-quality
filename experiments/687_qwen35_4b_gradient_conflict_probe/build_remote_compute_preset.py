@@ -57,8 +57,8 @@ def build(args: argparse.Namespace) -> dict:
         or not re.fullmatch(r"[0-9a-f]{40}", args.probe_code_revision)
     ):
         raise ValueError("probe bundle identity is not shell-safe and immutable")
-    expected_code_prefix = "/d.strizhakov/ecup/experiments/687/code/"
-    expected_output_prefix = "/d.strizhakov/ecup/experiments/687/probe/fold3/"
+    expected_code_prefix = "/project/experiments/687/code/"
+    expected_output_prefix = "/project/experiments/687/probe/fold3/"
     if (
         not args.probe_bundle_src.startswith(expected_code_prefix)
         or not args.output_dst.startswith(expected_output_prefix)

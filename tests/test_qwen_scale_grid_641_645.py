@@ -12,8 +12,12 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 GRID = ROOT / "experiments/645_qwen_scale_2x3_gate"
-if str(GRID) not in sys.path:
-    sys.path.insert(0, str(GRID))
+while str(GRID) in sys.path:
+    sys.path.remove(str(GRID))
+sys.path.insert(0, str(GRID))
+
+for module_name in ("evaluate", "freeze_audit", "grid_contract", "runtime_builder", "train_lora"):
+    sys.modules.pop(module_name, None)
 
 import evaluate
 import freeze_audit
@@ -38,7 +42,9 @@ def test_grid_reuses_exact_prompt_and_frozen_effective_batch() -> None:
         for spec in grid_contract.CELL_SPECS.values()
     } == {16}
     assert grid_contract.grid_contract_payload()["threshold"] == 0.0
-    for prefix in ("641", "642", "643", "644", "645"):
+    # Only the accepted 4B cell and the immutable grid contract are retained.
+    # Removed 27B scaffolds must not be required for repository health.
+    for prefix in ("641", "645"):
         directory = next((ROOT / "experiments").glob(f"{prefix}_*"))
         frozen = json.loads((directory / "frozen_spec.json").read_text(encoding="utf-8"))
         assert frozen["grid_contract_sha256"] == grid_contract.GRID_CONTRACT_SHA256
@@ -181,7 +187,7 @@ def test_trained_grid_cells_lock_identical_fast_path_artifacts() -> None:
         'ziglang_wheel_sha256 = "9fcda73f62b851dd72a54b710ad40a209896db14cfb13649e62191243556342b"',
         'kernels_wheel_sha256 = "794af6a10fd888bb4f46ad1b9b2f4f61b5b0b104475a6415c5322b58a7bf02ed"',
     }
-    for prefix in ("641", "642", "643", "644"):
+    for prefix in ("641",):
         directory = next((ROOT / "experiments").glob(f"{prefix}_*"))
         config = (directory / "experiment.toml").read_text(encoding="utf-8")
         assert required.issubset(config.splitlines())

@@ -55,7 +55,7 @@ PaddleOCR-VL-1.6 подтверждён как разумный офлайн-у�
 лидер на русских товарных карточках. После полного 633 проводится ручной A/B
 качества против GLM-OCR и PP-OCRv5-`eslav`; отдельно PP-OCRv5 проходит
 production-runtime gate `652`. Протокол находится в
-`docs/research/2026-08-23-ocr-model-selection.md`.
+`docs/research/foundations/2026-08-23-ocr-model-selection.md`.
 
 ### 3. Провести ручной аудит доказательств
 
@@ -81,7 +81,7 @@ production-runtime gate `652`. Протокол находится в
 сравнения качества разметки; использование 400B не является предпосылкой.
 Научные основания, фильтрация teacher-разметки и четыре заранее разделённые
 абляции зафиксированы в
-`docs/research/2026-08-23-grounded-distillation-design.md`; сам запуск остаётся
+`docs/research/explanations/2026-08-23-grounded-distillation-design.md`; сам запуск остаётся
 запрещён до полного gate 645.
 
 ## Инженерный принцип

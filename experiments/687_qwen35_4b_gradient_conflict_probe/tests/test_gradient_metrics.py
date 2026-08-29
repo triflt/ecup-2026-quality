@@ -294,8 +294,8 @@ def test_preset_rejects_shell_unsafe_bundle_basename_before_reading_inputs(
         probe_bundle_file="bad;name.tar.gz",
         probe_bundle_sha256="a" * 64,
         probe_code_revision="b" * 40,
-        probe_bundle_src="/d.strizhakov/ecup/experiments/687/code/safe",
-        output_dst="/d.strizhakov/ecup/experiments/687/probe/fold3/safe",
+        probe_bundle_src="/project/experiments/687/code/safe",
+        output_dst="/project/experiments/687/probe/fold3/safe",
     )
     with pytest.raises(ValueError, match="shell-safe"):
         build_preset(args)

@@ -23,22 +23,25 @@
 | 270 | Family-balanced negative BAD | Rejected | Locked `−0.000216`, 3/5 побед |
 | 280 | Public-190 with component 260 | Rejected online | Public 0.891924: точная ничья с 190 |
 | 290–300 | MiniCPM and InternVL screens | Rejected | Независимые vision/attribute ветки не прошли заранее заданные фильтры |
-| 310–390 | Soft targets, evidence, gates and metric learning | Rejected/diagnostic | Ни одна ветка не дала устойчивого production-safe улучшения; детали в карточках и журнале |
+| 310–390 | Soft targets, counterfactuals and metric controls | Rejected/diagnostic | Сохранены измеренные отрицательные результаты; они предотвращают повторение неустойчивых веток |
 | 400 | Category-routed Qwen3.5 | Public champion | Public **0.8922900011**, `+0.0003655774` к 190; локальный масштаб эффекта был переоценён |
 | 410–420 | Flammable sampling/continuation | Rejected | Дополнительные градиенты увеличили false negatives |
 | 430 | One-pass adapter soup | Rejected, promising | Alpha 0.50 дала `+0.003185`, но только 2/5 побед и слабый bootstrap |
 | 440–470 | R-Drop, transaction scope, embedding and seed repeat | Rejected | Независимые проверки не прошли замороженные gates |
 | 480 | Fisher blockwise soup | Paused | Не запускать до новой semantic-family validation |
 | 490 | Evidence-grounded explanations | Research prepared | Нужен verdict-locked span/concept baseline и слепой ручной аудит 200 строк |
-| 600–631 | Новая semantic-v3 проверка Qwen | Mixed/Rejected | Лучшие component gains не пережили full-route stability или Public; детали в карточках |
+| 600–626, 628–631 | Новая semantic-v3 проверка Qwen | Mixed/Rejected | Сохранены измеренные проверки, честные gate-skips и explanation-аудит; пустые финальные scaffolds удалены |
 | 632–635 | Exact-span reasoning repeat | Rejected in full route | Компонент воспроизвёлся, но интеграция в 140 не прошла bootstrap/stability gate |
 | 633–660 | Offline OCR и строгий repair | Partial dataset only | 41 691 изображение доступны fail-closed; тяжёлый OCR запрещён в submission-runtime |
 | 640–659 | Масштаб Qwen и 27B LoRA | Offline teacher accepted | 659 выиграл 5/5 для опасного класса, но 27B не deployable |
 | 661 | Полный контроль Qwen3.5-4B | Accepted control | 11 118 строк, immutable five-fold input для 659 |
-| 662 | Outer-train scoring Qwen3.6-27B | Full scoring running | Smoke принят 8/8; folds 0/1/3 считают только label-free train-targets для честной дистилляции |
+| 662 | Outer-train scoring Qwen3.6-27B | Completed | Все пять outer-safe target folds приняты; validation labels не использовались |
 | 679 | Qwen3.5-4B с LR 1e-4 | Rejected at screen | Один fold вырос, второй упал; PR-AUC опасного класса ухудшился |
 | 680 | Flammable-only Qwen3.5-4B | Rejected at screen | Положительный fold 0 не перенёсся на fold 3; Macro и F1 редкого класса снизились |
-| 681 | Outer-safe 27B→4B distillation | Prepared | Ближайший deployable перенос 27B-сигнала без second-level leakage |
+| 681 | Outer-safe 27B→4B distillation | Rejected at screen | Raw-logit KD проиграл hard-label production control на обоих screen folds |
+| 682 | BAD-only seed-632 route | Validated, refit not run | `+0.002824` Macro, 5/5 folds и 72/19 corrections/regressions; требует отдельного full refit/runtime gate |
+| 683–688 | Compact teacher transfer and rank-KD | Rejected/diagnostic | Сохранены терминальные AP/F1 и gradient-conflict выводы; ни один кандидат не открыт для Public |
+| 693–695 | Следующие 4B distillation hypotheses | Prepared, unmeasured | Preregistered causal/hard-negative/ranking варианты; не выдаются за результаты |
 | 900 | Infrastructure checks | Completed | Runtime/schema/preprocessing safeguards |
 
 Новый experiment создаётся из `templates/experiment/`, затем добавляется отдельной строкой в `reports/experiment-log.csv`.

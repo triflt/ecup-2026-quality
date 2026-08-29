@@ -1,14 +1,31 @@
-# Legacy research source
+# Research entrypoints
 
-Здесь сохранены исторические training/evaluation scripts. Большие outputs, raw data, manifests, adapters, embeddings и private execution files исключены из Git.
+The Python files in this directory are stable historical entrypoints used by
+experiment packages. They intentionally remain flat: moving them would break
+recorded commands and provenance links. There are no byte-identical duplicate
+scripts in this directory.
 
-Новые запуски должны идти через соответствующую папку `experiments/`, которая фиксирует hypothesis, validation protocol, status и result record. Общие новые функции следует добавлять в `src/ecup_quality/`, а не копировать между scripts.
+## Solution 140 path
 
-## Правило миграции
+- `train_full_fusion.py` — robust text and embedding base training.
+- `aggregate_lora_oof.py` — fold prediction aggregation.
+- `nested_lora_calibration.py` — leakage-safe calibration of one LoRA branch.
+- `nested_multimodel_fusion.py` — nested fusion of the robust base, Qwen3-VL
+  LoRA and Qwen3.5-4B LoRA.
+- `dual_lora_submission_smoke_bootstrap.py` and
+  `dual_lora_runtime_smoke_bootstrap.py` — submission and scaled-runtime checks.
 
-При изменении исторического script:
+The canonical commands and artifact contract are documented in
+[`experiments/140_dual_lora_fusion/final/`](../experiments/140_dual_lora_fusion/final/).
 
-1. заменить absolute infrastructure paths на `ECUP_*` environment variables с backward-compatible default;
-2. вынести повторяющуюся normalization/metrics/split logic в `src/ecup_quality/`;
-3. сохранить исторический result JSON в experiment package как агрегированные метрики;
-4. не коммитить локальные artifacts.
+## Other groups
+
+- `*_cv.py`, `*_audit.py`: offline comparisons and fail-closed audits.
+- `qwen35_*`, `qwen3vl_*`: model-specific training and OOF utilities.
+- `paddleocr_*`: OCR diagnostics; OCR is not part of the current solution 140
+  runtime.
+- `*_bootstrap.py`: reproducible environment or runtime smoke builders.
+
+New reusable code should go under `src/ecup_quality/`. New experiment-specific
+code should live in its experiment directory. Do not add more one-off scripts
+to this directory unless an existing immutable command depends on that path.

@@ -14,4 +14,4 @@ Machine-readable журнал переноса local validation в Public. Дл�
 
 ## Обновление
 
-После запуска сначала обновляется `experiments/<id>/results/metrics.json`, затем добавляется строка в общий CSV. Для leaderboard result дополнительно обновляется `submissions.csv` и `WHATS_NEXT.md`.
+После запуска сначала обновляется `experiments/<id>/results/metrics.json`, затем добавляется строка в общий CSV. Для leaderboard result дополнительно обновляются `submissions.csv`, `champion.json` и при необходимости `semantic-v3-leaderboard.csv`.

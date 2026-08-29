@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -9,9 +10,13 @@ HERE = ROOT / "experiments/683_gemma4_e4b_class_only_lora_screen"
 
 
 def load(name: str, path: Path):
+    if path.name == "contract.py":
+        sys.modules.pop("contract", None)
     spec = importlib.util.spec_from_file_location(name, path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
+    if path.name == "contract.py":
+        sys.modules["contract"] = module
     spec.loader.exec_module(module)
     return module
 

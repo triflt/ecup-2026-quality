@@ -98,4 +98,5 @@
 - Можно ли получить не менее 90% релевантных evidence-grounded комментариев на
   ручном аудите 200 строк, сохранив вердикты `400` и runtime?
 
-Подробная очередность опытов и критерии принятия находятся в [`next-research-program.md`](next-research-program.md).
+Подробная очередность опытов и критерии принятия находятся в
+[`next-research-program.md`](../explanations/next-research-program.md).

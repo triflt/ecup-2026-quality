@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "solution": "140",
+  "weights_published": false,
+  "historical_submission": {
+    "filename": "quality-qwen3vl-qwen35-dual-lora-prior-submit.zip",
+    "sha256": "6cc2fda9d17d959880050889d964c3b971b92adbfa606505df7f04b46a819cd3"
+  },
+  "required_runtime_artifacts": [
+    {"path": "adapter_qwen3vl", "kind": "peft_adapter", "sha256": null},
+    {"path": "adapter_qwen35", "kind": "peft_adapter", "sha256": null},
+    {"path": "multimodal_classifier.joblib", "kind": "classifier_bundle", "sha256": null},
+    {"path": "strong_text_full.joblib", "kind": "classifier_bundle", "sha256": null}
+  ],
+  "base_models": [
+    "Qwen/Qwen3-VL-Embedding-2B",
+    "Qwen/Qwen3-VL-2B-Instruct",
+    "Qwen/Qwen3.5-4B"
+  ]
+}

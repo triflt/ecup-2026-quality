@@ -1,27 +1,28 @@
-id = 687
-name = "qwen35_4b_gradient_conflict_probe"
-status = "TERMINAL_ACCEPT_PROBE_REJECT_PCGRAD"
-parent_experiment = 686
-outer_fold = 3
-changed_factor = "train_only_gradient_conflict_measurement"
-gpu_jobs = 0
-public_submissions = 0
+[experiment]
+id = "687"
+slug = "qwen35_4b_gradient_conflict_probe"
+title = "Train-only hard/rank gradient-conflict probe"
+status = "terminal_accept_probe_reject_pcgrad"
+entrypoint = "experiments/687_qwen35_4b_gradient_conflict_probe/probe_gradient_conflict.py"
+result_file = "experiments/687_qwen35_4b_gradient_conflict_probe/results/terminal_probe.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+primary_metric = "gradient_conflict_diagnostics"
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false
+
+[lineage]
+parent = "686"
 deployable_candidate = false
-
-[hypothesis]
-mechanism = "rank-gradient conflicts with hard-BCE gradient and cancels hard descent"
-falsification = "low conflict rate or low retained non-conflicting rank signal"
-
-[resources]
-flavor = "h100-1x"
-region_primary = "ix-m5-sm11"
-region_fallback = "ix-m5-sm12"
-time_limit = "3h"
-
-[data_boundary]
-outer_train_labels = true
-outer_validation_transport_checksum_verified = true
-outer_validation_rows_consumed_by_probe = false
-outer_validation_labels = false
-sealed_rows = false
-public = false
+public_used = false

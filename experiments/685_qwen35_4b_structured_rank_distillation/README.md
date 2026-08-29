@@ -150,7 +150,6 @@ new immutable prefix. Code, pair input, base-model tree, initial LoRA state,
 training order, runtime versions and vendor bytes are all carried into the
 control/candidate acceptance and checked for exact parity.
 
-The only approved object namespace is
-`s3://biglm-alignment-pipeline/d.strizhakov/ecup/`. Direct S3 credentials may be
-read only from the ignored `.env.s3` when generating ignored remote compute presets;
+Remote artifacts are written only to an approved, experiment-scoped immutable
+namespace supplied outside Git. Credentials and execution presets remain ignored;
 their values are never printed or committed.

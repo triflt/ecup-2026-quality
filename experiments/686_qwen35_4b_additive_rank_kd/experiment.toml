@@ -1,24 +1,28 @@
-id = 686
-name = "qwen35_4b_additive_rank_kd"
-status = "TERMINAL_REJECT_CONFIRMATION"
-owner = "causal-rank-kd"
-parent = 685
+[experiment]
+id = "686"
+slug = "qwen35_4b_additive_rank_kd"
+title = "Additive hard-BCE plus rank-KD confirmation"
+status = "terminal_reject_confirmation"
+entrypoint = "experiments/686_qwen35_4b_additive_rank_kd/train_pair_fold.py"
+result_file = "experiments/686_qwen35_4b_additive_rank_kd/results/confirmation_terminal.json"
 
-[hypothesis]
-changed_factor = "candidate hard_BCE + 0.5*pair_rank_BCE; control hard_BCE"
-teacher = "accepted Qwen3.6-27B outer-train raw-logit ranks from experiment 662"
-student = "Qwen3.5-4B class-only LoRA"
-deployment = "4B_only"
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
 
 [validation]
-development_fold = 0
-blind_screen_fold = 3
-confirmation_folds = [1, 2, 4]
-threshold = 0.0
-threshold_tuned = false
-public_used = false
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+primary_metric = "flammable_average_precision_and_routed_macro_f1"
 
-[resources]
-screen_jobs = 2
-gpu_per_job = 1
-gpu_type = "H100"
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false
+
+[lineage]
+parent = "685"
+changed_factor = "full_hard_bce_plus_fixed_half_weight_pair_rank_bce"
+public_used = false

@@ -77,7 +77,7 @@ PaddleOCR-VL-1.6 остаётся лучшим единым default для text 
 координатами. Но опубликованного русского product-card benchmark у неё нет.
 После сборки полного датасета запланирован отдельный ручной A/B на 100–300
 карточках против GLM-OCR и PP-OCRv5-`eslav`; критерии и источники записаны в
-`docs/research/2026-08-23-ocr-model-selection.md`.
+`docs/research/foundations/2026-08-23-ocr-model-selection.md`.
 
 Отдельный эксперимент `652` проверит быстрый PP-OCRv5 как необязательный
 online-verifier. Даже он будет отвергнут, если не уложится в заранее

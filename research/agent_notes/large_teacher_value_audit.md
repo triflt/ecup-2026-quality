@@ -262,17 +262,12 @@ with tensor parallel 8, expert parallel, `mm-encoder-tp-mode=data`, and async
 scheduling. The [technical report](https://arxiv.org/abs/2511.21631) is the
 primary architectural source.
 
-Use one private compute platform `h100-8x` node in `private-gpu-pool`: 8 x H100 80GB (640GB aggregate
-HBM), 112 CPU, and 1120 GiB RAM. The FP8 repository is about 238GB, so weights
-fit on one node under the official TP8 route; multi-node distribution is not
-needed. Reference it through the public-model HF proxy as
-`huggingface-proxy/Qwen/Qwen3-VL-235B-A22B-Instruct-FP8/latest`. Cache presence
-has **not** been verified, so first-use delivery/download time is a real
-uncertainty. Do not use the private compute platform S3 model importer, whose documented large
-model limit is 100GB. Local platform sources:
-[`flavors`](../../../private compute-user-docs/docs/jobs/flavors/index.mdx),
-[`distributed jobs`](../../../private compute-user-docs/docs/jobs/distributed/index.mdx), and
-[`Hugging Face proxy`](../../../private compute-user-docs/docs/model_registry/hugging_face_proxy/index.md).
+Use one eight-H100 node following the official TP8 recipe. The FP8 repository is
+about 238GB, so the weights fit on one such node and multi-node distribution is
+not required. Provider-specific project names, storage paths, credentials and
+execution documentation are intentionally excluded from the public repository.
+Cache presence has not been verified, so first-use delivery time remains a real
+uncertainty.
 
 Use a short 8K--16K serving context; the model's 256K maximum is unnecessary and
 would waste KV-cache memory. Before the pilot, a 16-card throughput-only smoke

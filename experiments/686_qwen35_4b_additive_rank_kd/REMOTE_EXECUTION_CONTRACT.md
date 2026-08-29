@@ -83,7 +83,8 @@ receipt exists. Blind fold 3 is forbidden from consuming any promotion receipt.
 ## Security and operational rules
 
 - Use project name only from `.local/compute-project.txt`.
-- Use only the approved `biglm-alignment-pipeline/d.strizhakov/ecup` prefix.
+- Use only an approved, experiment-scoped immutable artifact prefix supplied
+  outside Git.
 - Keep job artifacts remote; no local artifact ZIP download before a qualified
   submission build with explicit user approval.
 - Maintain an owned-job registry; at most eight user-owned GPU jobs may run.

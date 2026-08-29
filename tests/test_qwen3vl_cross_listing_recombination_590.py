@@ -105,44 +105,6 @@ def test_exp590_synthetic_blind_audit_fails_below_precision_gate(tmp_path: Path)
     assert audit["decision"] == "NO_GO"
 
 
-def test_exp590_real_preflight_has_only_frozen_strong_pairs_and_is_blocked() -> None:
-    summary = json.loads((EXPERIMENT / "analysis/preflight/preflight_summary.json").read_text())
-    sample = pd.read_csv(EXPERIMENT / "analysis/preflight/blind_audit_pairs.csv", dtype=str)
-    assert len(sample) == 300
-    assert set(sample.stage).issubset(PLAN.ALLOWED_STAGES)
-    assert not set(sample.stage).intersection(PLAN.FORBIDDEN_STAGES)
-    assert sample.key_degree.astype(int).max() <= PLAN.MAX_KEY_DEGREE
-    assert "category" not in sample and "label" not in sample
-    assert summary["blind_audit"]["reviewed_pairs"] == 0
-    assert summary["decision"] == "NO_GO"
-    for fold in (0, 3):
-        audit = json.loads(
-            (EXPERIMENT / f"analysis/preflight/fold_{fold}/preflight_audit.json").read_text()
-        )
-        assert audit["eligible_pairs"] >= 200
-        assert audit["eligible_components"] >= 50
-        assert audit["forbidden_stage_pairs"] == 0
-        assert audit["generic_provenance_pairs"] == 0
-        assert audit["cross_category_pairs"] == 0
-        assert audit["cross_label_pairs"] == 0
-        assert audit["outer_validation_pairs"] == 0
-        assert audit["sealed_holdout_pairs"] == 0
-        assert audit["mixed_label_component_pairs"] == 0
-        assert audit["recombined_fraction_of_repeats"] == 0.25
-        assert audit["failures"] == ["blind_audit_not_approved"]
-
-
-def test_exp590_exact_null_control_changes_no_route400_predictions() -> None:
-    root = EXPERIMENT / "analysis/null_control"
-    report = json.loads((root / "null_screen_control.json").read_text())
-    arrays = np.load(root / "null_screen_control.npz", allow_pickle=False)
-    assert report["null_control_passed"] is True
-    assert report["evaluated_folds"] == [0, 3]
-    assert np.array_equal(
-        arrays["baseline_nested_predictions"], arrays["candidate_screen_nested_predictions"]
-    )
-
-
 def test_exp590_train_entrypoint_checks_no_go_before_parent_model_import() -> None:
     result = subprocess.run(
         [

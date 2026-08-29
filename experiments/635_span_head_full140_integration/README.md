@@ -32,7 +32,7 @@ grouped bootstrap по семантическим компонентам дал 
 `FUEL_OR_IGNITION`-фрагментом получают небольшое повышение stable-rank и
 пересекают высокий порог. Repeat-правила не покрывают эти строки. Подробный
 аудит и label-blind OCR-срезы находятся в
-`reports/exp632-635-span-error-audit-2026-08-23.md`.
+`docs/research/archive/exp632-635-span-error-audit-2026-08-23.md`.
 
 ## Проверяемый вопрос
 

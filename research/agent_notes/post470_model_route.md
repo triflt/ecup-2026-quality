@@ -216,7 +216,7 @@ pairwise screen не проходит, закрыть supervised InternVL specia
   `results/attribute_gate_report.json` и private compute platform presets;
 - `experiments/400_qwen35_category_routed_adapters/results/acceptance_audit.json`;
 - `docs/hackathon/data-and-models.md`, `docs/hackathon/task-and-rules.md` и
-  `docs/research/public-attempt-2026-08-21.md`.
+  `docs/research/archive/public-attempt-2026-08-21.md`.
 
 Официальные карточки/primary docs:
 

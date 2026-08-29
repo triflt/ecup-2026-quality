@@ -147,7 +147,7 @@ class RemoteHardeningTests(unittest.TestCase):
             extracted = root / "extracted"
             extracted.mkdir()
             with tarfile.open(bundle) as archive:
-                archive.extractall(extracted)
+                archive.extractall(extracted, filter="data")
             accepted = VERIFY_CODE.verify(extracted, expected_revision=revision)
             self.assertEqual(accepted["decision"], "ACCEPT_CODE_BUNDLE")
             (extracted / "payload.py").write_text("VALUE = 2\n", encoding="utf-8")

@@ -6,6 +6,8 @@ import sys
 import tomllib
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENT = ROOT / "experiments/631_public603_four_seed_refit"
 
@@ -54,4 +56,6 @@ def test_builder_accepts_only_verified_manifest_and_runtime() -> None:
     assert metrics["schema_valid"] is True
     assert metrics["projected_public_minutes"] <= 20.0
     assert metrics["projected_private_minutes"] <= 40.0
+    if not (EXPERIMENT / "submission/adapter_qwen35/adapter_model.safetensors").is_file():
+        pytest.skip("binary adapters are intentionally published separately")
     builder.verify_production_manifest()

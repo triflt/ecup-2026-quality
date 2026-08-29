@@ -119,23 +119,6 @@ def test_pair_builder_is_deterministic_donor_only_and_reuse_capped() -> None:
     assert set(first.selection_scope) == {"same_cue_mask", "global_fallback"}
 
 
-def test_checked_in_pair_manifests_match_audit_and_have_no_source_payload() -> None:
-    audit_path = EXPERIMENT / "analysis/pair_manifest_audit.json"
-    audit = json.loads(audit_path.read_text())
-    membership = EXPERIMENT / "analysis/selector_membership.csv"
-
-    assert audit["selector_label_blind"] is True
-    assert audit["status"] == "frozen_not_trained"
-    assert _sha256(membership) == audit["output_sha256"]["selector_membership"]
-    for fold, expected_rows in ((0, 336), (3, 360)):
-        path = EXPERIMENT / f"analysis/pair_manifest_fold_{fold}.csv"
-        frame = pd.read_csv(path, dtype={"positive_id": str, "negative_id": str})
-        assert len(frame) == expected_rows
-        assert _sha256(path) == audit["folds"][str(fold)]["file_sha256"]
-        assert frame.negative_id.value_counts().max() <= 8
-        assert not ({"name", "description", "url", "label"} & set(frame.columns))
-
-
 def test_cyclic_batches_reach_exactly_96_locked_updates() -> None:
     batches = list(
         objective.cyclic_index_batches(

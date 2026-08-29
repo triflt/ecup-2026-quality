@@ -9,8 +9,12 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 GRID = ROOT / "experiments/645_qwen_scale_2x3_gate"
-if str(GRID) not in sys.path:
-    sys.path.insert(0, str(GRID))
+while str(GRID) in sys.path:
+    sys.path.remove(str(GRID))
+sys.path.insert(0, str(GRID))
+
+for module_name in ("grid_contract", "verify_training_artifact"):
+    sys.modules.pop(module_name, None)
 
 import grid_contract
 import verify_training_artifact
