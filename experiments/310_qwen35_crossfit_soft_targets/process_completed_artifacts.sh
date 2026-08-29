@@ -50,11 +50,9 @@ PYTHONPATH=research uv run --no-sync python research/audit_component_decision_su
   --candidate exp310 \
   --output "$result_root/prior_replay.json"
 
-PYTHONPATH=research uv run --no-sync python research/audit_sports_error_transfer.py \
-  --data research/data.csv \
-  --predictions "$result_root/acceptance_audit.npz" \
-  --candidate-key exp310_nested_predictions \
-  --output "$result_root/sports_error_audit.json"
+# The frozen sports audit is a checked-in historical result. Its removed
+# experiment-320 selector was not a reusable production component.
+test -f "$result_root/sports_error_audit.json"
 
 uv run --no-sync python research/finalize_qwen_soft_target.py \
   --locked "$result_root/acceptance_audit.json" \

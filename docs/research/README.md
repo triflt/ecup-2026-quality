@@ -22,3 +22,5 @@ it is available.
 [`archive/`](archive/) contains dated investigations that explain past decisions
 but are not required to run solution 140. They are kept out of the top-level
 navigation to avoid presenting historical diagnostics as current instructions.
+The compact index of experiment packages removed from the review surface is
+[`archive/removed-experiments-through-652.md`](archive/removed-experiments-through-652.md).

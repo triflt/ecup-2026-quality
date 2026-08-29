@@ -1,9 +1,0 @@
-{
-  "experiment_id": "625",
-  "status": "skipped_by_gate",
-  "validation_complete": false,
-  "gpu_jobs_launched": 0,
-  "sealed_holdout_used": false,
-  "metrics": {},
-  "decision": "SKIPPED_NO_ACCEPTED_624_RECIPE"
-}

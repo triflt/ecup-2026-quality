@@ -501,7 +501,7 @@ def parse_args() -> argparse.Namespace:
         action="append",
         type=Path,
         default=None,
-        help="Repeatable; defaults to all files below experiments 490 and 500.",
+        help="Repeatable; defaults to experiment 490 and the frozen exp500 exclusion audit.",
     )
     return parser.parse_args()
 
@@ -510,7 +510,7 @@ def main() -> None:
     args = parse_args()
     roots = args.legacy_audit_root or [
         REPOSITORY / "experiments/490_evidence_grounded_explanations",
-        REPOSITORY / "experiments/500_transaction_scope_position_aug",
+        REPOSITORY / "validation/legacy_exclusions/exp500_semantic_audit.json",
     ]
     summary = build_preflight(
         features_path=args.features,

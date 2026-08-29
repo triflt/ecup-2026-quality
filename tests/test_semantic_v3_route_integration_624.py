@@ -23,12 +23,6 @@ def _module(name: str, path: Path):
 
 
 evaluator = _module("exp624_route_test", EXP / "evaluate.py")
-seed625 = _module(
-    "exp625_seed_manifest_test",
-    ROOT / "experiments/625_semantic_v3_independent_seed/run_fold.py",
-)
-
-
 def _synthetic(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, *, improve: bool = True):
     tmp_path.mkdir(parents=True, exist_ok=True)
     ids: list[str] = []
@@ -114,7 +108,7 @@ def _synthetic(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, *, improve: bool
     }
 
 
-def test_accepts_only_full_route_gain_and_emits_manifest_for_625(
+def test_accepts_only_full_route_gain_and_emits_signed_manifest(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     arguments = _synthetic(monkeypatch, tmp_path)
@@ -135,7 +129,9 @@ def test_accepts_only_full_route_gain_and_emits_manifest_for_625(
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     payload = {key: value for key, value in manifest.items() if key != "manifest_sha256"}
     assert manifest["manifest_sha256"] == evaluator.canonical_sha256(payload)
-    seed625.verify_route_manifest(manifest_path, seed625.load_spec())
+    assert manifest["schema_version"] == "exp624_route_recipe_v1"
+    assert manifest["experiment_id"] == "624"
+    assert manifest["uses_sealed_holdout"] is False
 
 
 def test_rejection_keeps_original_route_and_emits_no_recipe_manifest(

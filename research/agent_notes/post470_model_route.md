@@ -207,7 +207,7 @@ pairwise screen не проходит, закрыть supervised InternVL specia
 Локальные первичные артефакты:
 
 - `experiments/440_qwen3vl_rdrop/results/metrics.json`;
-- `experiments/450_flammable_transaction_scope/results/acceptance_audit.json`;
+- `docs/research/archive/removed-experiments-through-652.md` (experiment 450 summary);
 - `experiments/460_qwen3vl_embedding/results/metrics.json` и
   `results/acceptance_audit.json`;
 - `experiments/290_minicpm_v46_visual_screen/results/metrics.json` и

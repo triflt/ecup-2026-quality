@@ -114,7 +114,7 @@ python validation/build_folds.py --data /path/to/train.csv
 | [`validation/`](validation/) | Frozen folds, sealed protocols и integrity manifests |
 | [`experiments/`](experiments/) | Воспроизводимые проверки с выводом и финальные кандидаты |
 | [`components/`](components/) | Переиспользуемые компоненты решения и их provenance |
-| [`reports/`](reports/) | Champion, журнал экспериментов, submissions и hypothesis board |
+| [`reports/`](reports/) | Champion, журнал экспериментов, submissions и локальный leaderboard |
 | [`docs/`](docs/) | Правила, методология, исследования и текущее состояние |
 | [`templates/experiment/`](templates/experiment/) | Шаблон нового experiment package |
 
@@ -124,7 +124,7 @@ python validation/build_folds.py --data /path/to/train.csv
 
 - [`experiments/README.md`](experiments/README.md) — компактная карта ключевых серий;
 - [`reports/experiment-log.csv`](reports/experiment-log.csv) — полный журнал измерений;
-- [`reports/hypothesis-board.csv`](reports/hypothesis-board.csv) — активные и закрытые гипотезы;
+- [`docs/research/archive/removed-experiments-through-652.md`](docs/research/archive/removed-experiments-through-652.md) — краткие выводы удалённых незапущенных и терминально отклонённых веток;
 - [`docs/current-status.md`](docs/current-status.md) — компактное текущее состояние без оперативных черновиков.
 
 ## Соответствие правилам

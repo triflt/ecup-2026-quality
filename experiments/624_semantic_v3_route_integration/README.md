@@ -30,5 +30,6 @@ thresholds are fitted exclusively on the other four folds. There is no trained
 second-level router and no second candidate variant. The full route is accepted
 only if all frozen classification, component-bootstrap, category and false
 negative gates pass. On acceptance, the evaluator emits a canonically signed
-`exp624_route_recipe_v1` manifest consumed by experiment 625. On rejection it
-emits no recipe manifest and preserves original route 603.
+`exp624_route_recipe_v1` manifest for a possible independent-seed continuation.
+The actual gate rejected the candidate, so no manifest was emitted and the
+unlaunched experiment-625 scaffold was removed. Original route 603 is preserved.

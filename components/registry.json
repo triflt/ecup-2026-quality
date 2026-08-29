@@ -201,25 +201,6 @@
       "status": "rejected_offline"
     },
     {
-      "component_id": "bad_regulatory_selector_v1",
-      "type": "selector_manifest",
-      "role": "label-blind BAD regulatory evidence cohort and frozen residual features",
-      "canonical_path": "experiments/320_bad_regulatory_evidence/artifacts/bad_regulatory_selector_v1.csv.gz",
-      "sha256": "d254eba1c8d14114b982beee3877c3c8e361be8c83e4de2690e44b140ca195c1",
-      "size_bytes": 431391,
-      "producer_experiments": ["320_bad_regulatory_evidence"],
-      "used_by_experiments": ["320_bad_regulatory_evidence"],
-      "parent_component_ids": ["qwen35_lora_hard_seed42_v130"],
-      "single_changed_factor": "local family-weighted linear residual restricted to a predeclared regulatory BAD selector",
-      "training": "not trained; selector uses only text cues, locked score, connected-component identity and predeclared interactions; labels and predictions are absent",
-      "data_version": "competition_train_v1",
-      "evaluation_versions": ["component_transfer_gate_v4", "component_transfer_gate_v3", "component_transfer_gate_v2", "connected_family_repeated_v1"],
-      "known_results": [{"evaluation": "selector_integrity", "rows": 6210, "connected_safe_rows": 5439, "unsafe_rows_excluded": 771, "unique_ids": true, "forbidden_columns": 0}, {"evaluation": "component_transfer_gate_v4", "historical_macro_f1": 0.923197377241495, "historical_baseline_macro_f1": 0.9234086336846878, "historical_delta": -0.0002112564431928643, "historical_folds_won": 2, "connected_safe_delta": -0.0002144450400286546, "connected_repeat_mean_delta": 0.00013005591081982626, "macro_delta_after_priors": -0.0006531423543073567, "accepted_for_full_refit": false}],
-      "consumers": ["320_bad_regulatory_evidence"],
-      "production_status": "not_production",
-      "status": "rejected_offline"
-    },
-    {
       "component_id": "production_disagreement_selector_v330",
       "type": "selective_gate_candidate",
       "role": "Label-blind two-of-three reliability gate over production scores",
@@ -533,38 +514,6 @@
       "status": "rejected_at_screen"
     },
     {
-      "component_id": "flammable_transaction_scope_svc_v450",
-      "type": "cross_fitted_scope_text_rank",
-      "base_model": "LinearSVC over frozen label-blind transaction-scope view",
-      "role": "Independent flammable score for product-versus-included-content relations",
-      "canonical_path": null,
-      "producer_experiments": ["450_flammable_transaction_scope"],
-      "used_by_experiments": ["450_flammable_transaction_scope"],
-      "parent_component_ids": ["qwen35_category_router_v400"],
-      "single_changed_factor": "Add title plus frozen scope-sentence representation to the flammable route",
-      "training": "Five-fold cross-fit; word 1-2 and char 3-5 TF-IDF; balanced LinearSVC C=1; no teacher",
-      "data_version": "competition_train_v1",
-      "evaluation_versions": ["flammable_transaction_scope_nested_v1", "connected_family_guard_v2"],
-      "artifact_sha256": null,
-      "known_results": [
-        {
-          "evaluation": "flammable_transaction_scope_nested_v1",
-          "macro_delta": -0.0067443883313643704,
-          "flammable_delta": -0.01348877666272863,
-          "folds_won": 0,
-          "corrected": 1,
-          "regressed": 6,
-          "flammable_false_negative_delta": 4,
-          "connected_safe_delta": -0.007047619047618969,
-          "connected_bootstrap_probability_positive": 0.0158,
-          "accepted": false
-        }
-      ],
-      "consumers": ["450_flammable_transaction_scope"],
-      "production_status": "not_production",
-      "status": "rejected_offline"
-    },
-    {
       "component_id": "qwen3vl_embedding_multimodal_v460",
       "type": "multimodal_embedding_linear_head",
       "base_model": "Qwen/Qwen3-VL-Embedding-2B",
@@ -614,7 +563,7 @@
       "role": "Independent-seed confirmation component for the fixed alpha-0.50 original/specialist merge",
       "canonical_path": "experiments/470_qwen35_adapter_soup_seed_repeat/artifacts/seed_31415",
       "producer_experiments": ["470_qwen35_adapter_soup_seed_repeat"],
-      "used_by_experiments": ["470_qwen35_adapter_soup_seed_repeat", "480_qwen35_fisher_blockwise_soup"],
+      "used_by_experiments": ["470_qwen35_adapter_soup_seed_repeat"],
       "parent_component_ids": ["qwen35_lora_hard_seed31415_v230"],
       "single_changed_factor": "Repeat the experiment-260 specialist recipe at seed 31415 and merge with the same-seed original at fixed alpha 0.50",
       "training": "One epoch seed-31415 specialist training with the frozen experiment-260 selector on folds 0 and 3; exact effective-LoRA concatenation",
@@ -622,28 +571,9 @@
       "evaluation_versions": ["qwen35_adapter_soup_seed_repeat_screen_v1", "connected_family_guard_v2"],
       "artifact_sha256": null,
       "known_results": [{"mean_macro_delta": 0.0010014821936465967, "fold_macro_deltas": [-0.00015837820715858264, 0.0040584415584415945], "corrected": 4, "regressed": 4, "accepted": false}],
-      "consumers": ["470_qwen35_adapter_soup_seed_repeat", "480_qwen35_fisher_blockwise_soup"],
+      "consumers": ["470_qwen35_adapter_soup_seed_repeat"],
       "production_status": "not_production",
       "status": "rejected_at_screen"
-    },
-    {
-      "component_id": "qwen35_fisher_blockwise_soup_v480",
-      "type": "one_pass_rank32_blockwise_lora_merge",
-      "base_model": "Qwen/Qwen3.5-4B",
-      "role": "Train-only block-importance merge of the same-seed original and flammable specialist adapters",
-      "canonical_path": null,
-      "producer_experiments": ["480_qwen35_fisher_blockwise_soup"],
-      "used_by_experiments": ["480_qwen35_fisher_blockwise_soup"],
-      "parent_component_ids": ["qwen35_lora_adapter_soup_seed31415_v470"],
-      "single_changed_factor": "Replace global alpha 0.50 with per-block normalized Fisher coefficients estimated without holdout labels",
-      "training": "No optimizer step; train-fold-only mean squared LoRA gradients on broad-original and rare-flammable calibration sets",
-      "data_version": "competition_train_v1",
-      "evaluation_versions": ["qwen35_fisher_blockwise_soup_screen_v1", "connected_family_guard_v2"],
-      "artifact_sha256": null,
-      "known_results": [],
-      "consumers": ["480_qwen35_fisher_blockwise_soup"],
-      "production_status": "not_production",
-      "status": "prepared_not_launched"
     }
   ]
 }

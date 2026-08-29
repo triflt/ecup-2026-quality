@@ -240,8 +240,7 @@ solid-fuel и ignition cohorts, а не происходят из одной п�
 - `experiments/400_qwen35_category_routed_adapters/analysis/residual_errors.csv`
 - `experiments/430_qwen35_flammable_adapter_soup/results/acceptance_audit.json`
 - `experiments/430_qwen35_flammable_adapter_soup/results/nested_predictions.npz`
-- `experiments/450_flammable_transaction_scope/results/acceptance_audit.json`
-- `experiments/450_flammable_transaction_scope/results/nested_predictions.npz`
+- `docs/research/archive/removed-experiments-through-652.md` (experiment 450 summary)
 - `experiments/460_qwen3vl_embedding/results/acceptance_audit.json`
 - `experiments/460_qwen3vl_embedding/results/nested_predictions.npz`
 - `experiments/470_qwen35_adapter_soup_seed_repeat/README.md`
