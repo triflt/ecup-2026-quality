@@ -1,0 +1,60 @@
+[experiment]
+id = "713"
+slug = "qwen35_4b_rationale_then_label"
+title = "Qwen3.5-4B autoregressive rationale with label-last target"
+status = "secondary_candidate_waiting_user_approval"
+entrypoint = "experiments/713_qwen35_4b_rationale_then_label/trainer.py"
+result_file = "experiments/713_qwen35_4b_rationale_then_label/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+teacher_experiment = "712_qwen35_397b_evidence_teacher"
+outer_train_only_targets = true
+validation_teacher_targets_used_for_training = false
+max_student_image_index = 0
+cv5_folds = "grouped_text_v1"
+cv5_folds_sha256 = "03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d"
+historical_oof_sha256 = "d78bb7df897e244e030fa388e1b9c770d15434cc33aa1f56b238c7d057646116"
+image0_source = "solution140_runtime_source_bytes_and_in_memory_preprocessing"
+
+[hypothesis]
+changed_factor = "Replace the one-digit Qwen3.5-4B assistant target with compact reason/evidence/explanation JSON followed by LABEL as the final character"
+mechanism = "Autoregressively reconstructing decision-bearing evidence before the verdict may force the same 4B adapter to encode sold-object and policy relations instead of shortcutting directly to the digit"
+falsification = "Reject if supported target coverage is below 85% overall, label-last parse rate is below 99.5%, either connected-safe fold 0 or 3 loses Macro F1 versus the exact matched-support digit-only control, aggregate false negatives rise, or generated evidence fails grounding checks; report category-label coverage imbalance separately"
+
+[training]
+model = "Qwen/Qwen3.5-4B"
+model_revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+parent_recipe = "research/qwen3vl_lora_holdout.py"
+screen_folds = [0, 3]
+epochs = 1
+seed = 42
+micro_batch_size = 2
+gradient_accumulation = 8
+effective_batch_size = 16
+max_sequence_length = 2304
+max_generation_tokens = 384
+loss = "unit-weight causal CE over the full assistant sequence"
+label_position = "final_character_before_eos"
+changes_training_records = true
+changes_steps = true
+requires_matched_support_digit_control = true
+hyperparameter_grid = false
+require_exact_untruncated_supervised_target = true
+network_image_download = false
+
+[acceptance]
+min_target_coverage = 0.85
+cell_coverage_is_warning_not_artifact_rejection = true
+min_label_parse_rate = 0.995
+require_each_fold_macro_delta_positive = true
+max_false_negative_increase = 0
+require_exact_evidence_rate = 1.0
+
+[budget]
+planned_gpu_hours = 2.5
+planned_public_submissions = 0
+
+[artifacts]
+directory = "artifacts"
+publish = false
