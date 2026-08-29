@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Путь Public Macro F1 к решению 140</title>
+  <desc id="desc">Ключевые отправки: ранний text baseline 0.4790, сильный TF-IDF 0.7130, Qwen3-VL embedding 0.7220, late fusion 0.8066, сложный advanced ensemble 0.7855 и решение 140 0.8924.</desc>
+  <defs>
+    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7c3aed" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#7c3aed" stop-opacity="0.01"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .t { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #172033; }
+      .m { fill: #637083; }
+      .grid { stroke: #dfe4ee; stroke-width: 1; }
+      @media (prefers-color-scheme: dark) { .t { fill: #e5e7eb; } .m { fill: #aab4c3; } .grid { stroke: #384152; } }
+    </style>
+  </defs>
+  <rect width="1200" height="680" rx="28" fill="#f8fafc"/>
+  <text class="t" x="72" y="68" font-size="34" font-weight="850">От baseline к решению 140</text>
+  <text class="t m" x="72" y="101" font-size="17">Public рос не от усложнения само по себе, а от независимых сигналов и честной интеграции.</text>
+
+  <g>
+    <line class="grid" x1="112" y1="479" x2="1080" y2="479"/>
+    <line class="grid" x1="112" y1="396" x2="1080" y2="396"/>
+    <line class="grid" x1="112" y1="313" x2="1080" y2="313"/>
+    <line class="grid" x1="112" y1="231" x2="1080" y2="231"/>
+    <line class="grid" x1="112" y1="148" x2="1080" y2="148"/>
+    <text class="t m" x="94" y="485" font-size="14" text-anchor="end">0.50</text>
+    <text class="t m" x="94" y="402" font-size="14" text-anchor="end">0.60</text>
+    <text class="t m" x="94" y="319" font-size="14" text-anchor="end">0.70</text>
+    <text class="t m" x="94" y="237" font-size="14" text-anchor="end">0.80</text>
+    <text class="t m" x="94" y="154" font-size="14" text-anchor="end">0.90</text>
+    <text class="t m" transform="translate(30 340) rotate(-90)" font-size="14" text-anchor="middle">Public Macro F1</text>
+  </g>
+
+  <path d="M130 496 L310 303 L490 296 L670 225 L850 243 L1030 155 L1030 530 L130 530 Z" fill="url(#area)"/>
+  <path d="M130 496 L310 303 L490 296 L670 225 L850 243 L1030 155" fill="none" stroke="#7c3aed" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g font-family="Inter,system-ui,sans-serif">
+    <circle cx="130" cy="496" r="9" fill="#7c3aed" stroke="#ffffff" stroke-width="4"/>
+    <text class="t" x="130" y="467" text-anchor="middle" font-size="18" font-weight="800">0.4790</text>
+    <text class="t" x="130" y="560" text-anchor="middle" font-size="15" font-weight="700">ранний text</text>
+    <text class="t m" x="130" y="581" text-anchor="middle" font-size="13">baseline</text>
+
+    <circle cx="310" cy="303" r="9" fill="#7c3aed" stroke="#ffffff" stroke-width="4"/>
+    <text class="t" x="310" y="274" text-anchor="middle" font-size="18" font-weight="800">0.7130</text>
+    <text class="t" x="310" y="560" text-anchor="middle" font-size="15" font-weight="700">strong TF-IDF</text>
+    <text class="t m" x="310" y="581" text-anchor="middle" font-size="13">experiment 000</text>
+
+    <circle cx="490" cy="296" r="9" fill="#7c3aed" stroke="#ffffff" stroke-width="4"/>
+    <text class="t" x="490" y="267" text-anchor="middle" font-size="18" font-weight="800">0.7220</text>
+    <text class="t" x="490" y="560" text-anchor="middle" font-size="15" font-weight="700">VL embedding</text>
+    <text class="t m" x="490" y="581" text-anchor="middle" font-size="13">experiment 030</text>
+
+    <circle cx="670" cy="225" r="9" fill="#7c3aed" stroke="#ffffff" stroke-width="4"/>
+    <text class="t" x="670" y="196" text-anchor="middle" font-size="18" font-weight="800">0.8066</text>
+    <text class="t" x="670" y="560" text-anchor="middle" font-size="15" font-weight="700">late fusion</text>
+    <text class="t m" x="670" y="581" text-anchor="middle" font-size="13">experiment 040</text>
+
+    <circle cx="850" cy="243" r="9" fill="#ef6a73" stroke="#ffffff" stroke-width="4"/>
+    <text x="850" y="214" text-anchor="middle" font-size="18" font-weight="800" fill="#c23b49">0.7855</text>
+    <text class="t" x="850" y="560" text-anchor="middle" font-size="15" font-weight="700">advanced mix</text>
+    <text class="t m" x="850" y="581" text-anchor="middle" font-size="13">переобучение · 090</text>
+
+    <circle cx="1030" cy="155" r="13" fill="#14b8a6" stroke="#ffffff" stroke-width="5" filter="url(#glow)"/>
+    <text x="1030" y="120" text-anchor="middle" font-size="22" font-weight="900" fill="#087f73">0.8924</text>
+    <text class="t" x="1030" y="560" text-anchor="middle" font-size="16" font-weight="800">решение 140</text>
+    <text class="t m" x="1030" y="581" text-anchor="middle" font-size="13">dual LoRA + memory</text>
+  </g>
+
+  <g transform="translate(715 340)">
+    <rect width="385" height="112" rx="18" fill="#ffffff" stroke="#d9deea"/>
+    <circle cx="31" cy="32" r="7" fill="#ef6a73"/>
+    <text class="t" x="50" y="38" font-size="16" font-weight="750">Сложнее ≠ лучше</text>
+    <text class="t m" x="30" y="69" font-size="14">Experiment 090 улучшал локальную картину,</text>
+    <text class="t m" x="30" y="91" font-size="14">но потерял 0.0211 Public относительно late fusion.</text>
+  </g>
+
+  <text class="t m" x="72" y="638" font-size="13">Источник: reports/submissions.csv · показаны ключевые неизменяемые отправки, а не все эксперименты.</text>
+</svg>

@@ -19,6 +19,9 @@ The category-specific fusion weights are selected inside the four development
 folds and applied to the held-out outer fold. The submitted archive obtained
 Public Macro F1 `0.8923976821312729`.
 
+For a visual, reviewer-oriented account of the data and decisive ablations, see
+[`How we arrived at solution 140`](../../../docs/research/solution-140-journey.md).
+
 ## Review map
 
 | Question | Document or source |

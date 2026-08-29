@@ -4,6 +4,10 @@ This directory contains the compact written record behind solution 140 and the
 later ablations. It is organised by purpose so that the finalist narrative is
 separate from historical debugging.
 
+Start with [`solution-140-journey.md`](solution-140-journey.md): it is the
+reviewer-friendly story of the data, decisive experiments, final architecture
+and validation policy, with links back to the exact evidence.
+
 ## Foundations
 
 - [`foundations/literature-and-competitions.md`](foundations/literature-and-competitions.md) — external precedents and transfer hypotheses.
