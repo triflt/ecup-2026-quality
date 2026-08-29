@@ -1,0 +1,14 @@
+id = 709
+slug = "gemma4_lora_epoch_sweep"
+status = "CONFIRMATION_REQUIRED"
+public_used = false
+parent = 703
+fold = 0
+epochs = 5
+ranks = [16, 32, 64]
+alphas = [32, 64, 128]
+architectures = ["gemma4_e2b", "gemma4_e4b"]
+changed_factor = "multimodal_backbone"
+checkpoints_evaluated = 30
+selected_arm = "gemma4_e4b_r16"
+selected_epoch = 4

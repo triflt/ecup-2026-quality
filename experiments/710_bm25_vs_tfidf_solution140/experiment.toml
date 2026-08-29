@@ -1,0 +1,10 @@
+id = 710
+slug = "bm25_vs_tfidf_solution140"
+status = "READY_TO_EVALUATE"
+public_used = false
+parent = 140
+evaluation_folds = 5
+changed_factor = "tfidf_text_rank_to_bm25_retrieval_score"
+bm25_top_k = 30
+bm25_ngram_range = [1, 2]
+bm25_min_df = 2
