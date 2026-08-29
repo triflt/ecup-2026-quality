@@ -1,48 +1,74 @@
-# План исследования
+# План до финального решения
 
-## Завершено
+Цель репозитория — не сохранить максимальное число экспериментов, а довести
+**решение 140** до состояния, в котором жюри может понять его, воспроизвести
+кодовый путь и проверить ровно тот архив, который получил результат на Public.
 
-- полный аудит train/image export;
-- grouped и duplicate-stress validation;
-- text, embedding и late-fusion baselines;
-- first-image, multi-view, cross-modal и tree heads;
-- PaddleOCR hard-case branch;
-- Qwen3-VL, Qwen3.5 и Gemma LoRA ablations;
-- nested fusion calibration;
-- exact/name, numeric-family, shingle, image-hash и neighbour priors;
-- official-container schema/runtime smokes;
-- Public calibration сложного и устойчивого ensemble.
-- Public 0.8919244237 у Dual-LoRA с поиском похожих карточек.
-- второй независимый Qwen3.5 seed и честное среднее вероятностей;
-- grouped bootstrap и подробный анализ ошибок двух seed;
-- точное однопроходное объединение LoRA ранга 32, отклонённое по пяти folds;
-- двухпроходная сборка с проверенным Public-временем 14.23 минуты.
+## Текущее состояние
 
-## В работе
+- Канонический классификационный кандидат: **решение 140**.
+- Зафиксированный Public Macro F1: **0.8923976821**.
+- Историческая nested CV-5 fusion: **0.9118425206**.
+- Число **0.942878** относится к более оптимистичной recurrence simulation и
+  не является текущей оценкой переноса на новые товарные семейства.
+- Для новых архитектурных выводов используется только полный
+  `semantic_family_v3`; исторические результаты `grouped_text_v1` остаются для
+  сопоставимости с решением 140.
+- Технический handoff собран в
+  [`experiments/140_dual_lora_fusion/final/`](../experiments/140_dual_lora_fusion/final/).
 
-- семейно-сбалансированное обучение положительных flammable-семейств;
-- семейно-разнообразный отбор положительных БАД и полное покрытие отрицательных семейств БАД;
-- семейно-разнообразный отбор отрицательных flammable-примеров оставлен ниже по приоритету: у текущего лидера там только 18 ложноположительных ошибок;
-- выбор единственного Public-кандидата после пятифолдового решения.
+## Уже завершено
 
-## Запланировано
+- сильный text/embedding baseline и две rsLoRA-ветки Qwen;
+- честная пятифолдовая агрегация OOF и nested fusion;
+- category-specific fusion решения 140;
+- immutable SHA отправленного архива и подтверждённый Public-result;
+- schema/runtime smokes официального entrypoint;
+- аудит расхождения исторической CV-5 и более строгой semantic-family проверки;
+- локальный semantic-v3 leaderboard;
+- отдельный review-пакет решения 140 и автоматический repository verifier;
+- очистка навигации по reports/research и удаление незавершённого pre-GPU
+  scaffold без метрик.
 
-- Private result logging;
-- устойчивое к ошибкам меток обучение;
-- воспроизводимая разметка спорных случаев большой открытой моделью;
-- отдельный классификатор свойств легковоспламеняющихся товаров;
-- второй финальный candidate с orthogonal failure mode;
-- финальный full-data refit только после фиксации architecture/configuration.
+## Обязательно закрыть до финальной публикации
 
-## Отклонено
+1. **Опубликовать веса и артефакты.** Для двух LoRA adapters и classifier
+   bundles записать публичные immutable URI, размер и SHA-256 в
+   `artifact-contract.json`.
+2. **Закрыть exact replay.** Опубликовать три frozen OOF-массива либо ссылки на
+   них с уже записанными SHA-256 и схемой колонок.
+3. **Проверить чистую сборку.** Из нового checkout собрать архив, провести
+   network-disabled smoke, записать SHA итогового ZIP.
+4. **Повторить runtime/size gate.** Зафиксировать реальное время Check/Public/
+   Private projection и размеры ZIP/Docker уже для финального набора весов.
+5. **Закрыть explanation gate.** Объяснение должно быть связано с конкретными
+   признаками карточки, не менять classification verdict и пройти слепую ручную
+   проверку.
+6. **Обновить публичный README.** Заменить плейсхолдеры названием, коротким
+   объяснением архитектуры и одной проверенной командой запуска.
 
-- direct text/VLM prompting как основная модель;
-- hard regex overrides;
-- ID, character-TFIDF и rare-token neighbour priors;
-- aggressive clean filtering;
-- Qwen3-VL multi-image LoRA;
-- Gemma в primary fusion;
-- logistic meta-stacker;
-- OCR поверх сильной LoRA fusion;
-- image-hash prior.
-- точное rank-32 объединение двух Qwen3.5 LoRA.
+## Правило следующих экспериментов
+
+Новая модель или компонент продолжается только если заранее записаны baseline,
+протокол, метрики принятия и ожидаемая роль в deployable решении. Быстрый
+one/two-fold screen может только отклонить гипотезу. Promotion требует полного
+`semantic_family_v3`, выигрыша большинства folds, положительной pooled-дельты,
+неухудшения редкого класса и прохождения runtime/size gate.
+
+Public используется как редкий независимый сигнал переноса. Отправляется один
+заранее выбранный immutable кандидат с записанным SHA; Public нельзя превращать
+в цикл подбора порогов между множеством почти одинаковых архивов.
+
+## Сохранённые отрицательные выводы
+
+В репозитории остаются измеренные отрицательные эксперименты, которые запрещают
+повторять уже проверенные ветки: direct prompting, hard overrides, aggressive
+clean filtering, multi-image LoRA, Gemma в primary fusion, logistic stacker,
+OCR поверх сильной fusion, adapter soups без стабильного fold-переноса и
+distillation/ranking варианты, не прошедшие frozen gates.
+
+Подробные численные результаты находятся в [`reports/`](../reports/), текущий
+локальный рейтинг — в
+[`reports/semantic-v3-leaderboard.csv`](../reports/semantic-v3-leaderboard.csv),
+а критерии готовности — в
+[`docs/hackathon/repository-readiness.md`](hackathon/repository-readiness.md).
