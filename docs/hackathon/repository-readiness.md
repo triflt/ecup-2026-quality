@@ -1,33 +1,32 @@
-# Repository readiness for solution 140
+# Готовность репозитория решения 140
 
-This is an evidence-based readiness audit, not an invented jury score. The
-organizers evaluate the executable solution, Public/Private Macro F1, compliance
-with the rules and the quality of explanations. Repository quality matters
-because it must make those claims reproducible and auditable.
+Это проверка по фактам, а не выдуманный балл жюри. Организаторы оценивают
+исполняемое решение, Macro F1 на Public и Private, соблюдение правил и качество
+объяснений. Репозиторий должен позволить воспроизвести и проверить каждое из
+этих утверждений.
 
-The source requirements are summarized in
-[`task-and-rules.md`](task-and-rules.md).
+Исходные требования собраны в [`task-and-rules.md`](task-and-rules.md).
 
-| Criterion | Status | Evidence | Remaining action |
+| Критерий | Статус | Подтверждение | Что осталось |
 |---|---|---|---|
-| Official `-i/-o` launch | PASS | [`submission/run.py`](../../experiments/140_dual_lora_fusion/submission/run.py), repository verifier | Repeat in final immutable archive |
-| Output CSV and tag schema | PASS | formatter guard and [`test_solution_140_repository.py`](../../tests/test_solution_140_repository.py) | Repeat schema smoke with published weights |
-| Offline inference | PASS (source path) | top-level import audit and local-only image URI contract in [`verify.py`](../../experiments/140_dual_lora_fusion/final/verify.py) | Container-level network-disabled smoke |
-| Macro F1 evidence | PASS | [`EVALUATION.md`](../../experiments/140_dual_lora_fusion/final/EVALUATION.md), [`champion.json`](../../reports/champion.json) | Do not mix historical nested and semantic-v3 rows |
-| Public result provenance | PASS | immutable archive SHA and Public `0.8923976821` in [`champion.json`](../../reports/champion.json) | Private score remains unknown |
-| Explanation specificity | BLOCKED | explicit `final_readiness.explanations=false` | Finish the independent explanation gate |
-| Runtime limits | PASS (historical) | 600-row smoke: 228.76 s; projected 10.17/24.15 min | Replay unchanged final archive |
-| Archive/image size | PENDING | limits and required artifacts documented | Record final ZIP and image sizes after weights are published |
-| Training reproducibility | PASS (code path) | [`REPRODUCE.md`](../../experiments/140_dual_lora_fusion/final/REPRODUCE.md) | Publish immutable OOF/artifact references |
-| Exact historical replay | PENDING | frozen expected SHAs are recorded | Publish the three OOF arrays or immutable references |
-| Model/data provenance | PASS (metadata) | [`MODEL_AND_DATA_CARD.md`](../../experiments/140_dual_lora_fusion/final/MODEL_AND_DATA_CARD.md), registries | Add final model/processor revision hashes with weights |
-| No forbidden external data | PASS (declared) | [`datasets/registry.toml`](../../datasets/registry.toml) and dataset audit | Re-run audit on final train manifest |
-| Synthetic-data compliance | NOT USED BY SOLUTION 140 | solution 140 does not depend on a synthetic branch | If a synth branch replaces a component, publish generator/model/license/method |
+| Официальный запуск `-i/-o` | ГОТОВО | [`submission/run.py`](../../experiments/140_dual_lora_fusion/submission/run.py), автоматическая проверка репозитория | Повторить на финальном неизменяемом архиве |
+| CSV и схема тегов | ГОТОВО | Проверка форматирования и [`test_solution_140_repository.py`](../../tests/test_solution_140_repository.py) | Повторить после публикации весов |
+| Офлайн-инференс | ГОТОВО ПО КОДУ | Аудит импортов и контракт локальных изображений в [`verify.py`](../../experiments/140_dual_lora_fusion/final/verify.py) | Запустить контейнер с отключённой сетью |
+| Подтверждение Macro F1 | ГОТОВО | [`EVALUATION.md`](../../experiments/140_dual_lora_fusion/final/EVALUATION.md), [`champion.json`](../../reports/champion.json) | Не смешивать историческую CV и `semantic_family_v3` |
+| Происхождение Public-результата | ГОТОВО | SHA архива и Public `0.8923976821` в [`champion.json`](../../reports/champion.json) | Результат Private пока неизвестен |
+| Конкретность объяснений | НЕ ГОТОВО | `final_readiness.explanations=false` | Завершить независимую проверку объяснений |
+| Ограничение по времени | ГОТОВО ИСТОРИЧЕСКИ | 600 строк за 228,76 с; расчётно 10,17 / 24,15 мин | Повторить на неизменённом финальном архиве |
+| Размер архива и образа | ОЖИДАЕТ | Ограничения и список артефактов описаны | Записать размеры ZIP и образа после публикации весов |
+| Воспроизводимость обучения | ГОТОВО ПО КОДУ | [`REPRODUCE.md`](../../experiments/140_dual_lora_fusion/final/REPRODUCE.md) | Опубликовать неизменяемые ссылки на OOF и веса |
+| Точное повторение исторической метрики | ОЖИДАЕТ | Ожидаемые SHA уже записаны | Опубликовать три OOF-массива или ссылки на них |
+| Происхождение моделей и данных | ГОТОВО ПО МЕТАДАННЫМ | [`MODEL_AND_DATA_CARD.md`](../../experiments/140_dual_lora_fusion/final/MODEL_AND_DATA_CARD.md), реестры | Добавить версии модели и процессора вместе с весами |
+| Нет запрещённых внешних данных | ЗАЯВЛЕНО И ПРОВЕРЯЕМО | [`datasets/registry.toml`](../../datasets/registry.toml), аудит данных | Повторить аудит на финальном манифесте обучения |
+| Синтетические данные | НЕ ИСПОЛЬЗУЮТСЯ | Решение 140 не зависит от синтетической ветки | Если синтетика заменит компонент, опубликовать модель генератора, лицензию и метод |
 
-## Honest conclusion
+## Вывод
 
-The classification repository for solution 140 is reviewable and its code path
-is reproducible. It is not yet a fully closed finalist artifact because binary
-weights/OOF references, a fresh immutable runtime-size replay and the explanation
-gate are still outstanding. Those gaps are explicit and machine-checkable; no
-historical local score is presented as a substitute for them.
+Классификационная часть решения 140 доступна для проверки, а кодовый путь
+воспроизводим. Финальный пакет ещё не закрыт: нужно опубликовать веса и ссылки
+на OOF, повторить замеры времени и размера на неизменяемом архиве и завершить
+проверку объяснений. Эти пробелы явно отмечены и проверяются автоматически;
+историческая локальная метрика их не подменяет.

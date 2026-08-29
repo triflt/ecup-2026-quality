@@ -1,55 +1,53 @@
-# Solution 140 — finalist handoff
+# Решение 140: пакет для проверки
 
-This directory is the single review entrypoint for **solution 140**, the current
-submitted production champion. Existing experiment-140 sources remain in their
-original locations; this handoff links and verifies them without duplicating
-model code.
+Этот каталог — единая точка входа для проверки **решения 140**, лучшего из уже
+отправленных вариантов. Исходный код эксперимента остаётся на прежних местах:
+здесь собраны ссылки, инструкции и проверки без дублирования моделей.
 
-## What solution 140 is
+## Из чего состоит решение
 
-Solution 140 combines three learned signals and a train-only memory layer:
+Решение объединяет три обученных сигнала и память обучающей выборки:
 
-1. a robust TF-IDF / embedding classifier base;
-2. a Qwen3-VL-2B LoRA branch for multimodal evidence;
-3. a Qwen3.5-4B LoRA branch for category reasoning;
-4. exact and normalized-name product memory fitted only from available training
-   donors.
+1. опорный прогноз из TF-IDF и мультимодальных эмбеддингов;
+2. LoRA-ветку Qwen3-VL-2B для анализа текста и изображения;
+3. LoRA-ветку Qwen3.5-4B для дополнительного анализа контекста;
+4. точные совпадения по `id` и нормализованному названию, найденные только в
+   обучающей части данных.
 
-The category-specific fusion weights are selected inside the four development
-folds and applied to the held-out outer fold. The submitted archive obtained
-Public Macro F1 `0.8923976821312729`.
+Веса слияния подбираются отдельно для каждой категории на четырёх внутренних
+фолдах и один раз применяются к отложенному внешнему фолду. Отправленный архив
+получил Public Macro F1 `0.8923976821312729`.
 
-For a visual, reviewer-oriented account of the data and decisive ablations, see
-[`How we arrived at solution 140`](../../../docs/research/solution-140-journey.md).
+Краткая история данных и решающих абляций собрана на странице
+[`Как мы пришли к решению 140`](../../../docs/research/solution-140-journey.md).
 
-## Review map
+## Карта документов
 
-| Question | Document or source |
+| Вопрос | Документ или исходник |
 |---|---|
-| Architecture | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
-| Training and reproduction | [`REPRODUCE.md`](REPRODUCE.md) |
-| Validation and local leaderboard | [`EVALUATION.md`](EVALUATION.md) |
-| Offline/runtime/size meaning | [`RUNTIME_AND_SIZE.md`](RUNTIME_AND_SIZE.md) |
-| Models, licenses and data | [`MODEL_AND_DATA_CARD.md`](MODEL_AND_DATA_CARD.md) |
-| Weights and immutable artifacts | [`artifact-contract.json`](artifact-contract.json) |
-| Repository-level verifier | [`verify.py`](verify.py) |
-| Official inference entrypoint | [`../submission/run.py`](../submission/run.py) |
-| Official metadata | [`../submission/metadata.json`](../submission/metadata.json) |
-| Recorded metrics | [`../results/metrics.json`](../results/metrics.json) |
+| Архитектура | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
+| Обучение и воспроизведение | [`REPRODUCE.md`](REPRODUCE.md) |
+| Валидация и локальный лидерборд | [`EVALUATION.md`](EVALUATION.md) |
+| Офлайн-запуск, время и размер | [`RUNTIME_AND_SIZE.md`](RUNTIME_AND_SIZE.md) |
+| Модели, лицензии и данные | [`MODEL_AND_DATA_CARD.md`](MODEL_AND_DATA_CARD.md) |
+| Веса и неизменяемые артефакты | [`artifact-contract.json`](artifact-contract.json) |
+| Автоматическая проверка репозитория | [`verify.py`](verify.py) |
+| Официальная команда инференса | [`../submission/run.py`](../submission/run.py) |
+| Метаданные решения | [`../submission/metadata.json`](../submission/metadata.json) |
+| Зафиксированные метрики | [`../results/metrics.json`](../results/metrics.json) |
 
-## Quick verification without weights
+## Быстрая проверка без весов
 
 ```bash
 python3 experiments/140_dual_lora_fusion/final/verify.py
 pytest -q tests/test_solution_140_repository.py
 ```
 
-The verifier checks the repository contract, model/data identities, official
-CLI, output schema guard and consistency of the recorded Public score. Weight
-checks become active after the files and SHA-256 values are published in the
-artifact contract.
+Скрипт проверяет структуру репозитория, идентификаторы моделей и данных,
+официальный CLI, схему результата и согласованность Public-метрики. Проверка
+весов включится после публикации файлов и SHA-256 в контракте артефактов.
 
-## Build the submission after weights are published
+## Сборка архива после публикации весов
 
 ```bash
 python experiments/140_dual_lora_fusion/build_submission.py \
@@ -57,7 +55,7 @@ python experiments/140_dual_lora_fusion/build_submission.py \
 sha256sum /tmp/solution-140.zip
 ```
 
-The expected SHA of the already submitted immutable archive is recorded in
-[`reports/champion.json`](../../../reports/champion.json). A rebuilt archive is
-accepted only when its own manifest, schema smoke and runtime replay pass; it
-must not silently inherit the historical SHA.
+SHA уже отправленного неизменяемого архива записан в
+[`reports/champion.json`](../../../reports/champion.json). Новый архив считается
+готовым только после проверки собственного манифеста, схемы вывода и времени
+работы. Использовать для него SHA старого архива нельзя.

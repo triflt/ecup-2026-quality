@@ -1,11 +1,11 @@
-# Reproducing solution 140
+# Воспроизведение решения 140
 
-The code path is reproducible from a clean checkout. Exact historical numeric
-reproduction additionally requires the private training data, pretrained model
-revisions, two LoRA adapters and three frozen OOF arrays whose identities are
-listed below. The binary weights will be published separately.
+Код запускается из чистого клона репозитория. Для точного повторения
+исторических метрик также нужны закрытые обучающие данные, указанные версии
+предобученных моделей, два LoRA-адаптера и три зафиксированных OOF-массива. Их
+идентификаторы перечислены ниже, бинарные веса будут опубликованы отдельно.
 
-## 1. Environment and immutable inputs
+## 1. Окружение и неизменяемые входные данные
 
 ```bash
 python -m venv .venv
@@ -15,10 +15,10 @@ pip install -e '.[dev,vlm]'
 python tools/audit_dataset.py --data /path/to/data.csv --images /path/to/images
 ```
 
-Use `competition_train_v1` and the checked-in
-`validation/grouped_text_v1/folds.csv`. Do not regenerate the folds in place.
+Используйте `competition_train_v1` и сохранённый в репозитории файл
+`validation/grouped_text_v1/folds.csv`. Не перестраивайте эти фолды на месте.
 
-## 2. Train Qwen3-VL-2B rsLoRA folds
+## 2. Обучение Qwen3-VL-2B rsLoRA на пяти фолдах
 
 ```bash
 for fold in 0 1 2 3 4; do
@@ -36,7 +36,7 @@ for fold in 0 1 2 3 4; do
 done
 ```
 
-## 3. Train Qwen3.5-4B rsLoRA folds
+## 3. Обучение Qwen3.5-4B rsLoRA на пяти фолдах
 
 ```bash
 for fold in 0 1 2 3 4; do
@@ -55,14 +55,14 @@ for fold in 0 1 2 3 4; do
 done
 ```
 
-The shared runner freezes one epoch, maximum length 1536, micro-batch 4,
-gradient accumulation 4, seed 42, rsLoRA rank 16 / alpha 32 / dropout 0.05,
-and first-image edge 448.
+Общий скрипт фиксирует одну эпоху, максимальную длину 1536 токенов,
+микробатч 4, накопление градиента 4, seed 42, rsLoRA rank 16, alpha 32,
+dropout 0.05 и длинную сторону первого изображения 448 пикселей.
 
-For the two full-data adapters, repeat the corresponding command with a new
-output directory and `--set FULL_TRAIN=1`.
+Чтобы обучить два адаптера на всех данных, повторите соответствующие команды с
+новыми каталогами вывода и параметром `--set FULL_TRAIN=1`.
 
-## 4. Aggregate each model's five OOF prediction files
+## 4. Объединение пяти OOF-файлов каждой модели
 
 ```bash
 python research/aggregate_lora_oof.py \
@@ -76,9 +76,9 @@ python research/aggregate_lora_oof.py \
   --output /tmp/solution140/qwen35_aggregate.json
 ```
 
-Each command also writes a companion `.npz` used by the fusion step.
+Каждая команда также создаёт файл `.npz`, который использует следующий этап.
 
-## 5. Reproduce nested fusion
+## 5. Повторение вложенного слияния
 
 ```bash
 python experiments/140_dual_lora_fusion/run.py \
@@ -89,21 +89,21 @@ python experiments/140_dual_lora_fusion/run.py \
   --output /tmp/solution140/nested_fusion_report.json
 ```
 
-`--step 0.05` is required to represent the frozen weights exactly:
+Шаг `--step 0.05` нужен, чтобы точно получить зафиксированные веса:
 
-- БАД: robust base / Qwen3-VL / Qwen3.5 = `0.50 / 0.25 / 0.25`;
+- БАД: опорный прогноз / Qwen3-VL / Qwen3.5 = `0.50 / 0.25 / 0.25`;
 - Легковоспламеняющиеся: `0.15 / 0.10 / 0.75`.
 
-## Frozen historical OOF identities
+## Идентификаторы исторических OOF-артефактов
 
-| Object | SHA-256 |
+| Объект | SHA-256 |
 |---|---|
-| Fold assignments | `03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d` |
-| Robust/base OOF | `5d7467c48fc8a5a73f947f5aa1300071c77ba699b29c12250caf1bcd3176d7ac` |
-| Qwen3-VL aggregate OOF | `ba432e13624e6c3b1c7304ced8cacf580f4ffcc0a0cde1af8b6afb098bf6dc01` |
-| Qwen3.5 seed-42 aggregate OOF | `147f2b2b87d8220566526b38ab0e085c0bc44cd82b0442baca6b019516c3f1d8` |
+| Распределение по фолдам | `03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d` |
+| OOF опорного прогноза | `5d7467c48fc8a5a73f947f5aa1300071c77ba699b29c12250caf1bcd3176d7ac` |
+| Объединённый OOF Qwen3-VL | `ba432e13624e6c3b1c7304ced8cacf580f4ffcc0a0cde1af8b6afb098bf6dc01` |
+| Объединённый OOF Qwen3.5, seed 42 | `147f2b2b87d8220566526b38ab0e085c0bc44cd82b0442baca6b019516c3f1d8` |
 
-The last three arrays are not committed. Publishing them or immutable download
-references closes exact historical score reproduction; until then the source
-recipe is reproducible but the original cached-result replay is intentionally
-marked incomplete.
+Последние три массива не хранятся в Git. Для точного повторения исторической
+метрики нужно опубликовать сами файлы или неизменяемые ссылки на них. До этого
+кодовый путь воспроизводим, но повтор исходного результата по сохранённым
+прогнозам остаётся незакрытым.

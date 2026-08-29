@@ -1,30 +1,29 @@
-# Research notes
+# Исследовательские материалы
 
-This directory contains the compact written record behind solution 140 and the
-later ablations. It is organised by purpose so that the finalist narrative is
-separate from historical debugging.
+Здесь собрана краткая история решения 140 и последующих абляций. Документы
+разделены по назначению, чтобы основной рассказ не смешивался с исторической
+диагностикой.
 
-Start with [`solution-140-journey.md`](solution-140-journey.md): it is the
-reviewer-friendly story of the data, decisive experiments, final architecture
-and validation policy, with links back to the exact evidence.
+Начните с [`solution-140-journey.md`](solution-140-journey.md). На одной странице
+показаны данные, решающие эксперименты, финальная архитектура и протокол
+валидации со ссылками на подтверждающие артефакты.
 
-## Foundations
+## Основания исследования
 
-- [`foundations/literature-and-competitions.md`](foundations/literature-and-competitions.md) — external precedents and transfer hypotheses.
-- [`foundations/data-audit.md`](foundations/data-audit.md) — dataset structure and integrity findings.
-- [`foundations/2026-08-23-ocr-model-selection.md`](foundations/2026-08-23-ocr-model-selection.md) — OCR model decision record.
+- [`foundations/literature-and-competitions.md`](foundations/literature-and-competitions.md) — внешние прецеденты и гипотезы переноса.
+- [`foundations/data-audit.md`](foundations/data-audit.md) — структура данных и результаты проверки целостности.
+- [`foundations/2026-08-23-ocr-model-selection.md`](foundations/2026-08-23-ocr-model-selection.md) — обоснование выбора OCR-модели.
 
-## Explanations
+## Объяснения
 
-The active explanation-quality programme lives in [`explanations/`](explanations/).
-These documents do not claim that the current solution 140 explanation gate is
-complete; the accepted report will be linked from the solution-140 handoff when
-it is available.
+Работа над качеством объяснений ведётся в [`explanations/`](explanations/).
+Текущие документы не объявляют эту проверку завершённой. После приёмки ссылка
+на итоговый отчёт появится в пакете решения 140.
 
-## Archive
+## Архив
 
-[`archive/`](archive/) contains dated investigations that explain past decisions
-but are not required to run solution 140. They are kept out of the top-level
-navigation to avoid presenting historical diagnostics as current instructions.
-The compact index of experiment packages removed from the review surface is
+[`archive/`](archive/) содержит датированные исследования, которые объясняют
+прошлые решения, но не нужны для запуска решения 140. Они вынесены из основной
+навигации, чтобы историческая диагностика не выглядела как действующая
+инструкция. Краткий список убранных из обзора экспериментов находится в
 [`archive/removed-experiments-through-652.md`](archive/removed-experiments-through-652.md).

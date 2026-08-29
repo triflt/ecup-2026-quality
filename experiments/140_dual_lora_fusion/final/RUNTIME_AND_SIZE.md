@@ -1,32 +1,29 @@
-# Offline, runtime and size
+# Офлайн-запуск, время и размер
 
-These are submission-operability requirements, not model-quality metrics.
+Это требования к исполнимости решения, а не метрики качества модели.
 
-## Offline
+## Офлайн-запуск
 
-During judging the container has no internet. Solution 140 therefore loads base
-models from the competition-provided `SHARED_MODELS_PATH` and all trained LoRA
-and classifier files from the submission archive. The production runner has no
-top-level HTTP client import and does not download anything. It enumerates images
-only below the input CSV's sibling `images/` directory and passes resolved
-`file://` URIs to the vendored vision utility. That utility retains generic URL
-support from upstream, but the solution-140 production call path never supplies
-an HTTP(S) URI.
+Во время проверки у контейнера нет доступа в интернет. Базовые модели
+загружаются из предоставленного соревнованием `SHARED_MODELS_PATH`, а LoRA и
+классификаторы — из архива решения. Рабочий скрипт ничего не скачивает. Он ищет
+изображения только в каталоге `images/` рядом с входным CSV и передаёт локальные
+URI вида `file://` во встроенную библиотеку обработки изображений. Библиотека
+поддерживает сетевые URL, но решение 140 их не создаёт.
 
-## Runtime
+## Время работы
 
-The official limits are 3 minutes for Check, 20 minutes for Public and 40
-minutes for Private on one H100 80 GB. The recorded solution-140 smoke processed
-600 products / 2,274 images in `228.76 s`, projecting approximately `10.17 min`
-for Public and `24.15 min` for Private. This is passing historical evidence,
-not a guarantee for a rebuilt archive: the exact published-weight package must
-repeat the smoke before final submission.
+Официальные лимиты на одной H100 80 GB: 3 минуты для Check, 20 минут для Public
+и 40 минут для Private. Контрольный запуск решения 140 обработал 600 товаров и
+2 274 изображения за `228.76 s`. Расчётное время составляет `10.17 min` для
+Public и `24.15 min` для Private. Это исторический замер, а не гарантия для
+нового архива. После публикации весов контрольный запуск нужно повторить без
+изменений.
 
-## Size
+## Размер
 
-The submission ZIP must be at most 5 GB and a custom compressed Docker image at
-most 15 GB. Solution 140 relies on competition-mounted base models, so only the
-two LoRA adapters, fitted classifier bundles and Python source are packaged.
-The historical submitted archive SHA-256 is recorded in
-`reports/champion.json`; per-file size and hashes will be filled in
-`artifact-contract.json` when the weights are published.
+ZIP-архив решения должен занимать не более 5 GB, сжатый Docker-образ — не более
+15 GB. Базовые модели подключаются из среды соревнования, поэтому в архив входят
+только два LoRA-адаптера, обученные классификаторы и исходный код Python.
+SHA-256 отправленного архива записан в `reports/champion.json`. Размеры и хэши
+отдельных файлов появятся в `artifact-contract.json` после публикации весов.

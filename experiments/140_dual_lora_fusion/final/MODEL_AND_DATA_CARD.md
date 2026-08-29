@@ -1,24 +1,23 @@
-# Model and data card
+# Карточка моделей и данных
 
-## Data
+## Данные
 
-Solution 140 is trained only on the provided E-CUP 2026 Quality training set:
-`competition_train_v1`, 12,971 rows. Its immutable identity is registered in
-[`datasets/registry.toml`](../../../datasets/registry.toml). Raw rows and images
-are intentionally not committed.
+Решение 140 обучено только на предоставленной выборке E-CUP 2026 Quality:
+`competition_train_v1`, 12 971 строка. Её неизменяемый идентификатор записан в
+[`datasets/registry.toml`](../../../datasets/registry.toml). Исходные строки и
+изображения намеренно не добавлены в Git.
 
-No external product dataset and no synthetic training corpus is part of the
-submitted solution-140 recipe.
+В отправленном решении 140 нет внешних товарных данных или синтетической
+обучающей выборки.
 
-## Models
+## Модели
 
-| Component | Model | License status |
+| Компонент | Модель | Лицензия |
 |---|---|---|
-| Multimodal embedding | `Qwen/Qwen3-VL-Embedding-2B` | Competition-listed, Apache-2.0 |
-| Multimodal LoRA | `Qwen/Qwen3-VL-2B-Instruct` | Competition-listed, Apache-2.0 |
-| Reasoning LoRA | `Qwen/Qwen3.5-4B` | Competition-listed, Apache-2.0 |
-| Text classifiers | scikit-learn TF-IDF / linear models | Source and pinned dependency are public |
+| Мультимодальные эмбеддинги | `Qwen/Qwen3-VL-Embedding-2B` | Разрешена правилами, Apache-2.0 |
+| Мультимодальная LoRA | `Qwen/Qwen3-VL-2B-Instruct` | Разрешена правилами, Apache-2.0 |
+| Вторая LoRA-ветка | `Qwen/Qwen3.5-4B` | Разрешена правилами, Apache-2.0 |
+| Текстовые классификаторы | TF-IDF и линейные модели scikit-learn | Исходный код и зафиксированная зависимость публичны |
 
-The base weights are provided by the competition runtime and are not copied
-into this repository. The two trained adapters will be published separately
-with exact SHA-256 values.
+Базовые веса предоставляет среда соревнования, поэтому в репозитории их нет.
+Два обученных адаптера будут опубликованы отдельно вместе с точными SHA-256.

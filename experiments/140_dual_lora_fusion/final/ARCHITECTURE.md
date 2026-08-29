@@ -1,32 +1,32 @@
-# Architecture of solution 140
+# Архитектура решения 140
 
-| Component | Text input | Visual input | Role |
+| Компонент | Текст | Изображения | Роль |
 |---|---|---|---|
-| TF-IDF LinearSVC | name + description | none | stable text rank |
-| Qwen3-VL-Embedding-2B | name + description + category | **all available images** | multimodal rank inside the robust base |
-| Qwen3-VL-2B rsLoRA | name + description + category | **first image, max 448 px** | supervised multimodal score |
-| Qwen3.5-4B rsLoRA | name + description + category | **the same first image, max 448 px** | supervised multimodal reasoning score |
-| Product memory | normalized name/text | none | train-only exact/name correction after fusion |
+| TF-IDF LinearSVC | название + описание | нет | устойчивый текстовый ранг |
+| Qwen3-VL-Embedding-2B | название + описание + категория | **все доступные изображения** | мультимодальный ранг в опорном прогнозе |
+| Qwen3-VL-2B rsLoRA | название + описание + категория | **первое изображение, не более 448 px** | обученный мультимодальный прогноз |
+| Qwen3.5-4B rsLoRA | название + описание + категория | **то же первое изображение, не более 448 px** | независимый мультимодальный прогноз |
+| Память товаров | нормализованное название и текст | нет | коррекция точных совпадений после слияния |
 
-The TF-IDF and embedding ranks first form the robust base. Category-specific
-fusion then combines that base with both LoRA scores; product memory is applied
-after fusion. Thus all three Qwen components receive visual input. The embedding
-model consumes every available image, while the two LoRA branches deliberately
-share the same first-image view. If the embedding model hits a single-sample
-CUDA OOM, that one row has an explicit text-only fallback; the fallback is
-logged rather than silently changing the entire route.
+TF-IDF и Qwen3-VL Embedding сначала образуют опорный прогноз. Затем отдельные
+для каждой категории веса объединяют его с двумя LoRA-прогнозами. Последней
+применяется память товаров. Все три компонента Qwen получают изображения:
+embedding-модель видит все снимки, а обе LoRA-ветки используют один и тот же
+первый снимок. Если embedding-модель не может обработать одну карточку из-за
+нехватки памяти CUDA, только эта строка переходит на явно отмеченный текстовый
+режим. Остальной маршрут не меняется.
 
-The base models are loaded from `SHARED_MODELS_PATH`. The two small LoRA
-adapters and fitted classifier bundles are submission artifacts. Both LoRA
-branches use the same 448-pixel first-image preprocessing that passed the
-corrected official-image smoke. Qwen3.5 and Qwen3-VL produce independent probabilities; fusion is
-category-specific because the two competition categories have different error
-profiles.
+Базовые модели загружаются из `SHARED_MODELS_PATH`. В архив решения входят два
+небольших LoRA-адаптера и обученные классификаторы. Обе LoRA-ветки одинаково
+подготавливают первый снимок, ограничивая длинную сторону 448 пикселями. Qwen3.5
+и Qwen3-VL выдают независимые вероятности. Веса слияния различаются по
+категориям, потому что для БАД и легковоспламеняющихся товаров характерны разные
+ошибки.
 
-Exact/name memory is a donor-only feature, not a test-label lookup. The offline
-validation code fits it only from the training side of each split. The final
-runner uses the memory serialized from the full competition training set.
+Память точных `id` и названий не подсматривает тестовые метки. При локальной
+валидации она строится только по обучающей части каждого разбиения. Финальный
+скрипт использует память, собранную по полной обучающей выборке соревнования.
 
-The current explanation layer is format-safe but is being replaced by a
-separately audited evidence-grounded layer. That work must not change the
-classification verdict unless it is evaluated as a new solution.
+Текущий слой объяснений соблюдает формат, но проходит отдельную замену на
+версию, привязанную к признакам карточки. Он не должен менять вердикт
+классификатора без оценки как нового решения.
