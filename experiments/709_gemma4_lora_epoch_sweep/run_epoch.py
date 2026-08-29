@@ -1,0 +1,102 @@
+from __future__ import annotations
+
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+import sys
+from pathlib import Path
+
+
+ARCHITECTURES = ("gemma4_e2b", "gemma4_e4b")
+
+
+def load(path: Path):
+    spec = importlib.util.spec_from_file_location("exp709_parent", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def cache_filename(item_id: str) -> str:
+    return hashlib.sha256(item_id.encode()).hexdigest() + ".img"
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--parent", type=Path, required=True)
+    parser.add_argument("--architecture", choices=ARCHITECTURES, required=True)
+    parser.add_argument("--epochs", type=int, choices=range(1, 6), required=True)
+    parser.add_argument("--cache", type=Path, required=True)
+    parser.add_argument("--lora-r", type=int, choices=(16, 32, 64), required=True)
+    parser.add_argument("--lora-alpha", type=int, choices=(32, 64, 128), required=True)
+    args = parser.parse_args()
+
+    parent = load(args.parent)
+    parent.EPOCHS = args.epochs
+    parent.IMAGE_DIR = args.cache
+
+    def use_accepted_vendor():
+        vendor = Path(os.environ["ECUP_VENDOR"])
+        sys.path.insert(0, str(vendor))
+        import peft
+
+        if peft.__version__ != "0.20.0":
+            raise ValueError("accepted PEFT 0.20.0 required")
+        original = peft.LoraConfig
+
+        def bound_lora_config(*values, **kwargs):
+            if kwargs.get("r") != 16 or kwargs.get("lora_alpha") != 32:
+                raise ValueError("parent LoRA contract drifted")
+            kwargs["r"] = args.lora_r
+            kwargs["lora_alpha"] = args.lora_alpha
+            return original(*values, **kwargs)
+
+        peft.LoraConfig = bound_lora_config
+
+    parent.install_peft = use_accepted_vendor
+
+    def accepted_cache(ids, _urls):
+        def source_for(item_id):
+            direct = args.cache / f"{item_id}.jpg"
+            if direct.exists():
+                return direct
+            return args.cache / cache_filename(str(item_id))
+
+        missing = [str(item_id) for item_id in ids if not source_for(item_id).exists()]
+        if missing:
+            raise FileNotFoundError(f"accepted cache missing {len(missing)} rows")
+        view = Path(os.environ["EXP709_IMAGE_VIEW"])
+        view.mkdir(parents=True, exist_ok=True)
+        for item_id in ids:
+            source = source_for(item_id)
+            target = view / f"{item_id}.jpg"
+            if not target.exists():
+                target.symlink_to(source)
+        parent.IMAGE_DIR = view
+        return []
+
+    parent.predownload = accepted_cache
+    print(
+        json.dumps(
+            {
+                "experiment": 709,
+                "architecture": args.architecture,
+                "epochs": args.epochs,
+                "lora_r": args.lora_r,
+                "lora_alpha": args.lora_alpha,
+                "fold": int(os.environ.get("HOLDOUT_FOLD", "0")),
+                "public_used": False,
+            }
+        ),
+        flush=True,
+    )
+    parent.main()
+
+
+if __name__ == "__main__":
+    main()
