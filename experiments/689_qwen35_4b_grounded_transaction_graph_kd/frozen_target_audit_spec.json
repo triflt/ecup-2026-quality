@@ -1,0 +1,168 @@
+{
+  "audit": {
+    "critical_stratum": "device_accessory_compatible_mention",
+    "rare_positive_stratum": "direct_included_fuel",
+    "rows_per_stratum": 100,
+    "selection_salt": "exp689-grounded-transaction-graph-target-audit-v1",
+    "strata": [
+      "direct_included_fuel",
+      "device_accessory_compatible_mention",
+      "singleton_new_family_ambiguous"
+    ],
+    "total_rows": 300
+  },
+  "enums": {
+    "relation": [
+      "primary_sold_object",
+      "included",
+      "compatible_external",
+      "mentioned_only",
+      "negated",
+      "absent",
+      "unknown"
+    ],
+    "sold_object": [
+      "device",
+      "fuel_consumable",
+      "accessory",
+      "kit",
+      "other",
+      "unknown"
+    ],
+    "substance": [
+      "gas",
+      "flammable_liquid",
+      "solid_fuel",
+      "ignition_aid",
+      "none",
+      "unknown"
+    ],
+    "support_status": [
+      "supported",
+      "unsupported",
+      "ambiguous"
+    ],
+    "evidence_slice": [
+      "text_sufficient",
+      "image_helpful",
+      "image_required"
+    ]
+  },
+  "execution_scope": "remote_remote_compute_only",
+  "exclusions": {
+    "external_disjointness_claim": "component_only",
+    "expected_component_counts": {
+      "670": 300,
+      "672": 40,
+      "union": 340
+    },
+    "required_component_intersection": 0
+  },
+  "experiment_id": "689",
+  "gates": {
+    "maximum_contradictions": 15,
+    "maximum_image_required_unsupported_visual_claims": 0,
+    "minimum_exact_review_agreement": 0.9,
+    "minimum_evidence_supported": 297,
+    "minimum_image_required_rows": 30,
+    "minimum_image_required_strict_pass": 27,
+    "minimum_relation_cohen_kappa": 0.8,
+    "minimum_relation_gwet_ac1": 0.8,
+    "minimum_s1_object_relation_correct": 95,
+    "minimum_s2_object_relation_correct": 90,
+    "minimum_s3_object_relation_correct": 90,
+    "minimum_target_tuple_correct": 282,
+    "minimum_overall_supervised": 225,
+    "minimum_rare_positive_supervised": 80,
+    "required_nonduplicate_rows": 300,
+    "required_schema_grounding": 300
+  },
+  "hypothesis": "Grounded transaction-graph targets can teach sold-object, substance, and relation structure without copying free-form reasoning or outcome scores.",
+  "image_contract": {
+    "evidence_regions": [
+      "full",
+      "q00",
+      "q01",
+      "q10",
+      "q11"
+    ],
+    "first_image_required": true,
+    "verified_rows_required": 300
+  },
+  "parent_research_lane": "685_structured_verified_evidence",
+  "schema_version": "exp689_frozen_target_audit_spec_v1",
+  "student_gpu": {
+    "authorized": false,
+    "requires_fresh_independent_go_after_audit": true
+  },
+  "review_contract": {
+    "adjudication_scope": "disagreements_only",
+    "blind_reviewers_required": 2,
+    "required_rows_per_reviewer": 300,
+    "rubric_sha256": "a33bd2c45511477b249b25392cbe4243a873049a13b30a8fd819113fef9ca646",
+    "reported_agreement_metrics": [
+      "raw_exact_review_agreement",
+      "per_attribute_review_agreement",
+      "relation_cohen_kappa",
+      "relation_gwet_ac1"
+    ],
+    "stratum_gates": {
+      "S1": "device_accessory_compatible_mention",
+      "S2": "direct_included_fuel",
+      "S3": "singleton_new_family_ambiguous"
+    }
+  },
+  "source_contract_required_provenance": [
+    "runtime_sha256",
+    "data_sha256",
+    "registry_sha256",
+    "builder_revision_sha256",
+    "eligibility_universe_sha256",
+    "stratum_derivation_sha256",
+    "image_membership_sha256",
+    "image_transform_sha256",
+    "candidate_generator_sha256"
+  ],
+  "target_audit_schema_sha256": "c6efcff2fb4af8e084b6b606a2a6e9caa91d78c823290436b272995966c3c0b8",
+  "teacher_output_policy": {
+    "allowed_generated_fields": [
+      "audit_id",
+      "record_id",
+      "request_row_sha256",
+      "sold_object",
+      "substance",
+      "relation",
+      "object_evidence_candidate_ids",
+      "substance_evidence_candidate_ids",
+      "relation_evidence_candidate_ids",
+      "support_status",
+      "supervise",
+      "schema_version"
+    ],
+    "forbidden_fields": [
+      "label",
+      "verdict",
+      "logit",
+      "prob",
+      "probability",
+      "rank",
+      "family",
+      "family_id",
+      "cot",
+      "chain_of_thought",
+      "rationale"
+    ],
+    "free_text_allowed": false,
+    "selection_only_from_candidate_ids": true
+  },
+  "teacher_contract_required_provenance": [
+    "teacher_model_id",
+    "teacher_model_revision",
+    "prompt_sha256",
+    "decoding_sha256",
+    "inference_bundle_sha256",
+    "job_metadata_sha256",
+    "selection_rows_sha256"
+  ],
+  "self_sha256": "cd5dabb3d70b0bd8263de083f15c55d4d664a6412d60ce7bb9a6e2b34e9a27a8"
+}

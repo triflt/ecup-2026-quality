@@ -1,30 +1,68 @@
 [experiment]
 id = 685
 slug = "qwen35_4b_structured_rank_distillation"
-title = "Rank-normalized pairwise distillation into deployable Qwen3.5-4B"
+title = "Leakage-safe structured/ranking distillation into deployable 4B LoRA"
 status = "TERMINAL_REJECT_AT_OUTER0"
 parent_experiment = 681
+initial_teacher_experiment = 654
 teacher_score_experiment = 662
+stronger_teacher_experiment = 684
 public_submissions = 0
+gpu_jobs = 0
+artifact_execution = "remote_compute_s3_only"
+local_full_artifact_download = false
+local_job_artifact_download = false
 
 [student]
 model = "Qwen/Qwen3.5-4B"
 category_scope = "flammable_only"
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
 seed = 42
 epochs = 1
 effective_batch_size = 16
 learning_rate = 0.0002
 
-[comparison]
-control_objective = "hard_bce"
-candidate_objective = "0.5_hard_bce_plus_0.5_pairwise_rank_loss"
-only_changed_factor = "rank_loss_weight"
+[distillation]
+raw_logit_bce_reused = false
+first_stage_target_scope = "fold_matched_outer_train_in_sample_outer_validation_safe"
+nested_cross_fitted_targets_required_for_stage_685b = true
+causal_attributes_required_in_first_stage = false
+grounded_evidence_required_in_first_stage = false
+ranking_loss_required = true
+outer_fold_loss_tuning = false
+rank_transfer_detected = true
+decision_boundary_preserved = false
 
 [validation]
 version = "semantic_family_v3"
-terminal_fold = 0
-decision = "REJECT_AT_OUTER0"
-threshold = 0.0
+screen_folds = [0, 3]
+confirmation_folds = [1, 2, 4]
+primary_metric = "tie_aware_average_precision_flammable"
+minimum_screen_mean_ap_delta = 0.01
+minimum_screen_mean_macro_delta = 0.003
+minimum_full_mean_macro_delta = 0.006
+minimum_full_flammable_f1_delta = 0.012
+minimum_corrections_to_regressions = 1.5
+minimum_bootstrap_probability = 0.9
 threshold_tuned = false
 public_used = false
-next_blind_fold = 3
+
+[deployment]
+base_model = "Qwen/Qwen3.5-4B"
+teacher_packaged = false
+bad_route_byte_identical = true
+runtime_public_minutes_max = 20
+runtime_private_minutes_max = 40
+
+[operations]
+project_gpu_cap = 8
+working_gpu_cap = 6
+reserved_gpus = 2
+cheap_eval_in_training_job = true
+independent_eval_in_remote_compute = true
+s3_keys_immutable = true
+submission_zip_requires_fresh_user_approval = true
+sealed_fold3_outputs_used = false
