@@ -16,7 +16,6 @@
       .muted { fill: #647084; }
       .category { font-size: 24px; font-weight: 800; }
       .stat { font-size: 34px; font-weight: 850; letter-spacing: -1px; }
-      @media (prefers-color-scheme: dark) { .text { fill: #e5e7eb; } .muted { fill: #aab4c3; } }
     </style>
   </defs>
 
@@ -60,9 +59,9 @@
 
   <g>
     <rect x="64" y="428" width="250" height="160" rx="20" fill="#172554"/>
-    <text x="88" y="469" font-family="Inter,system-ui,sans-serif" font-size="14" fill="#c7d2fe">ВСЕГО СТРОК</text>
-    <text x="88" y="522" font-family="Inter,system-ui,sans-serif" font-size="37" font-weight="850" fill="#ffffff">12 971</text>
-    <text x="88" y="553" font-family="Inter,system-ui,sans-serif" font-size="15" fill="#c7d2fe">5 сбалансированных folds</text>
+    <text x="88" y="469" font-family="Inter,system-ui,sans-serif" font-size="14" fill="#c7d2fe">DEVELOPMENT</text>
+    <text x="88" y="522" font-family="Inter,system-ui,sans-serif" font-size="37" font-weight="850" fill="#ffffff">11 118</text>
+    <text x="88" y="553" font-family="Inter,system-ui,sans-serif" font-size="15" fill="#c7d2fe">5 folds · 12 971 всего</text>
   </g>
   <g>
     <rect x="330" y="428" width="250" height="160" rx="20" fill="#ffffff" stroke="#d9deea"/>

@@ -108,42 +108,42 @@
   </g>
 
   <g class="text" font-size="13">
-    <text x="78" y="568" font-weight="750">030 · VL embedding</text>
+    <text x="78" y="568" font-weight="750">030 · VL embedding · OOF v1</text>
     <line x1="427" y1="563" x2="1062" y2="563" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
     <circle cx="427" cy="563" r="7" class="public"/><circle cx="1062" cy="563" r="7" class="local"/>
     <text class="muted" x="427" y="552" text-anchor="middle" font-size="11">.7220</text><text class="muted" x="1062" y="552" text-anchor="middle" font-size="11">.9024</text>
 
-    <text x="78" y="608" font-weight="750">040 · late fusion</text>
+    <text x="78" y="608" font-weight="750">040 · late fusion · grouped v1</text>
     <line x1="725" y1="603" x2="1051" y2="603" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
     <circle cx="725" cy="603" r="7" class="public"/><circle cx="1051" cy="603" r="7" class="local"/>
     <text class="muted" x="725" y="592" text-anchor="middle" font-size="11">.8066</text><text class="muted" x="1051" y="592" text-anchor="middle" font-size="11">.8993</text>
 
-    <text x="78" y="648" font-weight="750">090 · advanced mix</text>
+    <text x="78" y="648" font-weight="750">090 · advanced mix · grouped v1</text>
     <line x1="651" y1="643" x2="1079" y2="643" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
     <circle cx="651" cy="643" r="7" class="public"/><circle cx="1079" cy="643" r="7" class="local"/>
     <text class="muted" x="651" y="632" text-anchor="middle" font-size="11">.7855</text><text class="muted" x="1079" y="632" text-anchor="middle" font-size="11">.9072</text>
 
-    <text x="78" y="688" font-weight="800">140 · dual LoRA + memory</text>
-    <line x1="1027" y1="683" x2="1205" y2="683" stroke="#A7E3D4" stroke-width="6" stroke-linecap="round"/>
-    <circle cx="1027" cy="683" r="8" class="winner"/><circle cx="1205" cy="683" r="8" class="local"/>
-    <text class="muted" x="1027" y="672" text-anchor="middle" font-size="11">.8924</text><text class="muted" x="1205" y="672" text-anchor="middle" font-size="11">.9429*</text>
+    <text x="78" y="688" font-weight="800">140 · dual LoRA · nested v1</text>
+    <line x1="1027" y1="683" x2="1096" y2="683" stroke="#A7E3D4" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="1027" cy="683" r="8" class="winner"/><circle cx="1096" cy="683" r="8" class="local"/>
+    <text class="muted" x="1027" y="672" text-anchor="middle" font-size="11">.8924</text><text class="muted" x="1096" y="672" text-anchor="middle" font-size="11">.9118</text>
 
-    <text x="78" y="728" font-weight="750">230 · второй seed</text>
+    <text x="78" y="728" font-weight="750">230 · второй seed · nested v1</text>
     <line x1="927" y1="723" x2="1122" y2="723" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
     <circle cx="927" cy="723" r="7" class="public"/><circle cx="1122" cy="723" r="7" class="local"/>
     <text class="muted" x="927" y="712" text-anchor="middle" font-size="11">.8639</text><text class="muted" x="1122" y="712" text-anchor="middle" font-size="11">.9192</text>
 
-    <text x="78" y="768" font-weight="750">400 · category route</text>
+    <text x="78" y="768" font-weight="750">400 · category route · locked v1</text>
     <line x1="1027" y1="763" x2="1165" y2="763" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
     <circle cx="1027" cy="763" r="7" class="public"/><circle cx="1165" cy="763" r="7" class="local"/>
     <text class="muted" x="1027" y="752" text-anchor="middle" font-size="11">.8923</text><text class="muted" x="1165" y="752" text-anchor="middle" font-size="11">.9316</text>
 
-    <text x="78" y="808" font-weight="750">631 · четыре seed</text>
+    <text x="78" y="808" font-weight="750">631 · четыре seed · semantic-v3</text>
     <line x1="926" y1="803" x2="1123" y2="803" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
     <circle cx="926" cy="803" r="7" class="public"/><circle cx="1123" cy="803" r="7" class="local"/>
     <text class="muted" x="926" y="792" text-anchor="middle" font-size="11">.8636</text><text class="muted" x="1123" y="792" text-anchor="middle" font-size="11">.9196</text>
 
-    <text x="78" y="848" font-weight="750">699 · train-синтетика</text>
+    <text x="78" y="848" font-weight="750">699 · train-синтетика · frozen full5</text>
     <line x1="830" y1="843" x2="1172" y2="843" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
     <circle cx="830" cy="843" r="7" class="public"/><circle cx="1172" cy="843" r="7" class="local"/>
     <text class="muted" x="830" y="832" text-anchor="middle" font-size="11">.8365</text><text class="muted" x="1172" y="832" text-anchor="middle" font-size="11">.9336</text>
@@ -186,6 +186,6 @@
     <text x="1041" y="1089" font-size="13" font-weight="700" fill="#B45309">ещё не измерен</text>
   </g>
 
-  <text class="text muted" x="62" y="1150" font-size="12">* 0.9429 — историческая recurrence-симуляция, а не текущая strict generalization CV. Локальные точки получены по разным зафиксированным протоколам и не образуют единый leaderboard.</text>
+  <text class="text muted" x="62" y="1150" font-size="12">0.9429 — отдельная историческая recurrence-симуляция решения 140; на графике показана сопоставимая nested CV 0.9118. Разные протоколы не образуют единый leaderboard.</text>
   <text class="text muted" x="62" y="1168" font-size="12">Источники: reports/submissions.csv · reports/semantic-v3-leaderboard.csv · журналы экспериментов 430, 635, 659, 699 и 712–713.</text>
 </svg>
