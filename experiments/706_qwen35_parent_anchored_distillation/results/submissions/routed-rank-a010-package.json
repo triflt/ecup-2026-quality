@@ -1,0 +1,15 @@
+{
+  "schema_version": "exp706_routed_submission_v1",
+  "base_submission_sha256": "d211ea3fa25260c30f6ad44cdf391af1c8ecc0474a5bccf8586a18f77853af20",
+  "distill_mode": "rank_candidate",
+  "distill_alpha": 0.1,
+  "bad_original_adapter_byte_exact": true,
+  "flammable_only_distill_route": true,
+  "teacher_at_inference": false,
+  "ocr_runtime_absent": true,
+  "output_sha256": "501e72b306a6ce661c8a9b7b1194a446bfb4b914d195607aebf5bdee676a6897",
+  "output_bytes": 55645267,
+  "under_5_gib": true,
+  "zip_integrity": "PASS",
+  "runtime_smoke": "PENDING"
+}

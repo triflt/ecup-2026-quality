@@ -1,0 +1,80 @@
+{
+  "schema_version": "exp697_screen_evaluation_v2",
+  "folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "coverage_rows": 12971,
+  "full_five_fold_oof": true,
+  "score_calibration": "label_blind_percentile_rank_within_fold_and_category_average_ties",
+  "raw_scores_preserved_in_fold_predictions": true,
+  "categories": {
+    "БАД": {
+      "nested_f1": 0.9461818181818182,
+      "folds": {
+        "0": {
+          "rank_threshold": 0.27242302543507363,
+          "f1": 0.9390909090909091,
+          "rows": 1494
+        },
+        "1": {
+          "rank_threshold": 0.27242302543507363,
+          "f1": 0.9531605275125057,
+          "rows": 1494
+        },
+        "2": {
+          "rank_threshold": 0.2716008037508372,
+          "f1": 0.9473684210526315,
+          "rows": 1494
+        },
+        "3": {
+          "rank_threshold": 0.27242302543507363,
+          "f1": 0.9478458049886621,
+          "rows": 1494
+        },
+        "4": {
+          "rank_threshold": 0.27242302543507363,
+          "f1": 0.9434306569343066,
+          "rows": 1493
+        }
+      }
+    },
+    "Легковоспламеняющиеся": {
+      "nested_f1": 0.8704156479217604,
+      "folds": {
+        "0": {
+          "rank_threshold": 0.9620796898201617,
+          "f1": 0.9156626506024096,
+          "rows": 1100
+        },
+        "1": {
+          "rank_threshold": 0.9645454545454546,
+          "f1": 0.75,
+          "rows": 1102
+        },
+        "2": {
+          "rank_threshold": 0.9620796898201617,
+          "f1": 0.8888888888888888,
+          "rows": 1100
+        },
+        "3": {
+          "rank_threshold": 0.9613636363636363,
+          "f1": 0.9156626506024096,
+          "rows": 1100
+        },
+        "4": {
+          "rank_threshold": 0.9613636363636363,
+          "f1": 0.8780487804878049,
+          "rows": 1100
+        }
+      }
+    }
+  },
+  "nested_macro_f1": 0.9082987330517893,
+  "solution_140_nested_macro_f1": 0.9118425205786493,
+  "delta_vs_140": -0.0035437875268600205,
+  "decision_scope": "full_grouped_text_v1_oof"
+}

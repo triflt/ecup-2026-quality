@@ -1,0 +1,45 @@
+[experiment]
+id = "697"
+slug = "qwen38_27b_grouped_teacher"
+title = "Qwen3.8-27B grouped-v1 offline teacher screen"
+status = "completed_rejected"
+entrypoint = "experiments/697_qwen38_27b_grouped_teacher/run_fold.py"
+result_file = "experiments/697_qwen38_27b_grouped_teacher/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+scope = "all grouped_text_v1 outer-train rows selected by label_only_v1"
+model_inputs = ["category", "name", "description", "first_image"]
+
+[validation]
+version = "grouped_text_v1"
+screen_folds = [0, 3]
+remaining_folds_after_screen = [1, 2, 4]
+solution_140_nested_macro_f1 = 0.9118425
+public_used = false
+
+[model]
+path = "Qwen/Qwen3.8-27B"
+role = "offline_teacher_only"
+submission_dependency = false
+
+[training]
+seed = 42
+epochs = 1
+micro_batch_size = 2
+gradient_accumulation = 8
+effective_batch_size = 16
+learning_rate = 0.0002
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+attention = "eager"
+gpus_per_job = 4
+
+[deployment]
+base_model = "Qwen/Qwen3.5-4B"
+strategy = "replace_solution_140_qwen35_adapter"
+additional_inference_passes = 0
+gpu_limit = "1xH100"
+submission_size_limit_gb = 5

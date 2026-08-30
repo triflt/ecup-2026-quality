@@ -1,0 +1,66 @@
+{
+  "candidates": [
+    {
+      "adapter_sha256": "b0ce042a3e82ce6da937ac14d1ed6d43f44384127f1b0a8cbddb519865df985b",
+      "average_precision": 0.9873903031098805,
+      "best_f1_diagnostic": 0.975,
+      "delta_average_precision": -0.002961379052460522,
+      "delta_best_f1_diagnostic": 0.0,
+      "delta_roc_auc": -9.66673916721339e-05,
+      "eligible": false,
+      "roc_auc": 0.9995529133135165,
+      "update": 10
+    },
+    {
+      "adapter_sha256": "80a990e2696dab0b241b32b727be153ff3e5a424500f7712ff358bf995696a8c",
+      "average_precision": 0.9889487278182104,
+      "best_f1_diagnostic": 0.975,
+      "delta_average_precision": -0.0014029543441306247,
+      "delta_best_f1_diagnostic": 0.0,
+      "delta_roc_auc": -2.416684791806123e-05,
+      "eligible": false,
+      "roc_auc": 0.9996254138572706,
+      "update": 20
+    },
+    {
+      "adapter_sha256": "5e0223a090ad0589242826964cb9a8d1a446afe51ba4f2030fcea1266e7858f3",
+      "average_precision": 0.9926841128035954,
+      "best_f1_diagnostic": 0.975,
+      "delta_average_precision": 0.002332430641254324,
+      "delta_best_f1_diagnostic": 0.0,
+      "delta_roc_auc": 8.458396771304777e-05,
+      "eligible": true,
+      "roc_auc": 0.9997341646729017,
+      "update": 40
+    },
+    {
+      "adapter_sha256": "5ac63193adb450165e20618cb42facb6fe72251758f3fdec6dcc43c0fe98d59d",
+      "average_precision": 0.9888326516110525,
+      "best_f1_diagnostic": 0.975,
+      "delta_average_precision": -0.0015190305512885471,
+      "delta_best_f1_diagnostic": 0.0,
+      "delta_roc_auc": -2.416684791806123e-05,
+      "eligible": false,
+      "roc_auc": 0.9996254138572706,
+      "update": 80
+    }
+  ],
+  "category": "Легковоспламеняющиеся",
+  "decision": "PROMOTE_TO_FULL_OOF_REFIT",
+  "parent": {
+    "adapter_sha256": "75d4cb53fb05636d715f33ad88d2b420f5af4393977da113286133843a6db2a1",
+    "average_precision": 0.990351682162341,
+    "best_f1_diagnostic": 0.975,
+    "roc_auc": 0.9996495807051886
+  },
+  "public_probe_required": false,
+  "schema_version": "exp706_strict_holdout_selection_v1",
+  "selected_update": 40,
+  "selection_data": "fold4_gold_never_seen_by_student",
+  "teacher_target_training_folds": [
+    0,
+    1,
+    2,
+    3
+  ]
+}
