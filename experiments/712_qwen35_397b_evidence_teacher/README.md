@@ -1,8 +1,8 @@
 # 712: Qwen3.5-397B evidence teacher
 
 Статус: **teacher synth по всем 12 971 карточке и технический аудит завершены;
-корпус ждёт явного user approval перед обучением**. Это offline teacher, а не
-ветка предсказаний ансамбля и не runtime сабмита.
+11 400 принятых targets использованы для explanation-only Exp714**. Это offline
+teacher, а не ветка предсказаний ансамбля и не runtime сабмита.
 
 ## Что именно запускаем
 

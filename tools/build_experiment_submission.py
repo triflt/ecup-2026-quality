@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
 
 from ecup_quality.experiments.runner import load_config
 from ecup_quality.submission.package import build_submission_archive

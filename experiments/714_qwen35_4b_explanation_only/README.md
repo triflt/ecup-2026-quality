@@ -8,6 +8,11 @@ category-specific fusion, thresholds и recurrence exact-id/name prior форм�
 окончательный verdict. Reasoner не видит component scores и не участвует ни в
 scores, ни в fusion, ни в priors.
 
+Поэтому при успешном запуске с теми же classifier-артефактами Macro F1
+математически совпадает с solution140: в метрике участвует только неизменный
+verdict. Public `0.8923976821` измерен на исходном classifier-архиве; новый ZIP
+всё ещё должен подтвердить runtime на Public.
+
 ## Обучение
 
 Отдельный Qwen3.5-4B explanation-only adapter обучен как rsLoRA `r=16`,
@@ -28,10 +33,11 @@ train label заменяется уже готовым frozen verdict solution14
 5. CSV содержит ровно `id,result`; формат без закрывающих тегов:
    `<комментарий>{текст}<вердикт>{бан|не бан}`.
 
-Контракты реализованы в
-[`runtime_contract.py`](runtime_contract.py),
-[`submission_runtime.py`](submission_runtime.py) и
-[`research/explanation_submission_contract.py`](../../research/explanation_submission_contract.py).
+Канонический production-код находится в
+[`submission/run.py`](../140_dual_lora_fusion/submission/run.py),
+[`explanation_runtime.py`](../140_dual_lora_fusion/submission/explanation_runtime.py)
+и [`explanation_contract.py`](../140_dual_lora_fusion/submission/explanation_contract.py).
+Файлы в этой папке фиксируют обучение и отдельные проверки Exp714.
 
 ## Проверенный пример
 

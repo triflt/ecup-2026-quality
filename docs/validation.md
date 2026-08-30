@@ -69,8 +69,11 @@ OOF нужен, чтобы честно подбирать веса слияни
 переносе на новые семьи. Её нельзя выдавать за ту же метрику, что `0.9118425206`
 или semantic-v3.
 
-Фактический Public результата решения 140 — `0.8923976821`. Public связан с
-точным ZIP через SHA-256 в [`reports/champion.json`](../reports/champion.json).
+Фактический Public classifier-архива решения 140 — `0.8923976821`. Его
+исторический SHA сохранён в
+[`artifact-contract.json`](../experiments/140_dual_lora_fusion/final/artifact-contract.json).
+Финальный ZIP 140+714 имеет отдельный SHA и статус Public pending; эти два
+артефакта намеренно не смешиваются.
 
 ## Текущий критерий принятия: `semantic_family_v3`
 

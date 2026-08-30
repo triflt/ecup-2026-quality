@@ -21,10 +21,11 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
+from explanation_contract import format_result
+from explanation_runtime import attach_explanation_adapter, generate_explanations
 from PIL import Image
 from qwen_vl_utils.vision_process import process_vision_info
 from src.model import compose_text, fingerprint, normalize
-
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "vendor"))
@@ -61,6 +62,9 @@ QWEN3VL_ADAPTER_PATH = Path(
 QWEN35_ADAPTER_PATH = Path(
     os.environ.get("QWEN35_LORA_ADAPTER_PATH", ROOT / "adapter_qwen35")
 )
+EXPLANATION_ADAPTER_PATH = Path(
+    os.environ.get("QWEN35_EXPLANATION_ADAPTER_PATH", ROOT / "adapter_reasoner")
+)
 ANNOTATOR_PRIOR_PATH = Path(
     os.environ.get("ANNOTATOR_PRIOR_PATH", ROOT / "annotator_prior.json.gz")
 )
@@ -70,6 +74,7 @@ VALID_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp"}
 MAX_PIXELS = int(os.environ.get("QWEN_MAX_PIXELS", "261120"))
 BATCH_SIZE = int(os.environ.get("QWEN_EMBED_BATCH_SIZE", "24"))
 LORA_BATCH_SIZE = int(os.environ.get("QWEN_LORA_BATCH_SIZE", "8"))
+EXPLANATION_BATCH_SIZE = int(os.environ.get("QWEN_EXPLANATION_BATCH_SIZE", "2"))
 INSTRUCTION = (
     "Represent this marketplace product card for verifying whether it genuinely belongs "
     "to its declared moderation category. Use the description, packaging text, product "
@@ -99,7 +104,7 @@ LORA_RULES = {
         "источник, горючий материал только как компонент или предмет не в комплекте — 0."
     ),
 }
-OUTPUT_RE = re.compile(r"^<комментарий>(.{50,300})<вердикт>(бан|не бан)$", re.S)
+OUTPUT_RE = re.compile(r"^<комментарий>(.{50,300})<вердикт>(бан|не бан)$", re.DOTALL)
 
 
 def normalize_id(value: Any) -> str:
@@ -162,7 +167,7 @@ def load_embedder(model_path: Path):
             attn_implementation="flash_attention_2",
             **kwargs,
         )
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - optional backend failures vary by stack
         print(f"flash_attention_2 unavailable ({error}); using eager attention", flush=True)
         torch.cuda.empty_cache()
         return module.Qwen3VLEmbedder(model_name_or_path=str(model_path), **kwargs)
@@ -336,15 +341,15 @@ def compute_lora_scores(
                 conversations = [
                     lora_messages(row, image) for row, image in zip(rows, images)
                 ]
-                kwargs = dict(
-                    add_generation_prompt=True,
-                    tokenize=True,
-                    return_dict=True,
-                    return_tensors="pt",
-                    padding=True,
-                    truncation=True,
-                    max_length=1536,
-                )
+                kwargs = {
+                    "add_generation_prompt": True,
+                    "tokenize": True,
+                    "return_dict": True,
+                    "return_tensors": "pt",
+                    "padding": True,
+                    "truncation": True,
+                    "max_length": 1536,
+                }
                 try:
                     batch = processor.apply_chat_template(
                         conversations, enable_thinking=False, **kwargs
@@ -382,20 +387,6 @@ def compute_lora_scores(
                 flush=True,
             )
     return np.asarray(scores, dtype=np.float32)
-
-
-def explain(category: str, prediction: int) -> str:
-    if category == "БАД":
-        return (
-            "Текст и изображения подтверждают маркировку товара как биологически активной добавки."
-            if prediction
-            else "Текст и изображения не подтверждают обязательную маркировку товара как биологически активной добавки."
-        )
-    return (
-        "Текст и изображения подтверждают наличие самостоятельного горючего товара или источника воспламенения."
-        if prediction
-        else "Текст и изображения не подтверждают наличие самостоятельного горючего товара или источника воспламенения."
-    )
 
 
 def rank01(values: np.ndarray) -> np.ndarray:
@@ -515,17 +506,31 @@ def main() -> None:
             predictions[index] = annotator_prior["exact"][exact_key]
         elif name_key in annotator_prior["name"]:
             predictions[index] = annotator_prior["name"][name_key]
+    frozen_predictions = predictions.copy()
+    attach_explanation_adapter(qwen35_model, EXPLANATION_ADAPTER_PATH)
+    comments, explanation_statuses = generate_explanations(
+        qwen35_model,
+        qwen35_processor,
+        frame,
+        frozen_predictions,
+        batch_size=EXPLANATION_BATCH_SIZE,
+    )
+    if not np.array_equal(predictions, frozen_predictions):
+        raise AssertionError("explanation stage changed solution140 verdicts")
     results = []
-    for row, prediction in zip(frame.itertuples(index=False), predictions):
-        verdict = "не бан" if prediction else "бан"
-        result = f"<комментарий>{explain(row.category, int(prediction))}<вердикт>{verdict}"
+    for comment, prediction in zip(comments, frozen_predictions, strict=True):
+        result = format_result(comment, int(prediction))
         if OUTPUT_RE.fullmatch(result) is None:
             raise ValueError(f"invalid output: {result!r}")
         results.append(result)
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame({"id": frame["id"], "result": results}).to_csv(output_path, index=False)
-    print(f"saved rows={len(results)} path={output_path}", flush=True)
+    fallback_rows = sum(status != "generated_plain_text" for status in explanation_statuses)
+    print(
+        f"saved rows={len(results)} fallback_rows={fallback_rows} path={output_path}",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":

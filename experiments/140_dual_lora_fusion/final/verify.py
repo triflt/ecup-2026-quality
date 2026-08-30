@@ -6,13 +6,13 @@ import json
 import re
 from pathlib import Path
 
-
 HERE = Path(__file__).resolve().parent
 EXPERIMENT = HERE.parent
 ROOT = EXPERIMENT.parents[1]
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 EXPECTED_PUBLIC = 0.8923976821312729
 EXPECTED_ARCHIVE_SHA = "6cc2fda9d17d959880050889d964c3b971b92adbfa606505df7f04b46a819cd3"
+EXPECTED_FINAL_ARCHIVE_SHA = "a0695a55a85ca835d18f23e3700ee3eccc9ba03b9d490653719f474c38861bce"
 
 
 def sha256_file(path: Path) -> str:
@@ -33,6 +33,8 @@ def verify_repository() -> dict:
         EXPERIMENT / "results/metrics.json",
         EXPERIMENT / "submission/metadata.json",
         EXPERIMENT / "submission/run.py",
+        EXPERIMENT / "submission/explanation_contract.py",
+        EXPERIMENT / "submission/explanation_runtime.py",
         EXPERIMENT / "submission/src/model.py",
         EXPERIMENT / "submission/src/output.py",
         ROOT / "datasets/registry.toml",
@@ -78,6 +80,11 @@ def verify_repository() -> dict:
         '"file://" + str(Path(path).resolve())',
         'pd.DataFrame({"id": frame["id"], "result": results})',
         "OUTPUT_RE.fullmatch(result)",
+        "frozen_predictions = predictions.copy()",
+        "attach_explanation_adapter(qwen35_model, EXPLANATION_ADAPTER_PATH)",
+        "generate_explanations(",
+        "np.array_equal(predictions, frozen_predictions)",
+        "format_result(comment, int(prediction))",
     ):
         if token not in runner:
             raise ValueError(f"solution 140 runtime contract missing {token!r}")
@@ -91,10 +98,16 @@ def verify_repository() -> dict:
         raise ValueError("solution 140 metrics Public score drift")
     if float(champion["leaderboard"]["public_macro_f1"]) != EXPECTED_PUBLIC:
         raise ValueError("solution 140 champion Public score drift")
-    if champion.get("canonical_experiment_id") != "140_dual_lora_fusion":
-        raise ValueError("solution 140 champion identity mismatch")
+    if champion.get("canonical_experiment_id") != "714_qwen35_4b_explanation_only":
+        raise ValueError("solution 714 champion identity mismatch")
+    if champion.get("classifier_experiment_id") != "140_dual_lora_fusion":
+        raise ValueError("solution 140 classifier identity mismatch")
     if artifacts["historical_submission"]["sha256"] != EXPECTED_ARCHIVE_SHA:
         raise ValueError("solution 140 archive identity drift")
+    if artifacts["final_submission"]["sha256"] != EXPECTED_FINAL_ARCHIVE_SHA:
+        raise ValueError("solution 714 archive identity drift")
+    if artifacts["final_submission"]["public_status"] != "pending":
+        raise ValueError("unverified solution 714 Public status drift")
 
     checked_weights = 0
     if artifacts.get("weights_published"):
@@ -110,12 +123,15 @@ def verify_repository() -> dict:
             checked_weights += 1
 
     return {
-        "solution": "140",
+        "solution": "140+714",
+        "classifier_solution": "140",
+        "explanation_solution": "714",
         "decision": "REPOSITORY_CONTRACT_PASS",
         "public_macro_f1": EXPECTED_PUBLIC,
         "weights_published": bool(artifacts.get("weights_published")),
         "published_weight_artifacts_checked": checked_weights,
         "runtime_network_imports": forbidden_network,
+        "verdict_owner": "frozen_solution140",
         "offline_image_inputs": "local_file_uris_only",
         "required_files": len(required),
     }

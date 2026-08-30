@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
+import sys
+import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,7 +25,9 @@ def _load_module(name: str, path: Path):
 
 def test_solution_140_repository_contract() -> None:
     report = VERIFY.verify_repository()
-    assert report["solution"] == "140"
+    assert report["solution"] == "140+714"
+    assert report["classifier_solution"] == "140"
+    assert report["explanation_solution"] == "714"
     assert report["decision"] == "REPOSITORY_CONTRACT_PASS"
     assert report["runtime_network_imports"] == []
     assert report["weights_published"] is False
@@ -61,13 +66,15 @@ def test_solution_140_visual_inputs_reach_all_three_qwen_components() -> None:
     assert 'INSTRUCT_MODEL_PATH, QWEN3VL_ADAPTER_PATH, "image_text"' in source
     assert 'QWEN35_MODEL_PATH, QWEN35_ADAPTER_PATH, "multimodal"' in source
     assert "qwen35_scores = compute_lora_scores(" in source
+    assert "frozen_predictions = predictions.copy()" in source
+    assert "attach_explanation_adapter(qwen35_model, EXPLANATION_ADAPTER_PATH)" in source
+    assert "np.array_equal(predictions, frozen_predictions)" in source
 
 
 def test_exp714_preserves_verdict_and_fails_closed() -> None:
-    experiment = ROOT / "experiments/714_qwen35_4b_explanation_only"
-    runtime = _load_module("exp714_runtime_contract", experiment / "runtime_contract.py")
-    output = _load_module(
-        "exp714_output_contract", ROOT / "research/explanation_submission_contract.py"
+    submission = ROOT / "experiments/140_dual_lora_fusion/submission"
+    contract = _load_module(
+        "final_explanation_contract", submission / "explanation_contract.py"
     )
     fallback = (
         "Текст и первое изображение не подтверждают обязательную маркировку "
@@ -80,25 +87,48 @@ def test_exp714_preserves_verdict_and_fails_closed() -> None:
         "электрический заряд не делает её БАД."
     )
 
-    comment, status = runtime.normalize_generated_comment(
+    comment, status = contract.normalize_generated_comment(
         audited, fallback, category="БАД", verdict=0
     )
     assert (comment, status) == (audited, "generated_plain_text")
-    assert output.format_result(comment, 0) == (
+    assert contract.format_result(comment, 0) == (
         f"<комментарий>{audited}<вердикт>бан"
     )
-    assert output.verdict_from_label(1) == "не бан"
+    assert contract.verdict_from_prediction(1) == "не бан"
 
     contradiction = (
         "Карточка имеет маркировку БАД и является биологически активной добавкой, "
         "поэтому соответствует заявленной категории."
     )
-    assert runtime.normalize_generated_comment(
+    assert contract.normalize_generated_comment(
         contradiction, fallback, category="БАД", verdict=0
     ) == (fallback, "fallback_verdict_mismatch")
-    assert runtime.normalize_generated_comment(
+    assert contract.normalize_generated_comment(
         "Это незаконченное объяснение длиной больше пятидесяти символов без точки",
         fallback,
         category="БАД",
         verdict=0,
     ) == (fallback, "fallback_incomplete_sentence")
+
+
+def test_final_source_archive_contains_reasoner(tmp_path: Path) -> None:
+    output = tmp_path / "solution140-exp714-source.zip"
+    subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "experiments/140_dual_lora_fusion/build_submission.py"),
+            "--output",
+            str(output),
+        ],
+        cwd=ROOT,
+        check=True,
+    )
+    with zipfile.ZipFile(output) as archive:
+        names = set(archive.namelist())
+    assert {
+        "run.py",
+        "metadata.json",
+        "explanation_contract.py",
+        "explanation_runtime.py",
+    }.issubset(names)
+    assert all("__pycache__" not in name and not name.endswith(".pyc") for name in names)

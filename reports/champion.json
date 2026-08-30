@@ -1,11 +1,13 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-23",
-  "experiment": "140_qwen35_dual_lora_prior",
-  "canonical_experiment_id": "140_dual_lora_fusion",
-  "experiment_field_note": "Historical submission-recipe alias retained for compatibility",
-  "submission_filename": "quality-qwen3vl-qwen35-dual-lora-prior-submit.zip",
-  "submission_sha256": "6cc2fda9d17d959880050889d964c3b971b92adbfa606505df7f04b46a819cd3",
+  "updated_at": "2026-08-30",
+  "experiment": "714_qwen35_4b_explanation_only",
+  "canonical_experiment_id": "714_qwen35_4b_explanation_only",
+  "classifier_experiment_id": "140_dual_lora_fusion",
+  "experiment_field_note": "Exp714 adds explanation-only generation after the frozen solution140 verdict",
+  "submission_filename": "exp714-solution140-reasoner-4b-b192-final.zip",
+  "submission_sha256": "a0695a55a85ca835d18f23e3700ee3eccc9ba03b9d490653719f474c38861bce",
+  "submission_size_bytes": 55770475,
   "data_version": "competition_train_v1",
   "evaluation_versions": [
     "nested_grouped_recurrence_v1",
@@ -20,30 +22,41 @@
   },
   "leaderboard": {
     "public_macro_f1": 0.8923976821312729,
+    "public_score_owner": "historical_solution140_classifier_archive",
+    "final_package_public_macro_f1": null,
+    "final_package_public_status": "pending",
     "public_baseline_190": 0.8919244236941932,
     "public_delta_vs_190": 0.0004732584370797,
     "private_macro_f1": null
   },
   "runtime": {
     "measured_rows": 600,
-    "measured_seconds": null,
-    "projected_public_minutes": 10.2,
-    "projected_private_minutes": 24.1
+    "measured_seconds": 341.0,
+    "reasoner_seconds": 89.76,
+    "schema_valid_rows": 600,
+    "verdict_changes": 0,
+    "projected_public_minutes": 15.16,
+    "projected_private_minutes": 35.99
   },
   "verification": {
     "official_container_smoke": true,
     "output_schema": true,
     "empty_category_safe": true,
-    "adapter_checksums_recorded": true,
+    "adapter_checksums_recorded": false,
     "archive_sha256_recorded": true,
+    "reasoner_runs_after_frozen_verdict": true,
+    "reasoner_receives_component_scores": false,
+    "verdict_preservation_smoke_rows": 600,
     "connected_family_audit": false,
     "exact_production_replay": false,
     "clean_rebuild_before_public": true
   },
-  "acceptance_reason": "Эксперименты 140 и 180 получили одинаковый лучший Public 0.8923976821. Более простой 140 выбран отображаемым чемпионом: дополнительное правило числовых вариантов в 180 не дало измеримого эффекта. Преимущество над 400 равно только 0.0001076810 и не доказывает устойчивый Private-перенос.",
+  "acceptance_reason": "Solution140 остаётся владельцем classifier verdict и подтверждённого Public 0.8923976821. Exp714 выбран финальным comment-layer: он запускается после fusion и exact/name prior, не получает component scores и на frozen 600-row E2E smoke не изменил ни одного verdict. Public нового ZIP пока не измерен и не используется для настройки.",
   "final_readiness": {
     "classification": true,
     "explanations": false,
-    "blocker": "Новый слепой пакет эксперимента 626 готов, но 300 реальных ручных оценок объяснений ещё не предоставлены."
+    "explanation_runtime_contract": true,
+    "explanation_human_audit": false,
+    "blocker": "Нужны ручной аудит содержания объяснений и фактическая Public-проверка frozen Exp714 ZIP; classifier Public не выдаётся за измеренный Public нового архива."
   }
 }

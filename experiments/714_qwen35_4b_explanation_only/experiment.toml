@@ -63,6 +63,7 @@ planned_public_submissions = 0
 [artifacts]
 directory = "artifacts"
 publish = false
+final_submission_source = "experiments/140_dual_lora_fusion/submission"
 submission_zip = "exp714-solution140-reasoner-4b-b192-final.zip"
 submission_zip_sha256 = "a0695a55a85ca835d18f23e3700ee3eccc9ba03b9d490653719f474c38861bce"
 submission_zip_size_bytes = 55770475

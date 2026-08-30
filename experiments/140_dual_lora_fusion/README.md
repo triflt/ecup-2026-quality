@@ -42,15 +42,21 @@ python3 experiments/140_dual_lora_fusion/run.py \
 
 Исходники лежат в `experiments/140_dual_lora_fusion/submission`. Локальный ZIP
 собирается командой `python3 experiments/140_dual_lora_fusion/build_submission.py --output /tmp/submission.zip`.
+Канонический runtime теперь включает Exp714: после финального classifier verdict
+он переключает уже загруженную Qwen3.5-4B на explanation-only adapter и формирует
+комментарий, не меняя prediction.
 
 ## Результат
 
 Основная архитектура получила Macro F1 `0.911843` на вложенной CV-5. Расчётное
 время работы укладывается в лимит.
 
-Public Macro F1: **0,8923976821**. Эксперимент `180` получил ровно тот же
+Public Macro F1 classifier-архива: **0,8923976821**. Эксперимент `180` получил ровно тот же
 результат, поэтому более простой `140` выбран основным решением.
 Public не используется для перенастройки весов или порогов.
+
+Public объединённого Exp714 ZIP пока pending. На frozen 600-row E2E smoke схема
+валидна для 600/600 строк, а изменений verdict нет: 0/600.
 
 Подробные машиночитаемые результаты находятся в `results/metrics.json` и
 `reports/experiment-log.csv`.
