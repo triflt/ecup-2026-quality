@@ -5,6 +5,7 @@ import csv
 import hashlib
 import json
 import math
+import os
 import sys
 import time
 from pathlib import Path
@@ -24,7 +25,7 @@ import grid_contract
 import run_fold as student
 
 
-MODEL = Path("/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3.5-4B")
+MODEL = Path(os.environ.get("ECUP_MODEL_DIR", "models/Qwen3.5-4B"))
 FLAMMABLE = "Легковоспламеняющиеся"
 
 

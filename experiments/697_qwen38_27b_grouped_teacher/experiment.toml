@@ -2,7 +2,7 @@
 id = "697"
 slug = "qwen38_27b_grouped_teacher"
 title = "Qwen3.8-27B grouped-v1 offline teacher screen"
-status = "screen_running"
+status = "completed_rejected"
 entrypoint = "experiments/697_qwen38_27b_grouped_teacher/run_fold.py"
 result_file = "experiments/697_qwen38_27b_grouped_teacher/results/metrics.json"
 
@@ -19,15 +19,15 @@ solution_140_nested_macro_f1 = 0.9118425
 public_used = false
 
 [model]
-path = "/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3.8-27B"
+path = "Qwen/Qwen3.8-27B"
 role = "offline_teacher_only"
 submission_dependency = false
 
 [training]
 seed = 42
 epochs = 1
-micro_batch_size = 4
-gradient_accumulation = 4
+micro_batch_size = 2
+gradient_accumulation = 8
 effective_batch_size = 16
 learning_rate = 0.0002
 lora_rank = 16

@@ -5,13 +5,14 @@ import csv
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from sklearn.metrics import f1_score
 
-DEFAULT_DATA = Path("/home/jovyan/shares/SR008.fs2/litvinov/tmp/QC/data/data.csv")
+DEFAULT_DATA = Path(os.environ.get("ECUP_DATA", "data/data.csv"))
 DEFAULT_FOLDS = (
     Path(__file__).resolve().parents[2] / "validation/grouped_text_v1/folds.csv"
 )

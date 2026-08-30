@@ -105,7 +105,7 @@ class EvaluateTest(unittest.TestCase):
                     "fold": fold,
                     "mode": mode,
                     "technical_smoke": False,
-                    "model": "/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3.5-4B",
+                    "model": "Qwen/Qwen3.5-4B",
                     "submission_eligible_base_model": True,
                     "teacher_model_required_at_inference": False,
                     "image_preprocessing": "solution140_first_image_thumbnail_448_lanczos_v1",

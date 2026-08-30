@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -10,7 +11,7 @@ from sklearn.metrics import f1_score
 
 from assemble_oof import best_threshold, fold_category_percentile_rank
 
-DATA = Path("/home/jovyan/shares/SR008.fs2/litvinov/tmp/QC/data/data.csv")
+DATA = Path(os.environ.get("ECUP_DATA", "data/data.csv"))
 FOLDS = Path(__file__).resolve().parents[2] / "validation/grouped_text_v1/folds.csv"
 
 

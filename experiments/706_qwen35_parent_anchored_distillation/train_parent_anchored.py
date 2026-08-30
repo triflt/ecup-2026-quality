@@ -28,7 +28,7 @@ import run_fold as student
 
 EXPERIMENT_ID = "706"
 FLAMMABLE = "Легковоспламеняющиеся"
-MODEL = Path("/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3.5-4B")
+MODEL = Path(os.environ.get("ECUP_MODEL_DIR", "models/Qwen3.5-4B"))
 SEED = 20260829
 LR = 1e-5
 GRAD_ACCUM = 8

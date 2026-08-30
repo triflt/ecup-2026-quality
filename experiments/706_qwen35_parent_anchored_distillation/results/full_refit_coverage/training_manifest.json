@@ -21,31 +21,31 @@
   "parent_prediction_sources": [
     {
       "metrics_sha256": "074e40a6f2ff814b0bd230fcdf1b1e12e7dcd3aac29c1024cf3dceb920186c07",
-      "path": "/home/jovyan/shares/SR008.fs2/litvinov/tmp/ecup-qwen38-distill-execution/experiments/706_qwen35_parent_anchored_distillation/results/full_parent_scores/f0/predictions.jsonl",
+      "path": "results/full_parent_scores/f0/predictions.jsonl",
       "predictions_sha256": "23c50d86bf927c475e902131fb9a9b3710a30bff272b683c05695c80cd21f831",
       "rows": 1100
     },
     {
       "metrics_sha256": "681ba2f888942b6f38955d48f2f44176f119133f00c37287948c86d335c01235",
-      "path": "/home/jovyan/shares/SR008.fs2/litvinov/tmp/ecup-qwen38-distill-execution/experiments/706_qwen35_parent_anchored_distillation/results/full_parent_scores/f1/predictions.jsonl",
+      "path": "results/full_parent_scores/f1/predictions.jsonl",
       "predictions_sha256": "d1446398a7b765dbf49ae93a2b5fa1347c0f4ab0869f650c99c5e82f00ccab86",
       "rows": 1102
     },
     {
       "metrics_sha256": "8b05decac4bf23299a97e60fbb947d04e2e7734483167838fae9d05303d97f12",
-      "path": "/home/jovyan/shares/SR008.fs2/litvinov/tmp/ecup-qwen38-distill-execution/experiments/706_qwen35_parent_anchored_distillation/results/full_parent_scores/f2/predictions.jsonl",
+      "path": "results/full_parent_scores/f2/predictions.jsonl",
       "predictions_sha256": "d1af8334d0c9795770cc10c7706bbaba41b1bbe438a00a38da48b2bd562a3b11",
       "rows": 1100
     },
     {
       "metrics_sha256": "3ff9f083b4e3602ba26829dda95e6504b306bca916b4cc903cc9a47b4ce3795e",
-      "path": "/home/jovyan/shares/SR008.fs2/litvinov/tmp/ecup-qwen38-distill-execution/experiments/706_qwen35_parent_anchored_distillation/results/full_parent_scores/f3/predictions.jsonl",
+      "path": "results/full_parent_scores/f3/predictions.jsonl",
       "predictions_sha256": "8b1e81918159187f209057d2dc5b78abc74e9e668198fd70d2ece3007fb317b2",
       "rows": 1100
     },
     {
       "metrics_sha256": "e748cd75dd128cc7ada8ef038f7cdb75a370b8c6355ba89a0fc6822a34a97042",
-      "path": "/home/jovyan/shares/SR008.fs2/litvinov/tmp/ecup-qwen38-distill-execution/experiments/706_qwen35_parent_anchored_distillation/results/holdout_eval/parent/predictions.jsonl",
+      "path": "results/holdout_eval/parent/predictions.jsonl",
       "predictions_sha256": "73ae1561bb95778b5cd71e6e8a987bb12aae878ec4ff57918dd9475188c67da7",
       "rows": 1100
     }

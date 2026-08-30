@@ -40,15 +40,9 @@
 | 682 | BAD-only seed-632 route | Validated, refit not run | `+0.002824` Macro, 5/5 folds и 72/19 corrections/regressions; требует отдельного full refit/runtime gate |
 | 683–688 | Compact teacher transfer and rank-KD | Rejected/diagnostic | Сохранены терминальные AP/F1 и gradient-conflict выводы; ни один кандидат не открыт для Public |
 | 693–695 | Следующие 4B distillation hypotheses | Prepared, unmeasured | Preregistered causal/hard-negative/ranking варианты; не выдаются за результаты |
-| 689 | Grounded transaction-graph KD | Research packet | Source audit, teacher smoke и provenance contracts сохранены; production-кандидат не принят |
 | 697 | Qwen3.8-27B grouped teacher | Completed offline, rejected for transfer | Strict five-fold OOF `0.908299` ниже локального exp140 `0.911843`; ранний screen `0.926364` был оптимистичен |
-| 698 | Teacher-guided student controls | Executed/rejected | Контрольные схемы hard-negative/ranking сохранены для воспроизводимости |
-| 704–706 | Deadline distillation and submission lanes | Rejected online | Scratch Public `0.796849–0.835403`; strict exp706 `0.821766` против `0.892398` у exp140 |
-| 715–719 | Renumbered full-refit/package/selection pipeline | Historical executable packet | Это бывшие локальные IDs 699–703; перенумерованы, потому что свежий main уже занял 699–703 |
-| 720 | Gemma-4 LoRA SFT (former 240-QC) | Trained, eval blocked | Перенумерован при merge; vLLM did not apply LoRA at generation |
-| 721 | Qwen3-VL contrastive (former 241-QC) | Negative first attempt | Перенумерован из-за main ID 241; LR/KNN ухудшились |
-| 722 | Fusion grid (former 242-QC) | Prepared | Fusion 720/721 ждёт валидных component scores |
-| 723 | Embedder tuning for top (former 243-QC) | Prepared | Task-specific embedding + LinearSVC план из `maksimcrewceo` |
+| 698 | Teacher-guided student objective | Support code for 706 | Реализация matched-control objective; терминальные результаты сведены в 706 |
+| 706 | Parent-anchored 27B→4B distillation | Rejected online | Scratch Public `0.796849–0.835403`; strict package `0.821766` против `0.892398` у решения 140 |
 | 900 | Infrastructure checks | Completed | Runtime/schema/preprocessing safeguards |
 
 Новый experiment создаётся из `templates/experiment/`, затем добавляется отдельной строкой в `reports/experiment-log.csv`.

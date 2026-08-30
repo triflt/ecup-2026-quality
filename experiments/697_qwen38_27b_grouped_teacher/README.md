@@ -3,8 +3,8 @@
 This is an offline teacher screen against the exact grouped-text-v1 protocol used
 to evaluate solution 140. The 27B model is never a submission dependency.
 
-- source data: the canonical `QC/data/data.csv` from main;
-- images: the first local image in `QC/data/images/images/<id>`;
+- source data: the canonical competition CSV supplied through `ECUP_DATA`;
+- images: the first local image under `ECUP_IMAGES/<id>`;
 - folds: `validation/grouped_text_v1/folds.csv`;
 - objective: binary class-only LoRA;
 - screen folds: 0 and 3, one four-H100 process per fold;
@@ -34,16 +34,18 @@ Evaluation first applies a label-blind average-tie percentile rank within each
 folds. The resulting v2 report is the immutable input for component and
 distillation analysis rather than an implicit collection of loose prediction
 files.
-The independent `assemble_oof_wait.sh` waiter is safe to start before all folds
-finish and makes the postprocessing durable even when an older evaluator shell
-was already running before the assembler was added.
-
 Runtime examples:
 
 ```bash
-python build_runtime.py --fold 0 --output-dir .local/runtime-f0
-CUDA_VISIBLE_DEVICES=0,1,2,3 python run_fold.py \
+ECUP_DATA=<data.csv> ECUP_IMAGES=<images-dir> \
+python experiments/697_qwen38_27b_grouped_teacher/build_runtime.py \
+  --fold 0 --output-dir .local/runtime-f0
+CUDA_VISIBLE_DEVICES=0,1,2,3 \
+python experiments/697_qwen38_27b_grouped_teacher/run_fold.py \
   --fold 0 --runtime-dir .local/runtime-f0 --output-dir .local/output-f0
+python experiments/697_qwen38_27b_grouped_teacher/assemble_oof.py \
+  --experiment-dir experiments/697_qwen38_27b_grouped_teacher \
+  --output-dir .local/oof
 ```
 
 The first fold-3 attempt demonstrated that microbatch 4 had effectively no

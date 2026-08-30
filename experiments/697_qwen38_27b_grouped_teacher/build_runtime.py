@@ -3,14 +3,15 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import random
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-DATA = Path("/home/jovyan/shares/SR008.fs2/litvinov/tmp/QC/data/data.csv")
-IMAGES = Path("/home/jovyan/shares/SR008.fs2/litvinov/tmp/QC/data/images/images")
+DATA = Path(os.environ.get("ECUP_DATA", "data/data.csv"))
+IMAGES = Path(os.environ.get("ECUP_IMAGES", "data/images"))
 FOLDS = Path(__file__).resolve().parents[2] / "validation/grouped_text_v1/folds.csv"
 EXPECTED_DATA_SHA256 = "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
 SEED = 42

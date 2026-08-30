@@ -15,14 +15,11 @@ failure. Public scores below were read from the competition UI.
 
 ## Provenance
 
-- Teacher repository branch: `codex/qwen38-teacher-distill`
-- Teacher implementation commit: `0db3aa9`
 - Teacher experiment: `697_qwen38_27b_grouped_teacher`
-- Execution repository branch: `codex/qwen38-distill-execution`
 - Execution experiment: `706_qwen35_parent_anchored_distillation`
-- Teacher model: `/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3.8-27B`
+- Teacher model: `Qwen/Qwen3.8-27B` (local revision supplied through the runtime)
 - Student/deployment model: `Qwen/Qwen3.5-4B`
-- Runtime Python: `/home/jovyan/shares/SR008.fs2/me/envs/mlitvinov_vlm/bin/python`
+- Runtime: the frozen environment recorded by the experiment contract
 
 Teacher folds `f0..f4` produced strict OOF scores: each target row was scored by
 a teacher adapter that had not trained on that row. The final target contract

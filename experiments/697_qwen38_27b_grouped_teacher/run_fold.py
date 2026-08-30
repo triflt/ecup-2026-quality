@@ -28,7 +28,7 @@ SHARED = Path(__file__).resolve().parents[1] / "645_qwen_scale_2x3_gate"
 sys.path.insert(0, str(SHARED))
 from grid_contract import base_prompt  # noqa: E402
 
-MODEL = Path("/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3.8-27B")
+MODEL = Path(os.environ.get("ECUP_MODEL_DIR", "models/Qwen3.8-27B"))
 SEED = 42
 MAX_LENGTH = 1536
 DEFAULT_MICRO_BATCH = 2

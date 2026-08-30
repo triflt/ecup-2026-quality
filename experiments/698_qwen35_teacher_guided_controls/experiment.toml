@@ -1,7 +1,7 @@
 [experiment]
 id = "698"
 slug = "qwen35_teacher_guided_controls"
-status = "prepared_waiting_exp697_targets"
+status = "support_code_results_consolidated_in_706"
 
 [training]
 model = "Qwen/Qwen3.5-4B"

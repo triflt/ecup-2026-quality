@@ -1,5 +1,10 @@
 # 698: Qwen3.5-4B teacher-guided matched controls
 
+Этот каталог содержит реализацию student objective. Полный запуск, выбор
+checkpoint, упаковка и терминальные метрики сведены в
+[`../706_qwen35_parent_anchored_distillation/RESULTS.md`](../706_qwen35_parent_anchored_distillation/RESULTS.md);
+отдельного результата 698 не заявляет.
+
 This experiment consumes the exact five frozen experiment-697 outer-fold
 runtimes and occurrence-aligned frozen 27B teacher targets. It deliberately does
 not pass those artifacts through the older 691/696 consumer: that consumer uses
@@ -27,11 +32,9 @@ area-bounded view: knowledge may cross resolution during training, but student
 OOF and deployment preprocessing must be identical. The preprocessing version
 is required in every fold output contract and downstream package contract.
 
-`queue_after_teacher.sh` contains two target-generation lanes and one student
-lane. It is safe to start while the teacher is running: each lane waits on
-non-empty immutable contracts, skips completed outputs, and refuses to overwrite
-partial outputs. Five student folds run concurrently on five GPUs, but each
-individual train/inference process uses one H100.
+Each fold is launched through `run_fold.py` after the corresponding immutable
+teacher contract and occurrence-aligned targets have been produced. The runner
+refuses incomplete contracts and does not overwrite partial outputs.
 
 The evaluator verifies all fold contracts, self-hashes, prediction checksums and
 exact ID coverage. The v2 fold contract also binds the base model, seed,

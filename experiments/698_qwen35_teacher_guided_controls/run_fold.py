@@ -22,8 +22,8 @@ base_prompt = None
 
 EXPERIMENT_ID = "698"
 SOURCE_EXPERIMENT_ID = "697"
-MODEL = Path("/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3.5-4B")
-TEACHER_MODEL = Path("/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3.8-27B")
+MODEL = Path(os.environ.get("ECUP_MODEL_DIR", "models/Qwen3.5-4B"))
+TEACHER_MODEL = Path(os.environ.get("ECUP_TEACHER_MODEL_DIR", "models/Qwen3.8-27B"))
 FLAMMABLE = "Легковоспламеняющиеся"
 MODES = ("gold_control", "hardneg_candidate", "rank_candidate")
 SEED = 42
