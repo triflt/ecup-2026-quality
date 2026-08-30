@@ -1,0 +1,13 @@
+id = "705"
+name = "qwen35_deadline_fast_distill"
+status = "deadline_fast_track"
+teacher_source_fold = 3
+full_train_occurrences = 6790
+arms = ["gold_control", "hardneg_candidate", "rank_candidate"]
+strict_oof = false
+
+[constraints]
+teacher_at_inference = false
+submission_base_model = "Qwen/Qwen3.5-4B"
+single_h100 = true
+immutable_exp719 = true

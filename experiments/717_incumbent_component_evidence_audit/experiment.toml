@@ -1,0 +1,12 @@
+id = "717"
+slug = "incumbent_component_evidence_audit"
+status = "active"
+
+[scope]
+incumbent = "140_dual_lora_fusion"
+changed_component = "adapter_qwen35"
+qc_read_only = true
+
+[decision]
+require_exact_component_oof_for_fusion_delta_claim = true
+freeze_fusion_when_exact_component_oof_missing = true

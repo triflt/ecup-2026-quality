@@ -1,0 +1,64 @@
+[experiment]
+id = "689"
+slug = "qwen35_4b_grounded_transaction_graph_kd"
+title = "Grounded transaction-graph knowledge distillation"
+status = "preregistered_remote_target_audit_only"
+entrypoint = "experiments/689_qwen35_4b_grounded_transaction_graph_kd/build_target_audit.py"
+result_file = "experiments/689_qwen35_4b_grounded_transaction_graph_kd/results/pre_gpu_review.json"
+
+[data]
+version = "remote_contract_bound_development_only"
+registry = "runtime_parameter_only"
+local_competition_artifacts_allowed = false
+sealed_rows_allowed = 0
+public_rows_allowed = 0
+
+[validation]
+primary_version = "exp689_image_aware_dual_blind_target_audit_v2"
+primary_metric = "strict_target_tuple_accuracy"
+audit_rows = 300
+component_disjoint_from = [670, 672]
+family_disjointness_claimed = false
+first_image_required = true
+blind_reviewers_required = 2
+
+[hypothesis]
+parent_experiment = "685_qwen35_4b_structured_rank_distillation"
+changed_factor = "closed grounded transaction-graph targets"
+mechanism = "Teach sold-object, substance, and relation structure from extractive candidate pointers without free-form reasoning or outcome scores."
+falsification = "Reject before student GPU unless the frozen 300-row remote audit passes every schema, grounding, accuracy, coverage, contradiction, and nonduplication gate."
+precedents = ["ERASER", "CLARITY", "Distilling Step-by-Step"]
+
+[acceptance]
+required_schema_grounding = 300
+minimum_target_tuple_correct = 282
+minimum_s1_object_relation_correct = 95
+minimum_s2_object_relation_correct = 90
+minimum_s3_object_relation_correct = 90
+minimum_evidence_supported = 297
+minimum_overall_coverage = 0.75
+minimum_rare_positive_coverage = 0.80
+maximum_contradiction_rate = 0.05
+minimum_exact_review_agreement = 0.90
+minimum_relation_cohen_kappa = 0.80
+minimum_relation_gwet_ac1 = 0.80
+minimum_image_required_rows = 30
+minimum_image_required_strict_pass = 27
+maximum_image_required_unsupported_visual_claims = 0
+exact_nonduplication_required = true
+
+[budget]
+planned_gpu_hours = 0.0
+planned_public_submissions = 0
+student_gpu_authorized = false
+
+[execution]
+scope = "remote_mlcore_only"
+presets_built = 0
+bundles_built = 0
+jobs_launched = 0
+uploads = 0
+
+[artifacts]
+directory = "remote_runtime_parameter_only"
+publish = false

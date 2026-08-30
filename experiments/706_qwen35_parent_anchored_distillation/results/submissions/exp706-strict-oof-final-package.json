@@ -1,0 +1,17 @@
+{
+  "bad_original_adapter_byte_exact": true,
+  "base_submission_sha256": "d211ea3fa25260c30f6ad44cdf391af1c8ecc0474a5bccf8586a18f77853af20",
+  "blend_space": "raw_logit",
+  "distill_alpha": 1.0,
+  "flammable_only_distill_route": true,
+  "full_refit_contract_sha256": "e8ed6a3a6167c0e5eea191611efd3b4d175f9e6ea0602b939d2651bc849a41a7",
+  "ocr_runtime_absent": true,
+  "output_bytes": 55645038,
+  "output_sha256": "223b42bf9d21733d002a462566c8ca768c5b395d2d58764fa9a984705f2cb464",
+  "runtime_smoke": "PENDING",
+  "schema_version": "exp706_final_submission_v1",
+  "selection_status": "STRICT_HOLDOUT_SELECTED",
+  "teacher_at_inference": false,
+  "under_5_gib": true,
+  "zip_integrity": "PASS"
+}

@@ -1,0 +1,36 @@
+[experiment]
+id = "698"
+slug = "qwen35_teacher_guided_controls"
+status = "prepared_waiting_exp697_targets"
+
+[training]
+model = "Qwen/Qwen3.5-4B"
+folds = [0, 1, 2, 3, 4]
+seed = 42
+sampler = "exp697_label_only_v1"
+micro_batch = 2
+gradient_accumulation = 8
+effective_batch = 16
+modes = ["gold_control", "hardneg_candidate", "rank_candidate"]
+hard_weight_max = 2.0
+rank_coefficient = 0.5
+rank_scope = "flammable_same_hard_label_within_batch"
+image_preprocessing = "solution140_first_image_thumbnail_448_lanczos_v1"
+
+[evaluation]
+version = "nested_grouped_v1"
+fold_output_contract = "exp698_fold_output_v2"
+matched_common_factor_verification = true
+score_calibration = "category_and_outer_fold_percentile_average_ties"
+deployment_score = "category_batch_percentile_rank"
+deployment_threshold_rule = "median_of_five_outer_train_thresholds"
+minimum_macro_delta_vs_control = 0.001
+minimum_fold_wins = 4
+maximum_category_regression = 0.005
+incumbent_140_nested_macro_f1 = 0.9118425205786493
+
+[deployment]
+teacher_required = false
+base_model = "Qwen/Qwen3.5-4B"
+gpus = 1
+submit_size_limit_gb = 5

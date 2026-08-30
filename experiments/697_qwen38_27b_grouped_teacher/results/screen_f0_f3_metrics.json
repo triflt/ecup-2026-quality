@@ -1,0 +1,47 @@
+{
+  "schema_version": "exp697_screen_evaluation_v2",
+  "folds": [
+    0,
+    3
+  ],
+  "coverage_rows": 5188,
+  "full_five_fold_oof": false,
+  "score_calibration": "label_blind_percentile_rank_within_fold_and_category_average_ties",
+  "raw_scores_preserved_in_fold_predictions": true,
+  "categories": {
+    "БАД": {
+      "nested_f1": 0.9428115743905218,
+      "folds": {
+        "0": {
+          "rank_threshold": 0.27058232931726905,
+          "f1": 0.9390909090909091,
+          "rows": 1494
+        },
+        "3": {
+          "rank_threshold": 0.2794511378848728,
+          "f1": 0.9465509365006852,
+          "rows": 1494
+        }
+      }
+    },
+    "Легковоспламеняющиеся": {
+      "nested_f1": 0.9135802469135802,
+      "folds": {
+        "0": {
+          "rank_threshold": 0.9640909090909091,
+          "f1": 0.9,
+          "rows": 1100
+        },
+        "3": {
+          "rank_threshold": 0.9627272727272728,
+          "f1": 0.926829268292683,
+          "rows": 1100
+        }
+      }
+    }
+  },
+  "nested_macro_f1": 0.928195910652051,
+  "solution_140_nested_macro_f1": null,
+  "delta_vs_140": null,
+  "decision_scope": "screen_only_not_comparable_to_full_140"
+}

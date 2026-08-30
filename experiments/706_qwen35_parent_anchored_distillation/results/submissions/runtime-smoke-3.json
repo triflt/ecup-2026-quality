@@ -1,0 +1,23 @@
+{
+  "cuda_visible_devices": "0",
+  "decision": "RUNTIME_SMOKE_PASS",
+  "elapsed_seconds": 114.86012689117342,
+  "experiment_id": "716",
+  "max_gpu_utilization_percent": 100,
+  "model_mounts": {
+    "Qwen/Qwen3-VL-2B-Instruct": "/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3-VL-2B-Instruct",
+    "Qwen/Qwen3-VL-Embedding-2B": "/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3-VL-Embedding-2B",
+    "Qwen/Qwen3.5-4B": "/home/jovyan/shares/SR008.fs2/litvinov/models/Qwen3.5-4B"
+  },
+  "output_schema_valid": true,
+  "output_sha256": "10f6f8446c48cfab08f775f7ec2d683127b64fac8e45f1534ce8e8e69c6eae7e",
+  "package_report_sha256": "f4b5a122dd7e99386db4924a0bbb948b3e45aba72e40bb3eef704f06defd972a",
+  "peak_gpu_memory_mib": 66641,
+  "return_code": 0,
+  "rows": 3,
+  "schema_version": "exp716_runtime_smoke_v1",
+  "stderr_log": "/home/jovyan/shares/SR008.fs2/litvinov/tmp/ecup-qwen38-distill-execution/experiments/706_qwen35_parent_anchored_distillation/.local/final-runtime-smoke-3/stderr.log",
+  "stdout_log": "/home/jovyan/shares/SR008.fs2/litvinov/tmp/ecup-qwen38-distill-execution/experiments/706_qwen35_parent_anchored_distillation/.local/final-runtime-smoke-3/stdout.log",
+  "submission_sha256": "223b42bf9d21733d002a462566c8ca768c5b395d2d58764fa9a984705f2cb464",
+  "unique_ids_valid": true
+}

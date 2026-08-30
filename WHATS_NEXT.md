@@ -1,14 +1,27 @@
 # Что делать дальше
 
-Обновлено: 2026-08-21.
+Обновлено: 2026-08-30.
 
 ## Текущий лидер
 
-- Подтверждённый Public: `quality-qwen3vl-qwen35-dual-lora-shingle-prior-submit.zip`, Macro F1 **0.8919244237**.
-- Предыдущий лучший результат: 0.8065791632; абсолютный прирост составил 0.0853452605.
+- Подтверждённый Public: immutable exp140, Macro F1 **0.8923976821**.
+- Qwen3.8-27B → Qwen3.5-4B distillation exp697–706 терминально отклонена.
 - Private scores пока отсутствуют.
 
-## Немедленная следующая задача
+## Не продолжать exp697–706 без нового experiment ID
+
+Strict five-fold teacher OOF exp697 дал `0.9082987331`, ниже локального exp140
+`0.9118425206`. Финальный student exp706 получил Public `0.8217663209` против
+`0.8923976821` у exp140. ZIP exp705/706 нельзя выбирать финальными.
+
+Следующая попытка переноса 27B-сигнала обязана до full refit пройти:
+
+1. полный five-fold teacher gate против exp140;
+2. exact end-to-end OOF уже с production fusion и порогами;
+3. byte-exact exp140 control и причинную абляцию teacher supervision;
+4. Macro/Flammable improvement без ухудшения BAD и false negatives.
+
+## Архивный план до закрытия distillation-ветки
 
 Второй Qwen3.5 seed `31415` завершил пять outer-fold jobs и full-data training. Нужно:
 
@@ -32,18 +45,18 @@
 
 ## QC-треки (Максим / maksimcrewceo)
 
-- **241 Qwen3-VL contrastive** — негативный первый заход: дообучение
+- **721 Qwen3-VL contrastive** — негативный первый заход: дообучение
   ухудшило LR/KNN head на r16/3ep. Финальный reject преждевременен, потому
   что лучшее решение команды построено на эмбеддерах. План Wave 1.5:
   LinearSVC-эвал (как у Данека), hard mining, больше r/alpha/эпох, абляция
   n_images/OCR. Сравнение с zero-shot на том же head.
-  Адаптеры и метрики сохранены в `experiments/241_qwen3vl_contrastive/`.
-- **240 Gemma LoRA SFT** — A01-A04 в процессе обучения (GPU 0-3), ожидаем
+  Адаптеры и метрики сохранены в `experiments/721_qwen3vl_contrastive/`.
+- **720 Gemma LoRA SFT** — A01-A04 в процессе обучения (GPU 0-3), ожидаем
   диагностические результаты. Порог: macro-F1 ≥ 0.45 для продолжения,
   ≥ 0.55 для пересчёта на grouped folds.
-- **242 fusion grid** — on hold, пока не будут ясны A-результаты и не найдётся
+- **722 fusion grid** — on hold, пока не будут ясны A-результаты и не найдётся
   независимый head лучше zero-shot.
-- **243 embedder tuning for top** — гипотеза и план готовы для Данека/агента:
+- **723 embedder tuning for top** — гипотеза и план готовы для Данека/агента:
   hard-mined Qwen3-VL contrastive + LinearSVC head, возможно два
   категориальных адаптера, интеграция в чемпионскую rank-fusion схему `190`.
   Не запущено; ждёт свободных GPU и приоритета.

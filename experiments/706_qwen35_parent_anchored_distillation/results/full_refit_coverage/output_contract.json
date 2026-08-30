@@ -1,0 +1,25 @@
+{
+  "adapter_bytes": 12592424,
+  "adapter_model_sha256": "0b5c36c941dfdaab37f57032d3be107f4595317d8c4180ea1ea9fd2fdf9a0dc5",
+  "bad_route": "immutable_original_exp140_adapter",
+  "contract_sha256": "08c9fefa778880082a8a943ed6ef27f2a04a735a235c426958584fd35bd62044",
+  "experiment_id": "706",
+  "full_oof": true,
+  "manifest_sha256": "dd621ef1686e680eecac777523cc098f1f8719f1281ef5e2db1bbb0bd1c21911",
+  "parent_adapter_sha256": "75d4cb53fb05636d715f33ad88d2b420f5af4393977da113286133843a6db2a1",
+  "schema_version": "exp706_parent_anchored_full_v1",
+  "selected_from_strict_holdout_update": 40,
+  "strict_oof": true,
+  "submission_base_model": "Qwen/Qwen3.5-4B",
+  "teacher_at_inference": false,
+  "teacher_folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "technical_smoke": false,
+  "unique_flammable_rows": 5502,
+  "unique_flammable_rows_covered": 5502
+}

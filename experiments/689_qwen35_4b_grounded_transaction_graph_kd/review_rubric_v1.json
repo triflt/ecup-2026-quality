@@ -1,0 +1,17 @@
+{
+  "evidence_slice": {
+    "image_helpful": "The target is supportable from text or OCR, while the first image materially reduces ambiguity.",
+    "image_required": "At least one target field cannot be supported without first-image evidence.",
+    "text_sufficient": "Text or OCR candidates fully support the target without image evidence."
+  },
+  "review_fields": {
+    "contradiction": "True only when the structured target contains a material internal contradiction.",
+    "evidence_supported": "True only when all three target fields are supported by their separately bound evidence candidates, or a no-supervision abstention is correct.",
+    "relation_correct": "The closed relation enum matches the sold-object transaction graph.",
+    "sold_object_correct": "The closed sold-object enum identifies what the listing sells.",
+    "substance_correct": "The closed substance enum matches the regulated substance in scope.",
+    "unsupported_visual_claim": "True when any target field relies on image evidence that the referenced image region does not support."
+  },
+  "schema_version": "exp689_review_rubric_v1",
+  "strict_row_pass": "sold_object_correct AND substance_correct AND relation_correct AND evidence_supported AND NOT contradiction AND NOT unsupported_visual_claim"
+}

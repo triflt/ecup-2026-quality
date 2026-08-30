@@ -1,0 +1,16 @@
+[experiment]
+id = "706"
+slug = "qwen35_parent_anchored_distillation"
+title = "Parent-anchored Qwen3.5 distillation"
+status = "rejected"
+
+[distillation]
+parent = "140_dual_lora_fusion"
+bad_route = "byte_exact_parent_adapter"
+flammable_route = "conservative_parent_distill_rank_blend"
+teacher_at_inference = false
+
+[result]
+public_macro_f1 = 0.8217663209
+reference_140_public_macro_f1 = 0.8923976821
+decision = "reject_never_promote"

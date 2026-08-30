@@ -1,0 +1,13 @@
+id = "704"
+name = "qwen35_three_arm_submissions"
+status = "deadline_auxiliary"
+base_model = "Qwen/Qwen3.5-4B"
+teacher_at_inference = false
+submission_limit_gib = 5
+provisional_fold = 3
+arms = ["gold_control", "hardneg_candidate", "rank_candidate"]
+
+[constraints]
+single_h100 = true
+frozen_solution140_base = true
+immutable_exp719 = true

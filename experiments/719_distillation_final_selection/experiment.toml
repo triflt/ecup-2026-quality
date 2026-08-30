@@ -1,0 +1,16 @@
+[experiment]
+id = "719"
+slug = "distillation_final_selection"
+status = "prepared_waiting_exp698_exp718"
+
+[policy]
+production_incumbent = "140_dual_lora_fusion"
+select_standalone_only_with_direct_metric_transfer_runtime_gates = true
+fixed_replacement_is_not_metric_promoted_without_exact_component_oof = true
+keep_incumbent_on_insufficient_evidence = true
+
+[constraints]
+teacher_in_submission = false
+allowed_model_at_most_4b = true
+single_h100 = true
+maximum_archive_gib = 5
