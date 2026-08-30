@@ -92,7 +92,10 @@ def generate_comments(
         )
         for row, verdict, raw in zip(rows, local_verdicts, texts, strict=True):
             comment, status = normalize_generated_comment(
-                raw, fallback(str(row.category), verdict)
+                raw,
+                fallback(str(row.category), verdict),
+                category=str(row.category),
+                verdict=verdict,
             )
             comments.append(comment)
             statuses.append(status)

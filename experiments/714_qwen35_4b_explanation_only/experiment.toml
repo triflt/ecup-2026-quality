@@ -2,7 +2,7 @@
 id = "714"
 slug = "qwen35_4b_explanation_only"
 title = "Primary submission candidate: frozen-ensemble grounded explanation generator"
-status = "primary_submission_candidate_waiting_user_approval"
+status = "final_package_ready_public_pending"
 entrypoint = "experiments/714_qwen35_4b_explanation_only/trainer.py"
 result_file = "experiments/714_qwen35_4b_explanation_only/results/metrics.json"
 
@@ -35,6 +35,9 @@ effective_batch_size = 16
 max_sequence_length = 2304
 max_generation_tokens = 192
 loss = "unit-weight causal CE over plain explanation text only"
+adapter_type = "rsLoRA"
+lora_rank = 16
+lora_alpha = 32
 assistant_target_contains_label = false
 assistant_target_is_plain_text = true
 classifier_weights_changed = false
@@ -60,3 +63,18 @@ planned_public_submissions = 0
 [artifacts]
 directory = "artifacts"
 publish = false
+submission_zip = "exp714-solution140-reasoner-4b-b192-final.zip"
+submission_zip_sha256 = "a0695a55a85ca835d18f23e3700ee3eccc9ba03b9d490653719f474c38861bce"
+submission_zip_size_bytes = 55770475
+upload_owner = "user"
+
+[frozen_smoke]
+rows = 600
+schema_valid_rows = 600
+verdict_changes = 0
+total_seconds = 341.0
+reasoner_seconds = 89.76
+public_projected_minutes = 15.16
+private_projected_minutes = 35.99
+public_status = "pending"
+public_used_for_tuning = false

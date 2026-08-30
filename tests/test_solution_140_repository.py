@@ -12,6 +12,14 @@ VERIFY = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(VERIFY)
 
 
+def _load_module(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_solution_140_repository_contract() -> None:
     report = VERIFY.verify_repository()
     assert report["solution"] == "140"
@@ -53,3 +61,44 @@ def test_solution_140_visual_inputs_reach_all_three_qwen_components() -> None:
     assert 'INSTRUCT_MODEL_PATH, QWEN3VL_ADAPTER_PATH, "image_text"' in source
     assert 'QWEN35_MODEL_PATH, QWEN35_ADAPTER_PATH, "multimodal"' in source
     assert "qwen35_scores = compute_lora_scores(" in source
+
+
+def test_exp714_preserves_verdict_and_fails_closed() -> None:
+    experiment = ROOT / "experiments/714_qwen35_4b_explanation_only"
+    runtime = _load_module("exp714_runtime_contract", experiment / "runtime_contract.py")
+    output = _load_module(
+        "exp714_output_contract", ROOT / "research/explanation_submission_contract.py"
+    )
+    fallback = (
+        "Текст и первое изображение не подтверждают обязательную маркировку "
+        "товара как биологически активной добавки."
+    )
+    audited = (
+        "Товар — электретная лечебная плёнка для наложения на рану. В описании "
+        "указано, что она усиливает действие БАД, но сама не является биологически "
+        "активной добавкой и не имеет соответствующей маркировки. Отрицательный "
+        "электрический заряд не делает её БАД."
+    )
+
+    comment, status = runtime.normalize_generated_comment(
+        audited, fallback, category="БАД", verdict=0
+    )
+    assert (comment, status) == (audited, "generated_plain_text")
+    assert output.format_result(comment, 0) == (
+        f"<комментарий>{audited}<вердикт>бан"
+    )
+    assert output.verdict_from_label(1) == "не бан"
+
+    contradiction = (
+        "Карточка имеет маркировку БАД и является биологически активной добавкой, "
+        "поэтому соответствует заявленной категории."
+    )
+    assert runtime.normalize_generated_comment(
+        contradiction, fallback, category="БАД", verdict=0
+    ) == (fallback, "fallback_verdict_mismatch")
+    assert runtime.normalize_generated_comment(
+        "Это незаконченное объяснение длиной больше пятидесяти символов без точки",
+        fallback,
+        category="БАД",
+        verdict=0,
+    ) == (fallback, "fallback_incomplete_sentence")

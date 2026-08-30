@@ -43,6 +43,7 @@
 | 697 | Qwen3.8-27B grouped teacher | Completed offline, rejected for transfer | Strict five-fold OOF `0.908299` ниже локального exp140 `0.911843`; ранний screen `0.926364` был оптимистичен |
 | 698 | Teacher-guided student objective | Support code for 706 | Реализация matched-control objective; терминальные результаты сведены в 706 |
 | 706 | Parent-anchored 27B→4B distillation | Rejected online | Scratch Public `0.796849–0.835403`; strict package `0.821766` против `0.892398` у решения 140 |
+| 712–714 | Explanation teacher → 4B reasoner | Final package, Public pending | Exp714 добавляет комментарий строго после frozen verdict solution140; smoke 600/600 valid, 0 изменений verdict |
 | 900 | Infrastructure checks | Completed | Runtime/schema/preprocessing safeguards |
 
 Новый experiment создаётся из `templates/experiment/`, затем добавляется отдельной строкой в `reports/experiment-log.csv`.

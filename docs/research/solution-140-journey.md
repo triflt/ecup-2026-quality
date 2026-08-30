@@ -35,14 +35,22 @@ flowchart TB
         Q["Qwen3.5<br/>4B multimodal rsLoRA"]
     end
 
-    subgraph DECISION["3 · СБОРКА РЕШЕНИЯ"]
+    subgraph DECISION["3 · ЗАМОРОЖЕННЫЙ ВЕРДИКТ SOLUTION140"]
         direction LR
         R["Опорный прогноз<br/>TF-IDF + Qwen3-VL Embedding"]
-        F{"Слияние по категории<br/>отдельные веса для БАД и ЛВЖ"}
+        F{"Слияние по категории<br/>веса и пороги для БАД и ЛВЖ"}
         M["Память обучающей выборки<br/>точный id / нормализованное название"]
+        P["Финальный verdict<br/>0 → бан · 1 → не бан"]
     end
 
-    O["id + объяснение + вердикт"]
+    subgraph EXPLANATION["4 · EXP714 · ТОЛЬКО КОММЕНТАРИЙ"]
+        direction LR
+        X["Qwen3.5-4B explanation-only<br/>rsLoRA r16 / α32"]
+        G{"Runtime-проверка<br/>50–300 · законченное предложение<br/>нет противоречия verdict"}
+        B["Статический fallback<br/>с учётом категории"]
+    end
+
+    O["CSV: id, result<br/>&lt;комментарий&gt;…&lt;вердикт&gt;бан | не бан"]
 
     DT --> S
     DA --> E
@@ -53,15 +61,23 @@ flowchart TB
     R --> F
     V --> F
     Q --> F
-    F --> M --> O
+    F --> M --> P
+    D1 --> X
+    P -- "только frozen verdict" --> X
+    X --> G
+    B --> G
+    G --> O
+    P --> O
 
     classDef data fill:#E8F3FF,stroke:#3B82F6,color:#0F2A44,stroke-width:2px;
     classDef model fill:#F2EAFE,stroke:#8B5CF6,color:#2E1065,stroke-width:2px;
     classDef decision fill:#E8F8F1,stroke:#10B981,color:#064E3B,stroke-width:2px;
+    classDef explanation fill:#FFF0E6,stroke:#F97316,color:#7C2D12,stroke-width:2px;
     classDef output fill:#FFF3DB,stroke:#F59E0B,color:#78350F,stroke-width:2px;
     class DT,DA,D1 data;
     class S,E,V,Q model;
-    class R,F,M decision;
+    class R,F,M,P decision;
+    class X,G,B explanation;
     class O output;
     linkStyle default stroke:#64748B,stroke-width:2px;
 ```
@@ -74,6 +90,37 @@ flowchart TB
   точные совпадения по `id` или нормализованному названию. Метки проверочной и
   тестовой выборок в неё не попадают.
 - Обе LoRA-ветки получают один и тот же первый снимок с длинной стороной 448 px.
+
+### Exp714: объяснение после решения
+
+Reasoner запускается **только после** финального verdict solution140. Он получает
+поля карточки, первый снимок 448 px и уже готовый verdict, но не видит component
+scores, не участвует в слиянии и не может изменить классификацию. Отдельный
+Qwen3.5-4B adapter генерирует только русский комментарий; runtime требует
+50–300 символов и законченное предложение, а явное противоречие verdict заменяет
+статическим комментарием для соответствующей категории.
+
+Выход содержит ровно `id,result` без закрывающих тегов:
+`<комментарий>{текст}<вердикт>{бан|не бан}`. Маппинг неизменен:
+solution140 `0 → бан`, `1 → не бан`.
+
+**Проверенный пример (БАД).** Для карточки «Полимедэл повязка на рану пленка
+электретная лечебная» solution140 выдал `0`. Комментарий reasoner:
+
+> Товар — электретная лечебная плёнка для наложения на рану. В описании указано,
+> что она усиливает действие БАД, но сама не является биологически активной
+> добавкой и не имеет соответствующей маркировки. Отрицательный электрический
+> заряд не делает её БАД.
+
+Финал заканчивается на `<вердикт>бан`; verdict не пересчитывается.
+
+Frozen E2E smoke на 600 строках: **600/600** строк прошли схему, **0/600**
+verdict изменились; полный прогон занял **341 с**, из них reasoner — **89.76 с**.
+Расчётное время: Public **15.16 мин**, Private **35.99 мин**. Финальный архив
+`exp714-solution140-reasoner-4b-b192-final.zip` — **55 770 475 байт**, SHA-256
+`a0695a55a85ca835d18f23e3700ee3eccc9ba03b9d490653719f474c38861bce`.
+Public ещё не измерен и не используется для тюнинга; архив загружает пользователь.
+Полный контракт: [эксперимент 714](../../experiments/714_qwen35_4b_explanation_only/).
 
 ## Шесть поворотов, которые дали финал
 
