@@ -1,0 +1,58 @@
+[experiment]
+id = "660"
+slug = "partial_ocr_availability_dataset"
+title = "Fail-closed partial OCR availability dataset"
+status = "accepted_partial_fail_closed_dataset"
+entrypoint = "experiments/660_partial_ocr_availability_dataset/build_partial_dataset.py"
+result_file = "experiments/660_partial_ocr_availability_dataset/results/metrics.json"
+
+[data]
+input_version = "competition_train_v1"
+source_experiment = "633_paddleocr_vl16_spotting"
+rejected_repair_experiments = ["655", "656", "657"]
+planned_output_version = "competition_train_paddleocr_vl16_partial_v1"
+expected_items = 12971
+expected_images = 49456
+
+[hypothesis]
+changed_factor = "Expose strict per-image OCR availability instead of requiring full repair"
+control = "634 full-coverage fail-closed builder"
+mechanism = "Reliable regions remain usable for evidence supervision while uncertain OCR is converted to explicit abstention"
+falsification = "Reject if coverage is not exact, an available record fails the unchanged 634 canonicalizer, or unavailable records expose OCR text or coordinates"
+
+[validation]
+integrity_version = "partial_ocr_availability_v1"
+availability_values = ["OCR_AVAILABLE", "OCR_UNAVAILABLE"]
+available_requires_strict_634_canonicalization = true
+unavailable_exposes_ocr_payload = false
+labels_read = false
+categories_read = false
+folds_read = false
+sealed_membership_used = false
+public_used = false
+
+[runtime]
+paddleocr_vl_submission_runtime = false
+
+[budget]
+gpu_hours = 0.0
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"
+local_output_directory = ".local/output_v1"
+
+[results]
+images = 49456
+items = 12971
+available_images = 41691
+unavailable_images = 7765
+availability_fraction = 0.84299175024264
+available_regions = 459678
+items_with_all_images_available = 7861
+items_with_no_images_available = 299
+availability_sha256 = "4723483b8ae851048255e959b1c98dcd054f5c099aa43864e682591051fdb3ed"
+available_records_sha256 = "610f6f5330bef77a50993b04e54a29bad85f1a5e057c52cd15a1386ba9a4e572"
+item_availability_sha256 = "ef540feac2c9ad1127dd6fafa81d2f0b5de6d684fc43d7f71d7ab5fc8f9bc90c"
+decision = "ACCEPT_PARTIAL_FAIL_CLOSED_OCR_DATASET"

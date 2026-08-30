@@ -243,15 +243,21 @@ def single_model_report(
                 "fold_f1": fold_f1,
                 "fold_f1_std": float(np.std(list(fold_f1.values()))),
             }
+        seed_names = [name for name in ranks if name != "mean_rank"]
         report[category]["seed_rank_correlation"] = float(
-            np.corrcoef(ranks["seed42"][positions], ranks["seed31415"][positions])[0, 1]
+            np.corrcoef(
+                ranks[seed_names[0]][positions], ranks[seed_names[1]][positions]
+            )[0, 1]
         )
     return report
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--seed-a-predictions", nargs="+")
     parser.add_argument("--seed-b-predictions", nargs="+", required=True)
+    parser.add_argument("--seed-a-name", default="seed42")
+    parser.add_argument("--seed-b-name", default="seed31415")
     parser.add_argument("--output", default=str(REPORT))
     args = parser.parse_args()
 
@@ -269,8 +275,22 @@ def main() -> None:
             raise ValueError(f"{name} fold mismatch")
     seed_b_logits = load_seed_predictions(args.seed_b_predictions, base)
     seed_b_rank = fold_category_ranks(seed_b_logits, folds, categories)
-    seed_a_rank = seed_a["lora_rank"].astype(np.float32)
+    seed_a_logits = None
+    if args.seed_a_predictions:
+        seed_a_logits = load_seed_predictions(args.seed_a_predictions, base)
+        seed_a_rank = fold_category_ranks(seed_a_logits, folds, categories)
+    else:
+        seed_a_rank = seed_a["lora_rank"].astype(np.float32)
     average_rank = (seed_a_rank + seed_b_rank) / 2.0
+    probability_rank = None
+    if seed_a_logits is not None:
+        seed_a_probability = 1.0 / (1.0 + np.exp(-seed_a_logits))
+        seed_b_probability = 1.0 / (1.0 + np.exp(-seed_b_logits))
+        probability_rank = fold_category_ranks(
+            (seed_a_probability + seed_b_probability) / 2.0,
+            folds,
+            categories,
+        )
     base_rank = seed_a["base_rank"].astype(np.float32)
     qwen3vl_rank = qwen3vl["lora_rank"].astype(np.float32)
 
@@ -279,8 +299,8 @@ def main() -> None:
         categories,
         folds,
         {
-            "seed42": seed_a_rank,
-            "seed31415": seed_b_rank,
+            args.seed_a_name: seed_a_rank,
+            args.seed_b_name: seed_b_rank,
             "mean_rank": average_rank,
         },
     )
@@ -298,12 +318,24 @@ def main() -> None:
         categories,
         folds,
     )
+    probability_report = None
+    probability_nested = None
+    probability_full = None
+    if probability_rank is not None:
+        probability_report, probability_nested, probability_full = evaluate_matrix(
+            ["robust_base", "qwen3vl", "qwen35_mean_probability"],
+            np.column_stack([base_rank, qwen3vl_rank, probability_rank]),
+            labels,
+            categories,
+            folds,
+        )
     report = {
         "rows": int(len(ids)),
-        "seed_a": 42,
-        "seed_b": 31415,
+        "seed_a": args.seed_a_name,
+        "seed_b": args.seed_b_name,
         "single_models": single,
         "mean_seed_three_head": mean_report,
+        "mean_probability_three_head": probability_report,
         "separate_seed_four_head": four_report,
     }
     output = Path(args.output)
@@ -318,6 +350,8 @@ def main() -> None:
         categories=categories,
         qwen35_seed42_rank=seed_a_rank,
         qwen35_seed31415_rank=seed_b_rank,
+        qwen35_seed_a_rank=seed_a_rank,
+        qwen35_seed_b_rank=seed_b_rank,
         qwen35_mean_rank=average_rank,
         nested_predictions=mean_nested,
         full_oof_predictions=mean_full,
@@ -325,6 +359,8 @@ def main() -> None:
         mean_full_predictions=mean_full,
         four_nested_predictions=four_nested,
         four_full_predictions=four_full,
+        probability_nested_predictions=probability_nested,
+        probability_full_predictions=probability_full,
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
 

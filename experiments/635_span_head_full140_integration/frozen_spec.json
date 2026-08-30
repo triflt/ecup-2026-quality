@@ -1,0 +1,103 @@
+{
+  "schema_version": "exp635_full140_integration_v1",
+  "experiment_id": "635",
+  "parent_full_system": "140",
+  "upstream_component_experiment": "632",
+  "upstream_seed": 31415,
+  "validation": "semantic_family_v3",
+  "screen_folds": [0, 3],
+  "full_folds": [0, 1, 2, 3, 4],
+  "uses_public_for_selection": false,
+  "sealed_rows_allowed": 0,
+  "component_f1_compared_to_full_ensemble": false,
+  "experiment_603_allowed_as_parent": false,
+  "variants": [
+    "original_qwen35",
+    "replace_with_632",
+    "fixed_mean_original_632",
+    "evidence_gated_632"
+  ],
+  "variant_definitions": {
+    "original_qwen35": "sigmoid(original_logit)",
+    "replace_with_632": "sigmoid(seed632_logit)",
+    "fixed_mean_original_632": "0.5 * sigmoid(original_logit) + 0.5 * sigmoid(seed632_logit)",
+    "evidence_gated_632": "sigmoid(seed632_logit) only on evaluator-verified exact evidence; otherwise sigmoid(original_logit)"
+  },
+  "rank_transform": "stable fold-category rank01",
+  "postprocess": "same donor-only exact/name override for every variant",
+  "route": {
+    "БАД": {
+      "weights": {
+        "robust_base_rank": 0.5,
+        "qwen3vl_rank": 0.25,
+        "qwen35_rank": 0.25
+      },
+      "threshold": 0.27193570137023926
+    },
+    "Легковоспламеняющиеся": {
+      "weights": {
+        "robust_base_rank": 0.15,
+        "qwen3vl_rank": 0.1,
+        "qwen35_rank": 0.75
+      },
+      "threshold": 0.953912615776062
+    }
+  },
+  "concepts": [
+    "OBJECT_OF_SALE",
+    "COMPOSITION",
+    "COMPLETENESS",
+    "FUEL_OR_IGNITION",
+    "NEGATION"
+  ],
+  "source_sha256": {
+    "experiments/140_dual_lora_fusion/submission/run.py": "9318db4cc0f26eabaa73ae9856dbf9daffd06787a162e6f5db71f249f6db7146",
+    "experiments/632_span_head_seed_repeat/run_fold.py": "4ce4db1cace205cd4955033b88416b838fecc08ff156b4c682faa70c23c2e924",
+    "experiments/632_span_head_seed_repeat/evaluate_screen.py": "016c5edf9026c019d53a02d28db6a7a0b6aee027e00def7d8f26f5acdeba6db2",
+    "experiments/632_span_head_seed_repeat/evaluate_full.py": "b3c43ef82cf541e67446eed9ff82ebf6a25713bac1c70bbfe6907e8c1857eb60",
+    "experiments/623_semantic_v3_multitask_span_head/frozen_spec.json": "8e54f442c4ea16704ad6588f36f8e6fa949443a63be4c699564b61838208bbb9",
+    "experiments/623_semantic_v3_multitask_span_head/renderer.py": "072138d1c4acf9ce411a44f8d49aaf0457c130f1015b21a213a6f072f2ac2a63",
+    "experiments/623_semantic_v3_multitask_span_head/protocol.py": "abe01ed810399369e82651aacaac779a858b8a7e31c60106c59751fcb36edef0",
+    "validation/semantic_family_v3/folds.csv": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae"
+  },
+  "required_replay_contract": {
+    "schema_version": "exp635_full140_replay_contract_v1",
+    "development_rows": 11118,
+    "parent_system": "140",
+    "source_experiment_603": false,
+    "labels_in_bundle": false,
+    "sealed_rows_in_bundle": 0,
+    "outer_fold_component_training_isolated": true,
+    "prior_target_fold_excluded": true,
+    "prior_recipe": "140_exact_then_name_donor_only",
+    "weights_equal_140": true,
+    "thresholds_equal_140": true
+  },
+  "acceptance": {
+    "screen": {
+      "minimum_mean_macro_delta": 0.0015,
+      "minimum_winning_folds": 2,
+      "minimum_category_delta": -0.002,
+      "minimum_corrected_to_regressed_ratio": 1.5,
+      "maximum_flammable_false_negative_increase": 0,
+      "maximum_all_positive_false_negative_increase": 0
+    },
+    "full": {
+      "minimum_macro_delta": 0.003,
+      "minimum_winning_folds": 4,
+      "minimum_category_delta": 0.0,
+      "minimum_corrected_to_regressed_ratio": 1.5,
+      "minimum_component_bootstrap_probability_positive": 0.9,
+      "maximum_flammable_false_negative_increase": 0,
+      "maximum_all_positive_false_negative_increase": 0,
+      "maximum_public_runtime_minutes": 20.0,
+      "maximum_private_runtime_minutes": 40.0
+    }
+  },
+  "bootstrap": {
+    "unit": "semantic_component",
+    "iterations": 10000,
+    "seed": 63531415,
+    "batch_size": 256
+  }
+}

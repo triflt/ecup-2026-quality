@@ -1,0 +1,13 @@
+{
+  "experiment_id": "624",
+  "status": "completed_fallback",
+  "validation_complete": true,
+  "sealed_holdout_used": false,
+  "accepted_new_component": null,
+  "fallback_experiment": 603,
+  "fallback_variant": "original_route_baseline",
+  "fallback_macro_f1": 0.9136312475000699,
+  "reference_route_changed": false,
+  "integration_manifest_created": false,
+  "decision": "KEEP_ORIGINAL_ROUTE_603"
+}

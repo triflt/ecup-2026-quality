@@ -1,0 +1,34 @@
+{
+  "artifact_schema_passed": true,
+  "bundle_sha256": "efa42b1b493dd6d1ef1bac75969ae846c0634fcec8de8aa23fcd8edaaedc3ffc",
+  "checkpoint_adapter_sha256": [
+    "9e2426f94538458c5a01da1166a7f049d21efa6f7ec7f5f92fafa7303515041b",
+    "d8e0e216ab277a7124e3588b549f9ea61c7f759731176dbda275fe616dcef4bb"
+  ],
+  "checkpoint_prediction_sha256": [
+    "d5106d3ec67935780df19515db54bb497708ae21eb1f120ec9704f3aa216a6cb",
+    "5395147d181d0f46acde39a995c01dd93f161521140beb402e47e957f43a7e41"
+  ],
+  "contract_sha256": "5733ba3c31147cb71a1f29211e7cf4dc3b657f81af84115eea87c2df233ca1bc",
+  "decision": "ACCEPT_TECHNICAL_SMOKE_ONLY",
+  "elapsed_seconds": 43.198194270953536,
+  "experiment_id": "677",
+  "finite_scores": true,
+  "inner_validation_fold": 1,
+  "labels_read": 0,
+  "optimizer_steps": 2,
+  "ordered_runtime_binding_passed": true,
+  "outer_archive_sha256": "6f7136ff6cd1dfeab578bf6c6f20475a2e24712ddf0a8553c24b61632aa5413b",
+  "packages": {
+    "peft": "0.20.0",
+    "torch": "2.10.0+cu128",
+    "transformers": "5.14.1"
+  },
+  "public_used": false,
+  "report_contract_sha256": "e29583e1e0035cb39ae5ef6f2672b368babccae8e12bff79cae04c603090f96a",
+  "rows_per_checkpoint": 4,
+  "runtime_contract_sha256": "504015b597d1a88f6cd1fece2fdf3c23827ec16f6849f272babcebda05259b2d",
+  "schema_version": 1,
+  "scientific_quality_evidence": false,
+  "sealed_rows": 0
+}

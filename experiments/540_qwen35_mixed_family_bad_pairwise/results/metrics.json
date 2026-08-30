@@ -1,0 +1,18 @@
+{
+  "experiment_id": "540",
+  "status": "rejected_at_screen",
+  "launched": true,
+  "manifest_decision": {
+    "fold_0": "GO",
+    "fold_3": "GO"
+  },
+  "null_control_passed": true,
+  "folds": {
+    "0": {"delta_macro_f1": -0.0013071160063926612, "delta_bad_f1": -0.0026142320127854335, "corrected": 4, "regressed": 10},
+    "3": {"delta_macro_f1": -0.00017647540152732066, "delta_bad_f1": -0.0003529508030546413, "corrected": 5, "regressed": 6}
+  },
+  "mean_screen_delta_macro_f1": -0.000741795703959991,
+  "screen_passed": false,
+  "decision": "REJECT",
+  "note": "Both BAD screen folds regressed; flammable predictions remained identical."
+}

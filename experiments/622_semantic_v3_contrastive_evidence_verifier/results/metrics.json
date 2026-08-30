@@ -1,0 +1,9 @@
+{
+  "experiment_id": "622",
+  "status": "confirmed_external_blocker",
+  "validation_complete": false,
+  "gpu_jobs_launched": 0,
+  "sealed_holdout_used": false,
+  "human_gate": {"sample_size": 300, "minimum_strict_pass": 282, "maximum_critical_unsupported": 0, "maximum_scope_or_negation_failure": 0, "observed_strict_pass": null, "observed_critical_unsupported": null, "observed_scope_or_negation_failure": null, "human_ratings_present": false},
+  "decision": "CONFIRMED_EXTERNAL_BLOCKER_NO_GPU"
+}

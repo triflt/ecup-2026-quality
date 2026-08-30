@@ -1,0 +1,88 @@
+[experiment]
+id = "657"
+slug = "paddleocr_recursive_tiled_repair"
+title = "Recursive failed-tile PaddleOCR-VL repair"
+status = "production_rejected_throughput_and_terminal_failures"
+entrypoint = "experiments/657_paddleocr_recursive_tiled_repair/run_recursive_repair.py"
+result_file = "experiments/657_paddleocr_recursive_tiled_repair/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+source_experiment = "633_paddleocr_vl16_spotting"
+parent_experiment = "656_paddleocr_tiled_repair"
+source_images = 49456
+source_shards = 32
+labels_read = false
+
+[model]
+id = "PaddlePaddle/PaddleOCR-VL-1.6"
+revision = "c5630abae1d940eafe0697512a0325494b02ab42"
+prompt = "Spotting:"
+decoding = "greedy"
+tile_max_new_tokens = 512
+
+[refinement]
+maximum_depth = 3
+split_axis = "longer_physical_side"
+overlap_fraction_per_side = 0.10
+reuse_successful_siblings = true
+discard_failed_parent_output = true
+
+[hypothesis]
+parent_experiment = "656_paddleocr_tiled_repair"
+changed_factor = "Recursively bisect only a tile that fails the unchanged strict grammar"
+mechanism = "Concentrated text can overflow one coarse tile; selective refinement bounds leaf density without recomputing accepted siblings"
+expected_macro_f1_delta = 0.0
+falsification = "Reject if any of the same eight rows has a terminal failed leaf or fails identity provenance coordinate or privacy checks"
+precedents = ["experiment 656 one-level tiling", "coarse-to-fine document tiling", "fail-closed weak-label preparation"]
+
+[validation]
+integrity_version = "ocr_recursive_tiled_repair_v1"
+evaluation_version = "label_blind_ocr_integrity_v1"
+bounded_smoke_images = 8
+required_accepted_images = 8
+maximum_terminal_failed_tiles = 0
+sealed_membership_used = false
+public_used = false
+
+[budget]
+smoke_jobs = 1
+gpu_per_job = 1
+planned_full_jobs = 32
+maximum_parallel_gpus = 16
+production_waves = 2
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"
+private_preset_directory = ".local/compute"
+native_source_artifacts = true
+
+[results.smoke]
+accepted_images = 8
+failed_images = 0
+terminal_failed_tiles = 0
+tile_attempts = 28
+refined_attempts = 6
+detections = 304
+overlap_duplicates_removed = 9
+manual_overlay_rows_reviewed = 8
+decision = "OPEN_TWO_WAVE_PRODUCTION_REPAIR"
+
+[results.production]
+wave1_jobs = 16
+gpu_per_job = 1
+observed_after_minutes = 42
+progress_rows_min = 10
+progress_rows_max = 20
+assigned_rows_per_shard = 242
+shards_with_failed_rows = 13
+failed_rows_per_affected_shard_min = 1
+failed_rows_per_affected_shard_max = 5
+projected_hours_per_shard_min = 8.0
+projected_hours_per_shard_max = 17.0
+job_time_limit_hours = 4.0
+cancelled_jobs = 16
+wave2_jobs = 0
+decision = "REJECT_FULL_REPAIR_USE_PARTIAL_AVAILABILITY_660"

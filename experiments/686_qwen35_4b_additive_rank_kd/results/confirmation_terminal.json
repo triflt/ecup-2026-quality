@@ -1,0 +1,47 @@
+{
+  "bad_route_byte_identical": true,
+  "decision": "TERMINAL_REJECT_CONFIRMATION",
+  "direct": {
+    "corrected": 10,
+    "flammable_f1_delta": 0.006980716389830999,
+    "flammable_false_negatives_after": 17,
+    "flammable_false_negatives_before": 16,
+    "fold_macro_deltas": {
+      "1": 0.0023809523809523725,
+      "2": -0.0019467878001298011,
+      "4": 0.007629107981220518
+    },
+    "macro_delta": 0.0034903581949154994,
+    "mean_fold_delta": 0.00268775752068103,
+    "regressed": 8
+  },
+  "evaluation_file_sha256": "f3ad5020af18557c03c296d7f1874a6603d2381d86e1a89ae54134f5dbb22405",
+  "evaluation_sha256": "6854116bd0715519694fdd21ef22e07570f421d4a745ff8a44227c8b8e78e9dd",
+  "experiment_id": 686,
+  "fold_ap_deltas": {
+    "1": 0.036229443747516576,
+    "2": -0.004031608960993083,
+    "4": 0.01209330183218904
+  },
+  "folds": [
+    1,
+    2,
+    4
+  ],
+  "mean_ap_delta": 0.014763712206237511,
+  "production": {
+    "corrected": 9,
+    "flammable_f1_delta": 0.0013301803133314305,
+    "flammable_false_negatives_after": 17,
+    "flammable_false_negatives_before": 15,
+    "macro_delta": 0.0006650901566657152,
+    "regressed": 8
+  },
+  "public_used": false,
+  "schema_version": 1,
+  "sealed_rows_used": 0,
+  "singleton_corrected": 8,
+  "singleton_regressed": 4,
+  "threshold_tuned": false,
+  "validation_labels_read_by_training": 0
+}

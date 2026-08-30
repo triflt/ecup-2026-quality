@@ -1,0 +1,24 @@
+{
+  "experiment_id": "621",
+  "name": "semantic_v3_fisher_blockwise_merge",
+  "status": "rejected_before_validation_reconstruction_gate",
+  "validation_version": "semantic_family_v3",
+  "validation_complete": false,
+  "sealed_holdout_used": false,
+  "labels_loaded_by_preflight": false,
+  "folds": [],
+  "metrics": {},
+  "screen_folds": [0, 3],
+  "screen_jobs_launched": 2,
+  "technical_pre_gpu_failures": 2,
+  "note": "Both screen folds stopped at the predeclared 0.05 SVD reconstruction gate before validation scoring. Observed layer-11 k_proj errors were 0.0944161222 and 0.0956405199. No validation metric was released; folds 1/2/4 are forbidden.",
+  "reconstruction_gate": {
+    "maximum_relative_error": 0.05,
+    "fold_0_observed_error": 0.09441612224364435,
+    "fold_3_observed_error": 0.09564051990541646,
+    "failed_module_suffix": "layers.11.self_attn.k_proj",
+    "passed": false
+  },
+  "expected_fold_minutes": [50, 90],
+  "expected_vram_gb": [24, 40]
+}

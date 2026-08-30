@@ -1,0 +1,50 @@
+{
+  "experiment_id": "460",
+  "status": "rejected_offline",
+  "evaluation_version": "qwen3vl_embedding_transfer_v1",
+  "parent_experiment": "400_qwen35_category_routed_adapters",
+  "uses_teacher": false,
+  "smoke": {
+    "launched": true,
+    "passed": true,
+    "job": "redacted-job",
+    "embedding_shape": [3, 2048],
+    "repeat_cosine": 1.0000001192092896,
+    "image_ablation_cosine": 0.40629351139068604,
+    "peak_gpu_gib": 4.630433082580566,
+    "superseded_attempts": [
+      {
+        "job": "redacted-job",
+        "stage": "after model load before embedding computation",
+        "confirmed_cause": "Sentence Transformers 5.4 expects custom instruction in encode(prompt=...), not as an input-dictionary key"
+      },
+      {
+        "job": "redacted-job",
+        "stage": "compatibility checks after successful embedding computation",
+        "confirmed_cause": "The script compared a bfloat16-normalized dot product to a cosine threshold without float32 renormalization; repeated embeddings were identical and the raw norm was 0.9987"
+      }
+    ]
+  },
+  "extraction": {
+    "job": "redacted-job",
+    "rows": 12971,
+    "dimensions": 2048,
+    "download_failures": 0,
+    "inference_minutes": 6.05,
+    "peak_gpu_gib": 5.86,
+    "artifact_sha256": "63e42fcb83316ec213e455250277e4370aa85363b741c8de001ed1bf7e34b695"
+  },
+  "validation": {
+    "baseline_macro_f1": 0.9316449231243215,
+    "candidate_macro_f1": 0.9149892353910192,
+    "delta_macro_f1": -0.016655687733302282,
+    "flammable_delta_f1": -0.033311375466604565,
+    "folds_won": 0,
+    "corrected": 2,
+    "regressed": 15,
+    "flammable_false_negative_delta": 7,
+    "connected_bootstrap_probability_positive": 0.0037,
+    "accepted": false
+  },
+  "decision": "Rejected offline. Keep embeddings for research only; do not build a full classifier or submission package."
+}

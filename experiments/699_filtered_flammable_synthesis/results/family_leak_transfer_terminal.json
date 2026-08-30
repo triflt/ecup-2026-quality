@@ -1,0 +1,180 @@
+{
+  "schema": "exp699_family_leak_transfer_terminal_v1",
+  "self_hash_algorithm": "sha256_canonical_json_without_self_sha256",
+  "self_sha256": "d964ca93d440111e1c597edb92c63ad7c9bad3c8bf6b6fcf98dec9eabeaa23a7",
+  "experiment": 699,
+  "decision": "ACCEPT_TOPOLOGY_FOR_GRAPH_AWARE_ORACLE_REJECT_MIXED_OOF_AS_SOLE_SHIP_GATE",
+  "public_used": false,
+  "sealed_rows": 0,
+  "code": {
+    "commit": "de8ba50",
+    "sha256": "be27901c713924eddb7b0b6a197c9dfa2d6ec44564d2e8a4a5b2f0e8916b93d1"
+  },
+  "remote_artifacts": {
+    "topology": {
+      "file_sha256": "7e16f6665ca4fb552e65145fe52b578ae3706dcd274027754851e24c827b90c1",
+      "self_sha256": "9ce30230c0c3b132504be65066e793d00c5d61e1e4cbcc5b001de1ff933e5e14",
+      "size": 7079464,
+      "contains_row_registry": true,
+      "downloaded_locally": false
+    },
+    "transfer": {
+      "file_sha256": "e677854638224c82040fe04ad5cc50c8e4131f617a01591fd836d9b851c2bc73",
+      "self_sha256": "79ea1e21bac71c56e76252ebd7d461adbc9404b8c14c2cf2c6dd8293cfbd43a5",
+      "size": 204347,
+      "contains_raw_predictions": false,
+      "downloaded_locally": false
+    }
+  },
+  "topology": {
+    "rows": 11118,
+    "unique_ids": 11118,
+    "components": 5262,
+    "cross_fold_components": 1095,
+    "recurrence_rows": 5477,
+    "recurrence_row_fraction": 0.4926245727648858,
+    "novel_family_rows": 5641,
+    "novel_family_row_fraction": 0.5073754272351142,
+    "largest_component_rows": 355,
+    "largest_component_manual_coherence": "coherent_brand_or_product_family_not_blank_image_chain",
+    "same_id_cross_fold_nodes": 0,
+    "edge_counts": {
+      "semantic_component": 2670,
+      "exact_text": 2997,
+      "normalized_text": 3526,
+      "rare_shingle": 13835,
+      "near_image_exact_bytes": 2692,
+      "near_image": 17239,
+      "high_confidence_multimodal": 7925
+    },
+    "cross_fold_edge_counts": {
+      "semantic_component": 0,
+      "exact_text": 690,
+      "normalized_text": 990,
+      "rare_shingle": 7127,
+      "near_image_exact_bytes": 444,
+      "near_image": 7384,
+      "high_confidence_multimodal": 2522
+    },
+    "cross_fold_edge_fraction": {
+      "semantic_component": 0.0,
+      "exact_text": 0.23023023023023023,
+      "normalized_text": 0.28077141236528646,
+      "rare_shingle": 0.5151427538847127,
+      "near_image_exact_bytes": 0.1649331352154532,
+      "near_image": 0.42833110969313764,
+      "high_confidence_multimodal": 0.3182334384858044
+    },
+    "finding": "The prior semantic_component registry was perfectly fold-pure and therefore hid substantial recurrence exposed by the union graph. Current row-wise OOF is a mixed recurrence/novel evaluation, not a pure unseen-family estimate."
+  },
+  "old_public_candidate_A": {
+    "evaluation_folds": [0, 1, 2, 3, 4],
+    "before_prior": {
+      "mixed_all": {
+        "macro_delta": 0.0194358847644569,
+        "corrections_regressions": [101, 26],
+        "net_correct_decisions": 75,
+        "flammable_corrections_regressions": [18, 6],
+        "flammable_q35_ap_delta": -0.026664712807040636
+      },
+      "recurrence_cross_fold": {
+        "macro_delta": 0.010024293507640336,
+        "corrections_regressions": [38, 9],
+        "net_correct_decisions": 29,
+        "fraction_of_net_lift": 0.38666666666666666,
+        "flammable_corrections_regressions": [3, 0],
+        "flammable_q35_ap_delta": -0.0029692099153355578
+      },
+      "novel_family_single_fold": {
+        "macro_delta": 0.03125378652322974,
+        "corrections_regressions": [63, 17],
+        "net_correct_decisions": 46,
+        "fraction_of_net_lift": 0.6133333333333333,
+        "flammable_corrections_regressions": [15, 6],
+        "flammable_q35_ap_delta": -0.012369353182463572
+      }
+    },
+    "after_prior": {
+      "mixed_all": {
+        "macro_delta": 0.016053887583133974,
+        "corrections_regressions": [77, 21],
+        "net_correct_decisions": 56
+      },
+      "recurrence_cross_fold": {
+        "macro_delta": 0.003440143408522167,
+        "corrections_regressions": [14, 4],
+        "net_correct_decisions": 10,
+        "fraction_of_net_lift": 0.17857142857142858
+      },
+      "novel_family_single_fold": {
+        "macro_delta": 0.031248274245876617,
+        "corrections_regressions": [63, 17],
+        "net_correct_decisions": 46,
+        "fraction_of_net_lift": 0.8214285714285714
+      }
+    },
+    "decision_survival": {
+      "changed_before_prior": 127,
+      "survived_after_prior": 98,
+      "suppressed_by_prior": 29,
+      "introduced_after_prior": 0
+    },
+    "overlapping_edge_component_fraction_of_before_prior_net_lift": {
+      "semantic_component": 0.5066666666666667,
+      "exact_text": 0.5066666666666667,
+      "normalized_text": 0.49333333333333335,
+      "rare_shingle": 0.64,
+      "near_image_exact_bytes": 0.4533333333333333,
+      "near_image": 0.5333333333333333,
+      "high_confidence_multimodal": 0.5733333333333334
+    }
+  },
+  "screen_routes_after_prior": {
+    "B_cap5": {
+      "folds": [0, 3],
+      "mixed_macro_delta": 0.02631167314618854,
+      "recurrence_macro_delta": -0.005979979405389857,
+      "novel_family_macro_delta": 0.06582703496807862,
+      "decision": "diagnostic_only"
+    },
+    "C_cap10_area": {
+      "folds": [0, 3],
+      "mixed_macro_delta": 0.034503599382047945,
+      "recurrence_macro_delta": 0.007743206456381602,
+      "novel_family_macro_delta": 0.06680027097781094,
+      "decision": "diagnostic_only"
+    },
+    "D_flammable_route": {
+      "folds": [0, 3],
+      "mixed_macro_delta": 0.03156199677938809,
+      "recurrence_macro_delta": 0.006322624743677396,
+      "novel_family_macro_delta": 0.06251736593498192,
+      "decision": "diagnostic_only"
+    }
+  },
+  "interpretation": {
+    "semantic_family_leakage_present": true,
+    "semantic_family_leakage_explains_public_inversion": false,
+    "reason": "The old candidate's net local lift is larger on novel-family rows than on recurrence rows, both before and after production priors. Leakage inflates the overall confidence in row-wise CV but is not the dominant source of the candidate's apparent lift.",
+    "remaining_explanations": [
+      "hidden distribution or prevalence shift",
+      "full-refit versus OOF trajectory mismatch",
+      "unverified uploaded-bytes-to-local-SHA binding",
+      "weak calibration under the hidden flammable boundary"
+    ]
+  },
+  "next_action": {
+    "name": "CPU_FIRST_GRAPH_AWARE_HYBRID_RETRIEVAL_ORACLE",
+    "gpu_hours": 0.0,
+    "public_submission": false,
+    "requirements": [
+      "union TF-IDF, BM25, existing multimodal embedding, exact-text and image candidates",
+      "report candidate recall@30 specifically on solution140 final errors",
+      "report oracle end-to-end gain after production priors and final decision survival",
+      "separate recurrence, novel-family and mixed regimes",
+      "report useful and false donors for rare, singleton, repeated and flammable FP/FN",
+      "compare against query-only control and donor-label permutation",
+      "do not train pairwise model and do not ship hard kNN override before oracle viability"
+    ]
+  }
+}

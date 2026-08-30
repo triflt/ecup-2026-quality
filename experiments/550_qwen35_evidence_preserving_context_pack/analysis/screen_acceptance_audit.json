@@ -1,0 +1,15 @@
+{
+  "experiment_id": "550",
+  "evaluation_version": "evidence_preserving_context_pack_screen_v1",
+  "screen_folds": [0, 3],
+  "mean_screen_delta_macro_f1": -0.013633749980781984,
+  "corrected": 6,
+  "regressed": 10,
+  "folds": {
+    "0": {"delta_macro_f1": -0.04345679012345682, "flammable_false_negative_delta": 6, "safety_union_false_negative_delta": 1, "passed": false},
+    "3": {"delta_macro_f1": 0.016189290161892855, "flammable_false_negative_delta": -3, "safety_union_false_negative_delta": -3, "passed": true}
+  },
+  "screen_passed": false,
+  "full_five_fold_cycle_allowed": false,
+  "decision": "REJECT"
+}

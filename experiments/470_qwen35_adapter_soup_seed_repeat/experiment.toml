@@ -1,0 +1,53 @@
+[experiment]
+id = "470"
+slug = "qwen35_adapter_soup_seed_repeat"
+title = "Independent-seed confirmation of the fixed Qwen3.5 adapter soup"
+status = "rejected"
+entrypoint = "research/run_qwen35_adapter_soup_seed_repeat.py"
+result_file = "experiments/470_qwen35_adapter_soup_seed_repeat/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "qwen35_adapter_soup_seed_repeat_screen_v1"
+selection_guard = "connected_family_guard_v2"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "430_qwen35_flammable_adapter_soup"
+changed_factor = "Repeat the fixed alpha-0.50 LoRA interpolation with seed 31415 on preselected folds 0 and 3"
+mechanism = "If interpolation follows a stable weight-space direction, it should improve recall relative to the pure specialist under an independent training seed"
+expected_macro_f1_delta = 0.002
+falsification = "Reject if either fold is non-positive, mean Macro delta is non-positive, false negatives increase, or corrections do not exceed regressions"
+
+[selection]
+seed = 31415
+folds = [0, 3]
+alpha_specialist = 0.50
+weights = [0.15, 0.10, 0.75]
+threshold_source = "experiments/430_qwen35_flammable_adapter_soup/results/acceptance_audit.json"
+threshold_tuning = false
+
+[acceptance]
+required_positive_folds = 2
+required_mean_macro_delta = 0.0
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+require_corrected_gt_regressed = true
+
+[budget]
+planned_gpu_hours = 2.5
+planned_public_submissions = 0
+runtime_limit_minutes_per_fold = 150
+
+[execution]
+jobs = ["redacted-job", "redacted-job"]
+hardware = "two independent one-H100 jobs"
+result = "both jobs succeeded and artifacts passed integrity checks; screen delta +0.001001 with one of two folds positive and 4/4 corrected/regressed; rejected"
+
+[artifacts]
+directory = "artifacts"
+publish = false

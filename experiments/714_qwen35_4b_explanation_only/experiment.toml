@@ -1,0 +1,62 @@
+[experiment]
+id = "714"
+slug = "qwen35_4b_explanation_only"
+title = "Primary submission candidate: frozen-ensemble grounded explanation generator"
+status = "primary_submission_candidate_waiting_user_approval"
+entrypoint = "experiments/714_qwen35_4b_explanation_only/trainer.py"
+result_file = "experiments/714_qwen35_4b_explanation_only/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+teacher_experiment = "712_qwen35_397b_evidence_teacher"
+train_conditioning_label_source = "competition_label"
+test_conditioning_label_source = "frozen_solution140_runtime_verdict"
+max_student_image_index = 0
+cv5_folds = "grouped_text_v1"
+cv5_folds_sha256 = "03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d"
+historical_oof_sha256 = "d78bb7df897e244e030fa388e1b9c770d15434cc33aa1f56b238c7d057646116"
+image0_source = "solution140_runtime_source_bytes_and_in_memory_preprocessing"
+
+[hypothesis]
+changed_factor = "Train a separate Qwen3.5-4B LoRA to generate only grounded explanation fields conditioned on gold labels during SFT; inject the immutable ensemble verdict at test runtime"
+mechanism = "Separating verdict and language generation prevents explanation loss from moving the classification boundary while allowing card-specific comments"
+falsification = "Reject if supported target coverage is below 85% overall, verdict binding is not 100%, format validity is below 99.5%, comment contract is below 100%, blind grounded relevance is below 90%, or unsupported claims reach 1%; report category-label coverage imbalance separately"
+
+[training]
+model = "Qwen/Qwen3.5-4B"
+model_revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+parent_recipe = "research/qwen3vl_lora_holdout.py"
+screen_folds = [0, 3]
+epochs = 1
+seed = 42
+micro_batch_size = 2
+gradient_accumulation = 8
+effective_batch_size = 16
+max_sequence_length = 2304
+max_generation_tokens = 192
+loss = "unit-weight causal CE over plain explanation text only"
+assistant_target_contains_label = false
+assistant_target_is_plain_text = true
+classifier_weights_changed = false
+classifier_scores_byte_frozen = true
+classifier_verdict_is_input = true
+hyperparameter_grid = false
+require_exact_untruncated_supervised_target = true
+network_image_download = false
+
+[acceptance]
+min_target_coverage = 0.85
+cell_coverage_is_warning_not_artifact_rejection = true
+required_verdict_preservation_rate = 1.0
+min_format_valid_rate = 0.995
+required_comment_contract_rate = 1.0
+min_blind_grounded_relevance = 0.945
+max_unsupported_claim_rate = 0.0
+
+[budget]
+planned_gpu_hours = 2.5
+planned_public_submissions = 0
+
+[artifacts]
+directory = "artifacts"
+publish = false

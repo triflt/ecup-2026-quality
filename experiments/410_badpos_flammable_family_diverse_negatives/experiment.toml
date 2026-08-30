@@ -1,0 +1,48 @@
+[experiment]
+id = "410"
+slug = "badpos_flammable_family_diverse_negatives"
+title = "Family-diverse flammable negatives on the routed 260 adapter"
+status = "rejected_offline"
+entrypoint = "research/qwen35_bad_family_diverse_positives_lora.py"
+result_file = "experiments/410_badpos_flammable_family_diverse_negatives/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "locked_190_category_routing_v2"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+training_parent_component = "qwen35_bad_family_diverse_v260"
+changed_factor = "Select flammable hard/random negatives from distinct normalized text families instead of rows"
+mechanism = "Repeated flammable-negative families occupy 299-328 of 1600 exposures and limit coverage of independent negative mechanisms"
+primary_comparison = "Route the new adapter only for flammable in locked 190 and compare against routed experiment 400"
+expected_macro_f1_delta = 0.003
+falsification = "Reject if delta is below 0.003, fewer than four folds improve, flammable false negatives increase, connected bootstrap P is below 0.90, safety-cohort recall falls, or priors remove the gain"
+
+[acceptance]
+baseline_macro_f1 = 0.9316449231243215
+required_macro_f1_delta = 0.003
+required_fold_wins = 4
+required_component_bootstrap_probability = 0.90
+max_flammable_false_negative_increase = 0
+required_prior_survival_rate = 0.80
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 4.0
+planned_public_submissions = 0
+runtime_limit_minutes = 150
+
+[execution]
+jobs = ["redacted-job", "redacted-job", "redacted-job"]
+hardware = "three independent one-H100 jobs"
+
+[artifacts]
+directory = "artifacts"
+publish = false

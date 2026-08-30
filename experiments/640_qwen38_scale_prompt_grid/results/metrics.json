@@ -1,0 +1,36 @@
+{
+  "experiment_id": "640",
+  "status": "complete_prompt_scale_gate_passed",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "prompt_version": "qwen_scale_binary_v1",
+  "rows": 11118,
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "small_model": {
+    "model": "Qwen3.5-4B",
+    "bad_f1": 0.8990956203637842,
+    "flammable_f1": 0.07650765076507651,
+    "macro_f1": 0.48780163556443036,
+    "shards": 4
+  },
+  "large_model": {
+    "model": "Qwen3.8-27B",
+    "bad_f1": 0.9214805946323456,
+    "flammable_f1": 0.1840277777777778,
+    "macro_f1": 0.5527541862050617,
+    "shards": 4
+  },
+  "large_minus_small": {
+    "bad_f1": 0.022384974268561342,
+    "flammable_f1": 0.10752012701270128,
+    "macro_f1": 0.06495255064063131,
+    "winning_folds": 5,
+    "corrected": 3248,
+    "regressed": 348,
+    "corrected_to_regressed": 9.333333333333334
+  },
+  "sealed_rows": 0,
+  "public_used": false,
+  "decision": "GO_CLASS_ONLY_TRAINING_GRID"
+}

@@ -1,0 +1,80 @@
+[experiment]
+id = "540"
+slug = "qwen35_mixed_family_bad_pairwise"
+title = "Qwen3.5 BAD mixed-family donor pairwise margin"
+status = "rejected_at_screen"
+entrypoint = "experiments/540_qwen35_mixed_family_bad_pairwise/trainer.py"
+result_file = "experiments/540_qwen35_mixed_family_bad_pairwise/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "qwen35_bad_pairwise_route400_screen_v1"
+selection_guard = "connected_family_guard_v2"
+screen_folds = [0, 3]
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+training_parent = "260_bad_family_diverse_positives"
+changed_factor = "Add a donor-only BAD first-token pairwise margin on label-blind same/nearest safe-family batches"
+mechanism = "Opposite-label donors from a frozen local family neighborhood should teach distinctions that pointwise SFT misses in mixed-family BAD errors"
+falsification = "Reject on insufficient safe pairs, any leakage, either non-positive screen fold, BAD regression, connected-safe regression, or any flammable change"
+uses_teacher = false
+uses_pseudo_labels = false
+
+[pairwise]
+topology = "connected_family_guard_v2 same component plus label-blind normalized-name nearest components"
+labels_used_only_for = "orienting selected outer-train donors as positive and negative"
+margin = 1.0
+weight = 0.10
+score = "first-token logit(1) minus logit(0)"
+max_negatives_per_positive = 4
+max_negative_reuse = 4
+min_realized_pairs = 100
+min_pair_batches = 50
+semantic_draft_allowed = false
+
+[training]
+parent_entrypoint = "research/qwen35_bad_family_diverse_positives_lora.py"
+model = "Qwen3.5-4B"
+seed = 42
+training_mode = "hard"
+epochs = 1
+learning_rate = 0.0002
+weight_decay = 0.01
+batch_size = 4
+gradient_accumulation = 4
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+changes_record_multiset = false
+changes_steps = false
+changes_inference = false
+
+[evaluation]
+route400_bad_weights = [0.50, 0.25, 0.25]
+candidate_replaces = "BAD Qwen3.5 rank only"
+replacement_weight = 0.25
+weight_grid = false
+null_control_required = true
+
+[acceptance.screen]
+folds = [0, 3]
+required_each_fold_delta_positive = true
+required_mean_macro_delta = 0.001
+required_bad_delta_positive = true
+require_flammable_byte_identical = true
+require_connected_safe_delta_positive = true
+require_corrected_greater_than_regressed = true
+
+[execution]
+arguments = []
+full_train_allowed = false
+planned_public_submissions = 0
+
+[artifacts]
+directory = "artifacts"
+publish = false

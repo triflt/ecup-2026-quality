@@ -1,0 +1,16 @@
+from __future__ import annotations
+
+import sys
+from importlib import import_module
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "src"))
+
+run_entrypoint = import_module("ecup_quality.experiments.runner").run_entrypoint
+
+
+if __name__ == "__main__":
+    raise SystemExit(
+        run_entrypoint(Path(__file__).with_name("experiment.toml"), sys.argv[1:])
+    )

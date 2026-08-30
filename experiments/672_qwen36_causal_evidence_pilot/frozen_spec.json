@@ -1,0 +1,32 @@
+{
+  "schema_version": "exp672_frozen_spec_v1",
+  "namespace": "exp672-fresh-causal-evidence-pilot-v1",
+  "rows": 40,
+  "rows_per_category_verdict": 10,
+  "candidate_models": {
+    "qwen35_4b": {
+      "model_id": "Qwen3.5-4B",
+      "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+    },
+    "qwen36_27b": {
+      "model_id": "Qwen3.6-27B",
+      "revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9"
+    }
+  },
+  "relation_values": [
+    "sold_object",
+    "included",
+    "compatible_external",
+    "mentioned_only",
+    "negated",
+    "unknown"
+  ],
+  "evidence_source_values": ["name", "description", "image", "none"],
+  "explanation_min_chars": 50,
+  "explanation_max_chars": 300,
+  "minimum_relevance_count_delta": 4,
+  "minimum_visual_count_delta": 6,
+  "required_candidate_format_count": 40,
+  "maximum_candidate_unsupported_count": 0,
+  "passing_action": "AUTHORIZE_FRESH_200_ROW_EXPLANATION_AUDIT_ONLY"
+}

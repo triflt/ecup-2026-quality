@@ -1,0 +1,29 @@
+[experiment]
+id = "688"
+slug = "qwen35_4b_gradient_control_kd"
+title = "Hard-primary gradient-controlled rank KD"
+status = "terminal_no_go_selector"
+entrypoint = "experiments/688_qwen35_4b_gradient_control_kd/train_gradient_control.py"
+result_file = "experiments/688_qwen35_4b_gradient_control_kd/results/terminal_selector.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+primary_metric = "selector_decision"
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false
+
+[lineage]
+parent = "686"
+selector = "687"
+jobs_launched = 0
+public_used = false

@@ -1,0 +1,12 @@
+{
+  "seed": 42,
+  "target": "negative BAD training records",
+  "folds": [
+    {"fold": 0, "all_records": 5390, "non_target_multiset_exact": true, "eligible_families": 1306, "selected_families": 1306, "duplicate_slots": 194, "max_family_exposure": 2},
+    {"fold": 1, "all_records": 5390, "non_target_multiset_exact": true, "eligible_families": 1305, "selected_families": 1305, "duplicate_slots": 195, "max_family_exposure": 2},
+    {"fold": 2, "all_records": 5395, "non_target_multiset_exact": true, "eligible_families": 1296, "selected_families": 1296, "duplicate_slots": 204, "max_family_exposure": 2},
+    {"fold": 3, "all_records": 5390, "non_target_multiset_exact": true, "eligible_families": 1297, "selected_families": 1297, "duplicate_slots": 203, "max_family_exposure": 2},
+    {"fold": 4, "all_records": 5395, "non_target_multiset_exact": true, "eligible_families": 1300, "selected_families": 1300, "duplicate_slots": 200, "max_family_exposure": 2}
+  ],
+  "passed": true
+}

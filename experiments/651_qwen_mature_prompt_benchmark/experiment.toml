@@ -1,0 +1,18 @@
+id = "651"
+name = "qwen_mature_prompt_benchmark"
+status = "complete_both_mature_prompt_candidates_rejected"
+data_version = "competition_train_v1"
+evaluation_version = "semantic_family_v3"
+parent_experiment = "640"
+public_tuning = false
+sealed_rows_used = 0
+
+[[models]]
+id = "Qwen/Qwen3.6-27B"
+revision = "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9"
+gpus = 1
+
+[[models]]
+id = "Qwen/Qwen3.5-122B-A10B"
+revision = "dc4d348443bc740c68e2d77492492c11606384d5"
+gpus = 4

@@ -1,0 +1,475 @@
+{
+  "primary_combination": "balanced241+seed31415",
+  "primary_was_fixed_before_evaluation": true,
+  "diagnostic_combinations_are_not_selection_evidence": true,
+  "combinations": {
+    "balanced241": {
+      "models": [
+        "robust_base",
+        "qwen3vl",
+        "qwen35_mean_probability"
+      ],
+      "step": 0.05,
+      "weight_candidates": 231,
+      "categories": {
+        "БАД": {
+          "nested_f1": 0.9536995414906051,
+          "folds": [
+            {
+              "fold": 0,
+              "weights": {
+                "robust_base": 0.4000000059604645,
+                "qwen3vl": 0.44999998807907104,
+                "qwen35_mean_probability": 0.15000000596046448
+              },
+              "threshold": 0.26289352774620056,
+              "validation_f1": 0.9478885893980233
+            },
+            {
+              "fold": 1,
+              "weights": {
+                "robust_base": 0.550000011920929,
+                "qwen3vl": 0.0,
+                "qwen35_mean_probability": 0.44999998807907104
+              },
+              "threshold": 0.2606496810913086,
+              "validation_f1": 0.9530621367903442
+            },
+            {
+              "fold": 2,
+              "weights": {
+                "robust_base": 0.550000011920929,
+                "qwen3vl": 0.0,
+                "qwen35_mean_probability": 0.44999998807907104
+              },
+              "threshold": 0.2606496810913086,
+              "validation_f1": 0.9557761732851986
+            },
+            {
+              "fold": 3,
+              "weights": {
+                "robust_base": 0.4000000059604645,
+                "qwen3vl": 0.44999998807907104,
+                "qwen35_mean_probability": 0.15000000596046448
+              },
+              "threshold": 0.26292699575424194,
+              "validation_f1": 0.9536244934714093
+            },
+            {
+              "fold": 4,
+              "weights": {
+                "robust_base": 0.4000000059604645,
+                "qwen3vl": 0.44999998807907104,
+                "qwen35_mean_probability": 0.15000000596046448
+              },
+              "threshold": 0.26292699575424194,
+              "validation_f1": 0.9581646423751687
+            }
+          ],
+          "full_oof": {
+            "f1": 0.9552319309600863,
+            "weights": {
+              "robust_base": 0.550000011920929,
+              "qwen3vl": 0.0,
+              "qwen35_mean_probability": 0.44999998807907104
+            },
+            "threshold": 0.2606496810913086,
+            "fold_f1": {
+              "0": 0.9506726457399103,
+              "1": 0.9530621367903442,
+              "2": 0.9557761732851986,
+              "3": 0.9559748427672956,
+              "4": 0.9602888086642599
+            },
+            "fold_f1_std": 0.003221352694474345
+          }
+        },
+        "Легковоспламеняющиеся": {
+          "nested_f1": 0.8508557457212714,
+          "folds": [
+            {
+              "fold": 0,
+              "weights": {
+                "robust_base": 0.4000000059604645,
+                "qwen3vl": 0.10000000149011612,
+                "qwen35_mean_probability": 0.5
+              },
+              "threshold": 0.9511374235153198,
+              "validation_f1": 0.8148148148148148
+            },
+            {
+              "fold": 1,
+              "weights": {
+                "robust_base": 0.15000000596046448,
+                "qwen3vl": 0.15000000596046448,
+                "qwen35_mean_probability": 0.699999988079071
+              },
+              "threshold": 0.9517288208007812,
+              "validation_f1": 0.8333333333333334
+            },
+            {
+              "fold": 2,
+              "weights": {
+                "robust_base": 0.10000000149011612,
+                "qwen3vl": 0.20000000298023224,
+                "qwen35_mean_probability": 0.699999988079071
+              },
+              "threshold": 0.9534121751785278,
+              "validation_f1": 0.9
+            },
+            {
+              "fold": 3,
+              "weights": {
+                "robust_base": 0.05000000074505806,
+                "qwen3vl": 0.25,
+                "qwen35_mean_probability": 0.699999988079071
+              },
+              "threshold": 0.9517971277236938,
+              "validation_f1": 0.8674698795180723
+            },
+            {
+              "fold": 4,
+              "weights": {
+                "robust_base": 0.15000000596046448,
+                "qwen3vl": 0.10000000149011612,
+                "qwen35_mean_probability": 0.75
+              },
+              "threshold": 0.9517971277236938,
+              "validation_f1": 0.8395061728395061
+            }
+          ],
+          "full_oof": {
+            "f1": 0.8921568627450981,
+            "weights": {
+              "robust_base": 0.15000000596046448,
+              "qwen3vl": 0.15000000596046448,
+              "qwen35_mean_probability": 0.699999988079071
+            },
+            "threshold": 0.9517288208007812,
+            "fold_f1": {
+              "0": 0.8888888888888888,
+              "1": 0.8333333333333334,
+              "2": 0.9382716049382716,
+              "3": 0.9135802469135802,
+              "4": 0.8888888888888888
+            },
+            "fold_f1_std": 0.03483144686337252
+          }
+        }
+      },
+      "nested_macro_f1": 0.9022776436059383
+    },
+    "seed31415": {
+      "models": [
+        "robust_base",
+        "qwen3vl",
+        "qwen35_mean_probability"
+      ],
+      "step": 0.05,
+      "weight_candidates": 231,
+      "categories": {
+        "БАД": {
+          "nested_f1": 0.9518245550961711,
+          "folds": [
+            {
+              "fold": 0,
+              "weights": {
+                "robust_base": 0.4000000059604645,
+                "qwen3vl": 0.6000000238418579,
+                "qwen35_mean_probability": 0.0
+              },
+              "threshold": 0.25815749168395996,
+              "validation_f1": 0.9431767337807606
+            },
+            {
+              "fold": 1,
+              "weights": {
+                "robust_base": 0.5,
+                "qwen3vl": 0.0,
+                "qwen35_mean_probability": 0.5
+              },
+              "threshold": 0.2659075856208801,
+              "validation_f1": 0.9519964109466128
+            },
+            {
+              "fold": 2,
+              "weights": {
+                "robust_base": 0.4000000059604645,
+                "qwen3vl": 0.44999998807907104,
+                "qwen35_mean_probability": 0.15000000596046448
+              },
+              "threshold": 0.26154106855392456,
+              "validation_f1": 0.9540540540540541
+            },
+            {
+              "fold": 3,
+              "weights": {
+                "robust_base": 0.4000000059604645,
+                "qwen3vl": 0.5,
+                "qwen35_mean_probability": 0.10000000149011612
+              },
+              "threshold": 0.26291459798812866,
+              "validation_f1": 0.9532374100719424
+            },
+            {
+              "fold": 4,
+              "weights": {
+                "robust_base": 0.5,
+                "qwen3vl": 0.0,
+                "qwen35_mean_probability": 0.5
+              },
+              "threshold": 0.26574012637138367,
+              "validation_f1": 0.9567177637511272
+            }
+          ],
+          "full_oof": {
+            "f1": 0.9548236141108711,
+            "weights": {
+              "robust_base": 0.5,
+              "qwen3vl": 0.0,
+              "qwen35_mean_probability": 0.5
+            },
+            "threshold": 0.26574012637138367,
+            "fold_f1": {
+              "0": 0.951307484220018,
+              "1": 0.9519964109466128,
+              "2": 0.9553047404063205,
+              "3": 0.9587813620071685,
+              "4": 0.9567177637511272
+            },
+            "fold_f1_std": 0.002822739083508352
+          }
+        },
+        "Легковоспламеняющиеся": {
+          "nested_f1": 0.8511749347258486,
+          "folds": [
+            {
+              "fold": 0,
+              "weights": {
+                "robust_base": 0.30000001192092896,
+                "qwen3vl": 0.05000000074505806,
+                "qwen35_mean_probability": 0.6499999761581421
+              },
+              "threshold": 0.9645001292228699,
+              "validation_f1": 0.8108108108108109
+            },
+            {
+              "fold": 1,
+              "weights": {
+                "robust_base": 0.6000000238418579,
+                "qwen3vl": 0.10000000149011612,
+                "qwen35_mean_probability": 0.30000001192092896
+              },
+              "threshold": 0.9612830281257629,
+              "validation_f1": 0.8048780487804879
+            },
+            {
+              "fold": 2,
+              "weights": {
+                "robust_base": 0.0,
+                "qwen3vl": 0.10000000149011612,
+                "qwen35_mean_probability": 0.8999999761581421
+              },
+              "threshold": 0.9649226665496826,
+              "validation_f1": 0.9090909090909091
+            },
+            {
+              "fold": 3,
+              "weights": {
+                "robust_base": 0.5,
+                "qwen3vl": 0.10000000149011612,
+                "qwen35_mean_probability": 0.4000000059604645
+              },
+              "threshold": 0.9641234874725342,
+              "validation_f1": 0.8378378378378378
+            },
+            {
+              "fold": 4,
+              "weights": {
+                "robust_base": 0.05000000074505806,
+                "qwen3vl": 0.05000000074505806,
+                "qwen35_mean_probability": 0.8999999761581421
+              },
+              "threshold": 0.9657642841339111,
+              "validation_f1": 0.8947368421052632
+            }
+          ],
+          "full_oof": {
+            "f1": 0.8888888888888888,
+            "weights": {
+              "robust_base": 0.0,
+              "qwen3vl": 0.20000000298023224,
+              "qwen35_mean_probability": 0.800000011920929
+            },
+            "threshold": 0.9656960964202881,
+            "fold_f1": {
+              "0": 0.8493150684931506,
+              "1": 0.8461538461538461,
+              "2": 0.9333333333333333,
+              "3": 0.8918918918918919,
+              "4": 0.9230769230769231
+            },
+            "fold_f1_std": 0.03618129019370644
+          }
+        }
+      },
+      "nested_macro_f1": 0.9014997449110098
+    },
+    "balanced241+seed31415": {
+      "models": [
+        "robust_base",
+        "qwen3vl",
+        "qwen35_mean_probability"
+      ],
+      "step": 0.05,
+      "weight_candidates": 231,
+      "categories": {
+        "БАД": {
+          "nested_f1": 0.9534841954022989,
+          "folds": [
+            {
+              "fold": 0,
+              "weights": {
+                "robust_base": 0.550000011920929,
+                "qwen3vl": 0.05000000074505806,
+                "qwen35_mean_probability": 0.4000000059604645
+              },
+              "threshold": 0.2563127875328064,
+              "validation_f1": 0.9476978095663835
+            },
+            {
+              "fold": 1,
+              "weights": {
+                "robust_base": 0.5,
+                "qwen3vl": 0.0,
+                "qwen35_mean_probability": 0.5
+              },
+              "threshold": 0.2572864592075348,
+              "validation_f1": 0.9530621367903442
+            },
+            {
+              "fold": 2,
+              "weights": {
+                "robust_base": 0.550000011920929,
+                "qwen3vl": 0.0,
+                "qwen35_mean_probability": 0.44999998807907104
+              },
+              "threshold": 0.26329541206359863,
+              "validation_f1": 0.9548736462093863
+            },
+            {
+              "fold": 3,
+              "weights": {
+                "robust_base": 0.3499999940395355,
+                "qwen3vl": 0.4000000059604645,
+                "qwen35_mean_probability": 0.25
+              },
+              "threshold": 0.2588914930820465,
+              "validation_f1": 0.953405017921147
+            },
+            {
+              "fold": 4,
+              "weights": {
+                "robust_base": 0.550000011920929,
+                "qwen3vl": 0.0,
+                "qwen35_mean_probability": 0.44999998807907104
+              },
+              "threshold": 0.26329541206359863,
+              "validation_f1": 0.9584462511291779
+            }
+          ],
+          "full_oof": {
+            "f1": 0.9554379987447323,
+            "weights": {
+              "robust_base": 0.5,
+              "qwen3vl": 0.0,
+              "qwen35_mean_probability": 0.5
+            },
+            "threshold": 0.2572864592075348,
+            "fold_f1": {
+              "0": 0.9502465262214254,
+              "1": 0.9530621367903442,
+              "2": 0.9568733153638814,
+              "3": 0.9578853046594982,
+              "4": 0.9591378536147284
+            },
+            "fold_f1_std": 0.003296495934218758
+          }
+        },
+        "Легковоспламеняющиеся": {
+          "nested_f1": 0.8967254408060453,
+          "folds": [
+            {
+              "fold": 0,
+              "weights": {
+                "robust_base": 0.05000000074505806,
+                "qwen3vl": 0.20000000298023224,
+                "qwen35_mean_probability": 0.75
+              },
+              "threshold": 0.9583940505981445,
+              "validation_f1": 0.8831168831168831
+            },
+            {
+              "fold": 1,
+              "weights": {
+                "robust_base": 0.05000000074505806,
+                "qwen3vl": 0.20000000298023224,
+                "qwen35_mean_probability": 0.75
+              },
+              "threshold": 0.9583940505981445,
+              "validation_f1": 0.8433734939759037
+            },
+            {
+              "fold": 2,
+              "weights": {
+                "robust_base": 0.05000000074505806,
+                "qwen3vl": 0.10000000149011612,
+                "qwen35_mean_probability": 0.8500000238418579
+              },
+              "threshold": 0.9563921689987183,
+              "validation_f1": 0.9113924050632911
+            },
+            {
+              "fold": 3,
+              "weights": {
+                "robust_base": 0.05000000074505806,
+                "qwen3vl": 0.20000000298023224,
+                "qwen35_mean_probability": 0.75
+              },
+              "threshold": 0.9583940505981445,
+              "validation_f1": 0.9090909090909091
+            },
+            {
+              "fold": 4,
+              "weights": {
+                "robust_base": 0.05000000074505806,
+                "qwen3vl": 0.20000000298023224,
+                "qwen35_mean_probability": 0.75
+              },
+              "threshold": 0.9584622383117676,
+              "validation_f1": 0.9382716049382716
+            }
+          ],
+          "full_oof": {
+            "f1": 0.9012658227848102,
+            "weights": {
+              "robust_base": 0.05000000074505806,
+              "qwen3vl": 0.20000000298023224,
+              "qwen35_mean_probability": 0.75
+            },
+            "threshold": 0.9583940505981445,
+            "fold_f1": {
+              "0": 0.8831168831168831,
+              "1": 0.8433734939759037,
+              "2": 0.935064935064935,
+              "3": 0.9090909090909091,
+              "4": 0.9382716049382716
+            },
+            "fold_f1_std": 0.0353627073034983
+          }
+        }
+      },
+      "nested_macro_f1": 0.9251048181041721
+    }
+  }
+}

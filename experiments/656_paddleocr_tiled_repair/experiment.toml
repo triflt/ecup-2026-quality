@@ -1,0 +1,69 @@
+[experiment]
+id = "656"
+slug = "paddleocr_tiled_repair"
+title = "Deterministic overlapping-tile repair of dense PaddleOCR-VL outputs"
+status = "rejected_at_bounded_smoke"
+entrypoint = "experiments/656_paddleocr_tiled_repair/run_tiled_repair.py"
+result_file = "experiments/656_paddleocr_tiled_repair/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+source_experiment = "633_paddleocr_vl16_spotting"
+rejected_parent_experiment = "655_paddleocr_truncation_repair"
+source_images = 49456
+source_shards = 32
+labels_read = false
+
+[model]
+id = "PaddlePaddle/PaddleOCR-VL-1.6"
+revision = "c5630abae1d940eafe0697512a0325494b02ab42"
+prompt = "Spotting:"
+decoding = "greedy"
+source_max_new_tokens = 512
+tile_max_new_tokens = 512
+
+[tiling]
+target_source_loc_tokens_per_tile = 160
+minimum_initial_tiles = 2
+maximum_initial_tiles = 16
+maximum_axis_tiles = 8
+overlap_fraction_per_side = 0.10
+order = "row_major"
+
+[deduplication]
+text_normalization = "Unicode NFC plus whitespace collapse; case-sensitive"
+geometry = "axis-aligned bbox IoU"
+minimum_iou = 0.75
+priority = "largest normalized distance from tile edge, then tile index, then detection index"
+
+[hypothesis]
+parent_experiment = "655_paddleocr_truncation_repair"
+changed_factor = "Replace length-only full-image repair with deterministic overlapping image tiles"
+mechanism = "Lower visual density bounds structured output length per decode while overlap preserves seam regions"
+expected_macro_f1_delta = 0.0
+falsification = "Reject if any of eight smoke rows or any production tile lacks EOS, has LOC modulo eight, is not fully parseable/empty, loses provenance, or needs labels"
+precedents = ["PaddleOCR-VL-1.6 structured spotting", "InternVL3.5 dynamic image tiling", "fail-closed weak-label preparation"]
+
+[validation]
+integrity_version = "ocr_tiled_repair_v1"
+evaluation_version = "label_blind_ocr_integrity_v1"
+maximum_failed_tiles = 0
+maximum_failed_rows = 0
+maximum_unaccepted_rows = 0
+sealed_membership_used = false
+public_used = false
+
+[budget]
+smoke_jobs = 1
+smoke_images = 8
+planned_full_jobs = 32
+gpu_per_job = 1
+maximum_parallel_gpus = 16
+production_waves = 2
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"
+private_preset_directory = ".local/compute"
+native_source_artifacts = true

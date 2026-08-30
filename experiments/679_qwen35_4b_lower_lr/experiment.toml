@@ -1,0 +1,64 @@
+[experiment]
+id = "679"
+slug = "qwen35_4b_lower_lr"
+title = "Deployable Qwen3.5-4B class-only LoRA with lower learning rate"
+status = "screen_gate_open"
+entrypoint = "experiments/679_qwen35_4b_lower_lr/train_fold.py"
+result_file = "experiments/679_qwen35_4b_lower_lr/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+scope = "semantic_family_v3 development only"
+source_runtime = "experiment 641 byte-identical folds"
+model_inputs = ["category", "name", "description", "first_image"]
+sealed_rows = 0
+
+[validation]
+version = "semantic_family_v3"
+primary_metric = "flammable_average_precision"
+screen_folds = [0, 3]
+confirmation_folds = [1, 2, 4]
+threshold = 0.0
+threshold_tuned = false
+required_full_fold_wins = 4
+required_confirmation_fold_wins = 3
+
+[model]
+id = "Qwen/Qwen3.5-4B"
+revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+objective = "class_only_binary_bce"
+deployable = true
+
+[training]
+seed = 42
+epochs = 1
+optimizer_steps = 306
+micro_batch_size = 2
+gradient_accumulation = 8
+effective_batch_size = 16
+control_learning_rate = 0.0002
+candidate_learning_rate = 0.0001
+warmup_fraction = 0.05
+scheduler = "cosine"
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+use_rslora = true
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+[hypothesis]
+changed_factor = "peak learning rate only: 0.0002 to 0.0001"
+mechanism = "reduce rare-class overfitting while preserving the deployable 4B route"
+falsification = "reject if either screen fold loses Macro F1 or flammable AP, or any guardrail fails"
+
+[budget]
+screen_jobs = 2
+screen_gpu_hours = 2.0
+confirmation_gpu_hours = 3.0
+refit_gpu_hours = 1.25
+gpu_per_job = 1
+planned_public_submissions = 1
+
+[artifacts]
+publish = false
+directory = "artifacts"

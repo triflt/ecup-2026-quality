@@ -1,0 +1,64 @@
+{
+  "audit_version": "competition_train_download_vs_s3_v1",
+  "created_at": "2026-08-22",
+  "read_only": true,
+  "verdict": "exact_match_complete",
+  "data_csv": {
+    "download_filename": "data.csv",
+    "s3_uri": "private://competition-artifacts/data.csv",
+    "size_bytes": 37164187,
+    "sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "md5_and_s3_etag": "e39ff94c0d4c29a113b858b85b81ee58",
+    "rows": 12971,
+    "unique_ids": 12971,
+    "columns": [
+      "id",
+      "name",
+      "description",
+      "category",
+      "label"
+    ],
+    "byte_identical_to_research_data_csv": true,
+    "same_s3_object": true
+  },
+  "images_zip": {
+    "download_filename": "images.zip",
+    "s3_uri": "private://competition-artifacts/images.zip",
+    "size_bytes": 9189322555,
+    "sha256": "9ff051272e9ee1b08d6d05939470ebc7006403f4647c546b29647efb03837edc",
+    "s3_multipart_etag": "7a47f4295470fa36292f600dd1ec6ba7-877",
+    "local_multipart_etag_10_mib": "7a47f4295470fa36292f600dd1ec6ba7-877",
+    "multipart_parts": 877,
+    "multipart_part_size_bytes": 10485760,
+    "zip_crc_test_first_bad_member": null,
+    "jpg_files": 49456,
+    "product_ids": 12971,
+    "minimum_images_per_product": 1,
+    "maximum_images_per_product": 5,
+    "duplicate_image_paths": 0,
+    "invalid_image_paths": 0,
+    "same_s3_object": true
+  },
+  "manifest_crosscheck": {
+    "path": "research/multi_image_manifest.tsv.gz",
+    "sha256": "7213e0600771625c14b659d90fd42d123c16fce86f74140166dd535e1bbfd592",
+    "rows": 12971,
+    "image_entries": 49456,
+    "same_product_ids_as_csv": true,
+    "same_image_count_for_every_product_as_zip": true,
+    "missing_product_ids": 0,
+    "extra_product_ids": 0,
+    "count_mismatches": 0
+  },
+  "method": [
+    "SHA-256 and byte-size comparison for the newly downloaded CSV",
+    "single-part S3 ETag parity for data.csv",
+    "10 MiB multipart S3 ETag parity for images.zip",
+    "full ZIP CRC decompression test",
+    "ZIP path and per-product image-count comparison against the existing manifest"
+  ],
+  "limitations": [
+    "S3 ETag parity uses MD5 internally because that is the storage protocol; the local ZIP also has a separately recorded SHA-256",
+    "The ignored presigned image manifest is recorded only by checksum and counts; URLs are never persisted in this report"
+  ]
+}

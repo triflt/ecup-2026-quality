@@ -1,9 +1,11 @@
 {
   "experiment_id": "180",
   "slug": "fuzzy_family_prior",
-  "status": "accepted",
+  "status": "public_tie_not_promoted",
   "data_version": "competition_train_v1",
   "evaluation_version": "recurrence_70_30_v1",
+  "public_macro_f1": 0.8923976821312729,
+  "public_decision": "Tied experiment 140 and was not promoted because the added rule had no measurable effect",
   "conclusion": "Donor-only BAD +0.000761; 17/20 recurrence wins; flammable отключён.",
   "historical_results": [
     {

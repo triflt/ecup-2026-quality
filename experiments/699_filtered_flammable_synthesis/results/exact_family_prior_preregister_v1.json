@@ -1,0 +1,31 @@
+{
+  "schema": "exp699_exact_family_prior_preregister_v1",
+  "experiment": 699,
+  "stage": "frozen_before_test_decision_diff",
+  "hypothesis": "A unanimous exact-family recurrence signal transfers to hidden test more reliably than broad similarity retrieval and can correct decisions without the false-negative cascade observed in soft-cache and learned-pair screens.",
+  "parent": "solution140",
+  "route": "flammable_only",
+  "family_priority": [
+    "exact_full_text",
+    "exact_first_image_bytes",
+    "digit_masked_full_text"
+  ],
+  "gate": {
+    "exact_full_text_minimum_donors": 1,
+    "exact_first_image_bytes_minimum_donors": 1,
+    "digit_masked_full_text_minimum_donors": 2,
+    "all_selected_donor_labels_must_be_unanimous": true,
+    "conflicting_higher_priority_family_abstains": true,
+    "no_near_image": true,
+    "no_tfidf_or_bm25_transfer": true
+  },
+  "action": "hard_override_before_frozen_annotator_prior",
+  "bad_route": "byte_identical_solution140",
+  "public_used_for_recipe": false,
+  "sealed_rows_used": 0,
+  "gpu_required": false,
+  "full5_claimed": false,
+  "status": "ExploratoryReadyNotSubmitted_only_after_runtime_smoke",
+  "self_hash_algorithm": "sha256_canonical_json_without_self_sha256",
+  "self_sha256": "e3ba6d28ec7122413febec4ac5e21a7c7774362ea0006708f3f740c2e91869e2"
+}

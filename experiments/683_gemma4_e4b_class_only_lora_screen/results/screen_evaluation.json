@@ -1,0 +1,150 @@
+{
+  "ablation_gates": {
+    "bad_route_byte_identical": true,
+    "both_folds_ap_positive": true,
+    "both_folds_macro_positive": false,
+    "corrected_to_regressed_at_least_1_5": false,
+    "flammable_f1_does_not_drop": true,
+    "flammable_false_negatives_do_not_increase": true,
+    "mean_ap_delta_at_least_0_003": true,
+    "mean_macro_delta_at_least_0_001": true
+  },
+  "ablation_submission_eligible": false,
+  "acceptance_tier": "no_go",
+  "candidate_acceptance_audit_sha256": [
+    "2c9cd7a8a73d7ded2e27f354d7d0f3d325f866d3921339cf7461f24b16f531a9",
+    "ac830f4f09282bdb4af2db58c679a10a1f06689553b55c709a2faf837dd846a8"
+  ],
+  "candidate_prediction_sha256": [
+    "cf9089db6a1c62ccf89a024e32a2c948eb832494b09d4ac1ea4f660026508c3e",
+    "1dff751173bd36a9addac6c6583fae695b13949a7c6dfb6eaf8862c08df67156"
+  ],
+  "candidate_scope": "Gemma replaces Qwen3.5 only for flammable; BAD is byte-identical control",
+  "changed_factor": "qwen35_4b_to_gemma4_e4b",
+  "control_experiment_id": "641",
+  "control_prediction_sha256": [
+    "5164909b7b56298f074e2d21a6e40f1ed53fd2d28d599609527715760f3468ae",
+    "f73d1b06f33c74c40cce03afac1537134e8da251e5e101c14616459414d0ab6a"
+  ],
+  "decision": "REJECT_AT_SCREEN",
+  "direct_component_control": "candidate raw logits are compared with fold-matched 641 logits by tie-aware flammable AP",
+  "experiment_id": "683",
+  "fold_flammable_average_precision": {
+    "0": {
+      "candidate": 0.8733959079131377,
+      "control": 0.7871625742261392,
+      "delta": 0.08623333368699848
+    },
+    "3": {
+      "candidate": 0.9350622274764746,
+      "control": 0.9215698294276969,
+      "delta": 0.013492398048777665
+    }
+  },
+  "gates": {
+    "bad_route_byte_identical": true,
+    "both_folds_ap_positive": true,
+    "both_folds_macro_positive": false,
+    "corrected_to_regressed_at_least_1_5": false,
+    "flammable_f1_does_not_drop": true,
+    "flammable_false_negatives_do_not_increase": true,
+    "mean_ap_delta_at_least_0_005": true,
+    "mean_macro_delta_at_least_0_0015": true
+  },
+  "mean_flammable_average_precision_delta": 0.04986286586788807,
+  "passed": false,
+  "production_metrics": {
+    "baseline_macro_f1": 0.9202901230914902,
+    "candidate_macro_f1": 0.9234366618988021,
+    "categories": {
+      "БАД": {
+        "baseline_f1": 0.9532563025210085,
+        "candidate_f1": 0.9532563025210085,
+        "delta": 0.0
+      },
+      "Легковоспламеняющиеся": {
+        "baseline_f1": 0.8873239436619719,
+        "candidate_f1": 0.8936170212765957,
+        "delta": 0.006293077614623832
+      }
+    },
+    "corrected": 6,
+    "corrected_to_regressed": 1.2,
+    "corrected_to_regressed_infinite": false,
+    "false_negatives": {
+      "all_positive": {
+        "baseline": 98,
+        "candidate": 98,
+        "delta": 0
+      },
+      "flammable": {
+        "baseline": 5,
+        "candidate": 5,
+        "delta": 0
+      }
+    },
+    "false_positives": {
+      "all_negative": {
+        "baseline": 96,
+        "candidate": 95,
+        "delta": -1
+      },
+      "flammable": {
+        "baseline": 11,
+        "candidate": 10,
+        "delta": -1
+      }
+    },
+    "folds": {
+      "0": {
+        "baseline_macro_f1": 0.9059636472885684,
+        "candidate_macro_f1": 0.9059636472885684,
+        "categories": {
+          "БАД": {
+            "baseline_f1": 0.9547844374342797,
+            "candidate_f1": 0.9547844374342797,
+            "delta": 0.0
+          },
+          "Легковоспламеняющиеся": {
+            "baseline_f1": 0.8571428571428571,
+            "candidate_f1": 0.8571428571428571,
+            "delta": 0.0
+          }
+        },
+        "delta": 0.0
+      },
+      "3": {
+        "baseline_macro_f1": 0.9341990206365862,
+        "candidate_macro_f1": 0.9406544196976191,
+        "categories": {
+          "БАД": {
+            "baseline_f1": 0.9517313746065058,
+            "candidate_f1": 0.9517313746065058,
+            "delta": 0.0
+          },
+          "Легковоспламеняющиеся": {
+            "baseline_f1": 0.9166666666666666,
+            "candidate_f1": 0.9295774647887324,
+            "delta": 0.012910798122065748
+          }
+        },
+        "delta": 0.006455399061032874
+      }
+    },
+    "macro_delta": 0.0031465388073119716,
+    "mean_fold_delta": 0.003227699530516437,
+    "regressed": 5,
+    "winning_folds": 1
+  },
+  "public_used": false,
+  "schema_version": 1,
+  "sealed_rows": 0,
+  "singleton_families": {
+    "corrected": 6,
+    "net": 4,
+    "regressed": 2,
+    "rows": 2815
+  },
+  "stage": "screen",
+  "threshold_tuned": false
+}

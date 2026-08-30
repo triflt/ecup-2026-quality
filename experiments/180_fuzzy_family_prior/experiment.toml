@@ -2,7 +2,7 @@
 id = "180"
 slug = "fuzzy_family_prior"
 title = "Numeric-variant family prior"
-status = "accepted"
+status = "public_tie_not_promoted"
 entrypoint = "research/fuzzy_annotator_prior_cv.py"
 result_file = "experiments/180_fuzzy_family_prior/results/metrics.json"
 submission_source = "experiments/180_fuzzy_family_prior/submission"

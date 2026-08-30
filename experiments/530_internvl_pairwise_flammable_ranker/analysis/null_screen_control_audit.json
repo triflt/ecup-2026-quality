@@ -1,0 +1,129 @@
+{
+  "experiment_id": "530",
+  "evaluation_version": "internvl_pairwise_rank_replacement_screen_v1",
+  "mode": "null_control",
+  "purpose": "Reject-only two-fold screen; passing does not authorize submission",
+  "required_screen_folds": [
+    0,
+    3
+  ],
+  "changed_factor": "On the frozen flammable selector only, replace the Qwen3-VL rank with the donor-CDF rank from pairwise-trained InternVL at fixed weight 0.10",
+  "selector_uses_labels": false,
+  "pair_labels_source": "outer-donor train rows only",
+  "fixed_thresholds": {
+    "0": 0.9564604759216309,
+    "3": 0.9570291638374329
+  },
+  "candidate_report_contracts": {},
+  "folds": [
+    {
+      "fold": 0,
+      "baseline_category_f1": {
+        "БАД": 0.9489380930863082,
+        "Легковоспламеняющиеся": 0.9135802469135802
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9489380930863082,
+        "Легковоспламеняющиеся": 0.9135802469135802
+      },
+      "category_delta": {
+        "БАД": 0.0,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "baseline_macro_f1": 0.9312591699999442,
+      "candidate_macro_f1": 0.9312591699999442,
+      "delta_macro_f1": 0.0,
+      "changed": 0,
+      "corrected": 0,
+      "regressed": 0,
+      "flammable_false_negatives": {
+        "baseline": 3,
+        "candidate": 3,
+        "delta": 0
+      },
+      "safety_union_false_negatives": {
+        "positive_rows": 32,
+        "baseline": 3,
+        "candidate": 3,
+        "delta": 0
+      },
+      "connected_safe_delta_macro_f1": 0.0,
+      "gates": {
+        "macro_delta_positive": false,
+        "bad_predictions_unchanged": true,
+        "flammable_false_negatives_not_increased": true,
+        "safety_union_false_negatives_not_increased": true,
+        "connected_safe_delta_positive": false,
+        "corrected_regressed_ratio_at_least_1_5": true
+      },
+      "passed": false
+    },
+    {
+      "fold": 3,
+      "baseline_category_f1": {
+        "БАД": 0.9566395663956639,
+        "Легковоспламеняющиеся": 0.8767123287671232
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9566395663956639,
+        "Легковоспламеняющиеся": 0.8767123287671232
+      },
+      "category_delta": {
+        "БАД": 0.0,
+        "Легковоспламеняющиеся": 0.0
+      },
+      "baseline_macro_f1": 0.9166759475813936,
+      "candidate_macro_f1": 0.9166759475813936,
+      "delta_macro_f1": 0.0,
+      "changed": 0,
+      "corrected": 0,
+      "regressed": 0,
+      "flammable_false_negatives": {
+        "baseline": 8,
+        "candidate": 8,
+        "delta": 0
+      },
+      "safety_union_false_negatives": {
+        "positive_rows": 38,
+        "baseline": 8,
+        "candidate": 8,
+        "delta": 0
+      },
+      "connected_safe_delta_macro_f1": 0.0,
+      "gates": {
+        "macro_delta_positive": false,
+        "bad_predictions_unchanged": true,
+        "flammable_false_negatives_not_increased": true,
+        "safety_union_false_negatives_not_increased": true,
+        "connected_safe_delta_positive": false,
+        "corrected_regressed_ratio_at_least_1_5": true
+      },
+      "passed": false
+    }
+  ],
+  "mean_screen_delta_macro_f1": 0.0,
+  "required_mean_delta_macro_f1": 0.003,
+  "corrected": 0,
+  "regressed": 0,
+  "component_bootstrap": {
+    "iterations": 10000,
+    "seed": 48042,
+    "probability_delta_positive": 0.0,
+    "delta_ci95": [
+      0.0,
+      0.0
+    ]
+  },
+  "required_bootstrap_probability": 0.8,
+  "bad_changed_predictions": 0,
+  "screen_passed": false,
+  "full_five_fold_cycle_allowed": false,
+  "null_control_passed": true,
+  "input_sha256": {
+    "selector_membership": "2b5b4c5cf1903cb02c457837b2df7a7471c3af5a4f98af6f4eaf23da9b9de32a",
+    "pair_manifest_audit": "985fbd1c36f70bef4f1fec80b2bf90fe5a58c11dd4d4609dd414bea2a0c91fdd",
+    "route400_predictions": "58aa9feb3e6a276fda27666b11e479e052549523999bf2fb3c9af660904ab174",
+    "connected_guard": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+  }
+}

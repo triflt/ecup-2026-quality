@@ -1,0 +1,86 @@
+{
+  "categories": {
+    "БАД": {
+      "baseline_f1": 0.9531869875694261,
+      "candidate_f1": 0.9531869875694261,
+      "delta": 0.0
+    },
+    "Легковоспламеняющиеся": {
+      "baseline_f1": 0.8169014084507042,
+      "candidate_f1": 0.8609271523178808,
+      "delta": 0.0440257438671765
+    }
+  },
+  "control_experiment_id": "641",
+  "corrected": 18,
+  "corrected_to_regressed": 1.3846153846153846,
+  "decision": "REJECT_AT_SCREEN",
+  "evaluation_version": "semantic_family_v3",
+  "experiment_id": "658",
+  "flammable_false_negatives": {
+    "baseline": 10,
+    "candidate": 3,
+    "delta": -7
+  },
+  "folds": {
+    "0": {
+      "baseline_macro_f1": 0.87183004905629,
+      "candidate_macro_f1": 0.8895932069510268,
+      "categories": {
+        "БАД": {
+          "baseline_f1": 0.9541864139020537,
+          "candidate_f1": 0.9541864139020537,
+          "delta": 0.0
+        },
+        "Легковоспламеняющиеся": {
+          "baseline_f1": 0.7894736842105263,
+          "candidate_f1": 0.825,
+          "delta": 0.03552631578947363
+        }
+      },
+      "delta": 0.017763157894736814
+    },
+    "3": {
+      "baseline_macro_f1": 0.9003316909799375,
+      "candidate_macro_f1": 0.9267934920896259,
+      "categories": {
+        "БАД": {
+          "baseline_f1": 0.9521785334750266,
+          "candidate_f1": 0.9521785334750266,
+          "delta": 0.0
+        },
+        "Легковоспламеняющиеся": {
+          "baseline_f1": 0.8484848484848485,
+          "candidate_f1": 0.9014084507042254,
+          "delta": 0.052923602219376864
+        }
+      },
+      "delta": 0.026461801109688432
+    }
+  },
+  "gates": {
+    "corrected_to_regressed_at_least_1_5": false,
+    "each_screen_fold_positive": true,
+    "flammable_false_negatives_do_not_increase": true,
+    "mean_delta_at_least_0_0015": true,
+    "no_category_drop_below_minus_0_002": true
+  },
+  "large_component_experiment_id": "654",
+  "mean_fold_delta": 0.022112479502212623,
+  "passed": false,
+  "public_used": false,
+  "regressed": 13,
+  "remaining_folds_launched": false,
+  "route": {
+    "БАД": "641",
+    "Легковоспламеняющиеся": "654"
+  },
+  "schema_version": 1,
+  "screen_folds": [
+    0,
+    3
+  ],
+  "sealed_rows": 0,
+  "threshold": 0.0,
+  "threshold_tuned": false
+}

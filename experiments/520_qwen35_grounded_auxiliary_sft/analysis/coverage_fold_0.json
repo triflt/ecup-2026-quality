@@ -1,0 +1,107 @@
+{
+  "audit_sha256": "f5897074efb39b7cac455172715a3aeb14415cb857764650e12c3f83cea140fc",
+  "cohorts": {
+    "БАД": {
+      "0": {
+        "fallback_training_occurrences": 723,
+        "fallback_unique_rows": 723,
+        "safe_occurrence_rate": 0.518,
+        "safe_training_occurrences": 777,
+        "safe_unique_rate": 0.518,
+        "safe_unique_rows": 777,
+        "training_occurrences": 1500,
+        "unique_rows": 1500
+      },
+      "1": {
+        "fallback_training_occurrences": 260,
+        "fallback_unique_rows": 260,
+        "safe_occurrence_rate": 0.8266666666666667,
+        "safe_training_occurrences": 1240,
+        "safe_unique_rate": 0.8266666666666667,
+        "safe_unique_rows": 1240,
+        "training_occurrences": 1500,
+        "unique_rows": 1500
+      }
+    },
+    "Легковоспламеняющиеся": {
+      "0": {
+        "fallback_training_occurrences": 1089,
+        "fallback_unique_rows": 1089,
+        "safe_occurrence_rate": 0.319375,
+        "safe_training_occurrences": 511,
+        "safe_unique_rate": 0.319375,
+        "safe_unique_rows": 511,
+        "training_occurrences": 1600,
+        "unique_rows": 1600
+      },
+      "1": {
+        "fallback_training_occurrences": 220,
+        "fallback_unique_rows": 44,
+        "safe_occurrence_rate": 0.7215189873417721,
+        "safe_training_occurrences": 570,
+        "safe_unique_rate": 0.7215189873417721,
+        "safe_unique_rows": 114,
+        "training_occurrences": 790,
+        "unique_rows": 158
+      }
+    }
+  },
+  "cross_check": {
+    "enabled": true,
+    "mismatch_count": 0,
+    "mismatch_row_ids": [],
+    "selected_rows_checked": 4758
+  },
+  "decision": "GO",
+  "experiment_id": "520",
+  "format_failures": [],
+  "format_version": "grounded_auxiliary_target_v1",
+  "gates": {
+    "failures": [],
+    "min_cohort_safe_occurrence_rate": 0.25,
+    "min_cohort_safe_occurrences": 25,
+    "min_overall_safe_occurrence_rate": 0.5
+  },
+  "holdout_fold": 0,
+  "ordered_records_sha256": "ce584d37f4dad8c9e33bbeacd8092d0c8410fa7ae5e3cf6feec41854f124a7a9",
+  "outer_validation_training_occurrences": 0,
+  "overall": {
+    "fallback_training_occurrences": 2292,
+    "fallback_unique_rows": 2116,
+    "safe_occurrence_rate": 0.5747680890538034,
+    "safe_training_occurrences": 3098,
+    "safe_unique_rate": 0.555275325767129,
+    "safe_unique_rows": 2642,
+    "training_occurrences": 5390,
+    "unique_rows": 4758
+  },
+  "parent_selection": {
+    "bad_positive_selection": {
+      "control_rng_consumed": true,
+      "eligible_families": 3131,
+      "eligible_rows": 4451,
+      "family_diverse": true,
+      "hard_families": 750,
+      "max_family_exposures": 1,
+      "random_families": 750,
+      "selected_families": 1500,
+      "selected_rows": 1500
+    },
+    "family_balanced": false,
+    "max_family_exposures": null,
+    "min_family_exposures": null,
+    "negative_selection": {
+      "family_diverse": false,
+      "selected_rows": 1600
+    },
+    "positive_families": null,
+    "positive_rows": 158,
+    "selector_version": "exp260_fixed_hard_selector_dependency_light_v1",
+    "total_exposures": 790
+  },
+  "record_multiset_sha256": "d0d9528126bf789af775dbaec464ddb08fe3fc462685423db4a73a8201a29f34",
+  "seed": 42,
+  "target_plan_sha256": "606e2bf5ab39485bdd6b320e762f1ed18744c53d011265013955f9471bda5967",
+  "training_records": 5390,
+  "training_unique_rows": 4758
+}

@@ -1,0 +1,85 @@
+# Исследовательская сетка после эксперимента 490
+
+Дата фиксации: 2026-08-22. Текущий Public-чемпион: эксперимент `400`, Macro F1
+`0,8922900011`. Public используется только как уже полученный внешний факт, но
+не для подбора новых порогов или вариантов.
+
+## Общий принцип
+
+Каждая ветка меняет один механизм относительно сильного родителя и сначала
+проходит дешёвый фильтр на двух заранее объявленных разбиениях. Эксперимент может
+быть отклонён по одному разбиению, но не может быть принят без полного
+component-disjoint цикла. Учитель порядка сотен миллиардов параметров не
+используется.
+
+Новая валидация строит label-blind граф товарных семейств по точному тексту,
+названиям с независимым подтверждением и контролируемым совпадениям изображений.
+До ручной проверки рёбер её разбиения имеют статус `draft`, а не sealed. Старые
+folds используются только для быстрых причинных reject-screen; положительный
+результат на них требует повторной проверки после фиксации нового графа.
+
+## Зафиксированные ветки
+
+| ID | Механизм | Предварительный фильтр | Вычисления | Состояние |
+|---:|---|---|---:|---|
+| `490` | Детерминированный exact-span extractor и закрытый словарь оснований при неизменном вердикте `400` | Точные offsets, неизменный verdict, комментарий 50–300 символов | CPU | Отклонён ручным аудитом: релевантны `141/200`, критически неподтверждены 12; вердикт и формат `200/200` |
+| `500` | Перенос целого предложения о комплектности в начало описания без изменения токенов | Label-blind semantic preservation `>=98%` | 0 GPU | Отклонён до обучения: `62/73 = 84,93%` strict pass |
+| `510` | Первое изображение Qwen3-VL: 448 → 672 пикселя | 200 изображений, ноль ошибок, реальный прирост пикселей минимум у 20% | 2 GPU-fold | Отклонён: fold `0/3` дали `−0,00718/−0,00963`, среднее `−0,00841`; 13 исправлений против 31 ухудшения |
+| `520` | Qwen3.5 учится выдавать verdict, закрытый concept и exact evidence одним continuation | Первый supervised token — прежний atomic verdict; SAFE majority; exact offsets | 2 GPU-fold | Отклонён: fold `0/3` дали `−0,05138/−0,01730`, среднее `−0,03434`; flammable FN `+7` на fold 0 |
+| `530` | Pairwise InternVL-ранжирование только для заранее выбранных сложных flammable-карточек | Donor-only пары, четыре похожих negative на positive, 96 updates, фиксированный вес 0,10 | 2 GPU-fold | Отклонён: folds `−0,09742/−0,03256`, среднее `−0,06499`; flammable FN `+14/+4` |
+| `540` | Pairwise Qwen3.5 внутри смешанных BAD-семейств | Donor-only пары внутри frozen label-blind selector, outer folds `0/3`, неизменный route `400` вне selector | 2 GPU-fold | Отклонён: fold `0/3` дали `−0,001307/−0,000176`, 9 исправлений против 16 ухудшений |
+| `550` | Evidence-preserving packing длинных описаний при том же бюджете 1800 символов | Union SAFE-span для обоих возможных verdict без чтения gold/model prediction; 100% provenance | 2 GPU-fold | Отклонён: folds `−0,04346/+0,01619`, среднее `−0,01363`; 6 исправлений против 10 ухудшений, сильная смена знака |
+| `560` | Pairwise Qwen3.5 для flammable hard boundaries | Неизменный parent `260`, pointwise CE и 5390-record multiset; auxiliary hinge только на donor hard pairs | 2 GPU-fold | Отклонён: folds `−0,04429/−0,02407`, среднее `−0,03418`; 4 исправления против 14 ухудшений, flammable FN `+4/+3` |
+| `570` | Ослабленный grounded auxiliary loss | Target `520` неизменен; verdict-token `1,0`, evidence-tokens `0,05`; exact unit-weight null-control | 2 GPU-fold | Отклонён: среднее `+0,00144`, но folds `−0,01929/+0,02217`; fold 0 добавил 2 flammable FN |
+| `580` | Детерминированная multi-view аугментация Qwen3-VL только при обучении | Одно реальное gallery-image на occurrence; inference остаётся first-image 448 и один проход | 2 GPU-fold | Отклонён: folds `−0,04341/−0,01307`, среднее `−0,02824`; 20 исправлений против 34 ухудшений, flammable FN fold 0 `+6` |
+| `590` | Cross-listing recombination по exact identity edges | 25% повторных occurrences получают первое фото другого листинга; parent multiset и inference неизменны | 0 GPU | Отклонён blind-аудитом: `292/300 = 97,33%` ниже порога 98%; κ `1,0`, восемь quantity/variant/product contradictions |
+| `600` | Qwen3.5 baselines на sealed semantic-v3 protocol | Exact original-190 и specialist-260 recipes на пяти development folds; sealed физически исключён | 10 GPU-fold | Пакет и контракты готовы; ждёт только strict-v2 development selector от `601` |
+| `601` | Robust-base и Qwen3-VL baselines на semantic-v3 | Strict nested four-head selector и exact parent-110 на пяти development folds | CPU + 5 GPU-fold | Legacy v1 заблокирован из-за inner vocabulary leakage; strict nested v2 CPU-run выполняется |
+| `602` | Training-variance и fixed seed ensemble Qwen3.5 | Exact original-190 recipe, три новых seed × 5 folds; единственный ансамбль — равное среднее четырёх seed | 15 GPU-fold | Контракты и presets готовы; ждёт тот же strict-v2 scoped runtime, после чего может стартовать вместе с `600` |
+
+`500` не исправляется после просмотра ошибок внутри того же ID. Любой новый
+parser с защитой от эксплуатационного «без спичек», смешанных отношений и
+оборванной анафоры должен получить новую версию и новый слепой аудит.
+
+## Почему эти направления содержательные
+
+- Rationale-guided distillation в e-commerce показала, что дополнительное
+  обучение на объясняющем сигнале может улучшать компактный классификатор, не
+  сохраняя дорогой учитель в применении. В `520` источник ещё строже: не
+  свободный текст учителя, а точная цитата из самой карточки и закрытый concept.
+  [Agrawal et al., COLING 2025](https://aclanthology.org/2025.coling-industry.12/)
+- В товарных задачах качество согласования текста и изображения важнее простого
+  добавления модальностей. Поэтому `510` увеличивает детализацию того же первого
+  изображения, а не повторяет неудачное одновременное добавление галереи.
+  [MM-LTP, CVPRW 2024](https://openaccess.thecvf.com/content/CVPR2024W/MULA/html/Hu_De-noised_Vision-language_Fusion_Guided_by_Visual_Cues_for_E-commerce_Product_CVPRW_2024_paper.html)
+- Контрастные товарные методы полезны при надёжных product identities, но
+  опасны при ложных отрицательных парах. Поэтому projection/recombination
+  заблокированы до ручной проверки semantic graph, а `530` использует только
+  фактические train-метки внутри outer-train и не меняет общий selector.
+  [ECLIP, CVPR 2023](https://openaccess.thecvf.com/content/CVPR2023/html/Jin_Learning_Instance-Level_Representation_for_Large-Scale_Multi-Modal_Pretraining_in_E-Commerce_CVPR_2023_paper.html)
+- Для тонких границ случайные отрицательные пары быстро становятся слишком
+  лёгкими; обучение на близких hard negatives обычно даёт более содержательный
+  градиент. Этим мотивированы узкие pairwise-экраны `530` и `540`, а не ещё одна
+  широкая классификационная голова.
+  [Cui et al., CVPR 2016](https://openaccess.thecvf.com/content_cvpr_2016/html/Cui_Fine-Grained_Categorization_and_CVPR_2016_paper.html)
+- Генеративная аугментация товарных текстов иногда повышает consistency, но
+  может снижать F1 из-за сдвига распределения. Это стало прямой причиной
+  обязательного semantic gate и остановки `500` до расходования GPU.
+  [Avigdor et al., ACL Industry 2023](https://aclanthology.org/2023.acl-industry.30/)
+- Контрфактическая аугментация не считается автоматически полезной: при
+  контроле объёма данных она может не улучшить перенос и даже усилить ложные
+  корреляции. Поэтому следующий augmentation-ID появится только после нового
+  label-blind semantic audit, а не как починка `500` по увиденным меткам.
+  [Huang et al., Insights 2020](https://aclanthology.org/2020.insights-1.13/)
+
+## Единые критерии остановки
+
+Двухfoldовый экран отклоняется, если хотя бы на одном fold прирост Macro F1 не
+положителен, растёт число flammable/safety false negatives или ухудшений не
+меньше исправлений. Средний прирост должен быть не ниже `+0,001`.
+
+Полный development acceptance требует Macro `>=+0,003`, минимум `4/5` побед,
+отсутствие существенного падения любой категории, corrected:regressed `>=1,5`,
+положительный component bootstrap, сохранение эффекта после downstream priors и
+повтор на независимом seed. После этого рецепт один раз проверяется на sealed
+семействах; перенастройка по sealed/Public запрещена.

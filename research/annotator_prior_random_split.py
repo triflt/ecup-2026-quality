@@ -73,6 +73,7 @@ def apply(frame, train_positions, valid_positions, base, config):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--fusion", default=str(LORA))
+    parser.add_argument("--prediction-key", default="full_oof_predictions")
     parser.add_argument("--output", default=str(OUTPUT))
     args = parser.parse_args()
     frame = pd.read_csv(DATA)
@@ -81,8 +82,8 @@ def main():
     frame["normalized_name"] = frame.name.map(normalize)
     frame["text_hash"] = [fingerprint(a, b) for a, b in zip(frame.name, frame.description)]
     lora = np.load(args.fusion, allow_pickle=True)
-    if "full_oof_predictions" in lora.files:
-        base = lora["full_oof_predictions"].astype(np.int8)
+    if args.prediction_key in lora.files:
+        base = lora[args.prediction_key].astype(np.int8)
     else:
         base = np.zeros(len(frame), dtype=np.int8)
         score_configs = {

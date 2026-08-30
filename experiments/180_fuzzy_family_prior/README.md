@@ -10,7 +10,7 @@ Dataset: `competition_train_v1`. Основной evaluation protocol: `recurren
 
 ## Связь с SOTA и решениями победителей
 
-Перед продолжением гипотезы агент обязан проверить `docs/research/literature-and-competitions.md`, найти сильный precedent и явно описать, почему он должен переноситься на наши данные. Цель — уровень первого места, а не локальное улучшение без независимой проверки.
+Перед продолжением гипотезы агент обязан проверить `docs/research/foundations/literature-and-competitions.md`, найти сильный precedent и явно описать, почему он должен переноситься на наши данные. Цель — уровень первого места, а не локальное улучшение без независимой проверки.
 
 ## Запуск
 
@@ -28,5 +28,9 @@ Source directory: `experiments/180_fuzzy_family_prior/submission`. Локаль�
 ## Результат
 
 Donor-only BAD +0.000761; 17/20 recurrence wins; flammable отключён.
+
+Public Macro F1: **0,8923976821**, точная ничья с `140`. Дополнительное правило
+не дало измеримой пользы, поэтому эксперимент не продвинут, а production-
+чемпионом остаётся более простой `140`.
 
 Подробные machine-readable результаты находятся в `results/metrics.json` и `reports/experiment-log.csv`.

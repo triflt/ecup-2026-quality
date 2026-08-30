@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Данные E-CUP Quality: зеркальный дисбаланс категорий</title>
+  <desc id="desc">В категории БАД 1 905 карточек с вердиктом бан и 5 564 с вердиктом не бан. В категории Легковоспламеняющиеся 5 304 карточки бан и 198 не бан. Всего 12 971 строка, 9 853 semantic components, 1 853 строки sealed holdout и 8 210 singleton families.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#eef2ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="13" flood-color="#172554" flood-opacity="0.09"/>
+    </filter>
+    <clipPath id="bad-bar"><rect x="96" y="255" width="440" height="38" rx="12"/></clipPath>
+    <clipPath id="fire-bar"><rect x="664" y="255" width="440" height="38" rx="12"/></clipPath>
+    <style>
+      .text { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #172033; }
+      .muted { fill: #647084; }
+      .category { font-size: 24px; font-weight: 800; }
+      .stat { font-size: 34px; font-weight: 850; letter-spacing: -1px; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="650" rx="28" fill="url(#background)"/>
+  <circle cx="1128" cy="28" r="155" fill="#8b5cf6" opacity="0.08"/>
+  <circle cx="35" cy="635" r="150" fill="#14b8a6" opacity="0.07"/>
+
+  <text class="text" x="64" y="68" font-size="34" font-weight="850">Две категории — две разные задачи</text>
+  <text class="text muted" x="64" y="101" font-size="17">Распределения почти зеркальны, поэтому модели и fusion оцениваются отдельно по каждой категории.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="64" y="142" width="504" height="242" rx="22" fill="#ffffff"/>
+    <rect x="632" y="142" width="504" height="242" rx="22" fill="#ffffff"/>
+  </g>
+
+  <text class="text category" x="96" y="192">БАД</text>
+  <text class="text muted" x="96" y="221" font-size="16">7 469 карточек · категория подтверждается часто</text>
+  <g clip-path="url(#bad-bar)">
+    <rect x="96" y="255" width="112" height="38" fill="#ef6671"/>
+    <rect x="208" y="255" width="328" height="38" fill="#26b4a5"/>
+  </g>
+  <circle cx="103" cy="330" r="6" fill="#ef6671"/>
+  <text class="text" x="117" y="336" font-size="16" font-weight="750">бан · 1 905</text>
+  <text class="text muted" x="117" y="359" font-size="14">25.5%</text>
+  <circle cx="317" cy="330" r="6" fill="#26b4a5"/>
+  <text class="text" x="331" y="336" font-size="16" font-weight="750">не бан · 5 564</text>
+  <text class="text muted" x="331" y="359" font-size="14">74.5%</text>
+
+  <text class="text category" x="664" y="192">Легковоспламеняющиеся</text>
+  <text class="text muted" x="664" y="221" font-size="16">5 502 карточки · подтверждение категории редкое</text>
+  <g clip-path="url(#fire-bar)">
+    <rect x="664" y="255" width="424" height="38" fill="#ef6671"/>
+    <rect x="1088" y="255" width="16" height="38" fill="#26b4a5"/>
+  </g>
+  <circle cx="671" cy="330" r="6" fill="#ef6671"/>
+  <text class="text" x="685" y="336" font-size="16" font-weight="750">бан · 5 304</text>
+  <text class="text muted" x="685" y="359" font-size="14">96.4%</text>
+  <circle cx="891" cy="330" r="6" fill="#26b4a5"/>
+  <text class="text" x="905" y="336" font-size="16" font-weight="750">не бан · 198</text>
+  <text class="text muted" x="905" y="359" font-size="14">3.6% · редкий класс</text>
+
+  <g>
+    <rect x="64" y="428" width="250" height="160" rx="20" fill="#172554"/>
+    <text x="88" y="469" font-family="Inter,system-ui,sans-serif" font-size="14" fill="#c7d2fe">DEVELOPMENT</text>
+    <text x="88" y="522" font-family="Inter,system-ui,sans-serif" font-size="37" font-weight="850" fill="#ffffff">11 118</text>
+    <text x="88" y="553" font-family="Inter,system-ui,sans-serif" font-size="15" fill="#c7d2fe">5 folds · 12 971 всего</text>
+  </g>
+  <g>
+    <rect x="330" y="428" width="250" height="160" rx="20" fill="#ffffff" stroke="#d9deea"/>
+    <text class="text muted" x="354" y="469" font-size="14">SEMANTIC COMPONENTS</text>
+    <text class="text stat" x="354" y="522">9 853</text>
+    <text class="text muted" x="354" y="553" font-size="15">семьи не пересекают folds</text>
+  </g>
+  <g>
+    <rect x="596" y="428" width="250" height="160" rx="20" fill="#ffffff" stroke="#d9deea"/>
+    <text class="text muted" x="620" y="469" font-size="14">SEALED HOLDOUT</text>
+    <text class="text stat" x="620" y="522">1 853</text>
+    <text class="text muted" x="620" y="553" font-size="15">не участвует в подборе</text>
+  </g>
+  <g>
+    <rect x="862" y="428" width="274" height="160" rx="20" fill="#ffffff" stroke="#d9deea"/>
+    <text class="text muted" x="886" y="469" font-size="14">SINGLETON FAMILIES</text>
+    <text class="text stat" x="886" y="522">8 210</text>
+    <text class="text muted" x="886" y="553" font-size="15">проверка переноса, не памяти</text>
+  </g>
+</svg>

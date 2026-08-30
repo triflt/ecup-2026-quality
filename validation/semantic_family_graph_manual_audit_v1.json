@@ -1,0 +1,1900 @@
+{
+  "accepted_edge_reviews": [
+    {
+      "audit_id": "aux-376f035c5039233a",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-88d48d9a1bab4301",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-a9c2a801bf985b6f",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-e215f8405afa805f",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-27e91e132bab462f",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-28ae464b63009ae3",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-fc2186b2ce6024ea",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-c7d76e85b275eefc",
+      "corroboration": "one_exact_auxiliary_plus_exact_full_text",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3
+        ],
+        "right": [
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-011e1b9b46654b5c",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 0.98465473,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          2,
+          3
+        ],
+        "right": [
+          2,
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-35156450442b91e2",
+      "corroboration": "one_exact_auxiliary_plus_related_name_and_description",
+      "description_similarity": 0.98465473,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3
+        ],
+        "right": [
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-3a8be66ff1faa6a8",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1
+        ],
+        "right": [
+          1,
+          2
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-ab84972e225a0f89",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-a93ab8695e97c556",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 0.97404372,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3,
+          4
+        ],
+        "right": [
+          2,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-b0678a42c375f486",
+      "corroboration": "one_exact_auxiliary_plus_related_name_and_description",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          4
+        ],
+        "right": [
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-13fd96069304dce6",
+      "corroboration": "one_exact_auxiliary_plus_exact_full_text",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3
+        ],
+        "right": [
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-6fcf9626157c9bf6",
+      "corroboration": "one_exact_auxiliary_plus_exact_full_text",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3
+        ],
+        "right": [
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-3f959b447a495373",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "right": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-1900a5d1c1ff5ffc",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "right": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-e4d5c0c32440fc32",
+      "corroboration": "one_exact_auxiliary_plus_related_name_and_description",
+      "description_similarity": 0.98083067,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          2
+        ],
+        "right": [
+          1
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-2d94caa86718102b",
+      "corroboration": "one_exact_auxiliary_plus_related_name_and_description",
+      "description_similarity": 0.98083067,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1
+        ],
+        "right": [
+          2
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-aecdf124c71563d6",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "right": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-e3ad8852bc5ad5ba",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "right": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-045874c16f15b0d5",
+      "corroboration": "one_exact_auxiliary_plus_related_name_and_description",
+      "description_similarity": 0.98083067,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1
+        ],
+        "right": [
+          2
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-2ff048b5da6aead8",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "right": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-6c61d131ac7099af",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "right": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-97d5d4cb7dc38e94",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-be2d5a78591f036a",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-8a75bb08e6c9af92",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-17b9f5d904b7c534",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-4732be0f07fad41d",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-631873f6a7ed5816",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "aux-6654a29e2d37b1e9",
+      "corroboration": "two_independent_exact_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "exact_auxiliary_images",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-67c4e863bfa94b22",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2
+        ],
+        "right": [
+          1,
+          2
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-9c770d0d87611b83",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1
+        ],
+        "right": [
+          0,
+          1
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-65a0e4bf32183452",
+      "corroboration": "two_hashes_per_match_and_both_first_positions",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0
+        ],
+        "right": [
+          0
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-7d104016f66cc775",
+      "corroboration": "two_hashes_per_match_plus_exact_full_text",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3
+        ],
+        "right": [
+          3
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-dc56a7e42917a1d9",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3,
+          4
+        ],
+        "right": [
+          3,
+          4
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-686f5ce8b885f705",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3,
+          4
+        ],
+        "right": [
+          3,
+          4
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-ac369a08c2dc5fab",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-f370541544b231de",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-622c3cb54370c926",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-0240e4af8d31b385",
+      "corroboration": "two_hashes_per_match_and_both_first_positions",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0
+        ],
+        "right": [
+          0
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-6a3c9df58b2c0659",
+      "corroboration": "two_hashes_per_match_and_both_first_positions",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0
+        ],
+        "right": [
+          0
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-b60726023dfb314e",
+      "corroboration": "two_hashes_per_match_plus_related_name_and_description",
+      "description_similarity": 0.97732997,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1
+        ],
+        "right": [
+          2
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-fe15543638d3fde4",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1,
+          2
+        ],
+        "right": [
+          0,
+          1,
+          2
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-725cd8e20d1691c5",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1,
+          2
+        ],
+        "right": [
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-313bf2e3c6d05974",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1
+        ],
+        "right": [
+          0,
+          1
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-71aceea9d0c42d30",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          2,
+          3
+        ],
+        "right": [
+          0,
+          2,
+          3
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-bcd8052fc7be4317",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          2,
+          3
+        ],
+        "right": [
+          2,
+          3
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-26d41ab7e90e7501",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          4
+        ],
+        "right": [
+          0,
+          4
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-e15c37d52fdbcc16",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          4
+        ],
+        "right": [
+          0,
+          4
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-bf967dce5462482a",
+      "corroboration": "two_hashes_per_match_plus_exact_full_text",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3
+        ],
+        "right": [
+          3
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-4c77d5d724f9c6ac",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "right": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-d12aac16184c1ed9",
+      "corroboration": "two_hashes_per_match_and_both_first_positions",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0
+        ],
+        "right": [
+          0
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-f89072c5e59c296c",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": "reused_generic_marketing_assets_across_distinct_products",
+      "image_position_pattern": {
+        "left": [
+          1,
+          2
+        ],
+        "right": [
+          1,
+          2
+        ]
+      },
+      "public_row_ids": [
+        "17869",
+        "285"
+      ],
+      "stage": "perceptual_corroborated",
+      "strict_pass": false
+    },
+    {
+      "audit_id": "perc-c9da920d0bdd7039",
+      "corroboration": "two_hashes_per_match_plus_related_name_and_description",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          4
+        ],
+        "right": [
+          4
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-f2719bd0ae942b5f",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          3
+        ],
+        "right": [
+          1,
+          3
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-a15e07facad731ac",
+      "corroboration": "two_hashes_per_match_and_both_first_positions",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0
+        ],
+        "right": [
+          0
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-15cd746362c2000b",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          0,
+          1
+        ],
+        "right": [
+          1,
+          2,
+          3
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-e49cfb8f0cd884a9",
+      "corroboration": "two_hashes_per_match_plus_exact_full_text",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3
+        ],
+        "right": [
+          3
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-af4797e632e1bc9b",
+      "corroboration": "two_hashes_per_match_plus_exact_full_text",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3
+        ],
+        "right": [
+          3
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-3caf883771b21173",
+      "corroboration": "two_hashes_per_match_plus_exact_full_text",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3
+        ],
+        "right": [
+          3
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-40067dc1e9dac071",
+      "corroboration": "two_hashes_per_match_plus_exact_full_text",
+      "description_similarity": 1.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          3
+        ],
+        "right": [
+          3
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    },
+    {
+      "audit_id": "perc-62dc8343ba725af9",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "description_similarity": 0.0,
+      "failure_type": null,
+      "image_position_pattern": {
+        "left": [
+          1,
+          2
+        ],
+        "right": [
+          1,
+          2
+        ]
+      },
+      "stage": "perceptual_corroborated",
+      "strict_pass": true
+    }
+  ],
+  "audit_version": "semantic_family_graph_manual_audit_v1",
+  "blindness": {
+    "allowed_fields": [
+      "public row id",
+      "name",
+      "description",
+      "images",
+      "edge provenance"
+    ],
+    "fold_assignments_inspected": false,
+    "label_blind": true,
+    "model_predictions_inspected": false
+  },
+  "decision": "NO_GO",
+  "decision_rule": "GO requires no observed false accepted edge and all 20 largest-component boundary checks to pass.",
+  "failure_taxonomy_counts": {
+    "copied_generic_text_and_auxiliary_asset_despite_different_product_images": 1,
+    "reused_generic_marketing_assets_across_distinct_products": 3,
+    "reused_seller_support_assets_across_distinct_products": 2
+  },
+  "false_accepted_edges": [
+    {
+      "audit_id": "false-edge-150d2531bd9af160",
+      "corroboration": "two_independent_exact_images",
+      "failure_type": "reused_seller_support_assets_across_distinct_products",
+      "public_row_ids": [
+        "100",
+        "8785"
+      ],
+      "stage": "exact_auxiliary_images"
+    },
+    {
+      "audit_id": "false-edge-77a8b276158c16ca",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "failure_type": "reused_generic_marketing_assets_across_distinct_products",
+      "public_row_ids": [
+        "10537",
+        "17869"
+      ],
+      "stage": "perceptual_corroborated"
+    },
+    {
+      "audit_id": "false-edge-f89072c5e59c296c",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "failure_type": "reused_generic_marketing_assets_across_distinct_products",
+      "public_row_ids": [
+        "17869",
+        "285"
+      ],
+      "stage": "perceptual_corroborated"
+    },
+    {
+      "audit_id": "false-edge-c9f5d52ba7ad9dad",
+      "corroboration": "two_hashes_per_match_and_two_independent_images",
+      "failure_type": "reused_generic_marketing_assets_across_distinct_products",
+      "public_row_ids": [
+        "17869",
+        "781"
+      ],
+      "stage": "perceptual_corroborated"
+    },
+    {
+      "audit_id": "false-edge-b974e53fcd8f31ef",
+      "corroboration": "one_exact_auxiliary_plus_exact_full_text",
+      "failure_type": "copied_generic_text_and_auxiliary_asset_despite_different_product_images",
+      "public_row_ids": [
+        "6776",
+        "7213"
+      ],
+      "stage": "exact_auxiliary_images"
+    },
+    {
+      "audit_id": "false-edge-9c4b5184c39a4399",
+      "corroboration": "two_independent_exact_images",
+      "failure_type": "reused_seller_support_assets_across_distinct_products",
+      "public_row_ids": [
+        "932",
+        "9462"
+      ],
+      "stage": "exact_auxiliary_images"
+    }
+  ],
+  "input_fingerprints": {
+    "edge_provenance_sha256": "9b772ceef055b9e8537ea06733f7c7f5cd0f5a725c6e3a3dcbae41f5284826f4",
+    "public_text_view_sha256": "be6a8bb670c7150b1b874534c61b33ad22ad242b1b2de4a2b6fd2232bea24e00",
+    "topology_view_sha256": "3da8fd8390d449c50c60089bc168742c65644b64cadd34a7f00e1b8de2fbb30f"
+  },
+  "largest_component_boundary_reviews": [
+    {
+      "component_audit_id": "component-39575ee5f7fa8e96",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-77a8b276158c16ca",
+          "corroboration": "two_hashes_per_match_and_two_independent_images",
+          "description_similarity": 0.0,
+          "failure_type": "reused_generic_marketing_assets_across_distinct_products",
+          "public_row_ids": [
+            "10537",
+            "17869"
+          ],
+          "role": "latest_stage_union_bridge",
+          "stage": "perceptual_corroborated",
+          "strict_pass": false
+        },
+        {
+          "audit_id": "boundary-edge-c9f5d52ba7ad9dad",
+          "corroboration": "two_hashes_per_match_and_two_independent_images",
+          "description_similarity": 0.0,
+          "failure_type": "reused_generic_marketing_assets_across_distinct_products",
+          "public_row_ids": [
+            "17869",
+            "781"
+          ],
+          "role": "riskiest_internal_edge",
+          "stage": "perceptual_corroborated",
+          "strict_pass": false
+        }
+      ],
+      "size": 132,
+      "strict_pass": false
+    },
+    {
+      "component_audit_id": "component-8424b16e22dc4c84",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-aa276aca6b1ac8b5",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-365ea914499de7ff",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        }
+      ],
+      "size": 51,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-4e23bb446942e7c3",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-150d2531bd9af160",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": "reused_seller_support_assets_across_distinct_products",
+          "public_row_ids": [
+            "100",
+            "8785"
+          ],
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": false
+        },
+        {
+          "audit_id": "boundary-edge-9c4b5184c39a4399",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": "reused_seller_support_assets_across_distinct_products",
+          "public_row_ids": [
+            "932",
+            "9462"
+          ],
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": false
+        }
+      ],
+      "size": 46,
+      "strict_pass": false
+    },
+    {
+      "component_audit_id": "component-677568d61713df88",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-031207ac606cf195",
+          "corroboration": "two_hashes_per_match_and_two_independent_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "perceptual_corroborated",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-fa37acc1611bd52d",
+          "corroboration": "two_hashes_per_match_and_two_independent_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "perceptual_corroborated",
+          "strict_pass": true
+        }
+      ],
+      "size": 45,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-dd4a380c3dca0e95",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-59420a9a1a904ef4",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-0c10fdb262dfe3c1",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        }
+      ],
+      "size": 35,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-952611cf9b5b35ca",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-66b7b2fefe466f49",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-12b3374d05bce14c",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        }
+      ],
+      "size": 33,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-d2cfea02b2f6e9e1",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-eff8831f4ba54fdc",
+          "corroboration": "direct_exact_full_text",
+          "description_similarity": 1.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_full_text",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-f70bf68ead2c74dc",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 1.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        }
+      ],
+      "size": 27,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-f94b07d7766b39b8",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-fe34d80ade76a2e3",
+          "corroboration": "both_informative_first_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_first_image",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-b974e53fcd8f31ef",
+          "corroboration": "one_exact_auxiliary_plus_exact_full_text",
+          "description_similarity": 1.0,
+          "failure_type": "copied_generic_text_and_auxiliary_asset_despite_different_product_images",
+          "public_row_ids": [
+            "6776",
+            "7213"
+          ],
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": false
+        }
+      ],
+      "size": 26,
+      "strict_pass": false
+    },
+    {
+      "component_audit_id": "component-b82c78ea929487c5",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-08b9e54129d8f581",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-2bb4797c86219d3c",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        }
+      ],
+      "size": 26,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-c89390f5c238fc25",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-4bd341cc0009f0d5",
+          "corroboration": "direct_exact_full_text",
+          "description_similarity": 1.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_full_text",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-2eab247190372bb0",
+          "corroboration": "one_exact_auxiliary_plus_exact_full_text",
+          "description_similarity": 1.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        }
+      ],
+      "size": 20,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-4af877b6e332026e",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-ec5cfe1bd3db4292",
+          "corroboration": "description_similarity",
+          "description_similarity": 0.97145877,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "masked_name_corroborated",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-7f475bff53e9e958",
+          "corroboration": "two_hashes_per_match_plus_related_name_and_description",
+          "description_similarity": 0.96421053,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "perceptual_corroborated",
+          "strict_pass": true
+        }
+      ],
+      "size": 19,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-d47d7e8b62f63aaf",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-b5b15417fe1d9f55",
+          "corroboration": "description_similarity",
+          "description_similarity": 0.97619048,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_name_corroborated",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-e674c1ef7d81e057",
+          "corroboration": "both_informative_first_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_first_image",
+          "strict_pass": true
+        }
+      ],
+      "size": 19,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-5cf490ca17d90ed0",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-826c41e7b3c96cd4",
+          "corroboration": "both_informative_first_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_first_image",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-238e4e9dbeec6dcf",
+          "corroboration": "both_informative_first_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_first_image",
+          "strict_pass": true
+        }
+      ],
+      "size": 19,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-6377dbedefb64fd6",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-9079532d94d58f2c",
+          "corroboration": "two_hashes_per_match_and_both_first_positions",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "perceptual_corroborated",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-fdb34d09288e8c63",
+          "corroboration": "two_hashes_per_match_and_two_independent_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "perceptual_corroborated",
+          "strict_pass": true
+        }
+      ],
+      "size": 19,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-78209e21bab2f89c",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-864121eb5bbaf755",
+          "corroboration": "both_informative_first_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_first_image",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-48fe83768c2e1eeb",
+          "corroboration": "two_hashes_per_match_and_two_independent_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "perceptual_corroborated",
+          "strict_pass": true
+        }
+      ],
+      "size": 18,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-4847be95cd608f54",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-58eab0fa02ac7646",
+          "corroboration": "both_informative_first_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_first_image",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-41df59e56bed8b18",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        }
+      ],
+      "size": 18,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-8bc7d2678c7f1415",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-043908c1f7f33315",
+          "corroboration": "description_similarity",
+          "description_similarity": 0.99736842,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "masked_name_corroborated",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-445abd0cfc4f3754",
+          "corroboration": "both_informative_first_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_first_image",
+          "strict_pass": true
+        }
+      ],
+      "size": 18,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-f8890cc74990001d",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-4de8adc0475b7d98",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-9477fceb747330d5",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        }
+      ],
+      "size": 17,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-ce669d06427ebb25",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-667dc784e45eaee6",
+          "corroboration": "description_similarity",
+          "description_similarity": 1.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "masked_name_corroborated",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-d3e5e2c83ab6fcdf",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 1.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        }
+      ],
+      "size": 17,
+      "strict_pass": true
+    },
+    {
+      "component_audit_id": "component-6ae374edc2ff2360",
+      "reviewed_boundary_edges": [
+        {
+          "audit_id": "boundary-edge-917b3db528a9fde6",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "latest_stage_union_bridge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        },
+        {
+          "audit_id": "boundary-edge-c2caed943e16b07d",
+          "corroboration": "two_independent_exact_images",
+          "description_similarity": 0.0,
+          "failure_type": null,
+          "role": "riskiest_internal_edge",
+          "stage": "exact_auxiliary_images",
+          "strict_pass": true
+        }
+      ],
+      "size": 17,
+      "strict_pass": true
+    }
+  ],
+  "limitations": [
+    "The 32+32 accepted-edge samples are deterministic rather than random.",
+    "A passed edge means the two rows appear to belong to one product family; it does not prove that every path inside the resulting component is correct.",
+    "No precision claim is made for unaudited stages or smaller components."
+  ],
+  "required_fail_closed_policy_changes": [
+    {
+      "change": "Remove standalone acceptance for two exact auxiliary images. Accept an auxiliary edge only with independent product-identity text corroboration; otherwise quarantine it.",
+      "policy_id": "auxiliary-requires-identity-corroboration"
+    },
+    {
+      "change": "Two perceptually matching auxiliary images are insufficient. Require a matched informative first image on both rows or independent product-identity text corroboration; otherwise quarantine.",
+      "policy_id": "perceptual-auxiliary-requires-first-or-text"
+    },
+    {
+      "change": "An image key reused across distinct normalized product-identity signatures cannot provide corroboration and must be marked non-informative for graph edges.",
+      "policy_id": "generic-asset-cross-identity-quarantine"
+    },
+    {
+      "change": "Quarantine an exact-full-text group when its name/text is low-information and informative first product images disagree; do not let copied boilerplate override product-image contradiction.",
+      "policy_id": "generic-exact-text-image-contradiction"
+    }
+  ],
+  "results": {
+    "accepted_edge_sample_combined": {
+      "audited": 64,
+      "estimate": 0.984375,
+      "passed": 63,
+      "wilson_95": [
+        0.9166589839990573,
+        0.9972364580766624
+      ]
+    },
+    "exact_auxiliary": {
+      "audited": 32,
+      "estimate": 1.0,
+      "passed": 32,
+      "wilson_95": [
+        0.8928208017449293,
+        1
+      ]
+    },
+    "largest_component_boundary": {
+      "audited": 20,
+      "estimate": 0.85,
+      "passed": 17,
+      "wilson_95": [
+        0.6395811352592431,
+        0.9476312541037835
+      ]
+    },
+    "note": "Wilson intervals are descriptive only: deterministic samples and deliberately risky component boundaries are not random population samples.",
+    "perceptual": {
+      "audited": 32,
+      "estimate": 0.96875,
+      "passed": 31,
+      "wilson_95": [
+        0.8425573617998744,
+        0.9944621398359969
+      ]
+    }
+  },
+  "review_method": "Side-by-side review of public names/descriptions, first product images, at least one matched image position, and accepted edge provenance. No result used labels, predictions, scores, or partitions.",
+  "scope": {
+    "accepted_exact_auxiliary_edges": 32,
+    "accepted_perceptual_edges": 32,
+    "largest_components": 20,
+    "selection": "For each accepted stage, first 32 pairs in deterministic builder row order; components ordered by descending size. Each component checks the latest-stage union bridge and the highest-risk lowest-text-similarity internal edge."
+  },
+  "status": "complete_label_blind_manual_audit"
+}

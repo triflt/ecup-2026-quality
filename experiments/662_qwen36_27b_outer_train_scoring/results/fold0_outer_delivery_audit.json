@@ -1,0 +1,8 @@
+{
+  "decision": "ACCEPT_OUTER_DELIVERY",
+  "inner_archive_sha256": "d58a273fcabeeda1c538ad30aea9aeec22d977cbc654fae132d6e261960bcc26",
+  "outer_archive_sha256": "07c58649f74c28447e3fc5699ea4c47120d1b898492e7502b10a1c63da36de29",
+  "report_sha256": "3a8c5be1a5d44a9be4bdd07b54b61bf7ef95ea7fd7b4d3d556f04188f4faa134",
+  "schema_version": 1,
+  "teacher_scores_sha256": "2dbbb3e1a16be024d4c62f03d150970a1ed62f9afdbc3d98fd8cd69cfc3154ba"
+}

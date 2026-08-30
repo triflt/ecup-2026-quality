@@ -1,0 +1,38 @@
+id = "622"
+name = "semantic_v3_contrastive_evidence_verifier"
+status = "confirmed_external_blocker"
+description = "Donor-only contrastive verifier for exact text evidence and closed policy claims."
+entrypoint = "experiments/622_semantic_v3_contrastive_evidence_verifier/build_preflight.py"
+result_file = "experiments/622_semantic_v3_contrastive_evidence_verifier/results/metrics.json"
+
+[hypothesis]
+mechanism = "Teach a small verifier to distinguish an exact evidence span's valid policy claim from a deterministic polarity or scope counterclaim."
+single_changed_factor = "Auxiliary contrastive evidence verification; the parent classifier, route and verdict renderer stay frozen."
+expected_effect = "Reduce unsupported disagreement flips, especially indirect BAD and long transaction-scope cases."
+falsification = "Reject before GPU unless a fresh 300-row human audit reaches 282 strict passes with zero critical scope or negation failures."
+
+[protocol]
+validation_version = "semantic_family_v3"
+screen_folds = [0, 3]
+sealed_holdout_used = false
+large_teacher_used = false
+validation_labels_physically_available_to_builder = false
+full_refit_allowed = false
+
+[compute]
+gpu_jobs_before_human_gate = 0
+screen_jobs_if_unblocked = 2
+
+[loss]
+binary_entailment_ce_weight = 1.0
+contrastive_infonce_weight = 0.2
+scope_auxiliary_ce_weight = 0.15
+negation_auxiliary_ce_weight = 0.15
+contrastive_temperature = 0.07
+
+[human_gate]
+sample_size = 300
+minimum_strict_pass = 282
+maximum_critical_unsupported = 0
+maximum_scope_or_negation_failure = 0
+status = "pending"

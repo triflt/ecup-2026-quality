@@ -1,0 +1,20 @@
+id = "360"
+slug = "hard_negative_diagonal_metric"
+status = "rejected_stage1"
+data_version = "competition_train_v1"
+evaluation_version = "connected_hard_negative_metric_screen_v1"
+parent_experiment = "190_shingle_neighbor_prior"
+
+[hypothesis]
+statement = "A donor-only diagonal metric learned from hard family pairs recovers local contrasts hidden by global heads."
+changed_factor = "Top-256 learned embedding coordinates and a top-2-percent selective metric disagreement gate."
+
+[entrypoints]
+run = "python experiments/360_hard_negative_diagonal_metric/run.py"
+
+[acceptance]
+minimum_macro_delta = 0.001
+minimum_fold_wins = 4
+minimum_corrected_to_regressed = 1.5
+minimum_bootstrap_probability = 0.80
+maximum_category_drop = 0.005

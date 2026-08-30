@@ -1,0 +1,9 @@
+{
+  "schema": "exp702_metrics_v1",
+  "status": "QUEUED_FOLD0",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "lora_r": 32,
+  "lora_alpha": 64,
+  "public_used": false
+}

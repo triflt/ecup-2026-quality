@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "experiment_id": "678",
+  "created_at": "2026-08-24T12:19:49Z",
+  "status": "complete",
+  "candidate": "fixed_equal_logit_route",
+  "screen_folds": [0, 3],
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "summary": {
+    "changed_rows": 20,
+    "corrected_rows": 17,
+    "regressed_rows": 3,
+    "changed_semantic_components": 12,
+    "pure_correction_components": 10,
+    "pure_regression_components": 1,
+    "mixed_change_components": 1,
+    "mixed_label_changed_components": 1,
+    "mixed_label_changed_rows": 2
+  },
+  "by_baseline_error": {
+    "corrected_false_negatives": 8,
+    "corrected_false_positives": 9,
+    "regressed_previously_correct": 3
+  },
+  "by_fold": {
+    "0": {"corrected": 12, "regressed": 2},
+    "3": {"corrected": 5, "regressed": 1}
+  },
+  "by_family_novelty": {
+    "semantic_singleton": {"corrected": 7, "regressed": 0},
+    "semantic_repeated": {"corrected": 10, "regressed": 3}
+  },
+  "by_ocr_availability": {
+    "all_images_available": {"corrected": 15, "regressed": 2},
+    "partially_available": {"corrected": 2, "regressed": 1},
+    "all_images_unavailable": {"corrected": 0, "regressed": 0}
+  },
+  "blend_margin": {
+    "definition": "absolute fixed blended logit after the frozen 0.5/0.5 average",
+    "corrected_median": 1.3125,
+    "regressed_median": 0.3125,
+    "corrected_below_0_5": 2,
+    "regressed_below_0_5": 3
+  },
+  "notable_components": [
+    {
+      "semantic_component": "aab22e70434bda87b36df6a0b79c57aa0af25075e6da7e799268258685582e93",
+      "ids": ["10068", "13040", "1362", "18103", "6982"],
+      "corrections": 5,
+      "regressions": 0,
+      "mixed_label": false,
+      "manual_description": "repeated gas-burner family"
+    },
+    {
+      "semantic_component": "c5a428e1e993e0d74e59591709f210cdec0f32badaba5d8103b1d107347797b7",
+      "ids": ["14564", "8255"],
+      "corrections": 2,
+      "regressions": 0,
+      "mixed_label": false,
+      "manual_description": "second repeated gas-burner family"
+    },
+    {
+      "semantic_component": "1e1739292844863aa0983bec566fa24824bc78d741b677c8a567bf535cbd7e4f",
+      "ids": ["11747", "11927"],
+      "corrections": 2,
+      "regressions": 0,
+      "mixed_label": false,
+      "manual_description": "repeated charcoal family"
+    },
+    {
+      "semantic_component": "f60ec45c5edf69e4531a89e8cb9025f78b3e9ec9edbe00417b83894d3bedc875",
+      "ids": ["13699", "454"],
+      "corrections": 0,
+      "regressions": 2,
+      "mixed_label": false,
+      "manual_description": "repeated gas-burner family; both changes have low margin"
+    },
+    {
+      "semantic_component": "247c2cb598672a27494be80d8b85db6ac0198fd704ce0339fbcf256da5910355",
+      "ids": ["3334", "5959"],
+      "corrections": 1,
+      "regressions": 1,
+      "mixed_label": true,
+      "manual_description": "near-identical ignition-stick listings with contradictory labels"
+    }
+  ],
+  "interpretation": [
+    "The gain is not explained only by repeated listings because singleton corrections are 7 to 0.",
+    "Repeated listings inflate row-level counts, so the component-level ratio is the more conservative evidence.",
+    "All observed regressions are low-margin and concentrated in repeated or contradictory families.",
+    "OCR availability does not isolate the mechanism because almost all changed rows already have fully available OCR."
+  ],
+  "candidate_changed_after_audit": false,
+  "public_used": false,
+  "sealed_rows_used": 0,
+  "decision": "KEEP_FROZEN_CANDIDATE_WAIT_FOR_FULL_FIVE_FOLDS"
+}

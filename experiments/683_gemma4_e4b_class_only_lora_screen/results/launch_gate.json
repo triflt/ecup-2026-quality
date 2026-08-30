@@ -1,0 +1,61 @@
+{
+  "allowed_folds": [
+    0
+  ],
+  "changed_factor": "qwen35_4b_to_gemma4_e4b",
+  "control_experiment_id": "641",
+  "decision": "OPEN_TECHNICAL_SMOKE_ONLY",
+  "experiment_id": "683",
+  "max_gpu_jobs": 1,
+  "model_id": "google/gemma-4-E4B-it",
+  "model_revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+  "public_submissions": 0,
+  "public_used": false,
+  "runtime_contract_sha256": {
+    "0": "757ad4749346ebf6d89fb497ccf93f5495e0ce75c9da217a944a88a5c05e52b1",
+    "3": "50d1578a41cc654f891fcaab927b50fa77370af0b660f193dae8a4e300222e1c"
+  },
+  "schema_version": 1,
+  "scientific_contract": {
+    "effective_batch_size": 16,
+    "epochs": 1,
+    "gemma_soft_image_tokens": 280,
+    "gradient_accumulation": 8,
+    "learning_rate": 0.0002,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "lora_rank": 16,
+    "micro_batch_size": 2,
+    "objective": "binary_bce_last_token_logit_1_minus_0",
+    "seed": 42,
+    "source_multiset": "exact_641",
+    "text_attention_targets": 132,
+    "threshold": 0.0,
+    "threshold_tuned": false
+  },
+  "screen_gate_after_smoke": {
+    "bad_byte_identical_by_route": true,
+    "both_fold_ap_positive": true,
+    "both_fold_macro_positive": true,
+    "corrected_to_regressed_min": 1.5,
+    "flammable_f1_drop_max": 0.0,
+    "fn_increase_max": 0,
+    "folds": [
+      0,
+      3
+    ],
+    "mean_ap_delta_min": 0.005,
+    "mean_macro_delta_min": 0.0015
+  },
+  "sealed_rows": 0,
+  "smoke_contract": {
+    "adapter_save_reload": true,
+    "backward": true,
+    "forward": true,
+    "label_free_validation_rows": 2,
+    "optimizer_step": true,
+    "real_train_rows": 2,
+    "score_parity_tolerance": 0.0001
+  },
+  "contract_sha256": "ef4cc02ff7a64e745bac68546bf0924f154b314e52dc9c65e096bdf068a17092"
+}

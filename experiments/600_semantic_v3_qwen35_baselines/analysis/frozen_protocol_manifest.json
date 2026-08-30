@@ -1,0 +1,32 @@
+{
+  "blockers": [
+    "A frozen development-only selector-score NPZ and its provenance are absent."
+  ],
+  "data_sha256": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+  "development_ids_sha256": "4fd6adf6a20d782972fa63b3569bf13a7e36e5bf282b2a7bd351a0230ccffa8e",
+  "development_rows": 11118,
+  "experiment_id": "600",
+  "folds_sha256": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+  "image_manifest_sha256": "d6193215ce2d6145440bd484ea225e77fe10784c4c2c06b7c6b0b85dc8efc7d9",
+  "jobs": [
+    {"component": "original", "fold": 0, "outer_train_rows": 8894, "outer_validation_rows": 2224, "sealed_rows": 0},
+    {"component": "original", "fold": 1, "outer_train_rows": 8895, "outer_validation_rows": 2223, "sealed_rows": 0},
+    {"component": "original", "fold": 2, "outer_train_rows": 8894, "outer_validation_rows": 2224, "sealed_rows": 0},
+    {"component": "original", "fold": 3, "outer_train_rows": 8894, "outer_validation_rows": 2224, "sealed_rows": 0},
+    {"component": "original", "fold": 4, "outer_train_rows": 8895, "outer_validation_rows": 2223, "sealed_rows": 0},
+    {"component": "specialist", "fold": 0, "outer_train_rows": 8894, "outer_validation_rows": 2224, "sealed_rows": 0},
+    {"component": "specialist", "fold": 1, "outer_train_rows": 8895, "outer_validation_rows": 2223, "sealed_rows": 0},
+    {"component": "specialist", "fold": 2, "outer_train_rows": 8894, "outer_validation_rows": 2224, "sealed_rows": 0},
+    {"component": "specialist", "fold": 3, "outer_train_rows": 8894, "outer_validation_rows": 2224, "sealed_rows": 0},
+    {"component": "specialist", "fold": 4, "outer_train_rows": 8895, "outer_validation_rows": 2223, "sealed_rows": 0}
+  ],
+  "protocol_version": "semantic_family_v3",
+  "parent_sha256": {
+    "original": "c30e690ad260af72fcc625c8d3e6d9ab9c5a096d8443d6d9f5f7adbcaa52123c",
+    "specialist": "404f6d07965f551dfe7c7ee0120ce0a16132e1103f1db7d13b3622993f4fd6c0"
+  },
+  "required_jobs": 10,
+  "sealed_holdout_rows": 1853,
+  "source_rows": 12971,
+  "status": "prepared_blocked_on_development_only_selector_scores"
+}

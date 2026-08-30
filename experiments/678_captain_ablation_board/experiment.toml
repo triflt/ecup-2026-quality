@@ -1,0 +1,43 @@
+[experiment]
+id = "678"
+slug = "captain_ablation_board"
+title = "Captain validation and honest ablation board"
+status = "active"
+entrypoint = ""
+result_file = "experiments/678_captain_ablation_board/results/candidate_board.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+folds = "validation/semantic_family_v3/folds.csv"
+primary_metric = "macro_f1_with_flammable_average_precision_diagnostic"
+
+[hypothesis]
+parent_experiment = "659"
+changed_factor = "No model change; coordination and validation state only"
+mechanism = "Fail-closed candidate promotion with exact artifact binding"
+expected_macro_f1_delta = 0.0
+falsification = "A candidate lacks exact OOF binding or a frozen acceptance gate"
+precedents = []
+
+[acceptance]
+baseline_macro_f1 = 0.0
+required_fold_wins = 4
+max_category_f1_drop = 0.002
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 0.0
+planned_public_submissions = 0
+runtime_limit_minutes = 1
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false

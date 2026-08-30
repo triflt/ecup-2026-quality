@@ -1,0 +1,32 @@
+{
+  "parent_experiment": "260_bad_family_diverse_positives",
+  "candidate_experiment": "410_badpos_flammable_family_diverse_negatives",
+  "seed": 42,
+  "single_environment_change": {
+    "FAMILY_DIVERSE_FLAMMABLE_NEGATIVES": ["0", "1"]
+  },
+  "fixed_environment": {
+    "FAMILY_BALANCE_FLAMMABLE": "0",
+    "FAMILY_DIVERSE_BAD_POSITIVES": "1",
+    "TRAINING_MODE": "hard"
+  },
+  "same_training_script": true,
+  "non_target_training_multiset_exact": true,
+  "record_count_exact": true,
+  "shuffle_permutation_exact": true,
+  "optimizer_update_count_exact": true,
+  "folds": [
+    {"fold": 0, "records": 5390, "optimizer_updates": 337, "parent_negative_families": 1301, "candidate_negative_families": 1600},
+    {"fold": 1, "records": 5390, "optimizer_updates": 337, "parent_negative_families": 1272, "candidate_negative_families": 1600},
+    {"fold": 2, "records": 5395, "optimizer_updates": 338, "parent_negative_families": 1286, "candidate_negative_families": 1600},
+    {"fold": 3, "records": 5390, "optimizer_updates": 337, "parent_negative_families": 1275, "candidate_negative_families": 1600},
+    {"fold": 4, "records": 5395, "optimizer_updates": 338, "parent_negative_families": 1289, "candidate_negative_families": 1600}
+  ],
+  "full": {
+    "records": 6790,
+    "optimizer_updates": 425,
+    "target_negative_rows": 2000
+  },
+  "known_validation_limitation": "The inherited OOF uncertainty scorer is not strictly nested relative to every outer holdout; connected guards and an independent-seed repeat are mandatory.",
+  "passed": true
+}

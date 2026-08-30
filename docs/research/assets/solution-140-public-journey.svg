@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1180" viewBox="0 0 1400 1180" role="img" aria-labelledby="title desc">
+  <title id="title">Путь к решению 140: Public, локальная метрика и перспективные ветки</title>
+  <desc id="desc">Два графика показывают рост Public Macro F1 и разрыв между историческими локальными оценками и Public. Ниже перечислены сильные идеи, которые не были включены в решение из-за стабильности, ограничений runtime или отсутствия подтверждения.</desc>
+  <defs>
+    <linearGradient id="publicArea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7C3AED" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#7C3AED" stop-opacity="0.01"/>
+    </linearGradient>
+    <filter id="shadow" x="-15%" y="-20%" width="130%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#172033" flood-opacity="0.08"/>
+    </filter>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .text { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #172033; }
+      .muted { fill: #637083; }
+      .grid { stroke: #DFE4EE; stroke-width: 1; }
+      .panel { fill: #FFFFFF; stroke: #E3E8F1; stroke-width: 1; }
+      .public { fill: #7C3AED; }
+      .local { fill: #3B82F6; }
+      .winner { fill: #10B981; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="1180" rx="30" fill="#F7F9FC"/>
+  <circle cx="1320" cy="40" r="155" fill="#EDE9FE"/>
+  <circle cx="35" cy="1145" r="130" fill="#DBF4ED"/>
+
+  <text class="text" x="62" y="65" font-size="36" font-weight="850">Путь к решению 140</text>
+  <text class="text muted" x="62" y="98" font-size="17">Public показывал перенос. Локальная метрика помогала искать идеи — но часто переоценивала их.</text>
+
+  <!-- Public journey -->
+  <g filter="url(#shadow)">
+    <rect class="panel" x="50" y="126" width="1300" height="300" rx="22"/>
+  </g>
+  <text class="text" x="78" y="169" font-size="22" font-weight="800">1 · Рост Public Macro F1</text>
+  <text class="text muted" x="78" y="194" font-size="14">Ключевые отправки, а не каждая промежуточная проверка</text>
+
+  <g>
+    <line class="grid" x1="110" y1="350" x2="1290" y2="350"/>
+    <line class="grid" x1="110" y1="302" x2="1290" y2="302"/>
+    <line class="grid" x1="110" y1="254" x2="1290" y2="254"/>
+    <line class="grid" x1="110" y1="206" x2="1290" y2="206"/>
+    <text class="text muted" x="96" y="355" font-size="12" text-anchor="end">0.45</text>
+    <text class="text muted" x="96" y="307" font-size="12" text-anchor="end">0.60</text>
+    <text class="text muted" x="96" y="259" font-size="12" text-anchor="end">0.75</text>
+    <text class="text muted" x="96" y="211" font-size="12" text-anchor="end">0.90</text>
+  </g>
+
+  <path d="M150 341 L360 266 L570 263 L780 236 L990 243 L1200 208 L1200 350 L150 350 Z" fill="url(#publicArea)"/>
+  <path d="M150 341 L360 266 L570 263 L780 236 L990 243 L1200 208" fill="none" stroke="#7C3AED" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g class="text">
+    <circle cx="150" cy="341" r="8" class="public" stroke="#FFFFFF" stroke-width="4"/>
+    <text x="150" y="325" font-size="15" font-weight="800" text-anchor="middle">0.4790</text>
+    <text x="150" y="382" font-size="13" font-weight="700" text-anchor="middle">text baseline</text>
+
+    <circle cx="360" cy="266" r="8" class="public" stroke="#FFFFFF" stroke-width="4"/>
+    <text x="360" y="250" font-size="15" font-weight="800" text-anchor="middle">0.7130</text>
+    <text x="360" y="382" font-size="13" font-weight="700" text-anchor="middle">TF-IDF</text>
+
+    <circle cx="570" cy="263" r="8" class="public" stroke="#FFFFFF" stroke-width="4"/>
+    <text x="570" y="247" font-size="15" font-weight="800" text-anchor="middle">0.7220</text>
+    <text x="570" y="382" font-size="13" font-weight="700" text-anchor="middle">VL embedding</text>
+
+    <circle cx="780" cy="236" r="8" class="public" stroke="#FFFFFF" stroke-width="4"/>
+    <text x="780" y="220" font-size="15" font-weight="800" text-anchor="middle">0.8066</text>
+    <text x="780" y="382" font-size="13" font-weight="700" text-anchor="middle">late fusion</text>
+
+    <circle cx="990" cy="243" r="8" fill="#EF6A73" stroke="#FFFFFF" stroke-width="4"/>
+    <text x="990" y="227" font-size="15" font-weight="800" text-anchor="middle" fill="#C23B49">0.7855</text>
+    <text x="990" y="382" font-size="13" font-weight="700" text-anchor="middle">advanced mix</text>
+
+    <circle cx="1200" cy="208" r="12" class="winner" stroke="#FFFFFF" stroke-width="5" filter="url(#glow)"/>
+    <text x="1200" y="185" font-size="19" font-weight="900" text-anchor="middle" fill="#087F73">0.8924</text>
+    <text x="1200" y="382" font-size="13" font-weight="800" text-anchor="middle">решение 140</text>
+  </g>
+
+  <!-- Local versus Public -->
+  <g filter="url(#shadow)">
+    <rect class="panel" x="50" y="450" width="1300" height="438" rx="22"/>
+  </g>
+  <text class="text" x="78" y="493" font-size="22" font-weight="800">2 · Где локальная метрика обещала больше, чем Public</text>
+  <text class="text muted" x="78" y="518" font-size="14">Длина отрезка — разрыв между зафиксированной локальной оценкой и реальной отправкой</text>
+
+  <circle cx="1050" cy="488" r="7" class="local"/>
+  <text class="text muted" x="1064" y="493" font-size="13">локальная</text>
+  <circle cx="1160" cy="488" r="7" class="public"/>
+  <text class="text muted" x="1174" y="493" font-size="13">Public</text>
+  <circle cx="1258" cy="488" r="7" class="winner"/>
+  <text class="text muted" x="1272" y="493" font-size="13">финал</text>
+
+  <g>
+    <line class="grid" x1="350" y1="548" x2="350" y2="848"/>
+    <line class="grid" x1="526" y1="548" x2="526" y2="848"/>
+    <line class="grid" x1="702" y1="548" x2="702" y2="848"/>
+    <line class="grid" x1="878" y1="548" x2="878" y2="848"/>
+    <line class="grid" x1="1054" y1="548" x2="1054" y2="848"/>
+    <line class="grid" x1="1230" y1="548" x2="1230" y2="848"/>
+    <text class="text muted" x="350" y="866" font-size="12" text-anchor="middle">0.70</text>
+    <text class="text muted" x="526" y="866" font-size="12" text-anchor="middle">0.75</text>
+    <text class="text muted" x="702" y="866" font-size="12" text-anchor="middle">0.80</text>
+    <text class="text muted" x="878" y="866" font-size="12" text-anchor="middle">0.85</text>
+    <text class="text muted" x="1054" y="866" font-size="12" text-anchor="middle">0.90</text>
+    <text class="text muted" x="1230" y="866" font-size="12" text-anchor="middle">0.95</text>
+  </g>
+
+  <g class="text" font-size="13">
+    <text x="78" y="568" font-weight="750">030 · VL embedding · OOF v1</text>
+    <line x1="427" y1="563" x2="1062" y2="563" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="427" cy="563" r="7" class="public"/><circle cx="1062" cy="563" r="7" class="local"/>
+    <text class="muted" x="427" y="552" text-anchor="middle" font-size="11">.7220</text><text class="muted" x="1062" y="552" text-anchor="middle" font-size="11">.9024</text>
+
+    <text x="78" y="608" font-weight="750">040 · late fusion · grouped v1</text>
+    <line x1="725" y1="603" x2="1051" y2="603" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="725" cy="603" r="7" class="public"/><circle cx="1051" cy="603" r="7" class="local"/>
+    <text class="muted" x="725" y="592" text-anchor="middle" font-size="11">.8066</text><text class="muted" x="1051" y="592" text-anchor="middle" font-size="11">.8993</text>
+
+    <text x="78" y="648" font-weight="750">090 · advanced mix · grouped v1</text>
+    <line x1="651" y1="643" x2="1079" y2="643" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="651" cy="643" r="7" class="public"/><circle cx="1079" cy="643" r="7" class="local"/>
+    <text class="muted" x="651" y="632" text-anchor="middle" font-size="11">.7855</text><text class="muted" x="1079" y="632" text-anchor="middle" font-size="11">.9072</text>
+
+    <text x="78" y="688" font-weight="800">140 · dual LoRA · nested v1</text>
+    <line x1="1027" y1="683" x2="1096" y2="683" stroke="#A7E3D4" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="1027" cy="683" r="8" class="winner"/><circle cx="1096" cy="683" r="8" class="local"/>
+    <text class="muted" x="1027" y="672" text-anchor="middle" font-size="11">.8924</text><text class="muted" x="1096" y="672" text-anchor="middle" font-size="11">.9118</text>
+
+    <text x="78" y="728" font-weight="750">230 · второй seed · nested v1</text>
+    <line x1="927" y1="723" x2="1122" y2="723" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="927" cy="723" r="7" class="public"/><circle cx="1122" cy="723" r="7" class="local"/>
+    <text class="muted" x="927" y="712" text-anchor="middle" font-size="11">.8639</text><text class="muted" x="1122" y="712" text-anchor="middle" font-size="11">.9192</text>
+
+    <text x="78" y="768" font-weight="750">400 · category route · locked v1</text>
+    <line x1="1027" y1="763" x2="1165" y2="763" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="1027" cy="763" r="7" class="public"/><circle cx="1165" cy="763" r="7" class="local"/>
+    <text class="muted" x="1027" y="752" text-anchor="middle" font-size="11">.8923</text><text class="muted" x="1165" y="752" text-anchor="middle" font-size="11">.9316</text>
+
+    <text x="78" y="808" font-weight="750">631 · четыре seed · semantic-v3</text>
+    <line x1="926" y1="803" x2="1123" y2="803" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="926" cy="803" r="7" class="public"/><circle cx="1123" cy="803" r="7" class="local"/>
+    <text class="muted" x="926" y="792" text-anchor="middle" font-size="11">.8636</text><text class="muted" x="1123" y="792" text-anchor="middle" font-size="11">.9196</text>
+
+    <text x="78" y="848" font-weight="750">699 · train-синтетика · frozen full5</text>
+    <line x1="830" y1="843" x2="1172" y2="843" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="830" cy="843" r="7" class="public"/><circle cx="1172" cy="843" r="7" class="local"/>
+    <text class="muted" x="830" y="832" text-anchor="middle" font-size="11">.8365</text><text class="muted" x="1172" y="832" text-anchor="middle" font-size="11">.9336</text>
+  </g>
+
+  <!-- Promising ideas -->
+  <text class="text" x="62" y="934" font-size="22" font-weight="800">Хорошие идеи, которые не стали финалом</text>
+  <text class="text muted" x="62" y="958" font-size="14">Они дали полезный сигнал, но не прошли заранее зафиксированный следующий барьер.</text>
+
+  <g filter="url(#shadow)">
+    <rect class="panel" x="50" y="980" width="305" height="135" rx="18"/>
+    <rect class="panel" x="372" y="980" width="305" height="135" rx="18"/>
+    <rect class="panel" x="694" y="980" width="305" height="135" rx="18"/>
+    <rect class="panel" x="1016" y="980" width="334" height="135" rx="18"/>
+  </g>
+
+  <g class="text">
+    <circle cx="78" cy="1008" r="7" fill="#F59E0B"/>
+    <text x="94" y="1014" font-size="15" font-weight="800">430 · adapter soup</text>
+    <text class="muted" x="75" y="1044" font-size="13">+0.0032 локально, −4 FN</text>
+    <text class="muted" x="75" y="1066" font-size="13">Но только 2/5 побед:</text>
+    <text x="75" y="1089" font-size="13" font-weight="700" fill="#B45309">не прошёл stability gate</text>
+
+    <circle cx="400" cy="1008" r="7" fill="#F59E0B"/>
+    <text x="416" y="1014" font-size="15" font-weight="800">635 · exact-span</text>
+    <text class="muted" x="397" y="1044" font-size="13">0.9166 полного route, 4/5</text>
+    <text class="muted" x="397" y="1066" font-size="13">Сильный компонент, но fold 4</text>
+    <text x="397" y="1089" font-size="13" font-weight="700" fill="#B45309">и bootstrap неустойчивы</text>
+
+    <circle cx="722" cy="1008" r="7" fill="#F59E0B"/>
+    <text x="738" y="1014" font-size="15" font-weight="800">659 · 27B teacher</text>
+    <text class="muted" x="719" y="1044" font-size="13">0.9295 компонента, 5/5</text>
+    <text class="muted" x="719" y="1066" font-size="13">Сильный offline-сигнал, но</text>
+    <text x="719" y="1089" font-size="13" font-weight="700" fill="#B45309">27B не проходит runtime</text>
+
+    <circle cx="1044" cy="1008" r="7" fill="#F59E0B"/>
+    <text x="1060" y="1014" font-size="15" font-weight="800">712–713 · reasoning traces</text>
+    <text class="muted" x="1041" y="1044" font-size="13">11 400 проверяемых targets</text>
+    <text class="muted" x="1041" y="1066" font-size="13">Корпус готов; student screen</text>
+    <text x="1041" y="1089" font-size="13" font-weight="700" fill="#B45309">ещё не измерен</text>
+  </g>
+
+  <text class="text muted" x="62" y="1150" font-size="12">0.9429 — отдельная историческая recurrence-симуляция решения 140; на графике показана сопоставимая nested CV 0.9118. Разные протоколы не образуют единый leaderboard.</text>
+  <text class="text muted" x="62" y="1168" font-size="12">Источники: reports/submissions.csv · reports/semantic-v3-leaderboard.csv · журналы экспериментов 430, 635, 659, 699 и 712–713.</text>
+</svg>

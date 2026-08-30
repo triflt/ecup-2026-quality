@@ -1,0 +1,43 @@
+{
+  "accepted_repeat1": {
+    "corrections": 54,
+    "flammable_ap_delta": -0.011078834597515907,
+    "flammable_f1": 0.9037037037037037,
+    "flammable_fn": 7,
+    "flammable_fp": 6,
+    "fold_macro_delta": {
+      "0": 0.06349712018818932,
+      "3": 0.016264275335623468
+    },
+    "macro_delta": 0.03941483737622187,
+    "regressions": 7,
+    "report_file_sha256": "d8c01f4a390131ad697cf7069bed53721724582738a04fd8487efbfdb47a61aa",
+    "report_self_sha256": "b716fc7a0934986039201b673bcfbacc68b79fd27b46c0ffde27dd6679105331"
+  },
+  "candidate_epochs2": {
+    "corrections": 47,
+    "flammable_ap_delta": 0.039362051678678345,
+    "flammable_f1": 0.8671328671328671,
+    "flammable_fn": 6,
+    "flammable_fp": 13,
+    "fold_macro_delta": {
+      "0": 0.03944311039708792,
+      "3": 0.0029493618683207323
+    },
+    "macro_delta": 0.02034325556879102,
+    "regressions": 12,
+    "report_file_sha256": "8369e364f1aca8e1e76217ec0f8c6a7626781e86a24240918c5e231f95379699",
+    "report_self_sha256": "df295693aae5d2193a2042bc454966f23198dc628cdcfc2a076f0859ecc1d432"
+  },
+  "decision": "REJECT_AT_SCREEN_NO_FULL5",
+  "experiment_id": "699",
+  "folds": [
+    0,
+    3
+  ],
+  "public_rows_used": 0,
+  "reason": "epochs2 improves AP and one FN but is materially worse than accepted repeat1 on Macro, flammable F1, FP and corrections/regressions",
+  "schema": "exp699_q35_v2p10_epochs2_f03_terminal_v1",
+  "sealed_rows_used": 0,
+  "self_sha256": "9451177cbd10a2b75d956e7bcb8252acb44c6ae4dd463d7add2667b427986907"
+}

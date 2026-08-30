@@ -1,0 +1,46 @@
+[experiment]
+id = "290"
+slug = "minicpm_v46_visual_screen"
+title = "MiniCPM-V-4.6 independent visual screen"
+status = "rejected_offline"
+entrypoint = "research/qwen3vl_lora_holdout.py"
+result_file = "experiments/290_minicpm_v46_visual_screen/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "minicpm_two_fold_screen_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "190_shingle_neighbor_prior"
+changed_factor = "Только семейство первого изображения: MiniCPM-V-4.6 вместо Qwen3.5 seed42"
+mechanism = "SigLIP2 и более детальное распознавание надписей должны независимо различать горючее вещество и внешне похожее оборудование; именно на таких отрицательных примерах 260 дал основной выигрыш"
+expected_macro_f1_delta = 0.003
+falsification = "После честной перекрёстной калибровки на заранее выбранных folds 0 и 3 средняя разница неположительна, либо F1 любой категории падает более чем на 0.005; тогда остальные folds не обучаются"
+precedents = [
+  "https://huggingface.co/openbmb/MiniCPM-V-4.6",
+  "https://arxiv.org/abs/2008.06179",
+]
+
+[acceptance]
+baseline_macro_f1 = 0.8946843034958715
+required_fold_wins = 2
+max_category_f1_drop = 0.005
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 3.0
+planned_public_submissions = 0
+runtime_limit_minutes = 20
+
+[execution]
+arguments = ["--screen-folds", "0", "3", "--first-image-only"]
+
+[artifacts]
+directory = "artifacts"
+publish = false

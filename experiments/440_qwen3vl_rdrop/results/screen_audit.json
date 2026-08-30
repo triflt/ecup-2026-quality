@@ -1,0 +1,298 @@
+{
+  "experiment_id": "440",
+  "evaluation_version": "qwen3vl_rdrop_two_fold_screen_v1",
+  "purpose": "Reject-only screen; passing authorizes but cannot replace full five-fold evaluation",
+  "mode": "candidate",
+  "required_screen_folds": [
+    0,
+    3
+  ],
+  "evaluated_folds": [
+    0,
+    3
+  ],
+  "all_screen_folds_ready": true,
+  "changed_factor": "Qwen3-VL adapter objective only: R-Drop alpha 1.0 symmetric binary KL",
+  "threshold_protocol": "Hybrid Qwen3-VL OOF ranks on folds 0 and 3; parent Qwen3-VL ranks on folds 1, 2 and 4; each tested fold is excluded from threshold fitting",
+  "weights": {
+    "БАД": {
+      "robust_base": 0.5,
+      "qwen3vl": 0.25,
+      "qwen35": 0.25
+    },
+    "Легковоспламеняющиеся": {
+      "robust_base": 0.15,
+      "qwen3vl": 0.1,
+      "qwen35": 0.75
+    }
+  },
+  "selection_uses_screen_labels": false,
+  "folds": [
+    {
+      "fold": 0,
+      "baseline_category_f1": {
+        "БАД": 0.9489380930863082,
+        "Легковоспламеняющиеся": 0.9135802469135802
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9490616621983914,
+        "Легковоспламеняющиеся": 0.8421052631578947
+      },
+      "category_delta": {
+        "БАД": 0.00012356911208322163,
+        "Легковоспламеняющиеся": -0.0714749837556855
+      },
+      "baseline_macro_f1": 0.9312591699999442,
+      "candidate_macro_f1": 0.895583462678143,
+      "delta_macro_f1": -0.03567570732180114,
+      "changed": 42,
+      "corrected": 18,
+      "regressed": 24,
+      "flammable_false_negatives": {
+        "baseline": 3,
+        "candidate": 8,
+        "delta": 5
+      },
+      "safety_union_false_negatives": {
+        "positive_rows": 32,
+        "baseline": 3,
+        "candidate": 3,
+        "delta": 0
+      },
+      "connected_safe_delta_macro_f1": -0.03638868130988793,
+      "gates": {
+        "routed_macro_delta_positive": false,
+        "no_category_drop_over_0_005": false,
+        "flammable_false_negatives_not_increased": false,
+        "corrected_exceeds_regressed": false,
+        "safety_union_false_negatives_not_increased": true
+      },
+      "passed": false
+    },
+    {
+      "fold": 3,
+      "baseline_category_f1": {
+        "БАД": 0.9566395663956639,
+        "Легковоспламеняющиеся": 0.8767123287671232
+      },
+      "candidate_category_f1": {
+        "БАД": 0.9551166965888689,
+        "Легковоспламеняющиеся": 0.868421052631579
+      },
+      "category_delta": {
+        "БАД": -0.0015228698067950575,
+        "Легковоспламеняющиеся": -0.008291276135544257
+      },
+      "baseline_macro_f1": 0.9166759475813936,
+      "candidate_macro_f1": 0.9117688746102239,
+      "delta_macro_f1": -0.004907072971169657,
+      "changed": 19,
+      "corrected": 7,
+      "regressed": 12,
+      "flammable_false_negatives": {
+        "baseline": 8,
+        "candidate": 7,
+        "delta": -1
+      },
+      "safety_union_false_negatives": {
+        "positive_rows": 38,
+        "baseline": 8,
+        "candidate": 7,
+        "delta": -1
+      },
+      "connected_safe_delta_macro_f1": -0.005140815519395048,
+      "gates": {
+        "routed_macro_delta_positive": false,
+        "no_category_drop_over_0_005": false,
+        "flammable_false_negatives_not_increased": true,
+        "corrected_exceeds_regressed": false,
+        "safety_union_false_negatives_not_increased": true
+      },
+      "passed": false
+    }
+  ],
+  "mean_screen_delta_macro_f1": -0.0202913901464854,
+  "required_mean_delta_macro_f1": 0.001,
+  "screen_passed": false,
+  "full_five_fold_cycle_allowed": false,
+  "null_control_passed": null,
+  "baseline_locked_detail": {
+    "БАД": {
+      "weights": {
+        "robust_base": 0.5,
+        "qwen3vl": 0.25,
+        "qwen35": 0.25
+      },
+      "nested_f1": 0.9546604046242775,
+      "nested_folds": [
+        {
+          "fold": 0,
+          "threshold": 0.27193570137023926,
+          "train_f1": 0.9563254711657826,
+          "validation_f1": 0.9489380930863082
+        },
+        {
+          "fold": 1,
+          "threshold": 0.2720194160938263,
+          "train_f1": 0.9551361735789354,
+          "validation_f1": 0.9531953195319532
+        },
+        {
+          "fold": 2,
+          "threshold": 0.27193570137023926,
+          "train_f1": 0.9547455140503329,
+          "validation_f1": 0.9556962025316456
+        },
+        {
+          "fold": 3,
+          "threshold": 0.27193570137023926,
+          "train_f1": 0.9545095383226098,
+          "validation_f1": 0.9566395663956639
+        },
+        {
+          "fold": 4,
+          "threshold": 0.27193570137023926,
+          "train_f1": 0.953960731211916,
+          "validation_f1": 0.9588421528720036
+        }
+      ],
+      "production_threshold": 0.27193570137023926,
+      "production_threshold_oof_f1": 0.954762979683973
+    },
+    "Легковоспламеняющиеся": {
+      "weights": {
+        "robust_base": 0.15000000596046448,
+        "qwen3vl": 0.10000000149011612,
+        "qwen35": 0.75
+      },
+      "nested_f1": 0.9086294416243654,
+      "nested_folds": [
+        {
+          "fold": 0,
+          "threshold": 0.9564604759216309,
+          "train_f1": 0.910828025477707,
+          "validation_f1": 0.9135802469135802
+        },
+        {
+          "fold": 1,
+          "threshold": 0.9569836854934692,
+          "train_f1": 0.9329073482428115,
+          "validation_f1": 0.8395061728395061
+        },
+        {
+          "fold": 2,
+          "threshold": 0.9569836854934692,
+          "train_f1": 0.9015873015873016,
+          "validation_f1": 0.9620253164556962
+        },
+        {
+          "fold": 3,
+          "threshold": 0.9570291638374329,
+          "train_f1": 0.91875,
+          "validation_f1": 0.8767123287671232
+        },
+        {
+          "fold": 4,
+          "threshold": 0.9569836854934692,
+          "train_f1": 0.9044585987261147,
+          "validation_f1": 0.95
+        }
+      ],
+      "production_threshold": 0.953912615776062,
+      "production_threshold_oof_f1": 0.9022556390977443
+    }
+  },
+  "candidate_locked_detail": {
+    "БАД": {
+      "weights": {
+        "robust_base": 0.5,
+        "qwen3vl": 0.25,
+        "qwen35": 0.25
+      },
+      "nested_f1": 0.9542600896860987,
+      "nested_folds": [
+        {
+          "fold": 0,
+          "threshold": 0.25971850752830505,
+          "train_f1": 0.9560538116591928,
+          "validation_f1": 0.9490616621983914
+        },
+        {
+          "fold": 1,
+          "threshold": 0.26072025299072266,
+          "train_f1": 0.9550196298373528,
+          "validation_f1": 0.953956191327671
+        },
+        {
+          "fold": 2,
+          "threshold": 0.26072025299072266,
+          "train_f1": 0.9547389648218687,
+          "validation_f1": 0.9550763701707098
+        },
+        {
+          "fold": 3,
+          "threshold": 0.26072025299072266,
+          "train_f1": 0.9547288211564321,
+          "validation_f1": 0.9551166965888689
+        },
+        {
+          "fold": 4,
+          "threshold": 0.26490288972854614,
+          "train_f1": 0.9537078651685393,
+          "validation_f1": 0.9581269698334084
+        }
+      ],
+      "production_threshold": 0.27193570137023926,
+      "production_threshold_oof_f1": 0.9542212189616253
+    },
+    "Легковоспламеняющиеся": {
+      "weights": {
+        "robust_base": 0.15000000596046448,
+        "qwen3vl": 0.10000000149011612,
+        "qwen35": 0.75
+      },
+      "nested_f1": 0.8883248730964467,
+      "nested_folds": [
+        {
+          "fold": 0,
+          "threshold": 0.9585304856300354,
+          "train_f1": 0.9102564102564102,
+          "validation_f1": 0.8421052631578947
+        },
+        {
+          "fold": 1,
+          "threshold": 0.9541401863098145,
+          "train_f1": 0.9182389937106918,
+          "validation_f1": 0.8395061728395061
+        },
+        {
+          "fold": 2,
+          "threshold": 0.9534122347831726,
+          "train_f1": 0.8888888888888888,
+          "validation_f1": 0.95
+        },
+        {
+          "fold": 3,
+          "threshold": 0.9541401863098145,
+          "train_f1": 0.9102167182662538,
+          "validation_f1": 0.868421052631579
+        },
+        {
+          "fold": 4,
+          "threshold": 0.9541401863098145,
+          "train_f1": 0.8930817610062893,
+          "validation_f1": 0.9382716049382716
+        }
+      ],
+      "production_threshold": 0.953912615776062,
+      "production_threshold_oof_f1": 0.8955223880597015
+    }
+  },
+  "input_sha256": {
+    "experiments/440_qwen3vl_rdrop/artifacts/screen_seed42/fold_0/lora_holdout_predictions.csv": "6ecdbbb32648be8248fcb9b751e8daa44bce0fd13bb112658c07d7c8e7e3e33c",
+    "experiments/440_qwen3vl_rdrop/artifacts/screen_seed42/fold_3/lora_holdout_predictions.csv": "5e1464eaf85f68d963ec9a9238a152f0385f065e97eaf4990348d636f7f95f3a",
+    "experiments/400_qwen35_category_routed_adapters/results/routed_predictions.npz": "58aa9feb3e6a276fda27666b11e479e052549523999bf2fb3c9af660904ab174",
+    "validation/connected_family_guard_v2/rows.csv": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "research/data.csv": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+  }
+}

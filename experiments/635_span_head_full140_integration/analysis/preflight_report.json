@@ -1,0 +1,29 @@
+{
+  "experiment_id": "635",
+  "audit": "full_140_semantic_v3_replay_readiness_v1",
+  "status": "blocked_fail_closed",
+  "checked_at": "2026-08-23",
+  "existing_evidence": {
+    "production_140_source_present": true,
+    "semantic_v3_visual_components_documented_by_601": true,
+    "semantic_v3_original_qwen35_components_documented_by_600": true,
+    "span_head_seed_repeat_screen_passed": true,
+    "span_head_seed_repeat_full_acceptance_present": true,
+    "span_head_seed_repeat_full_report_sha256": "2ccf3340ab1b9332c5c8fb174c3be8863a91f6afe9bace03bef7d3f482194957",
+    "span_head_seed_repeat_winning_folds": 4,
+    "span_head_seed_repeat_macro_delta": 0.023270379138293884,
+    "full_140_semantic_v3_replay_contract_present": false,
+    "full_140_donor_only_prior_replay_present": false
+  },
+  "inadmissible_shortcut": {
+    "experiment": "603",
+    "reason": "It reproduces a locked-190 model route with donor-calibrated thresholds and does not reproduce the complete 140 exact/name post-processing."
+  },
+  "required_to_unblock": [
+    "Label-free 11118-row full-140 semantic-v3 replay bundle matching evaluate.py's exact array contract.",
+    "Self-hashed replay contract proving outer-fold isolation and donor-only exact/name prior construction.",
+    "For full promotion only, a self-hashed 600-row runtime report for every candidate variant."
+  ],
+  "jobs_launched": 0,
+  "metrics_released": false
+}

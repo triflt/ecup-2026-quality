@@ -1,0 +1,58 @@
+{
+  "accepted_artifacts": {
+    "1": {
+      "adapter_sha256": "20ce70a2519f5b93f14afb2cbb768bf47ac22bb94d307ef8413811d3768cc8cf",
+      "contract_sha256": "7a57ebf23681d5ad151913f77147cf07e63a0f0a657c9b9603495afc9bc0af46",
+      "outer_zip_sha256": "716c20662313fd59e53a24be5dde0dcadb1e0187d224fd526d1fed9c182af558",
+      "predictions_sha256": "d7dff899b1af47858cd8855226f2688aad6756ed5472b175f0a7576891fe2ab1",
+      "rows": 2223
+    },
+    "2": {
+      "adapter_sha256": "96555203cdbeb24c409ec94fa258244c9055b80ca9afb91032426d29e503cdc7",
+      "contract_sha256": "d9e7df083d7f9f717309ade2c6d2346ffe86c59e5d61b894f5f5a1f151703d0a",
+      "outer_zip_sha256": "621eea9916fa0549e5c2c3e7259561c17dd7e731aac1290ea4d5af7ab2ff5956",
+      "predictions_sha256": "4ff669918b7bdcc9c1dddee458ce101f77d931c556171040e90794839a871211",
+      "rows": 2224
+    },
+    "4": {
+      "adapter_sha256": "1ee8a31524617d3582224a319206ccdd035ebaa50534e49bb246bd4cb4335009",
+      "contract_sha256": "e9da17c304e720bdf65ae210e0d911fea0dba4d3eea06df8a9245486cccadb0d",
+      "outer_zip_sha256": "948f351dd158e4cd1d4961b5ea6bd7641d12fc5f9227df7bbb7767195d020b43",
+      "predictions_sha256": "a0649d7f25db993211c758aa8f9158ef71701eefa2dd2dc6938de7f94353a435",
+      "rows": 2223
+    }
+  },
+  "decision": "ACCEPT_FULL_CONTROL",
+  "evaluation_version": "semantic_family_v3",
+  "exact_runtime_alignment": true,
+  "experiment_id": "661",
+  "fold_macro_f1": {
+    "0": 0.87183004905629,
+    "1": 0.8780001027872475,
+    "2": 0.90183346065699,
+    "3": 0.9003316909799375,
+    "4": 0.9359929078014184
+  },
+  "full_oof_rows": 11118,
+  "mean_fold_macro_f1": 0.8975976422563766,
+  "pooled_categories": {
+    "БАД": {
+      "average_precision": 0.9900269201495713,
+      "f1": 0.9515615041427661,
+      "false_negatives": 290,
+      "positives": 4769,
+      "rows": 6402
+    },
+    "Легковоспламеняющиеся": {
+      "average_precision": 0.8803789183585108,
+      "f1": 0.8439306358381503,
+      "false_negatives": 24,
+      "positives": 170,
+      "rows": 4716
+    }
+  },
+  "public_used": false,
+  "sealed_rows": 0,
+  "status": "complete",
+  "validation_labels_read_during_training": 0
+}

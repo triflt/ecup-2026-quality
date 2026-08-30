@@ -1,0 +1,89 @@
+[experiment]
+id = "550"
+slug = "qwen35_evidence_preserving_context_pack"
+title = "Qwen3.5 evidence-preserving description packing"
+status = "rejected_at_screen"
+entrypoint = "experiments/550_qwen35_evidence_preserving_context_pack/train_screen.py"
+result_file = "experiments/550_qwen35_evidence_preserving_context_pack/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "evidence_preserving_context_pack_screen_v1"
+selection_guard = "connected_family_guard_v2"
+folds = "validation/grouped_text_v1/folds.csv"
+screen_folds = [0, 3]
+reject_only = true
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+training_parent_component = "260_bad_family_diverse_positives"
+changed_factor = "Replace only the 70-percent head and 30-percent tail description crop with a deterministic head-tail pack that also preserves complete sentences containing safe exact evidence"
+mechanism = "Late decision-bearing evidence can enter the fixed 1800-character context without changing the model, selector, images, labels, steps or fusion"
+uses_teacher = false
+uses_pseudo_labels = false
+
+[packing]
+version = "evidence_preserving_context_pack_v1"
+description_budget = 1800
+baseline_head_share = 0.70
+evidence_source = "union of frozen extractor runs with constant predictions 0 and 1"
+uses_gold_label = false
+uses_model_prediction = false
+uses_fold = false
+allows_conflict = false
+allows_ambiguity = false
+allows_duplicate_source_chars = false
+allows_invented_chars = false
+allows_truncated_evidence_sentence = false
+
+[audit]
+status = "GO"
+rows = 12971
+long_rows = 3633
+long_evidence_rows = 2059
+strictly_improved_rows = 390
+strict_improvement_fraction = 0.1894123360854784
+regressed_rows = 0
+minimum_strict_improvement_fraction = 0.10
+provenance_fraction = 1.0
+determinism_fraction = 1.0
+
+[training]
+parent_entrypoint = "research/qwen35_bad_family_diverse_positives_lora.py"
+training_mode = "hard"
+model_class = "multimodal"
+use_chat_batch = true
+family_balance_flammable = false
+family_diverse_bad_positives = true
+family_diverse_flammable_negatives = false
+description_limit = 1800
+epochs = 1
+batch_size = 4
+gradient_accumulation = 4
+seed = 42
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+rslora = true
+
+[acceptance.screen]
+folds = [0, 3]
+required_each_fold_delta_positive = true
+required_mean_macro_f1_delta = 0.001
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+require_corrected_greater_than_regressed = true
+require_each_fold_connected_safe_delta_positive = true
+bad_predictions_must_be_identical = true
+
+[execution]
+launch_authorized = true
+screen_evaluator = "experiments/550_qwen35_evidence_preserving_context_pack/evaluate_screen.py"
+
+[artifacts]
+directory = "artifacts"
+publish = false

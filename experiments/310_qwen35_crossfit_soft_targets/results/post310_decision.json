@@ -1,0 +1,84 @@
+{
+  "audit_complete": true,
+  "offline_core_gate_passed": false,
+  "sports_errors_fixed_out_of_243": 6,
+  "guardrail_breach": true,
+  "guardrail_breaches": {
+    "sports_new_errors_exceed_corrections": true,
+    "locked_category_drop_over_0_005": true,
+    "connected_category_drop_over_0_005": true,
+    "nonpositive_macro_delta_after_priors": true
+  },
+  "launch_experiment_320": true,
+  "gates": {
+    "locked_delta_at_least_0_003": false,
+    "locked_wins_at_least_4_of_5": false,
+    "locked_no_category_drop_over_0_005": false,
+    "locked_bootstrap_probability_at_least_0_90": false,
+    "connected_delta_at_least_0_003": false,
+    "connected_wins_at_least_4_of_5": false,
+    "connected_no_category_drop_over_0_005": false,
+    "connected_bootstrap_probability_at_least_0_90": false,
+    "downstream_change_survival_at_least_0_8": true,
+    "positive_macro_delta_after_priors": false
+  },
+  "locked_summary": {
+    "baseline_macro_f1": 0.9234086336846878,
+    "candidate_macro_f1": 0.9112457222135184,
+    "delta_macro_f1": -0.012162911471169435,
+    "folds_won": 1,
+    "category_delta": {
+      "БАД": -0.0015156938655822572,
+      "Легковоспламеняющиеся": -0.02281012907675639
+    },
+    "bootstrap_probability_delta_positive": 0.0345
+  },
+  "connected_summary": {
+    "delta_macro_f1": -0.012826939686854222,
+    "folds_won": 1,
+    "category_delta": {
+      "БАД": -0.001773122882630429,
+      "Легковоспламеняющиеся": -0.023880756491078126
+    },
+    "bootstrap_probability_delta_positive": 0.0315
+  },
+  "priors_summary": {
+    "change_survival_rate": 0.9651162790697675,
+    "macro_delta_after_priors": -0.012116588282307661
+  },
+  "sports_summary": {
+    "frozen_common_sports_errors": 243,
+    "fixed_from_frozen_243": 6,
+    "remaining_from_frozen_243": 237,
+    "cue_defined_sports_rows": 2255,
+    "cue_defined_baseline_errors": 254,
+    "cue_defined_candidate_errors": 258,
+    "new_sports_errors_created": 13,
+    "sports_errors_corrected": 9,
+    "guardrail_breach": true,
+    "input_sha256": {
+      "predictions": "08dbc30e582293c3f7e660767827d39dd3b08c1aae659c36ffacbfed441c8ef1",
+      "targets": "6e58a21f1830a24f6659347ea2110780fb29b8c75f81b1d14c9f99c26c0782d0",
+      "selector": "d254eba1c8d14114b982beee3877c3c8e361be8c83e4de2690e44b140ca195c1",
+      "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+    }
+  },
+  "evidence": [
+    {
+      "path": "experiments/310_qwen35_crossfit_soft_targets/results/acceptance_audit.json",
+      "sha256": "b9fd2c1ba530e433b97161f83d84385e4ec2a13affe8a7726adc50bee18f4c3e"
+    },
+    {
+      "path": "experiments/310_qwen35_crossfit_soft_targets/results/connected_safe_audit.json",
+      "sha256": "c6102fe19386e23b6783f215ba7ee61df8c92f55c42bd41e4ffb546355a4ed1a"
+    },
+    {
+      "path": "experiments/310_qwen35_crossfit_soft_targets/results/sports_error_audit.json",
+      "sha256": "01cc3244380851f1acbf8c5ea45ad22844e0182793e6eb97cd5e7963cb6f12b1"
+    },
+    {
+      "path": "experiments/310_qwen35_crossfit_soft_targets/results/prior_replay.json",
+      "sha256": "5bfba912b8ea6a4e33657c2539fab187c0a747e0a94cb8a7c1f4284e626f6eab"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "experiment_id": "602",
+  "status": "complete_no_go",
+  "launched": true,
+  "protocol": "semantic_family_v3_seed_variance_v1",
+  "reference_seed": 42,
+  "new_seeds": [31415, 271828, 161803],
+  "planned_jobs": 15,
+  "completed_jobs": 15,
+  "sealed_holdout_used": false,
+  "ensemble": {
+    "type": "fixed_arithmetic_probability_mean",
+    "weights": {"42": 0.25, "31415": 0.25, "271828": 0.25, "161803": 0.25},
+    "weights_tuned": false,
+    "bad_f1": 0.9418825015792799,
+    "flammable_f1": 0.8493975903614458,
+    "macro_f1": 0.8956400459703628,
+    "delta_vs_seed_42": 0.008034637927990529,
+    "fold_wins": 3,
+    "corrected": 130,
+    "regressed": 120,
+    "corrected_to_regressed": 1.0833333333333333,
+    "component_bootstrap_probability_positive": 0.8205,
+    "accepted": false
+  },
+  "blockers": [],
+  "runtime_archive_sha256": "1490e7349433b30d7773202327851e376d09f183af1abe6d771e2bf17c2d758e",
+  "working_jobs": 0,
+  "technical_pretraining_failures": 30,
+  "threshold_calibration": "leave_one_fold_out_over_fixed_oof_scores",
+  "fully_nested_meta_validation": false,
+  "validation_limitation": "Donor OOF base models may have trained on labels of the currently evaluated fold; only threshold fitting leaves that fold out.",
+  "seed_42_baseline": {
+    "bad_f1": 0.9418774827514113,
+    "flammable_f1": 0.8333333333333334,
+    "macro_f1": 0.8876054080423723
+  },
+  "individual_seeds": {
+    "31415": {
+      "bad_f1": 0.9412505245488879,
+      "flammable_f1": 0.835820895522388,
+      "macro_f1": 0.8885357100356379,
+      "delta_vs_seed_42": 0.0009303019932656031,
+      "fold_wins": 2,
+      "bootstrap_probability_positive": 0.5297,
+      "accepted": false
+    },
+    "271828": {
+      "bad_f1": 0.936598812553011,
+      "flammable_f1": 0.8323353293413174,
+      "macro_f1": 0.8844670709471643,
+      "delta_vs_seed_42": -0.0031383370952080547,
+      "fold_wins": 2,
+      "bootstrap_probability_positive": 0.3847,
+      "accepted": false
+    },
+    "161803": {
+      "bad_f1": 0.9440166493236213,
+      "flammable_f1": 0.8545454545454545,
+      "macro_f1": 0.8992810519345379,
+      "delta_vs_seed_42": 0.011675643892165577,
+      "fold_wins": 2,
+      "bootstrap_probability_positive": 0.8328,
+      "accepted": false
+    }
+  },
+  "evaluation_artifacts": {
+    "report_canonical_sha256": "d210958b26e744e00aadda90a90d44b2f555f7cba25c40097838845263eef20c",
+    "report_npz_sha256": "f9cb916710d61948e5548bec988ffb8a27830572229d060717a275ab8ce66947"
+  },
+  "acceptance": {
+    "macro_delta_at_least_0_003": true,
+    "fold_wins_at_least_4": false,
+    "maximum_category_drop_respected": true,
+    "bootstrap_probability_at_least_0_90": false,
+    "corrected_to_regressed_at_least_1_5": false
+  },
+  "decision": "NO_GO"
+}

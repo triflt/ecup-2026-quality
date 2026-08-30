@@ -1,0 +1,17 @@
+{
+  "archive_sha256": "33f2d940733a05c7fdeb40c3bfd671405d7d1672aef1572d9c4859f3e0cf38da",
+  "decision": "PASS",
+  "deployable_4b_only": true,
+  "exact_runtime_binding": true,
+  "experiment_id": "681",
+  "first_attempt_classification": "pre_download_literal_url_transport_failure",
+  "first_attempt_scientific_inputs_read": false,
+  "outer_fold": 0,
+  "predictions_sha256": "4ff03515b37d794eee1dca7d8120d6dc8e55001d2c520b88e830ea5a49a5f10c",
+  "rows": 2,
+  "runtime_contract_sha256": "212238d5c00767c6e65561aadfc6d738d98bcf2661735a1b75f64f704c029830",
+  "runtime_validation_sha256": "109807781797f51ec8c1d98d0385aef2e9edd0d89183c4a44aab76e2a26f56bc",
+  "schema_version": 1,
+  "technical_smoke": true,
+  "uses_27b_at_inference": false
+}

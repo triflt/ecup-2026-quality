@@ -1,0 +1,56 @@
+{
+  "experiment_id": "440",
+  "status": "rejected_at_screen",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "qwen3vl_rdrop_two_fold_screen_v1",
+  "parent_experiment": "400_qwen35_category_routed_adapters",
+  "training_parent": "110_qwen3vl_lora",
+  "changed_factor": "R-Drop alpha 1.0 symmetric binary class-token KL added to unchanged assistant-suffix CE",
+  "screen": {
+    "folds": [0, 3],
+    "reject_only": true,
+    "launched": true,
+    "jobs": ["redacted-job", "redacted-job"],
+    "passed": false,
+    "full_cycle_allowed": false
+  },
+  "baseline": {
+    "bad_f1": 0.9546604046242775,
+    "flammable_f1": 0.9086294416243654,
+    "macro_f1": 0.9316449231243215
+  },
+  "runtime": {
+    "estimated_minutes_per_screen_fold": [50, 70],
+    "estimated_screen_gpu_hours": [1.7, 2.3],
+    "inference_pass_delta": 0,
+    "projected_public_minutes": 10.17,
+    "projected_private_minutes": 24.15
+  },
+  "screen_result": {
+    "mean_delta_macro_f1": -0.0202913901464854,
+    "fold_macro_deltas": [-0.03567570732180114, -0.004907072971169657],
+    "fold_flammable_f1_deltas": [-0.0714749837556855, -0.008291276135544257],
+    "fold_changed": [42, 19],
+    "fold_corrected": [18, 7],
+    "fold_regressed": [24, 12],
+    "fold_flammable_false_negative_deltas": [5, -1],
+    "fold_safety_union_false_negative_deltas": [0, -1],
+    "all_frozen_gates_passed": false
+  },
+  "reproducibility": {
+    "training_code_sha256": "dcbad8f454dbcfe4f30d7239bd1a173022706527350bdaad05eba83fa934017f",
+    "cycle_code_sha256": "74f53353f38e7536a00f2597e797f7cf209c39ba891c810edb53e7d063609b25",
+    "evaluator_sha256": "a02509ece2b995e27ceff049f1dec77c2ec1b6adad5aeb72c0473b170c86379b",
+    "ingest_script_sha256": "e7f1f1e72f2cc1a4eccc387b797fdbb0e27212b0b53404f2e35190845c7e4845",
+    "training_manifest_sha256": "8b935d834e4fe9a9cddd69580f540ab55e17e597699a9d8b82918265138d20f5",
+    "selector_bundle_sha256": "79b5738b72cccf84e7906e1c235ea63b3c9d1643649c76353eb5c9c5f18b69a0",
+    "selector_probe_job": "redacted-job",
+    "null_control_changed_predictions": 0
+  },
+  "infrastructure_attempts": {
+    "missing_data_url": ["redacted-job", "redacted-job"],
+    "local_rng_manifest_mismatch": ["redacted-job", "redacted-job"],
+    "interpretation": "Pre-model infrastructure failures without model-quality evidence; the exact private compute platform selector output is now frozen."
+  },
+  "decision": "Rejected at the frozen two-fold screen. Do not train folds 1/2/4, repeat the seed, refit on all data, package, or submit this component."
+}

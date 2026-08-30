@@ -1,0 +1,288 @@
+{
+  "experiment_id": "400",
+  "evaluation_version": "locked_190_category_routing_v1",
+  "single_changed_factor": "original adapter for BAD; experiment 260 adapter for flammable",
+  "baseline": {
+    "category_f1": {
+      "БАД": 0.9546604046242775,
+      "Легковоспламеняющиеся": 0.8921568627450981
+    },
+    "macro_f1": 0.9234086336846878
+  },
+  "candidate": {
+    "category_f1": {
+      "БАД": 0.9546604046242775,
+      "Легковоспламеняющиеся": 0.9086294416243654
+    },
+    "macro_f1": 0.9316449231243215
+  },
+  "category_delta": {
+    "БАД": 0.0,
+    "Легковоспламеняющиеся": 0.01647257887926734
+  },
+  "delta_macro_f1": 0.008236289439633615,
+  "folds": [
+    {
+      "fold": 0,
+      "baseline_macro_f1": 0.9030404751145826,
+      "candidate_macro_f1": 0.9312591699999442,
+      "delta": 0.02821869488536155
+    },
+    {
+      "fold": 1,
+      "baseline_macro_f1": 0.8932643264326433,
+      "candidate_macro_f1": 0.8963507461857296,
+      "delta": 0.0030864197530863224
+    },
+    {
+      "fold": 2,
+      "baseline_macro_f1": 0.9403481012658228,
+      "candidate_macro_f1": 0.9588607594936709,
+      "delta": 0.01851265822784809
+    },
+    {
+      "fold": 3,
+      "baseline_macro_f1": 0.9398582447362935,
+      "candidate_macro_f1": 0.9166759475813936,
+      "delta": -0.023182297154899945
+    },
+    {
+      "fold": 4,
+      "baseline_macro_f1": 0.9428357105823433,
+      "candidate_macro_f1": 0.9544210764360017,
+      "delta": 0.011585365853658436
+    }
+  ],
+  "folds_won": 4,
+  "changed": 26,
+  "corrected": 17,
+  "regressed": 9,
+  "connected_safe": {
+    "full_rows": {
+      "baseline": {
+        "БАД": 0.9546604046242775,
+        "Легковоспламеняющиеся": 0.8921568627450981,
+        "Macro": 0.9234086336846878
+      },
+      "candidate": {
+        "БАД": 0.9546604046242775,
+        "Легковоспламеняющиеся": 0.9086294416243654,
+        "Macro": 0.9316449231243215
+      },
+      "delta_macro_f1": 0.008236289439633615
+    },
+    "connected_safe_rows": {
+      "rows": 11207,
+      "baseline": {
+        "БАД": 0.9509505304064699,
+        "Легковоспламеняющиеся": 0.8877551020408163,
+        "Macro": 0.9193528162236431
+      },
+      "candidate": {
+        "БАД": 0.9509505304064699,
+        "Легковоспламеняющиеся": 0.9047619047619048,
+        "Macro": 0.9278562175841873
+      },
+      "delta_macro_f1": 0.008503401360544283,
+      "folds_won": 4,
+      "folds": [
+        {
+          "fold": 0,
+          "safe_rows": 2225,
+          "baseline_macro_f1": 0.8983566764885318,
+          "candidate_macro_f1": 0.9272236107274945,
+          "delta": 0.028866934238962694,
+          "baseline_category_f1": {
+            "БАД": 0.9430548163916977,
+            "Легковоспламеняющиеся": 0.8536585365853658
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9430548163916977,
+            "Легковоспламеняющиеся": 0.9113924050632911
+          }
+        },
+        {
+          "fold": 1,
+          "safe_rows": 2268,
+          "baseline_macro_f1": 0.889792708709328,
+          "candidate_macro_f1": 0.8928800813552065,
+          "delta": 0.003087372645878439,
+          "baseline_category_f1": {
+            "БАД": 0.9503171247357294,
+            "Легковоспламеняющиеся": 0.8292682926829268
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9503171247357294,
+            "Легковоспламеняющиеся": 0.8354430379746836
+          }
+        },
+        {
+          "fold": 2,
+          "safe_rows": 2239,
+          "baseline_macro_f1": 0.9372487156578067,
+          "candidate_macro_f1": 0.9572413109928677,
+          "delta": 0.019992595335061036,
+          "baseline_category_f1": {
+            "БАД": 0.9555785123966942,
+            "Легковоспламеняющиеся": 0.918918918918919
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9555785123966942,
+            "Легковоспламеняющиеся": 0.958904109589041
+          }
+        },
+        {
+          "fold": 3,
+          "safe_rows": 2226,
+          "baseline_macro_f1": 0.9334803135578122,
+          "candidate_macro_f1": 0.9079828011200013,
+          "delta": -0.025497512437810954,
+          "baseline_category_f1": {
+            "БАД": 0.9502939604489578,
+            "Легковоспламеняющиеся": 0.9166666666666666
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9502939604489578,
+            "Легковоспламеняющиеся": 0.8656716417910447
+          }
+        },
+        {
+          "fold": 4,
+          "safe_rows": 2249,
+          "baseline_macro_f1": 0.9410265744448489,
+          "candidate_macro_f1": 0.9526119402985074,
+          "delta": 0.011585365853658436,
+          "baseline_category_f1": {
+            "БАД": 0.9552238805970149,
+            "Легковоспламеняющиеся": 0.926829268292683
+          },
+          "candidate_category_f1": {
+            "БАД": 0.9552238805970149,
+            "Легковоспламеняющиеся": 0.95
+          }
+        }
+      ],
+      "changed_predictions": 26,
+      "corrected": 17,
+      "regressed": 9,
+      "component_bootstrap": {
+        "iterations": 10000,
+        "seed": 40042,
+        "probability_delta_positive": 0.8585,
+        "delta_ci95": [
+          -0.007002544291286,
+          0.024826201311449782
+        ]
+      }
+    }
+  },
+  "prior_replay": {
+    "baseline_before_priors": {
+      "bad_f1": 0.9546604046242775,
+      "flammable_f1": 0.8921568627450981,
+      "macro_f1": 0.9234086336846878
+    },
+    "candidate_before_priors": {
+      "bad_f1": 0.9546604046242775,
+      "flammable_f1": 0.9086294416243654,
+      "macro_f1": 0.9316449231243215
+    },
+    "baseline_after_priors": {
+      "bad_f1": 0.9571402845308842,
+      "flammable_f1": 0.8921568627450981,
+      "macro_f1": 0.9246485736379911
+    },
+    "candidate_after_priors": {
+      "bad_f1": 0.9571402845308842,
+      "flammable_f1": 0.9086294416243654,
+      "macro_f1": 0.9328848630776247
+    },
+    "change_survival": {
+      "changed_before_priors": {
+        "rows": 26,
+        "bad_rows": 0,
+        "flammable_rows": 26
+      },
+      "overridden_by_priors": {
+        "rows": 0,
+        "bad_rows": 0,
+        "flammable_rows": 0
+      },
+      "survived_after_priors": {
+        "rows": 26,
+        "bad_rows": 0,
+        "flammable_rows": 26
+      },
+      "introduced_by_different_prior_resolution": {
+        "rows": 0,
+        "bad_rows": 0,
+        "flammable_rows": 0
+      },
+      "survival_rate": 1.0,
+      "before_priors": {
+        "corrected": 17,
+        "regressed": 9
+      },
+      "after_priors": {
+        "corrected": 17,
+        "regressed": 9
+      }
+    },
+    "baseline_prior_hits": {
+      "БАД": {
+        "rows": 7469,
+        "exact_hits": 7,
+        "name_hits": 291,
+        "canonical_hits": 603,
+        "shingle_hits": 280,
+        "shingle_changes": 13
+      },
+      "Легковоспламеняющиеся": {
+        "rows": 5502,
+        "exact_hits": 0,
+        "name_hits": 0,
+        "canonical_hits": 0,
+        "shingle_hits": 0,
+        "shingle_changes": 0
+      }
+    },
+    "candidate_prior_hits": {
+      "БАД": {
+        "rows": 7469,
+        "exact_hits": 7,
+        "name_hits": 291,
+        "canonical_hits": 603,
+        "shingle_hits": 280,
+        "shingle_changes": 13
+      },
+      "Легковоспламеняющиеся": {
+        "rows": 5502,
+        "exact_hits": 0,
+        "name_hits": 0,
+        "canonical_hits": 0,
+        "shingle_hits": 0,
+        "shingle_changes": 0
+      }
+    },
+    "delta_after_priors": {
+      "bad_f1": 0.0,
+      "flammable_f1": 0.01647257887926734,
+      "macro_f1": 0.008236289439633615
+    }
+  },
+  "acceptance": {
+    "macro_delta_at_least_0_005": true,
+    "folds_won_at_least_4": true,
+    "bad_unchanged": true,
+    "flammable_delta_positive": true,
+    "corrected_to_regressed_at_least_1_5": true,
+    "connected_safe_delta_positive": true,
+    "post_prior_delta_positive": true
+  },
+  "input_sha256": {
+    "validation/locked_190_nested_v1/adapter_replacement_report.npz": "176b76b0b0fd3527e9e15c8f2edd6a43f90fd3a24db1567a32a4b05e215139e8",
+    "validation/connected_family_guard_v2/rows.csv": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "research/data.csv": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+  },
+  "accepted_for_submission_integration": true
+}

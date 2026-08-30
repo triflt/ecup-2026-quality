@@ -1,0 +1,25 @@
+{
+  "version": "semantic_v3_evidence_router_backbone_decision_v2",
+  "status": "accepted",
+  "model_id": "Qwen/Qwen3.5-4B",
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "license": "Apache-2.0",
+  "files_sha256": {
+    "config.json": "ddc63e1c717afa86c865bb5e01313d89d72bb53b97ad4a8a03ba8510c0621670",
+    "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+    "tokenizer_config.json": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+  },
+  "score_semantics": "binary_normalized_next_token_support_score_not_calibrated_probability",
+  "nli_label_order": "not_applicable_atomic_answer_tokens_0_then_1",
+  "label_free_probe_report_sha256": "ad52bb9262288296ef05472cb2fe4f8d1b2ab252f6b6da8a54683716cdf778f1",
+  "label_free_probe_zip_sha256": "cc7972b626622c7dea303621036c5c19c16c0023f3e2c9d04c6aaa24e07dfa20",
+  "compatibility_passed": true,
+  "synthetic_input_only": true,
+  "competition_rows_loaded": 0,
+  "labels_loaded": false,
+  "sealed_rows_loaded": 0,
+  "russian_offsets_valid": true,
+  "hidden_size": 2560,
+  "peak_gpu_memory_bytes": 9334074368,
+  "note": "The probe verifies runtime compatibility only. It does not establish classification quality or calibrate support scores."
+}

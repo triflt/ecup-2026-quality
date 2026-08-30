@@ -1,9 +1,11 @@
 {
   "experiment_id": "140",
   "slug": "dual_lora_fusion",
-  "status": "accepted",
+  "status": "current_public_production_champion",
   "data_version": "competition_train_v1",
   "evaluation_version": "nested_grouped_v1",
+  "public_macro_f1": 0.8923976821312729,
+  "public_decision": "Selected over tied experiment 180 because it is simpler",
   "conclusion": "Главная architecture: nested Macro F1 0.911843; scaled runtime укладывается в лимит.",
   "historical_results": [
     {

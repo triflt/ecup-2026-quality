@@ -1,0 +1,84 @@
+[experiment]
+id = "590"
+slug = "qwen3vl_cross_listing_recombination"
+title = "Qwen3-VL audited cross-listing first-image recombination"
+status = "rejected_blind_audit"
+entrypoint = "experiments/590_qwen3vl_cross_listing_recombination/train_screen.py"
+result_file = "experiments/590_qwen3vl_cross_listing_recombination/results/metrics.json"
+
+[validation]
+baseline = "400_qwen35_category_routed_adapters"
+training_parent = "110_qwen3vl_lora"
+semantic_graph = "validation/semantic_family_v3"
+edge_provenance = "semantic_family_graph_audit_draft_v3"
+screen_folds = [0, 3]
+reject_only = true
+primary_metric = "macro_f1"
+
+[hypothesis]
+changed_factor = "Replace the image of exactly 25 percent of repeated eligible training occurrences with another listing's first image from the same audited product component"
+mechanism = "A real same-product packaging view should reduce listing-specific visual shortcuts without adding rows or changing inference"
+uses_teacher = false
+uses_pseudo_labels = false
+
+[selection]
+allowed_stages = ["exact_full_text", "exact_first_image", "exact_name_corroborated"]
+forbidden_stages = ["exact_auxiliary_images", "perceptual_corroborated", "masked_name_corroborated"]
+same_category = true
+same_training_label = true
+outer_train_only = true
+exclude_mixed_label_components = true
+exclude_sealed_holdout = true
+maximum_key_degree = 32
+
+[preflight.blind_audit]
+required_pairs = 300
+required_reviewers = 2
+minimum_same_product_precision = 0.98
+minimum_cohen_kappa_if_defined = 0.80
+minimum_pairs_per_screen_fold = 200
+minimum_components_per_screen_fold = 50
+current_decision = "NO_GO"
+
+[training]
+model = "Qwen/Qwen3-VL-2B-Instruct"
+seed = 42
+epochs = 1
+training_mode = "hard"
+recombined_fraction_of_repeated_eligible_occurrences = 0.25
+images_per_occurrence = 1
+first_image_max_edge = 448
+first_image_max_pixels = 262144
+batch_size = 4
+gradient_accumulation = 4
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+record_multiset = "byte-identical parent"
+steps = "byte-identical parent"
+text_prompt_labels_weights = "byte-identical parent"
+
+[inference]
+view_policy = "original_first_image_only"
+images_per_row = 1
+max_edge = 448
+passes = 1
+tta = false
+
+[acceptance.screen]
+folds = [0, 3]
+required_each_fold_delta_positive = true
+required_mean_macro_f1_delta = 0.001
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+required_corrected_exceeds_regressed = true
+maximum_bad_f1_drop = 0.003
+
+[execution]
+gpu_count = 1
+launch_authorized = false
+full_train_allowed = false
+
+[artifacts]
+directory = "artifacts"
+publish = false

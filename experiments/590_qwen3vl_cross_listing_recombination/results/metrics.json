@@ -1,0 +1,29 @@
+{
+  "experiment_id": "590",
+  "status": "rejected_blind_audit",
+  "launched": false,
+  "preflight_decision": "NO_GO",
+  "blind_reviewed_pairs": 300,
+  "blind_reviewer_accepts": {
+    "reviewer_a": 292,
+    "reviewer_b": 292
+  },
+  "blind_same_product_precision": 0.9733333333333334,
+  "blind_raw_agreement": 1.0,
+  "blind_cohen_kappa": 1.0,
+  "eligible_pairs": {
+    "fold_0": 4773,
+    "fold_3": 4538
+  },
+  "eligible_components": {
+    "fold_0": 986,
+    "fold_3": 980
+  },
+  "recombined_occurrences": {
+    "fold_0": 35,
+    "fold_3": 40
+  },
+  "null_control_passed": true,
+  "folds": {},
+  "note": "Two-pass CPU blind audit completed without gold labels or downstream scores. Eight of 300 pairs were rejected for a quantity/variant or product contradiction; strict precision 0.9733 is below the 0.98 gate. No GPU training or model inference was launched."
+}

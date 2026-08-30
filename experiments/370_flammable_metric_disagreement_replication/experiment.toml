@@ -1,0 +1,20 @@
+id = "370"
+slug = "flammable_metric_disagreement_replication"
+status = "rejected_offline_promising_signal"
+data_version = "competition_train_v1"
+evaluation_version = "flammable_metric_connected_replication_v1"
+parent_experiment = "360_hard_negative_diagonal_metric"
+
+[hypothesis]
+statement = "High-confidence flammable disagreements from a hard-negative family metric replicate across new connected topologies."
+changed_factor = "Top ten percent of metric disagreements; BAD is frozen."
+
+[entrypoints]
+run = "python experiments/370_flammable_metric_disagreement_replication/run.py"
+
+[acceptance]
+minimum_repeat_mean_macro_delta = 0.001
+minimum_total_fold_wins = 11
+minimum_corrected_to_regressed = 2.0
+minimum_each_bootstrap_probability = 0.80
+all_repeat_deltas_positive = true

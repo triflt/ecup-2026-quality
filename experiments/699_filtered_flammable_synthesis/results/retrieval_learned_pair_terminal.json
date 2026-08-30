@@ -1,0 +1,50 @@
+{
+  "schema": "exp699_retrieval_learned_pair_terminal_v1",
+  "experiment": 699,
+  "decision": "REJECT_LEARNED_PAIR_SCREEN",
+  "public_used": false,
+  "full5_authorized": false,
+  "package_authorized": false,
+  "ods_submit_authorized": false,
+  "code_commits": [
+    "c5275e8",
+    "49ffca7"
+  ],
+  "preflight": {
+    "decision": "ACCEPT_LEARNED_PAIR_PREFLIGHT",
+    "packet_sha256": "d54499693dc0fe6827ee1afd49382418583240a11900b52b9cf926f6e25208e1",
+    "report_self_sha256": "5119539383c5658d8a6f87d6baa6fc6f584cb1b5b60c966725655e171dd01e54",
+    "fold0_pairs": 4000,
+    "fold3_pairs": 3792,
+    "same_fold_pairs": 0,
+    "same_component_pairs": 0,
+    "per_query_balanced": true
+  },
+  "screen": {
+    "folds": [0, 3],
+    "gpu_count": 1,
+    "runtime_seconds": 4.995038777589798,
+    "report_file_sha256": "ad46d9e824b45ab322f97a12fc10dc9ad6d7587d2a199238c10481111a862a2c",
+    "report_self_sha256": "d481fdc05a6195bc13e1f84cb6db4b5ff8d01ff45ddf37b4a5597671b1658ce0",
+    "baseline_macro_f1": 0.9568949027529112,
+    "candidate_macro_f1": 0.92599073510516,
+    "baseline_flammable_f1": 0.948905109489051,
+    "candidate_flammable_f1": 0.8870967741935484,
+    "baseline_fp": 4,
+    "candidate_fp": 1,
+    "baseline_fn": 3,
+    "candidate_fn": 13,
+    "corrections": 3,
+    "regressions": 10,
+    "net": -7,
+    "original_fp_corrected": 3,
+    "original_fn_corrected": 0,
+    "residual_changes_before_prior": 27,
+    "survived_after_prior": 13,
+    "suppressed_by_prior": 14,
+    "beats_query_only": true,
+    "beats_fixed_embedding": true,
+    "permutation_positive_gain": false
+  },
+  "conclusion": "Learned pair interaction contains more signal than query-only and fixed-embedding controls, but the frozen residual rule converts that signal into excessive positive-to-negative boundary movement. The mechanism is terminally rejected without threshold, dose, seed, or aggregation rescue."
+}

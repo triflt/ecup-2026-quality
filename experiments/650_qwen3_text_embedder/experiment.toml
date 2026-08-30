@@ -1,0 +1,43 @@
+[experiment]
+id = "650"
+slug = "qwen3_text_embedder"
+title = "Compact multilingual text embedder versus strict TF-IDF"
+status = "rejected_on_frozen_screen"
+entrypoint = "experiments/650_qwen3_text_embedder/run_embeddings.py"
+result_file = "experiments/650_qwen3_text_embedder/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+runtime_parent = "640_qwen38_scale_prompt_grid"
+scope = "semantic_family_v3 development only"
+expected_rows = 11118
+labels_in_gpu_runtime = false
+
+[model]
+id = "Qwen/Qwen3-Embedding-0.6B"
+revision = "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3"
+parameters_billions = 0.6
+dimension = 1024
+max_length = 2048
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+baseline = "strict outer-train TF-IDF word 1-2 plus char 3-5 and category-specific LinearSVC C=1"
+candidate = "frozen Qwen3 embedding and category-specific LinearSVC C=1"
+
+[hypothesis]
+changed_factor = "Replace only TF-IDF representation with a frozen compact multilingual embedding"
+mechanism = "Semantic embeddings may generalize scope negation and product-relation paraphrases that sparse lexical features miss"
+expected_macro_f1_delta = 0.003
+falsification = "Either screen fold non-positive; mean delta below 0.0015; category drop over 0.002; no complementary corrections"
+precedents = ["Qwen3 Embedding 2025", "Qwen3-Embedding-0.6B official model card"]
+
+[budget]
+embedding_gpus = 1
+planned_gpu_hours = 2.0
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

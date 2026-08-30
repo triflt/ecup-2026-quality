@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "experiment_id": "680",
+  "control_experiment_id": "641",
+  "decision": "CLOSED_TERMINAL_REJECT_AT_SCREEN",
+  "training_lane_open": false,
+  "allowed_folds": [],
+  "screen_folds": [0, 3],
+  "confirmation_folds": [1, 2, 4],
+  "model_id": "Qwen/Qwen3.5-4B",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "objective": "class_only_binary_bce",
+  "changed_factor": "remove_bad_training_occurrences",
+  "learning_rate": 0.0002,
+  "runtime_backend": "legacy_eager",
+  "micro_batch_size": 2,
+  "gradient_accumulation": 8,
+  "effective_batch_size": 16,
+  "expected_optimizer_steps": 143,
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "runtime_contract_sha256": {
+    "0": "7b4e10915c561bec447a0a2ff249962dc974ed7afc992a6c342841c08ed02cec",
+    "3": "1a65d0d4aacbfa21f19ef00b9dc3cd9f9f7cd6862f3d4e1fc48e9398285cc0af"
+  },
+  "runtime_payload_sha256": {
+    "0": {
+      "train.jsonl": "c157aaf80fd287f1153b322adb506af94bc8d2d1b534286c47bc6fb15ed3493e",
+      "validation.jsonl": "109807781797f51ec8c1d98d0385aef2e9edd0d89183c4a44aab76e2a26f56bc"
+    },
+    "3": {
+      "train.jsonl": "05e8ca8f84379fb9c43d153c8746a0c532d17b140f99c7f1901d3f5aa0b3abca",
+      "validation.jsonl": "bbbbae3f4ddb38bf3af238cd53dd8fc1b851b04598101ab7b57809e73c7a2257"
+    }
+  },
+  "public_used": false,
+  "sealed_rows": 0,
+  "non_duplication_audit": "PASS_GENUINELY_NEW_FACTOR",
+  "gpu_jobs": 3,
+  "screen_passed": false,
+  "ablation_screen_passed": false,
+  "screen_report_sha256": "58613c341acf09fbdf2d440e86fbe8bc5da33eb43b92658042cd5a0e5514335b"
+}

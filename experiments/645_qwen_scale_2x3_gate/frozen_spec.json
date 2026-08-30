@@ -1,0 +1,19 @@
+{
+  "experiment_id": "645",
+  "grid_contract_sha256": "aad63f99ee9ddd5ecfa133575ea5cf1a803c11ab3fd26b5328d894f8631b3224",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "semantic_family_v3",
+  "screen_folds": [0, 3],
+  "full_folds": [0, 1, 2, 3, 4],
+  "primary_evidence_order": "evidence_first",
+  "diagnostic_evidence_order": "class_first",
+  "required_full_fold_wins": 4,
+  "minimum_macro_delta": 0.003,
+  "maximum_category_drop": 0.002,
+  "minimum_corrected_to_regressed": 1.5,
+  "minimum_evidence_coverage": 0.5,
+  "minimum_grounded_fraction": 0.95,
+  "manual_audit_rows": 200,
+  "sealed_rows": 0,
+  "public_used": false
+}

@@ -1,0 +1,22 @@
+{
+  "experiment_id": 631,
+  "status": "rejected_public",
+  "parent_experiment": 603,
+  "new_full_seed_jobs": 2,
+  "completed_full_seed_jobs": 2,
+  "submission_ready": true,
+  "resubmission_recommended": false,
+  "submitted": true,
+  "runtime_smoke_rows": 600,
+  "runtime_smoke_images": 2274,
+  "runtime_seconds": 331.949325338006,
+  "projected_public_minutes": 14.753303348355821,
+  "projected_private_minutes": 35.03909545234508,
+  "schema_valid": true,
+  "predictions_identical_to_unoptimized": true,
+  "public_f1": 0.8636091486049575,
+  "public_reference_140": 0.8923976821312729,
+  "public_delta_vs_140": -0.0287885335263154,
+  "public_used_for_tuning": false,
+  "decision": "REJECTED_PUBLIC_NO_RETUNING"
+}

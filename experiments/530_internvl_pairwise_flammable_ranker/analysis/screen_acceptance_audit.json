@@ -1,0 +1,15 @@
+{
+  "experiment_id": "530",
+  "evaluation_version": "internvl_pairwise_rank_replacement_screen_v1",
+  "screen_folds": [0, 3],
+  "mean_screen_delta_macro_f1": -0.06498709319553819,
+  "corrected": 3,
+  "regressed": 18,
+  "folds": {
+    "0": {"delta_macro_f1": -0.09741512345679015, "flammable_false_negative_delta": 14, "safety_union_false_negative_delta": 9},
+    "3": {"delta_macro_f1": -0.03255906293428623, "flammable_false_negative_delta": 4, "safety_union_false_negative_delta": 4}
+  },
+  "screen_passed": false,
+  "full_five_fold_cycle_allowed": false,
+  "decision": "REJECT"
+}

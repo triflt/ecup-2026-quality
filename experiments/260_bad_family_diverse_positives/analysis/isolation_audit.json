@@ -1,0 +1,14 @@
+{
+  "control_script": "research/qwen3vl_lora_holdout.py",
+  "candidate_script": "research/qwen35_bad_family_diverse_positives_lora.py",
+  "seed": 42,
+  "family_rng_seed": 26043,
+  "folds": [
+    {"fold": 0, "all_records": 5390, "non_target_multiset_exact": true, "selected_positive_bad_families": 1500, "max_family_exposure": 1, "control_rng_consumed": true},
+    {"fold": 1, "all_records": 5390, "non_target_multiset_exact": true, "selected_positive_bad_families": 1500, "max_family_exposure": 1, "control_rng_consumed": true},
+    {"fold": 2, "all_records": 5395, "non_target_multiset_exact": true, "selected_positive_bad_families": 1500, "max_family_exposure": 1, "control_rng_consumed": true},
+    {"fold": 3, "all_records": 5390, "non_target_multiset_exact": true, "selected_positive_bad_families": 1500, "max_family_exposure": 1, "control_rng_consumed": true},
+    {"fold": 4, "all_records": 5395, "non_target_multiset_exact": true, "selected_positive_bad_families": 1500, "max_family_exposure": 1, "control_rng_consumed": true}
+  ],
+  "passed": true
+}

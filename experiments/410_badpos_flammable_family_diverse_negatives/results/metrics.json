@@ -1,0 +1,66 @@
+{
+  "experiment_id": "410",
+  "status": "rejected_offline",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "locked_190_category_routing_v2",
+  "seed": 42,
+  "changed_factor": "family-diverse negative flammable sampling on the experiment 260 training recipe",
+  "parent": {
+    "experiment": "400_qwen35_category_routed_adapters",
+    "training_component": "qwen35_bad_family_diverse_v260",
+    "baseline_macro_f1": 0.9316449231243215
+  },
+  "validation": {
+    "baseline_bad_f1": 0.9546604046242775,
+    "baseline_flammable_f1": 0.9086294416243654,
+    "baseline_macro_f1": 0.9316449231243215,
+    "bad_f1": 0.9546604046242775,
+    "flammable_f1": 0.8636363636363636,
+    "macro_f1": 0.9091483841303205,
+    "delta_macro_f1": -0.022496538994000947,
+    "folds_won": 2,
+    "fold_deltas": [-0.07217473884140546, 0.00707618187292991, -0.019474196689386547, 0.016189290161892855, -0.04290123456790118],
+    "changed": 32,
+    "corrected": 7,
+    "regressed": 25,
+    "flammable_false_negative_delta": 8,
+    "safety_union_false_negative_delta": 3,
+    "connected_safe_delta": -0.023433583959899806,
+    "component_bootstrap_probability": 0.0108,
+    "component_bootstrap_ci95": [-0.046568478341293094, -0.0032453941978691455],
+    "prior_survival_rate": 1.0,
+    "post_prior_delta": -0.022496538994000836,
+    "stage1_passed": false,
+    "repeat_seed_launched": false
+  },
+  "runtime": {
+    "fold_minutes": [37.18664868737881, 37.19454888844242, 36.629930150322615, 37.093034808849914, 36.86332520529007],
+    "full_refit_minutes": 42.10619118430962,
+    "download_failures": 0
+  },
+  "jobs": [
+    "redacted-job",
+    "redacted-job",
+    "redacted-job"
+  ],
+  "reproducibility": {
+    "hardware": "three independent one-H100 jobs",
+    "training_code_sha256": "404f6d07965f551dfe7c7ee0120ce0a16132e1103f1db7d13b3622993f4fd6c0",
+    "cycle_code_sha256": "b7e4b0e01f47160bd2c138a60b01c1606d8565bf9b10dbf8c180e04f4823d2a9",
+    "evaluator_sha256": "7e9811ec4cabe42d511a601a1d79ea1e073ad37b366ef7b69c16ed7fdf030f43",
+    "finalizer_sha256": "8cce31dd6df1861ad86282de02b5b1e7a1ce8f6f2765299f8adbccea61e0148e",
+    "ingest_code_sha256": "18e42bb8617733a777544dd64591faae0cc604cd6e1893cbff5125fd3d17dead",
+    "partial_fold_code_sha256": "1f54b53703992047d8d3743fdf134f901ffa6e18ef8957699fc0097a9bcb22ba",
+    "oof_input_sha256": "5d7467c48fc8a5a73f947f5aa1300071c77ba699b29c12250caf1bcd3176d7ac",
+    "image_manifest_sha256": "d6193215ce2d6145440bd484ea225e77fe10784c4c2c06b7c6b0b85dc8efc7d9"
+  },
+  "artifacts": [
+    {"path": "results/acceptance_audit.json", "sha256": "460e72dd6e218535bd04b2d06fdb65ba1184bc4655e9077ba176dd39c6d96d89"},
+    {"path": "results/locked_replacement_report.npz", "sha256": "d3ed75c52ab14c010e4753d4d403dc802feb663c3dd6b41266126d4d09ff8ebf"},
+    {"path": "results/routed_predictions.npz", "sha256": "32043fff5661cb2b2e31dfa905b42a053501d8c60b81df039d9c93b2c4f61bd7"},
+    {"path": "results/prior_replay.json", "sha256": "192f410c0ac788432a2936d42d266b18e3fd9989b7ee90ce8170d32bf27005d2"},
+    {"path": "results/safety_cohort_audit.json", "sha256": "07bfe77633868cfa337c88db764f68b9b1ad100ddfdd30118669d07934667fac"},
+    {"path": "artifacts/seed_42_negdiv/full/adapter/adapter_model.safetensors", "sha256": "b5ab55a8746a2048549390c7e65034e336fd83703e77818a2ebe58ad0ae0791a", "research_only": true}
+  ],
+  "decision": "Rejected decisively. Family-diverse flammable negatives reduced rare-class recall, failed seven of nine frozen stage-1 gates, and therefore did not trigger the seed-31415 repeat or submission integration."
+}

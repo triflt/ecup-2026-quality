@@ -1,0 +1,86 @@
+[experiment]
+id = "600"
+slug = "semantic_v3_qwen35_baselines"
+title = "Semantic-family-v3 Qwen3.5 route baselines"
+status = "complete_baselines_specialist_not_promoted"
+entrypoint = "experiments/600_semantic_v3_qwen35_baselines/train_component.py"
+result_file = "experiments/600_semantic_v3_qwen35_baselines/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+source_rows = 12971
+development_rows = 11118
+sealed_holdout_rows = 1853
+
+[validation]
+protocol = "semantic_family_v3"
+folds = "validation/semantic_family_v3/folds.csv"
+folds_sha256 = "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae"
+development_folds = [0, 1, 2, 3, 4]
+sealed_holdout_used_for_training = false
+sealed_holdout_used_for_selection = false
+sealed_holdout_used_for_thresholds = false
+sealed_holdout_used_for_evaluation = false
+threshold_calibration = "leave-one-fold-out over fixed OOF scores"
+fully_nested_meta_validation = false
+validation_limitation = "donor OOF base models may have trained on labels of the currently evaluated fold"
+
+[components.original]
+source = "190"
+parent_entrypoint = "research/qwen3vl_lora_holdout.py"
+seed = 42
+recipe_exact = true
+
+[components.specialist]
+source = "260"
+parent_entrypoint = "research/qwen35_bad_family_diverse_positives_lora.py"
+seed = 42
+recipe_exact = true
+family_diverse_bad_positives = true
+family_balance_flammable = false
+family_diverse_flammable_negatives = false
+
+[training]
+model = "Qwen3.5-4B"
+training_mode = "hard"
+model_class = "multimodal"
+epochs = 1
+batch_size = 4
+gradient_accumulation = 4
+learning_rate = 0.0002
+steps_policy = "exact parent formula applied to the available development-train selection"
+teacher = false
+pseudo_labels = false
+public_feedback = false
+full_train = false
+
+[runtime_audit]
+physical_development_csv_required = true
+development_only_selector_npz_required = true
+selector_provenance_required = true
+id_mapping_required = true
+zero_sealed_rows_required = true
+zero_outer_validation_training_occurrences_required = true
+output_contract_required = true
+
+[execution]
+components = ["original", "specialist"]
+folds = [0, 1, 2, 3, 4]
+jobs = 10
+gpu_per_job = 1
+launch_authorized = false
+launched = true
+blocked_on = ""
+completed_jobs = 10
+completed = true
+all_runtime_contracts_verified = true
+
+[budget]
+expected_gpu_hours_min = 6.0
+expected_gpu_hours_max = 8.5
+expected_parallel_wall_minutes_min = 45
+expected_parallel_wall_minutes_max = 70
+
+[artifacts]
+directory = "artifacts"
+publish = false

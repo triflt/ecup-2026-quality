@@ -1,0 +1,28 @@
+{
+  "allowed_folds": [],
+  "contract_sha256": "473a4f21ea894be04803a8ae4c45c96359354fcfaeb29c5cb0c44412694adb73",
+  "decision": "REJECT_AT_SCREEN",
+  "experiment_id": "683",
+  "forbidden": [
+    "folds_1_2_4",
+    "full_refit",
+    "submission_packaging",
+    "public_submission",
+    "threshold_tuning_on_folds_0_3",
+    "calibration_tuning_on_folds_0_3",
+    "route_weight_tuning_on_folds_0_3"
+  ],
+  "gpu_jobs": 0,
+  "public_submissions": 0,
+  "public_used": false,
+  "screen_evaluation_sha256": "fab6b8ed6a611f67e5406d4bdf3baf9f3e368149a5b75930c798960c778e373e",
+  "screen_gate_failures": [
+    "both_folds_macro_positive",
+    "corrected_to_regressed_at_least_1_5"
+  ],
+  "screen_prediction_sha256": {
+    "0": "cf9089db6a1c62ccf89a024e32a2c948eb832494b09d4ac1ea4f660026508c3e",
+    "3": "1dff751173bd36a9addac6c6583fae695b13949a7c6dfb6eaf8862c08df67156"
+  },
+  "training_lane_open": false
+}

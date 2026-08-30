@@ -1,0 +1,42 @@
+{
+  "version": "component_transfer_gate_v3",
+  "dataset_version": "competition_train_v1",
+  "created_before_experiment_320_training": true,
+  "parent": "component_transfer_gate_v2",
+  "purpose": "Preserve every v2 transfer requirement while defining an explicit stability gate for deterministic local heads",
+  "inherits_without_change": {
+    "historical_comparability_gate": "component_transfer_gate_v2.historical_comparability_gate",
+    "connected_safe_gate": "component_transfer_gate_v2.connected_safe_gate",
+    "topology_repeat_gate": "component_transfer_gate_v2.topology_repeat_gate",
+    "downstream_replay": "component_transfer_gate_v2.downstream_replay",
+    "runtime": "component_transfer_gate_v2.runtime"
+  },
+  "model_stability": {
+    "stochastic_head": {
+      "protocol": "Use the component_transfer_gate_v2 stochastic seed-31415 repeat on the best and worst primary-seed folds",
+      "required": true
+    },
+    "deterministic_head": {
+      "protocol": "Refit the best and worst historical folds after a seed-31415 donor-row permutation; selected hyperparameters stay fixed",
+      "required": true,
+      "acceptance": {
+        "reference_prediction_mismatches": 0,
+        "positive_mean_full_delta": true,
+        "positive_mean_connected_safe_delta": true,
+        "maximum_category_f1_drop": 0.005
+      },
+      "reason": "A random-seed repeat is undefined for a deterministic solver; row-order permutation checks numerical and serialization stability without changing the estimator"
+    }
+  },
+  "production_promotion": {
+    "offline_gate_is_not_production_ready": true,
+    "required_after_offline_acceptance": [
+      "full-data refit from a rule fixed before outer results",
+      "serialized component checksum",
+      "hidden-schema feature parity smoke",
+      "runtime smoke with at least 20 percent reserve",
+      "submission package integrity audit"
+    ]
+  },
+  "immutable": true
+}

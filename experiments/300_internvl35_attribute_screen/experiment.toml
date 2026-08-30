@@ -1,0 +1,47 @@
+[experiment]
+id = "300"
+slug = "internvl35_attribute_screen"
+title = "InternVL3.5-2B structured flammable attribute screen"
+status = "rejected_offline"
+entrypoint = "research/internvl35_attribute_screen.py"
+result_file = "experiments/300_internvl35_attribute_screen/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "component_transfer_gate_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "190_shingle_neighbor_prior"
+changed_factor = "InternVL3.5-2B extracts structured flammable attributes instead of directly replacing the final classifier"
+mechanism = "Dynamic 448px image tiles and OCR/document pretraining should expose gas, fuel, ignition-source, empty-equipment and kit-content evidence that the existing binary heads confuse"
+expected_macro_f1_delta = 0.003
+falsification = "Reject if a real-image backward pass is incompatible, the predeclared two-fold screen does not improve both contrast folds, or runtime cannot retain a 20 percent reserve"
+precedents = [
+  "https://huggingface.co/OpenGVLab/InternVL3_5-2B",
+  "https://aclanthology.org/2023.acl-industry.29/",
+  "https://arxiv.org/abs/2008.06179",
+]
+
+[acceptance]
+baseline_macro_f1 = 0.9234086336846878
+required_fold_wins = 4
+max_category_f1_drop = 0.005
+repeat_required = true
+
+[budget]
+planned_gpu_hours = 3.5
+planned_public_submissions = 0
+runtime_limit_minutes = 20
+
+[execution]
+arguments = ["--first-image-only", "--structured-attributes"]
+
+[artifacts]
+directory = "artifacts"
+publish = false

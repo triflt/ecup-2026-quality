@@ -1,0 +1,32 @@
+{
+  "experiment_id": "390",
+  "status": "rejected_offline_promising_signal",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "bagged_all_image_flammable_metric_connected_v1",
+  "parent_experiment": "380_all_image_hard_negative_metric_parity",
+  "frozen_recipe": {
+    "bag_seeds": [39041, 39042, 39043],
+    "family_fraction": 0.8,
+    "direction_consensus": "unanimous",
+    "disagreement_quantile": 0.9,
+    "confidence": "minimum absolute margin across bags"
+  },
+  "validation": {
+    "repeat_macro_deltas": [0.0040766944583255915, -0.0011046526919334942, 0.0014860208831960486],
+    "mean_macro_delta": 0.0014860208831960486,
+    "total_fold_wins": 7,
+    "total_folds": 15,
+    "total_corrected": 15,
+    "total_regressed": 9,
+    "bootstrap_probability_delta_positive": [0.8756, 0.3828, 0.659],
+    "changed_bad": 0,
+    "changed_unsafe": 0,
+    "acceptance_passed": false
+  },
+  "artifacts": {
+    "source_sha256": "f09411037f53f2a7b905c89cedbe322e3f4ad39c87bb678fe44c93b325f6a796",
+    "replication_audit_sha256": "7e5e6e603514195a30a8552482b3da8d8f16db7cbb237d53e32d9aa6d5909da4",
+    "replication_predictions_sha256": "ecd76f403ab5d3cec644c24f123c6243774edd7ac7eb3d9df265056992322c35"
+  },
+  "decision": "Reject the 80-percent within-fold bagging rule: repeat 1 is negative, only 7/15 folds win, corrected-to-regressed is 1.67 and two bootstrap probabilities are below 0.75. Do not tune bags or quantile post hoc."
+}

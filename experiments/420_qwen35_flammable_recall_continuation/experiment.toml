@@ -1,0 +1,74 @@
+[experiment]
+id = "420"
+slug = "qwen35_flammable_recall_continuation"
+title = "Short recall-oriented continuation of the routed flammable adapter"
+status = "rejected_at_screen"
+entrypoint = "research/qwen35_flammable_recall_continuation.py"
+result_file = "experiments/420_qwen35_flammable_recall_continuation/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "locked_190_category_routing_v2"
+selection_guard = "connected_family_guard_v2"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+training_parent_component = "qwen35_lora_bad_positive_family_seed42_v260"
+changed_factor = "One short flammable-only balanced continuation stage on each matching experiment-260 adapter"
+mechanism = "Experiment 410's added negative pressure systematically reduced rare-class recall; a low-LR balanced replay should restore flammable positives without changing routing or inference cost"
+expected_macro_f1_delta = 0.003
+falsification = "Reject at the two-fold screen if either routed delta is non-positive, false negatives grow, corrected decisions do not exceed regressions, or the safety-union recall falls; full gates are stricter"
+precedents = ["class-balanced fine-tuning for long-tailed recognition", "category-specialist continuation in routed ensembles"]
+
+[acceptance.screen]
+folds = [0, 3]
+threshold_protocol = "hybrid nested OOF: continuation ranks on folds 0 and 3; frozen parent-260 ranks on folds 1, 2 and 4; tested fold excluded from threshold fit"
+reject_only = true
+require_each_routed_delta_positive = true
+max_flammable_false_negative_increase = 0
+min_corrected_to_regressed_ratio = 1.0
+max_safety_union_recall_drop = 0.0
+
+[acceptance.full]
+baseline_macro_f1 = 0.9316449231243215
+required_macro_f1_delta = 0.003
+required_flammable_f1_delta = 0.006
+required_fold_wins = 4
+max_flammable_false_negative_increase = 0
+min_corrected_to_regressed_ratio = 1.5
+required_component_bootstrap_probability = 0.90
+required_prior_survival_rate = 0.80
+repeat_folds = [0, 3]
+repeat_seed = 31415
+max_repeat_fold_drop = 0.005
+
+[training]
+parent = "experiment 260 matching fold/full adapter"
+category = "Легковоспламеняющиеся"
+positive_repeats = 5
+negative_sampling = "unique connected-safe rows by stable SHA256"
+class_exposure_ratio = "1:1"
+epochs = 1
+learning_rate = 0.00002
+weight_decay = 0.01
+uses_predictions_for_selection = false
+
+[budget]
+planned_gpu_hours = 3.0
+planned_public_submissions = 0
+runtime_limit_minutes = 150
+
+[execution]
+jobs = ["redacted-job", "redacted-job"]
+hardware = "two one-H100 screen jobs; full five-fold cycle only after screen passes"
+result = "both jobs succeeded; both frozen screen folds failed; full cycle not launched"
+
+[artifacts]
+directory = "artifacts"
+publish = false

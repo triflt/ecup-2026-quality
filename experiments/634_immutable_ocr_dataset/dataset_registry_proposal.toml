@@ -1,0 +1,35 @@
+schema_version = 1
+status = "proposal_pending_full_artifact"
+target_registry = "datasets/registry.toml"
+promotion_is_manual = true
+
+[entry]
+version = "competition_train_paddleocr_vl16_spotting_v1"
+description = "Label-blind PaddleOCR-VL-1.6 spotting regions for every image in competition_train_v1; exact normalized quadrilaterals and full provenance"
+format = "jsonl"
+artifact = "ocr_images.jsonl"
+sha256_source = "dataset_manifest.json:dataset_sha256"
+rows = 49456
+items = 12971
+source_data_version = "competition_train_v1"
+source_experiment = "633_paddleocr_vl16_spotting"
+builder_experiment = "634_immutable_ocr_dataset"
+schema = "ocr_image_record.schema.json"
+immutable = true
+label_blind = true
+contains_labels = false
+contains_categories = false
+contains_fold_membership = false
+contains_public_data = false
+contains_sealed_membership = false
+
+[promotion_requirements]
+dataset_manifest_verified = true
+manifest_coverage = 1.0
+missing_images = 0
+duplicate_images = 0
+processing_errors = 0
+malformed_location_images = 0
+out_of_bounds_regions = 0
+all_source_checksums_verified = true
+verify_only_passed = true

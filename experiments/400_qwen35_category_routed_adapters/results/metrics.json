@@ -1,0 +1,43 @@
+{
+  "experiment_id": "400",
+  "status": "former_public_champion",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "locked_190_category_routing_v1",
+  "parent_experiment": "280_bad_family_diverse_public190",
+  "validation": {
+    "baseline_macro_f1": 0.9234086336846878,
+    "candidate_macro_f1": 0.9316449231243215,
+    "delta_macro_f1": 0.008236289439633615,
+    "bad_delta": 0.0,
+    "flammable_delta": 0.01647257887926734,
+    "folds_won": 4,
+    "changed": 26,
+    "corrected": 17,
+    "regressed": 9,
+    "connected_safe_delta": 0.008503401360544283,
+    "connected_safe_bootstrap_probability_delta_positive": 0.8585,
+    "post_prior_delta": 0.008236289439633615,
+    "changes_survived_priors": 26,
+    "changes_total": 26,
+    "accepted": true
+  },
+  "runtime_smoke": {
+    "job": "category-route-smoke-v3",
+    "state": "SUCCEEDED",
+    "rows": 2,
+    "both_adapter_routes_exercised": true,
+    "run_duration_seconds": 45,
+    "output_schema_valid": true
+  },
+  "artifacts": {
+    "submission": "artifacts/quality-public190-category-route-v400.zip",
+    "submission_sha256": "2a99472be1d2b753ae93036becdaee5595f44c4694d161e11fd9d59d2c52a373",
+    "submission_size_bytes": 59422077,
+    "s3_uri": "private://competition-artifacts/experiments/400/quality-public190-category-route-v400.zip",
+    "acceptance_audit_sha256": "a271ed7564873cfc428f1137ab6ac5069b98eeef903c90594344dc5755ca187c",
+    "routed_predictions_sha256": "58aa9feb3e6a276fda27666b11e479e052549523999bf2fb3c9af660904ab174"
+  },
+  "public_macro_f1": 0.8922900010951702,
+  "public_delta_vs_190": 0.0003655774009770001,
+  "decision": "Accepted as Public champion on 2026-08-22; superseded on 2026-08-23 by the simpler experiment 140 at 0.8923976821."
+}

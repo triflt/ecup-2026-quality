@@ -1,0 +1,188 @@
+{
+  "categories": {
+    "БАД": {
+      "baseline_f1": 0.9515615041427661,
+      "candidate_f1": 0.9515615041427661,
+      "delta": 0.0
+    },
+    "Легковоспламеняющиеся": {
+      "baseline_f1": 0.8439306358381503,
+      "candidate_f1": 0.9075144508670521,
+      "delta": 0.06358381502890176
+    }
+  },
+  "control_experiment_id": "641",
+  "corrected": 25,
+  "corrected_to_regressed": 8.333333333333334,
+  "decision": "ACCEPT_FULL_COMPONENT_ROUTE",
+  "evaluation_version": "semantic_family_v3",
+  "experiment_id": "659",
+  "flammable_false_negatives": {
+    "baseline": 24,
+    "candidate": 13,
+    "delta": -11
+  },
+  "flammable_pr_auc": {
+    "diagnostic_only": true,
+    "folds": {
+      "0": {
+        "baseline_4b": 0.7871625742261392,
+        "equal_logit_blend": 0.9839757585415252,
+        "large_27b": 0.9700102721463575,
+        "positives": 34,
+        "rows": 943
+      },
+      "1": {
+        "baseline_4b": 0.8333815387019445,
+        "equal_logit_blend": 0.898738720860818,
+        "large_27b": 0.8609001722795309,
+        "positives": 34,
+        "rows": 943
+      },
+      "2": {
+        "baseline_4b": 0.9349622383622451,
+        "equal_logit_blend": 0.950288184398748,
+        "large_27b": 0.9244969547458743,
+        "positives": 34,
+        "rows": 944
+      },
+      "3": {
+        "baseline_4b": 0.9215698294276969,
+        "equal_logit_blend": 0.961799432911715,
+        "large_27b": 0.9520789046452292,
+        "positives": 34,
+        "rows": 943
+      },
+      "4": {
+        "baseline_4b": 0.9842260243755946,
+        "equal_logit_blend": 0.9939558399117223,
+        "large_27b": 0.9850792517551485,
+        "positives": 34,
+        "rows": 943
+      }
+    },
+    "metric": "average_precision",
+    "pooled": {
+      "baseline_4b": 0.8803789183585108,
+      "equal_logit_blend": 0.9320378545710759,
+      "large_27b": 0.9195422256734048,
+      "positives": 170,
+      "rows": 4716
+    },
+    "used_for_weights_or_threshold": false
+  },
+  "fold_wins": 5,
+  "folds": {
+    "0": {
+      "baseline_macro_f1": 0.87183004905629,
+      "candidate_macro_f1": 0.9365526664104864,
+      "categories": {
+        "БАД": {
+          "baseline_f1": 0.9541864139020537,
+          "candidate_f1": 0.9541864139020537,
+          "delta": 0.0
+        },
+        "Легковоспламеняющиеся": {
+          "baseline_f1": 0.7894736842105263,
+          "candidate_f1": 0.918918918918919,
+          "delta": 0.12944523470839264
+        }
+      },
+      "delta": 0.06472261735419638
+    },
+    "1": {
+      "baseline_macro_f1": 0.8780001027872475,
+      "candidate_macro_f1": 0.8846103619094051,
+      "categories": {
+        "БАД": {
+          "baseline_f1": 0.9495485926712692,
+          "candidate_f1": 0.9495485926712692,
+          "delta": 0.0
+        },
+        "Легковоспламеняющиеся": {
+          "baseline_f1": 0.8064516129032258,
+          "candidate_f1": 0.819672131147541,
+          "delta": 0.01322051824431525
+        }
+      },
+      "delta": 0.006610259122157625
+    },
+    "2": {
+      "baseline_macro_f1": 0.90183346065699,
+      "candidate_macro_f1": 0.9304048892284187,
+      "categories": {
+        "БАД": {
+          "baseline_f1": 0.946524064171123,
+          "candidate_f1": 0.946524064171123,
+          "delta": 0.0
+        },
+        "Легковоспламеняющиеся": {
+          "baseline_f1": 0.8571428571428571,
+          "candidate_f1": 0.9142857142857143,
+          "delta": 0.05714285714285716
+        }
+      },
+      "delta": 0.028571428571428692
+    },
+    "3": {
+      "baseline_macro_f1": 0.9003316909799375,
+      "candidate_macro_f1": 0.9332321238803705,
+      "categories": {
+        "БАД": {
+          "baseline_f1": 0.9521785334750266,
+          "candidate_f1": 0.9521785334750266,
+          "delta": 0.0
+        },
+        "Легковоспламеняющиеся": {
+          "baseline_f1": 0.8484848484848485,
+          "candidate_f1": 0.9142857142857143,
+          "delta": 0.06580086580086575
+        }
+      },
+      "delta": 0.032900432900432985
+    },
+    "4": {
+      "baseline_macro_f1": 0.9359929078014184,
+      "candidate_macro_f1": 0.9565328139047048,
+      "categories": {
+        "БАД": {
+          "baseline_f1": 0.9553191489361702,
+          "candidate_f1": 0.9553191489361702,
+          "delta": 0.0
+        },
+        "Легковоспламеняющиеся": {
+          "baseline_f1": 0.9166666666666666,
+          "candidate_f1": 0.9577464788732394,
+          "delta": 0.04107981220657275
+        }
+      },
+      "delta": 0.020539906103286376
+    }
+  },
+  "gates": {
+    "at_least_four_of_five_fold_wins": true,
+    "corrected_to_regressed_at_least_1_5": true,
+    "flammable_false_negatives_do_not_increase": true,
+    "mean_delta_at_least_0_0015": true,
+    "no_category_drop_below_minus_0_002": true,
+    "screen_folds_reproduced_exactly": true
+  },
+  "large_component_experiment_id": "654",
+  "mean_fold_delta": 0.03066892881030041,
+  "passed": true,
+  "public_used": false,
+  "regressed": 3,
+  "route": {
+    "БАД": "641",
+    "Легковоспламеняющиеся": "equal_logit_blend_641_654"
+  },
+  "schema_version": 1,
+  "screen_gate_sha256": "de330470c07559a6fe589b2df12da4d2dad67c860e11d385c3f94a72c2fc9322",
+  "sealed_rows": 0,
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "weights": {
+    "641": 0.5,
+    "654": 0.5
+  }
+}

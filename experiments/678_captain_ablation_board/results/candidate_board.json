@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "experiment_id": "678",
+  "updated_at": "2026-08-24T13:35:00Z",
+  "captain_contract": {
+    "validation_owner": true,
+    "critic_of_parallel_agent": true,
+    "outer_validation_selects_hyperparameters": false,
+    "public_selects_hyperparameters": false,
+    "submission_count_is_acceptance_gate": false
+  },
+  "critical_path": {
+    "control_folds_ready": [0, 1, 2, 3, 4],
+    "control_full_oof_binding": "ACCEPT_FULL_CONTROL_SCORE_SET",
+    "control_full_oof_rows": 11118,
+    "large_folds_ready": [0, 3],
+    "large_folds_running": [1, 2, 4],
+    "large_runtime_topology": "naive_balanced_model_parallel_frozen_for_active_jobs",
+    "large_future_runtime_gate": "single_h100_fit_then_deepspeed_or_fsdp_preflight",
+    "missing_for_terminal_offline_teacher_evaluation": [
+      "large_fold_1_predictions",
+      "large_fold_2_predictions",
+      "large_fold_4_predictions"
+    ],
+    "new_gpu_jobs_allowed": "deployable_4b_screen_only_after_capacity_and_duplicate_check",
+    "submission_critical_path": "experiment_679_deployable_4b_lower_learning_rate"
+  },
+  "candidates": [
+    {
+      "id": "fixed_equal_logit_route",
+      "parent_experiment_id": "659",
+      "status": "waiting_for_terminal_artifacts_offline_only",
+      "eligibility": "offline_teacher_probe_only_never_submission_ready",
+      "changed_factor": "flammable score becomes fixed 0.5/0.5 equal-logit blend",
+      "fixed_parameters": {
+        "bad_route_changed": false,
+        "small_weight": 0.5,
+        "large_weight": 0.5,
+        "threshold": 0.0,
+        "threshold_tuned": false
+      },
+      "screen_evidence": {
+        "folds": [0, 3],
+        "mean_macro_f1_delta": 0.0488115,
+        "fold_deltas": {
+          "0": 0.0647226,
+          "3": 0.0329004
+        },
+        "corrected": 17,
+        "regressed": 3,
+        "flammable_false_negatives_before": 10,
+        "flammable_false_negatives_after": 2,
+        "changed_semantic_components": 12,
+        "pure_correction_components": 10,
+        "pure_regression_components": 1,
+        "mixed_change_components": 1,
+        "singleton_corrections": 7,
+        "singleton_regressions": 0
+      },
+      "screen_residual": {
+        "errors": 12,
+        "false_positives": 10,
+        "false_negatives": 2,
+        "semantic_components": 10,
+        "absolute_margin_below_0_5": 4,
+        "interpretation": "diagnostic_only_no_threshold_change"
+      },
+      "full_acceptance": {
+        "minimum_fold_wins": 4,
+        "minimum_mean_macro_f1_delta": 0.0015,
+        "maximum_category_drop": 0.002,
+        "minimum_corrections_to_regressions": 1.5,
+        "flammable_false_negatives_may_increase": false,
+        "screen_folds_must_reproduce_exactly": true
+      },
+      "gpu_hours_remaining": 0.0,
+      "deployability": {
+        "base_model": "Qwen/Qwen3.6-27B",
+        "submission_allowed": false,
+        "reason": "base model and adapter route exceed the allowed submission deployment envelope"
+      },
+      "public_submission_planned": 0
+    },
+    {
+      "id": "optimizer_stop_step",
+      "parent_experiment_id": "677",
+      "status": "prepared_gate_closed",
+      "eligibility": "ablation_only_until_nested_confirmation_is_complete",
+      "changed_factor": "optimizer stop step only",
+      "selector_scope": "inner folds 1/2/3/4 inside outer0-train",
+      "blind_confirmation_scope": [0],
+      "fold3_is_blind": false,
+      "candidate_fractions": [0.25, 0.5, 0.75, 1.0],
+      "acceptance": {
+        "minimum_inner_fold_wins": 3,
+        "minimum_mean_flammable_average_precision_gain": 0.01,
+        "maximum_bad_average_precision_drop_per_inner_fold": 0.002
+      },
+      "gpu_hours_if_opened": 12.0,
+      "public_submission_planned": 0
+    },
+    {
+      "id": "deployable_4b_lower_learning_rate",
+      "parent_experiment_id": "679",
+      "status": "screen_folds_0_3_running",
+      "eligibility": "submission_ready_only_after_full_cv_refit_and_runtime_gate",
+      "open_condition": "capacity_available_and_no_duplicate_job",
+      "changed_factor": "learning rate only: 0.0002 to 0.0001",
+      "fixed_factors": [
+        "binary BCE objective",
+        "LoRA rank 16 alpha 32 rsLoRA",
+        "q/k/v/o target modules",
+        "data and folds",
+        "optimizer stop policy selected before launch"
+      ],
+      "validation": {
+        "screen_folds": [0, 3],
+        "confirmation_folds": [1, 2, 4],
+        "standalone_gate_required": true,
+        "frozen_full_production_replay_gate_required": true,
+        "production_replacement_scope": "flammable_qwen35_signal_only",
+        "bad_route_byte_identical": true,
+        "threshold_tuned": false,
+        "public_used": false
+      },
+      "deployability": {
+        "base_model": "Qwen/Qwen3.5-4B",
+        "submission_allowed_after_runtime_smoke": true
+      },
+      "public_submission_planned": 1
+    }
+  ],
+  "rejected_directions": [
+    {
+      "id": "direct_large_flammable_route",
+      "reason": "frozen screen corrections/regressions gate failed"
+    },
+    {
+      "id": "verified_ocr_as_classifier_input",
+      "reason": "frozen critical-span recall gate failed"
+    },
+    {
+      "id": "analytic_prior_shift",
+      "reason": "fixed-blend flammable F1 dropped on both screen folds and false negatives increased",
+      "evidence": {
+        "threshold": 1.6094379124341003,
+        "fold_flammable_f1_delta": {
+          "0": -0.040131040131040185,
+          "3": -0.05274725274725267
+        }
+      }
+    }
+  ],
+  "public_used_for_selection": false,
+  "sealed_rows_used": 0
+}

@@ -1,0 +1,457 @@
+{
+  "audit_version": "semantic_family_graph_manual_audit_v2",
+  "graph_candidate": "semantic_family_graph_audit_draft_v2",
+  "status": "complete",
+  "decision": "NO_GO",
+  "seal_candidate": false,
+  "independence": {
+    "new_manual_review": true,
+    "prior_manual_decisions_reused": false
+  },
+  "blindness": {
+    "label_blind": true,
+    "allowed_fields": [
+      "public_row_id",
+      "name",
+      "description",
+      "images",
+      "edge_provenance",
+      "component_topology"
+    ],
+    "target_annotations_inspected": false,
+    "model_outputs_inspected": false,
+    "data_partitions_inspected": false
+  },
+  "scope": {
+    "deterministic_manual_samples": 173,
+    "accepted_risky_edges": 64,
+    "quarantines_and_rejections": 109,
+    "largest_components": 20,
+    "known_false_replay_cases": 6
+  },
+  "seal_criteria": {
+    "accepted_risky_edges_min_precision": 0.99,
+    "largest_component_boundaries_min_precision": 0.95,
+    "known_false_replay_required_remaining": 0,
+    "all_criteria_required": true
+  },
+  "results": {
+    "accepted_exact_auxiliary": {
+      "audited": 32,
+      "passed": 30,
+      "failed": 2,
+      "precision": 0.9375
+    },
+    "accepted_perceptual": {
+      "audited": 32,
+      "passed": 32,
+      "failed": 0,
+      "precision": 1.0
+    },
+    "accepted_risky_edges": {
+      "audited": 64,
+      "passed": 62,
+      "failed": 2,
+      "precision": 0.96875
+    },
+    "quarantined_generic_text_group": {
+      "audited": 14,
+      "correct_safety_blocks": 3,
+      "conservative_recall_losses": 11,
+      "manual_agreement_with_block": 0.2142857143
+    },
+    "quarantined_reused_image_key": {
+      "audited": 32,
+      "correct_safety_blocks": 4,
+      "conservative_recall_losses": 28,
+      "manual_agreement_with_block": 0.125
+    },
+    "quarantined_text_key": {
+      "audited": 4,
+      "correct_safety_blocks": 1,
+      "conservative_recall_losses": 3,
+      "manual_agreement_with_block": 0.25
+    },
+    "rejected_auxiliary_pair": {
+      "audited": 16,
+      "correct_safety_blocks": 1,
+      "conservative_recall_losses": 15,
+      "manual_agreement_with_block": 0.0625
+    },
+    "rejected_perceptual_pair": {
+      "audited": 11,
+      "correct_safety_blocks": 11,
+      "conservative_recall_losses": 0,
+      "manual_agreement_with_block": 1.0
+    },
+    "rejected_text_pair": {
+      "audited": 32,
+      "correct_safety_blocks": 9,
+      "conservative_recall_losses": 23,
+      "manual_agreement_with_block": 0.28125
+    },
+    "quarantines_and_rejections": {
+      "audited": 109,
+      "correct_safety_blocks": 29,
+      "conservative_recall_losses": 80,
+      "manual_agreement_with_block": 0.2660550459,
+      "seal_gate": false,
+      "interpretation": "Descriptive recall audit only; conservative blocks do not create false family links."
+    },
+    "largest_component_boundaries": {
+      "audited": 20,
+      "passed": 16,
+      "failed": 4,
+      "precision": 0.8
+    },
+    "known_false_replay": {
+      "audited": 6,
+      "remaining_in_candidate": 0,
+      "passed": true
+    }
+  },
+  "criterion_checks": {
+    "accepted_risky_edges": {
+      "observed": 0.96875,
+      "required": 0.99,
+      "passed": false
+    },
+    "largest_component_boundaries": {
+      "observed": 0.8,
+      "required": 0.95,
+      "passed": false
+    },
+    "known_false_replay": {
+      "observed_remaining": 0,
+      "required_remaining": 0,
+      "passed": true
+    }
+  },
+  "manual_sample_coverage": {
+    "accepted_exact_auxiliary": {
+      "all_audit_ids": "S001-S032",
+      "strict_pass_audit_ids": [
+        "S001",
+        "S003-S031"
+      ],
+      "false_accept_audit_ids": [
+        "S002",
+        "S032"
+      ]
+    },
+    "accepted_perceptual": {
+      "all_audit_ids": "S033-S064",
+      "strict_pass_audit_ids": [
+        "S033-S064"
+      ],
+      "false_accept_audit_ids": []
+    },
+    "quarantined_generic_text_group": {
+      "all_audit_ids": "S065-S078",
+      "correct_safety_block_audit_ids": [
+        "S067",
+        "S068",
+        "S076"
+      ],
+      "conservative_recall_loss_audit_ids": [
+        "S065-S066",
+        "S069-S075",
+        "S077-S078"
+      ]
+    },
+    "quarantined_reused_image_key": {
+      "all_audit_ids": "S079-S110",
+      "correct_safety_block_audit_ids": [
+        "S080",
+        "S091",
+        "S096",
+        "S098"
+      ],
+      "conservative_recall_loss_audit_ids": [
+        "S079",
+        "S081-S090",
+        "S092-S095",
+        "S097",
+        "S099-S110"
+      ]
+    },
+    "quarantined_text_key": {
+      "all_audit_ids": "S111-S114",
+      "correct_safety_block_audit_ids": [
+        "S111"
+      ],
+      "conservative_recall_loss_audit_ids": [
+        "S112-S114"
+      ]
+    },
+    "rejected_auxiliary_pair": {
+      "all_audit_ids": "S115-S130",
+      "correct_safety_block_audit_ids": [
+        "S130"
+      ],
+      "conservative_recall_loss_audit_ids": [
+        "S115-S129"
+      ]
+    },
+    "rejected_perceptual_pair": {
+      "all_audit_ids": "S131-S141",
+      "correct_safety_block_audit_ids": [
+        "S131-S141"
+      ],
+      "conservative_recall_loss_audit_ids": []
+    },
+    "rejected_text_pair": {
+      "all_audit_ids": "S142-S173",
+      "correct_safety_block_audit_ids": [
+        "S148",
+        "S150",
+        "S153",
+        "S155",
+        "S162",
+        "S164",
+        "S169",
+        "S171-S172"
+      ],
+      "conservative_recall_loss_audit_ids": [
+        "S142-S147",
+        "S149",
+        "S151-S152",
+        "S154",
+        "S156-S161",
+        "S163",
+        "S165-S168",
+        "S170",
+        "S173"
+      ]
+    }
+  },
+  "false_accepted_edges": [
+    {
+      "audit_id": "S002",
+      "stage": "exact_auxiliary_images",
+      "public_row_ids": [
+        10400,
+        153
+      ],
+      "failure_mode": "generic_weight_loss_marketing_auxiliary_without_independent_product_identity"
+    },
+    {
+      "audit_id": "S032",
+      "stage": "exact_auxiliary_images",
+      "public_row_ids": [
+        153,
+        7198
+      ],
+      "failure_mode": "generic_weight_loss_marketing_auxiliary_without_independent_product_identity"
+    }
+  ],
+  "largest_component_boundary_reviews": [
+    {
+      "audit_id": "C01-6216d3a1",
+      "component_size": 58,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C02-1d452547",
+      "component_size": 33,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C03-f5c83593",
+      "component_size": 27,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C04-f6ca4664",
+      "component_size": 20,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C05-a31dcf04",
+      "component_size": 20,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C06-9917247b",
+      "component_size": 20,
+      "strict_pass": false,
+      "failure_mode": "generic_marketing_text_merged_distinct_products"
+    },
+    {
+      "audit_id": "C07-6a91394a",
+      "component_size": 19,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C08-4773b58f",
+      "component_size": 19,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C09-1128d89e",
+      "component_size": 19,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C10-fa668e3b",
+      "component_size": 18,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C11-9cbb22ec",
+      "component_size": 18,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C12-16161824",
+      "component_size": 17,
+      "strict_pass": false,
+      "failure_mode": "commodity_product_class_merged_without_brand_or_model_identity"
+    },
+    {
+      "audit_id": "C13-6c6d8a53",
+      "component_size": 16,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C14-71f5a7a8",
+      "component_size": 16,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C15-b5bc8166",
+      "component_size": 16,
+      "strict_pass": false,
+      "failure_mode": "generic_commodity_name_and_copied_description_merged_multiple_brands"
+    },
+    {
+      "audit_id": "C16-a33b008f",
+      "component_size": 16,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C17-780f74e9",
+      "component_size": 15,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C18-4fb7aef8",
+      "component_size": 15,
+      "strict_pass": false,
+      "failure_mode": "copied_catalog_text_and_template_images_merged_distinct_brands"
+    },
+    {
+      "audit_id": "C19-50c92023",
+      "component_size": 15,
+      "strict_pass": true,
+      "failure_mode": null
+    },
+    {
+      "audit_id": "C20-f357116b",
+      "component_size": 15,
+      "strict_pass": true,
+      "failure_mode": null
+    }
+  ],
+  "false_component_boundary_examples": [
+    {
+      "component_audit_id": "C06-9917247b",
+      "public_row_ids": [
+        2163,
+        3563
+      ]
+    },
+    {
+      "component_audit_id": "C12-16161824",
+      "public_row_ids": [
+        11833,
+        10643
+      ]
+    },
+    {
+      "component_audit_id": "C15-b5bc8166",
+      "public_row_ids": [
+        2820,
+        714
+      ]
+    },
+    {
+      "component_audit_id": "C18-4fb7aef8",
+      "public_row_ids": [
+        245,
+        13818
+      ]
+    }
+  ],
+  "failure_taxonomy": [
+    {
+      "failure_mode": "generic_inflected_terms_escape_surface_stoplist",
+      "affected_accepted_edges": 2
+    },
+    {
+      "failure_mode": "generic_marketing_auxiliary_treated_as_identity_evidence",
+      "affected_accepted_edges": 2
+    },
+    {
+      "failure_mode": "generic_text_transitive_component_overmerge",
+      "affected_largest_components": 4
+    },
+    {
+      "failure_mode": "incompatible_informative_first_images_not_used_as_component_veto",
+      "affected_largest_components": 4
+    },
+    {
+      "failure_mode": "commodity_class_similarity_treated_as_product_identity",
+      "affected_largest_components": 2
+    }
+  ],
+  "required_fail_closed_policy_changes": [
+    {
+      "rule_id": "FC-V2-01",
+      "rule": "Normalize Russian genericity by lemma or conservative stems before identity scoring; inflected weight-loss and product-class words must remain non-informative."
+    },
+    {
+      "rule_id": "FC-V2-02",
+      "rule": "Weight-loss marketing phrases and auxiliary creatives can never establish identity alone; require an exact independent brand-model or ingredient-dose anchor."
+    },
+    {
+      "rule_id": "FC-V2-03",
+      "rule": "For exact auxiliary or exact text edges with incompatible informative first images, require a strong independent identity anchor or quarantine the edge."
+    },
+    {
+      "rule_id": "FC-V2-04",
+      "rule": "Copied marketing content is non-independent evidence even when its key is rare in the current corpus."
+    },
+    {
+      "rule_id": "FC-V2-05",
+      "rule": "Before component closure, require pairwise strong-anchor consistency; generic names or descriptions must not bridge distinct image or brand clusters."
+    },
+    {
+      "rule_id": "FC-V2-06",
+      "rule": "For commodity product classes, quantity, function and generic appearance are insufficient; require a shared brand-model identifier or an exact informative primary image."
+    },
+    {
+      "rule_id": "FC-V2-07",
+      "rule": "After every merge, veto and quarantine any component containing incompatible informative first-image clusters without one shared strong identity anchor."
+    }
+  ],
+  "decision_reasons": [
+    "Accepted risky-edge precision is 0.96875, below the required 0.99.",
+    "Largest-component boundary precision is 0.8, below the required 0.95.",
+    "All six previously known false cases are absent, but this is insufficient because two new false accepted edges and four impure large components were found."
+  ]
+}

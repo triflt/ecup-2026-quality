@@ -1,49 +1,51 @@
-# E-CUP 2026 Quality Research
+# E-CUP 2026 · Quality
 
-Воспроизводимый research repository для классификации качества карточек товаров в категориях `БАД` и `Легковоспламеняющиеся`. Цель команды — первое место; process и evidence quality соответствуют уровню DS Master / Kaggle Grandmaster.
+Решение задачи модерации товарных карточек в категориях **«БАД»** и **«Легковоспламеняющиеся»**. Репозиторий содержит код решения 140, честную CV-5, журнал экспериментов и воспроизводимый пакет для запуска.
 
-Лучший подтверждённый Public результат: **0.891924 Macro F1**. Его дала система из текстовой модели, двух дообученных Qwen-моделей и осторожного поиска похожих товарных карточек.
+> **Решение 140:** Public Macro F1 — **0.8923976821** · полностью офлайн · [архитектура и история](docs/research/solution-140-journey.md) · [пакет воспроизведения](experiments/140_dual_lora_fusion/final/)
+
+## Задача
+
+Для каждой карточки нужно определить вердикт **«бан / не бан»** и сформировать конкретное объяснение. Основная метрика — Macro F1 по двум категориям; официальный формат и ограничения описаны в [правилах задачи](docs/hackathon/task-and-rules.md).
+
+## Решение 140
+
+Опорный прогноз строят TF-IDF и Qwen3-VL Embedding по тексту и всем изображениям. Две rsLoRA-модели — Qwen3-VL-2B и Qwen3.5-4B — обрабатывают текст и первое изображение. Их прогнозы объединяются с отдельными весами для каждой категории, после чего точные совпадения по `id` или нормализованному названию корректирует память обучающей выборки.
+
+Подробнее: [как мы пришли к решению 140](docs/research/solution-140-journey.md) и [полная спецификация](experiments/140_dual_lora_fusion/final/README.md).
+
+## Запуск
+
+```bash
+python3 experiments/140_dual_lora_fusion/submission/run.py \
+  -i /path/to/test.csv \
+  -o /path/to/result.csv
+```
+
+Обучение и точное воспроизведение описаны в [`final/REPRODUCE.md`](experiments/140_dual_lora_fusion/final/REPRODUCE.md). Проверка контракта репозитория:
+
+```bash
+python3 experiments/140_dual_lora_fusion/final/verify.py
+```
+
+## Валидация
+
+Исторические результаты решения 140 получены на `grouped_text_v1`. Новые архитектурные выводы принимаются только после проверки на более строгом `semantic_family_v3`; результаты этих протоколов не смешиваются.
+
+- [методология CV-5](datasets/cv5/README.md)
+- [актуальный локальный лидерборд](reports/semantic-v3-leaderboard.csv)
+- [полное описание валидации](docs/validation.md)
 
 ## Навигация
 
-- [`CODEX.md`](CODEX.md) — правила работы AI-агентов.
-- [`WHATS_NEXT.md`](WHATS_NEXT.md) — точка продолжения и приоритеты.
-- [`docs/current-status.md`](docs/current-status.md) — текущий model/leaderboard status.
-- [`docs/solutions/two-best-solutions.md`](docs/solutions/two-best-solutions.md) — понятный разбор двух лучших решений.
-- [`notebooks/data_overview_ru/`](notebooks/data_overview_ru/) — русский notebook-отчёт по данным с графиками и локальной галереей.
-- [`docs/hackathon/task-and-rules.md`](docs/hackathon/task-and-rules.md) — задача, проверка и ограничения соревнования.
-- [`docs/hackathon/data-and-models.md`](docs/hackathon/data-and-models.md) — данные, правила классов и доступные модели.
-- [`docs/research/literature-and-competitions.md`](docs/research/literature-and-competitions.md) — статьи и похожие соревнования.
-- [`docs/research/next-research-program.md`](docs/research/next-research-program.md) — приоритетная программа дальнейших исследований.
-- [`docs/research/data-audit.md`](docs/research/data-audit.md) — исследование данных и рисков валидации.
-- [`docs/operations/experiment-cli.md`](docs/operations/experiment-cli.md) — переносимый CLI contract.
-- [`docs/operations/agent-research-loop.md`](docs/operations/agent-research-loop.md) — управляемый цикл работы исследовательских агентов.
-- [`docs/operations/publication.md`](docs/operations/publication.md) — безопасная публикация без legacy binaries.
-- [`validation/`](validation/) — frozen fold assignment и validation basket.
-- [`datasets/registry.toml`](datasets/registry.toml) — immutable версии исходных данных.
-- [`validation/registry.toml`](validation/registry.toml) — immutable версии evaluation protocols.
-- [`experiments/`](experiments/) — изолированные experiment packages.
-- [`reports/experiment-log.csv`](reports/experiment-log.csv) — полный machine-readable журнал.
-- [`reports/submissions.csv`](reports/submissions.csv) — leaderboard и готовые submission candidates.
-- [`reports/hypothesis-board.csv`](reports/hypothesis-board.csv) — очередь гипотез до дорогого запуска.
-- [`reports/champion.json`](reports/champion.json) — единственный указатель на текущее лучшее решение и состояние его проверки.
-- [`research/`](research/) — legacy research scripts и JSON-отчёты; новые эксперименты должны оформляться через `experiments/`.
+| Что искать | Где |
+|---|---|
+| Финальное решение | [`experiments/140_dual_lora_fusion/final/`](experiments/140_dual_lora_fusion/final/) |
+| История исследования | [`docs/research/solution-140-journey.md`](docs/research/solution-140-journey.md) |
+| Карта экспериментов | [`experiments/README.md`](experiments/README.md) |
+| Журнал измерений | [`reports/experiment-log.csv`](reports/experiment-log.csv) |
+| Готовность репозитория | [`docs/hackathon/repository-readiness.md`](docs/hackathon/repository-readiness.md) |
 
-## Быстрый старт
+## Данные и артефакты
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e '.[dev]'
-python validation/build_folds.py --data /path/to/data.csv
-python tools/list_experiments.py
-python experiments/040_late_fusion/run.py --data /path/to/data.csv --images /path/to/images
-```
-
-Все experiment runners принимают обычные filesystem paths и не зависят от конкретной compute platform. Private runner может передать те же аргументы из локального preset в `experiments/<id>/.local/compute/`, но такие presets намеренно исключены из Git. Submission ZIP и веса лежат локально в `experiments/<id>/artifacts/`.
-
-## Политика публикации
-
-В репозиторий не входят исходные competition data и изображения, submission ZIP archives, model weights, adapters, embeddings, joblib artifacts, vendor-копии библиотек, credentials, internal URLs, job names и private execution presets.
-
-Публикуются код, конфигурации экспериментов, frozen split assignments, агрегированные метрики, отчёты и submission source code без весов.
+Исходные данные, изображения и веса не публикуются. Код, конфигурации, схемы артефактов и контрольные суммы находятся в репозитории; локальные бинарные файлы размещаются в игнорируемых каталогах `artifacts/` и `.local/`.

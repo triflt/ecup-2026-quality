@@ -1,0 +1,62 @@
+{
+  "schema_version": "exp622_frozen_spec_v1",
+  "experiment_id": "622",
+  "parent_validation": "semantic_family_v3",
+  "screen_folds": [0, 3],
+  "uses_sealed_holdout": false,
+  "uses_large_teacher": false,
+  "candidate_policy": {
+    "extractor": "experiment_490_policy_concepts_v1",
+    "extract_both_possible_predictions_without_gold": true,
+    "exact_text_spans_only": true,
+    "allow_visual_claims": false,
+    "allow_bounded_absence": false,
+    "one_positive_target_per_donor_row": true,
+    "one_mapped_negative_per_positive": true
+  },
+  "label_isolation": {
+    "features_and_membership_must_not_contain_label_columns": true,
+    "donor_label_ids_must_equal_outer_train_ids": true,
+    "outer_validation_labels_loaded": false,
+    "outer_validation_labels_written": false,
+    "semantic_components_must_not_cross_folds": true
+  },
+  "loss": {
+    "binary_entailment_ce_weight": 1.0,
+    "contrastive_infonce_weight": 0.2,
+    "scope_auxiliary_ce_weight": 0.15,
+    "negation_auxiliary_ce_weight": 0.15,
+    "contrastive_temperature": 0.07
+  },
+  "audit": {
+    "namespace": "exp622_fresh_human_audit_300_v1",
+    "sample_size": 300,
+    "maximum_rows_per_product_family": 1,
+    "exclude_all_discoverable_experiment_490_audit_ids": true,
+    "exclude_all_discoverable_experiment_500_audit_ids": true,
+    "minimum_human_strict_pass": 282,
+    "maximum_critical_unsupported": 0,
+    "maximum_scope_or_negation_failure": 0,
+    "human_gate_required_before_gpu": true
+  },
+  "screen_acceptance": {
+    "folds": [0, 3],
+    "minimum_delta_each_fold_exclusive": 0.0,
+    "minimum_mean_macro_delta": 0.001,
+    "minimum_corrected_to_regressed_ratio": 1.0,
+    "maximum_flammable_false_negative_increase_each_fold": 0,
+    "maximum_safety_false_negative_increase_each_fold": 0,
+    "minimum_changed_predictions_total": 5
+  },
+  "full_acceptance": {
+    "minimum_mean_macro_delta": 0.003,
+    "minimum_winning_folds": 4,
+    "maximum_category_drop": 0.003,
+    "minimum_corrected_to_regressed_ratio": 1.5,
+    "minimum_component_bootstrap_probability_positive": 0.9,
+    "require_singleton_delta_positive": true,
+    "require_downstream_prior_delta_positive": true,
+    "minimum_surviving_candidate_changes_fraction": 0.8,
+    "require_independent_seed_repeat_positive": true
+  }
+}

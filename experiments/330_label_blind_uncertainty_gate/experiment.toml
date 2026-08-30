@@ -1,0 +1,21 @@
+id = "330"
+slug = "label_blind_uncertainty_gate"
+status = "rejected_offline"
+data_version = "competition_train_v1"
+evaluation_version = "component_transfer_gate_v4"
+parent_experiment = "190_shingle_neighbor_prior"
+
+[hypothesis]
+statement = "A nested selective gate can recover production-component disagreement without global restacking or new inference passes."
+changed_factor = "Decision routing only inside a calibrated two-of-three disagreement region."
+
+[entrypoints]
+run = "python experiments/330_label_blind_uncertainty_gate/run.py"
+
+[acceptance]
+minimum_macro_delta = 0.002
+minimum_fold_wins = 4
+minimum_bootstrap_probability = 0.90
+maximum_category_drop = 0.005
+all_repeat_deltas_positive = true
+positive_delta_after_priors = true

@@ -1,0 +1,51 @@
+{
+  "schema_version": "exp622_claim_ontology_v1",
+  "source_vocabulary": "policy_concepts_v1",
+  "claims": [
+    {"concept": "BAD_EXPLICIT_MARKING", "category": "БАД", "supports_prediction": 1, "polarity": "asserted", "scope": "product"},
+    {"concept": "BAD_EXPLICIT_SUPPLEMENT_MARKING", "category": "БАД", "supports_prediction": 1, "polarity": "asserted", "scope": "product"},
+    {"concept": "BAD_EXPLICIT_NEGATION", "category": "БАД", "supports_prediction": 0, "polarity": "negated", "scope": "product"},
+    {"concept": "FL_STANDALONE_IGNITION_SOURCE", "category": "Легковоспламеняющиеся", "supports_prediction": 1, "polarity": "asserted", "scope": "product"},
+    {"concept": "FL_PYROTECHNIC_PRODUCT", "category": "Легковоспламеняющиеся", "supports_prediction": 1, "polarity": "asserted", "scope": "product"},
+    {"concept": "FL_COMBUSTIBLE_PRODUCT", "category": "Легковоспламеняющиеся", "supports_prediction": 1, "polarity": "asserted", "scope": "product"},
+    {"concept": "FL_INCLUDED_QUALIFYING_ITEM", "category": "Легковоспламеняющиеся", "supports_prediction": 1, "polarity": "asserted", "scope": "included"},
+    {"concept": "FL_EXPLICIT_HAZARD_MARKING", "category": "Легковоспламеняющиеся", "supports_prediction": 1, "polarity": "asserted", "scope": "product"},
+    {"concept": "FL_FUEL_EXCLUDED", "category": "Легковоспламеняющиеся", "supports_prediction": 0, "polarity": "negated", "scope": "excluded"},
+    {"concept": "FL_EMPTY_CONTAINER", "category": "Легковоспламеняющиеся", "supports_prediction": 0, "polarity": "negated", "scope": "empty"},
+    {"concept": "FL_COMPATIBILITY_ONLY", "category": "Легковоспламеняющиеся", "supports_prediction": 0, "polarity": "conditional", "scope": "compatibility"},
+    {"concept": "FL_INTEGRATED_IGNITION_ONLY", "category": "Легковоспламеняющиеся", "supports_prediction": 0, "polarity": "asserted", "scope": "integrated_component"}
+  ],
+  "excluded_non_extractive_concepts": [
+    "BAD_TEXT_MARKING_NOT_FOUND",
+    "FL_QUALIFYING_ITEM_NOT_FOUND"
+  ],
+  "hard_negative_mappings": [
+    {
+      "id": "bad_identity_polarity",
+      "pairs": {
+        "BAD_EXPLICIT_MARKING": "BAD_EXPLICIT_NEGATION",
+        "BAD_EXPLICIT_SUPPLEMENT_MARKING": "BAD_EXPLICIT_NEGATION",
+        "BAD_EXPLICIT_NEGATION": "BAD_EXPLICIT_MARKING"
+      }
+    },
+    {
+      "id": "flammable_transaction_scope",
+      "pairs": {
+        "FL_INCLUDED_QUALIFYING_ITEM": "FL_FUEL_EXCLUDED",
+        "FL_FUEL_EXCLUDED": "FL_INCLUDED_QUALIFYING_ITEM"
+      }
+    },
+    {
+      "id": "flammable_sold_object_scope",
+      "pairs": {
+        "FL_STANDALONE_IGNITION_SOURCE": "FL_COMPATIBILITY_ONLY",
+        "FL_PYROTECHNIC_PRODUCT": "FL_INTEGRATED_IGNITION_ONLY",
+        "FL_COMBUSTIBLE_PRODUCT": "FL_EMPTY_CONTAINER",
+        "FL_EXPLICIT_HAZARD_MARKING": "FL_COMPATIBILITY_ONLY",
+        "FL_EMPTY_CONTAINER": "FL_COMBUSTIBLE_PRODUCT",
+        "FL_COMPATIBILITY_ONLY": "FL_STANDALONE_IGNITION_SOURCE",
+        "FL_INTEGRATED_IGNITION_ONLY": "FL_PYROTECHNIC_PRODUCT"
+      }
+    }
+  ]
+}

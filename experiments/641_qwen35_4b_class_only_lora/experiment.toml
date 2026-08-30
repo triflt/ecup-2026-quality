@@ -1,0 +1,73 @@
+[experiment]
+id = "641"
+slug = "qwen35_4b_class_only_lora"
+title = "Qwen3.5-4B class-only LoRA in the frozen scale grid"
+status = "screen_complete_grid_cell_accepted"
+entrypoint = "experiments/641_qwen35_4b_class_only_lora/run_fold.py"
+result_file = "experiments/641_qwen35_4b_class_only_lora/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+scope = "semantic_family_v3 development only"
+model_inputs = ["category", "name", "description", "first_image"]
+sealed_rows = 0
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+full_folds_after_screen = [1, 2, 4]
+threshold = 0.0
+threshold_tuned = false
+required_full_fold_wins = 4
+
+[model]
+id = "Qwen/Qwen3.5-4B"
+revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+objective = "class_only"
+
+[training]
+seed = 42
+epochs = 1
+micro_batch_size = 4
+gradient_accumulation = 4
+effective_batch_size = 16
+legacy_eager_runtime_micro_batch_size = 2
+legacy_eager_runtime_gradient_accumulation = 8
+legacy_eager_effective_batch_size = 16
+learning_rate = 0.0002
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+transformers_package = "transformers==5.15.1"
+transformers_wheel_sha256 = "b7cdf238ff583e3a58dbc7fa34da1aaf091ce063141f65a30538160bd5afe93f"
+optimized_kernel_package = "kernels==0.16.0"
+triton_package = "triton==3.6.0"
+einops_package = "einops==0.8.2"
+einops_wheel_sha256 = "54058201ac7087911181bfec4af6091bb59380360f069276601256a76af08193"
+flash_linear_attention_core_package = "fla-core==0.5.2"
+flash_linear_attention_core_wheel_sha256 = "5e830c85bad3d0d34677f98ac7074d08687a3756f0f0499d95ceb96eb6920761"
+flash_linear_attention_package = "flash-linear-attention==0.5.2"
+flash_linear_attention_wheel_sha256 = "dcf405d81f5426393b59037097aa700d0f4a841465d5028d5aa543f4502f2400"
+causal_conv1d_package = "causal-conv1d==1.6.2.post1"
+causal_conv1d_wheel_sha256 = "c16c1c48d4fa63415cc797e02d69f97248c57c04627d99e394d5bb0ef266e288"
+ziglang_package = "ziglang==0.16.0"
+ziglang_wheel_sha256 = "9fcda73f62b851dd72a54b710ad40a209896db14cfb13649e62191243556342b"
+kernels_package = "kernels==0.16.0"
+kernels_wheel_sha256 = "794af6a10fd888bb4f46ad1b9b2f4f61b5b0b104475a6415c5322b58a7bf02ed"
+
+[hypothesis]
+changed_factor = "Supervised class-only LoRA relative to fixed 4B prompting"
+control = "640/Qwen3.5-4B prompting"
+mechanism = "Task adaptation should learn the local policy boundary without changing inputs or evidence supervision"
+falsification = "Reject if the frozen screen gates in experiment 645 fail"
+precedents = ["Qwen3.5-4B official model card", "experiment 600"]
+
+[budget]
+screen_jobs = 2
+gpu_per_job = 1
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

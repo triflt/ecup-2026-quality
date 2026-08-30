@@ -1,0 +1,75 @@
+{
+  "version": "policy_concepts_v1",
+  "concepts": [
+    {
+      "id": "BAD_EXPLICIT_MARKING",
+      "category": "БАД",
+      "supports_prediction": 1
+    },
+    {
+      "id": "BAD_EXPLICIT_SUPPLEMENT_MARKING",
+      "category": "БАД",
+      "supports_prediction": 1
+    },
+    {
+      "id": "BAD_EXPLICIT_NEGATION",
+      "category": "БАД",
+      "supports_prediction": 0
+    },
+    {
+      "id": "BAD_TEXT_MARKING_NOT_FOUND",
+      "category": "БАД",
+      "supports_prediction": 0
+    },
+    {
+      "id": "FL_STANDALONE_IGNITION_SOURCE",
+      "category": "Легковоспламеняющиеся",
+      "supports_prediction": 1
+    },
+    {
+      "id": "FL_PYROTECHNIC_PRODUCT",
+      "category": "Легковоспламеняющиеся",
+      "supports_prediction": 1
+    },
+    {
+      "id": "FL_COMBUSTIBLE_PRODUCT",
+      "category": "Легковоспламеняющиеся",
+      "supports_prediction": 1
+    },
+    {
+      "id": "FL_INCLUDED_QUALIFYING_ITEM",
+      "category": "Легковоспламеняющиеся",
+      "supports_prediction": 1
+    },
+    {
+      "id": "FL_EXPLICIT_HAZARD_MARKING",
+      "category": "Легковоспламеняющиеся",
+      "supports_prediction": 1
+    },
+    {
+      "id": "FL_FUEL_EXCLUDED",
+      "category": "Легковоспламеняющиеся",
+      "supports_prediction": 0
+    },
+    {
+      "id": "FL_EMPTY_CONTAINER",
+      "category": "Легковоспламеняющиеся",
+      "supports_prediction": 0
+    },
+    {
+      "id": "FL_COMPATIBILITY_ONLY",
+      "category": "Легковоспламеняющиеся",
+      "supports_prediction": 0
+    },
+    {
+      "id": "FL_INTEGRATED_IGNITION_ONLY",
+      "category": "Легковоспламеняющиеся",
+      "supports_prediction": 0
+    },
+    {
+      "id": "FL_QUALIFYING_ITEM_NOT_FOUND",
+      "category": "Легковоспламеняющиеся",
+      "supports_prediction": 0
+    }
+  ]
+}

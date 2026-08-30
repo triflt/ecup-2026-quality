@@ -1,0 +1,107 @@
+{
+  "audit_sha256": "4f22b5a5db7bf1a191229a582d1dc9e0b62642cf5b5977a61609e90da9cfa418",
+  "cohorts": {
+    "БАД": {
+      "0": {
+        "fallback_training_occurrences": 720,
+        "fallback_unique_rows": 720,
+        "safe_occurrence_rate": 0.52,
+        "safe_training_occurrences": 780,
+        "safe_unique_rate": 0.52,
+        "safe_unique_rows": 780,
+        "training_occurrences": 1500,
+        "unique_rows": 1500
+      },
+      "1": {
+        "fallback_training_occurrences": 243,
+        "fallback_unique_rows": 243,
+        "safe_occurrence_rate": 0.838,
+        "safe_training_occurrences": 1257,
+        "safe_unique_rate": 0.838,
+        "safe_unique_rows": 1257,
+        "training_occurrences": 1500,
+        "unique_rows": 1500
+      }
+    },
+    "Легковоспламеняющиеся": {
+      "0": {
+        "fallback_training_occurrences": 1127,
+        "fallback_unique_rows": 1127,
+        "safe_occurrence_rate": 0.295625,
+        "safe_training_occurrences": 473,
+        "safe_unique_rate": 0.295625,
+        "safe_unique_rows": 473,
+        "training_occurrences": 1600,
+        "unique_rows": 1600
+      },
+      "1": {
+        "fallback_training_occurrences": 270,
+        "fallback_unique_rows": 54,
+        "safe_occurrence_rate": 0.6582278481012658,
+        "safe_training_occurrences": 520,
+        "safe_unique_rate": 0.6582278481012658,
+        "safe_unique_rows": 104,
+        "training_occurrences": 790,
+        "unique_rows": 158
+      }
+    }
+  },
+  "cross_check": {
+    "enabled": true,
+    "mismatch_count": 0,
+    "mismatch_row_ids": [],
+    "selected_rows_checked": 4758
+  },
+  "decision": "GO",
+  "experiment_id": "520",
+  "format_failures": [],
+  "format_version": "grounded_auxiliary_target_v1",
+  "gates": {
+    "failures": [],
+    "min_cohort_safe_occurrence_rate": 0.25,
+    "min_cohort_safe_occurrences": 25,
+    "min_overall_safe_occurrence_rate": 0.5
+  },
+  "holdout_fold": 3,
+  "ordered_records_sha256": "c5aab5b2fc262b730f0da9158ee1fb6074463a9c9c347318ae36c0778bd160dc",
+  "outer_validation_training_occurrences": 0,
+  "overall": {
+    "fallback_training_occurrences": 2360,
+    "fallback_unique_rows": 2144,
+    "safe_occurrence_rate": 0.562152133580705,
+    "safe_training_occurrences": 3030,
+    "safe_unique_rate": 0.5493905002101723,
+    "safe_unique_rows": 2614,
+    "training_occurrences": 5390,
+    "unique_rows": 4758
+  },
+  "parent_selection": {
+    "bad_positive_selection": {
+      "control_rng_consumed": true,
+      "eligible_families": 3117,
+      "eligible_rows": 4451,
+      "family_diverse": true,
+      "hard_families": 750,
+      "max_family_exposures": 1,
+      "random_families": 750,
+      "selected_families": 1500,
+      "selected_rows": 1500
+    },
+    "family_balanced": false,
+    "max_family_exposures": null,
+    "min_family_exposures": null,
+    "negative_selection": {
+      "family_diverse": false,
+      "selected_rows": 1600
+    },
+    "positive_families": null,
+    "positive_rows": 158,
+    "selector_version": "exp260_fixed_hard_selector_dependency_light_v1",
+    "total_exposures": 790
+  },
+  "record_multiset_sha256": "fa85627009b4145ff1394691b72e28dce8a76da98674b02578ad3ff40c5ff4a7",
+  "seed": 42,
+  "target_plan_sha256": "7fe8bd269dde49c29b6291f33ad85d552a1b25faa2ae9ac25c05da5fbc8ef5e9",
+  "training_records": 5390,
+  "training_unique_rows": 4758
+}

@@ -1,0 +1,59 @@
+[experiment]
+id = "683"
+slug = "gemma4_e4b_class_only_lora_screen"
+title = "Gemma 4 E4B class-only LoRA on the exact 641 multiset"
+status = "technical_smoke_prepared"
+entrypoint = "experiments/683_gemma4_e4b_class_only_lora_screen/train_fold.py"
+result_file = "experiments/683_gemma4_e4b_class_only_lora_screen/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+scope = "exact immutable experiment-641 fold runtime"
+model_inputs = ["category", "name", "description", "first_image"]
+sealed_rows = 0
+
+[validation]
+version = "semantic_family_v3"
+screen_folds = [0, 3]
+full_folds_after_screen = [1, 2, 4]
+primary_metric = "tie_aware_flammable_average_precision"
+threshold = 0.0
+threshold_tuned = false
+
+[model]
+id = "google/gemma-4-E4B-it"
+revision = "ee0ef6023621cff504d758262d4e04895a5af4a2"
+objective = "class_only"
+inference_scope_if_accepted = "flammable_only"
+
+[training]
+seed = 42
+epochs = 1
+micro_batch_size = 2
+gradient_accumulation = 8
+effective_batch_size = 16
+learning_rate = 0.0002
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+target_scope = "132 text-decoder attention q/k/v/o projections only"
+gemma_soft_image_tokens = 280
+max_length = 1536
+
+[hypothesis]
+parent_experiment = "641"
+changed_factor = "Qwen3.5-4B to Gemma 4 E4B while preserving the data multiset, BCE objective, batching, epoch, seed and zero threshold"
+control = "641 Qwen3.5-4B class-only LoRA"
+mechanism = "A different compact multimodal architecture may rank rare flammable examples differently; routing it only to that category keeps BAD predictions identical"
+falsification = "Reject unless both folds improve tie-aware AP and routed Macro F1, mean AP gain is at least 0.005, false negatives do not rise and corrections/regressions is at least 1.5"
+precedents = ["Official Gemma 4 multimodal model card", "experiment 659 category-specific routing"]
+
+[budget]
+technical_smoke_jobs = 1
+screen_jobs_after_smoke = 2
+gpu_per_job = 1
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

@@ -1,0 +1,35 @@
+[experiment]
+id = "674"
+slug = "verified_ocr_critical_span_audit"
+title = "Blind visual audit of fail-closed OCR critical-span recall"
+status = "no_go_reject_verified_ocr_feature_screen"
+entrypoint = "experiments/674_verified_ocr_critical_span_audit/build_audit.py"
+result_file = "experiments/674_verified_ocr_critical_span_audit/results/metrics.json"
+
+[validation]
+primary_version = "semantic_family_v3"
+primary_metric = "visual_critical_span_recall"
+sample_rows = 120
+sealed_rows_allowed = 0
+
+[hypothesis]
+parent_experiment = "673_verified_ocr_coverage_audit"
+changed_factor = "Human-verified critical evidence from OCR_AVAILABLE images only"
+mechanism = "Packaging text absent from title and description can repair visual/rule errors if OCR captures the complete scope"
+expected_macro_f1_delta = 0.0
+falsification = "Reject below 0.90 critical-span recall, below 0.95 scope preservation, or above 0.01 unsupported rate"
+
+[acceptance]
+minimum_visual_critical_rows = 50
+minimum_critical_span_recall = 0.90
+minimum_scope_preservation = 0.95
+maximum_unsupported_rate = 0.01
+passing_action = "GO_BUILD_OCR_CONSUMER_SCREEN_675_ONLY"
+
+[budget]
+planned_gpu_hours = 0.0
+planned_public_submissions = 0
+
+[artifacts]
+directory = "artifacts"
+publish = false

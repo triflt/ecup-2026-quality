@@ -1,0 +1,24 @@
+{
+  "schema": "exp699_retrieval_ocr_signal_falsification_v1",
+  "self_hash_algorithm": "sha256_canonical_json_without_self_sha256",
+  "self_sha256": "f77304b6aebd35f259cf924dfd338761d9a25433f66608db7d05a0ab16cb4c75",
+  "experiment": 699,
+  "created_at": "2026-08-28T19:18:00+03:00",
+  "stage": "cpu_champion_error_first_falsification",
+  "public_used": false,
+  "target": "all final solution140 flammable FP and FN across frozen five-fold OOF",
+  "target_rows": 15,
+  "target_fp": 10,
+  "target_fn": 5,
+  "new_observable_tested": "ocr_images text absent from solution140 and retrieval-v1 text composition",
+  "results": {
+    "rows_with_nonempty_ocr": 0,
+    "rows_with_new_critical_flammable_cue": 0,
+    "rows_with_new_containment_or_empty_equipment_cue": 0
+  },
+  "decision": "REJECT_OCR_AUGMENTATION_NO_SIGNAL_ON_TARGET_ERRORS",
+  "gpu_used": 0,
+  "package_authorized": false,
+  "ods_submit_authorized": false,
+  "interpretation": "OCR augmentation cannot explain or repair the frozen champion flammable errors because every target row has an empty OCR payload. Do not train an OCR-augmented classifier for this cohort."
+}

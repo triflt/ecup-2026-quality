@@ -1,0 +1,41 @@
+{
+  "experiment_id": "550",
+  "audit_version": "evidence_preserving_context_pack_v1",
+  "status": "GO",
+  "label_blind": true,
+  "columns_read": [
+    "id",
+    "category",
+    "name",
+    "description"
+  ],
+  "labels_read": false,
+  "folds_read": false,
+  "prediction_source": "constant union of frozen_prediction=0 and 1",
+  "description_budget": 1800,
+  "rows": 12971,
+  "long_rows": 3633,
+  "long_evidence_rows": 2059,
+  "long_evidence_rows_strictly_improved": 390,
+  "long_evidence_rows_regressed": 0,
+  "strict_improvement_fraction": 0.1894123360854784,
+  "safe_evidence_spans": 7489,
+  "baseline_retained_safe_evidence": 7099,
+  "candidate_retained_safe_evidence": 7489,
+  "blocked_conflict_or_ambiguity_rows": 1065,
+  "gates": {
+    "strictly_more_evidence_on_at_least_10_percent": true,
+    "never_less_evidence": true,
+    "all_rows_packable": true,
+    "provenance_100_percent": true,
+    "determinism_100_percent": true,
+    "budget_100_percent": true,
+    "evidence_sentences_complete_100_percent": true
+  },
+  "input_sha256": {
+    "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510"
+  },
+  "output_sha256": {
+    "rows": "f29456cc36595ef126394fcd42739c228e24278e03f66dc663cda0a404a71aac"
+  }
+}

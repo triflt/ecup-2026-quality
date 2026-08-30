@@ -1,0 +1,41 @@
+[experiment]
+id = "460"
+slug = "qwen3vl_embedding"
+title = "Qwen3-VL-Embedding-2B independent multimodal representation"
+status = "rejected_offline"
+entrypoint = "experiments/460_qwen3vl_embedding/smoke.py"
+result_file = "experiments/460_qwen3vl_embedding/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "qwen3vl_embedding_transfer_v1"
+selection_guard = "connected_family_guard_v2"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+changed_factor = "Add a specialized multimodal embedding model as an independent flammable component"
+mechanism = "A model trained for cross-modal retrieval can preserve product-to-content relations that keyword filtering and the generative visual classifier missed"
+uses_teacher = false
+
+[budget]
+smoke_gpus = 1
+planned_extraction_gpus = 1
+planned_public_submissions = 0
+
+[execution]
+smoke_preset = ".local/compute/smoke.yml"
+hardware = "h100-1x"
+region = "private-gpu-pool"
+superseded_infrastructure_attempts = ["redacted-job", "redacted-job"]
+smoke_job = "redacted-job"
+extraction_job = "redacted-job"
+decision = "Rejected after five-fold evaluation: Macro -0.016656, 0/5 wins, 2/15 corrected/regressed and flammable FN +7"
+
+[artifacts]
+directory = "artifacts"
+publish = false

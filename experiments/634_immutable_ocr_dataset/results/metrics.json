@@ -1,0 +1,42 @@
+{
+  "experiment_id": "634",
+  "status": "full_dataset_rejected_superseded_by_partial_660",
+  "input_data_version": "competition_train_v1",
+  "input_ocr_experiment": "633_paddleocr_vl16_spotting",
+  "planned_output_data_version": "competition_train_paddleocr_vl16_spotting_v1",
+  "expected_items": 12971,
+  "expected_images": 49456,
+  "labels_read": 0,
+  "categories_read_by_builder": 0,
+  "sealed_membership_used": false,
+  "public_used": false,
+  "source_acceptance": {
+    "source_shards": 32,
+    "requested_images": 49456,
+    "successful_images": 49456,
+    "failed_images": 0,
+    "source_archives_checked": 32,
+    "source_archives_corrupt": 0
+  },
+  "build_attempts": [
+    {
+      "status": "failed_before_content_validation",
+      "confirmed_cause": "authenticated artifact URL returned non-archive content",
+      "changed_factor_next": "use native immutable artifact inputs"
+    },
+    {
+      "status": "stopped_by_strict_content_gate",
+      "confirmed_cause": "source OCR generation reached the 512-token limit inside a location block",
+      "dataset_published": false,
+      "repair_experiment": "655"
+    }
+  ],
+  "merge_report": null,
+  "category_coverage_report": null,
+  "partial_successor": {
+    "available_images": 41691,
+    "experiment_id": "660",
+    "unavailable_images": 7765
+  },
+  "decision": "REJECT_FULL_DATASET_USE_FAIL_CLOSED_PARTIAL_660"
+}

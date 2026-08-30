@@ -1,0 +1,75 @@
+{
+  "experiment_id": "662",
+  "status": "accepted_full_target_set",
+  "training": false,
+  "submission_eligible": false,
+  "source_experiment_id": "654",
+  "folds": [0, 1, 2, 3, 4],
+  "first_gate": "fold0_smoke8",
+  "full_bundle_sha256": "26a7b98ce0639e5b954b8193662eefdfed798a431fa171d0c5c1fcd9d1110303",
+  "smoke_bundle_sha256": "4b8d6e4d2d70727f9b4ac1869dbd135972476fccecfd940d62256d241afd3105",
+  "transport_attempts": {
+    "initial": "rejected_before_model_load_due_to_macos_appledouble_files",
+    "controlled_retry": "accepted_8_of_8_with_identical_scientific_payload_and_clean_tar_manifest"
+  },
+  "smoke_acceptance_audit": "results/smoke_acceptance_audit.json",
+  "accepted_full_folds": [0, 1, 2, 3, 4],
+  "accepted_full_rows": 24464,
+  "accepted_full_runtime": {
+    "elapsed_seconds_by_fold": {
+      "0": 2458.4644504860044,
+      "1": 1982.0506731569767,
+      "2": 2398.786080516875,
+      "3": 2333.1081213653088,
+      "4": 1960.1750765442848
+    },
+    "end_to_end_rows_per_second_by_fold": {
+      "0": 1.9899,
+      "1": 2.4692,
+      "2": 2.0394,
+      "3": 2.0968,
+      "4": 2.4967
+    },
+    "total_gpu_hours": 12.3695,
+    "gpu_per_fold": 4
+  },
+  "active_full_folds": [],
+  "pending_full_folds": [],
+  "full_acceptance_audits": {
+    "0": "results/fold0_acceptance_audit.json",
+    "1": "results/fold1_acceptance_audit.json",
+    "2": "results/fold2_acceptance_audit.json",
+    "3": "results/fold3_acceptance_audit.json",
+    "4": "results/fold4_acceptance_audit.json"
+  },
+  "outer_delivery_audits": {
+    "0": "results/fold0_outer_delivery_audit.json",
+    "1": "results/fold1_outer_delivery_audit.json",
+    "2": "results/fold2_outer_delivery_audit.json",
+    "3": "results/fold3_outer_delivery_audit.json",
+    "4": "results/fold4_outer_delivery_audit.json"
+  },
+  "runtime_contract_sha256": {
+    "0": "3c83e1219264ca1e90ce81ed1e27ab3da65fd8d9059a2486452a817bae42078e",
+    "1": "8be023f1c5d70c92650012000d4655d3a2f3b1316aef4f95e35bd1a4619ec7d1",
+    "2": "2b64ea4ed988268b580c73abc409b5beea5895d3c3a432fd9bbb43528be60d26",
+    "3": "c917497696c0eb877b587eaf219789e129a40fda6147f1b5ffc48578023d62ec",
+    "4": "485c5a404dc1b7c265a7515ddcba56741a738f6ffa02561a97e8d69459994825"
+  },
+  "validation_rows_read": 0,
+  "validation_labels_read": 0,
+  "sealed_rows": 0,
+  "public_used": false,
+  "target_policy": {
+    "cv_targets": "outer_fold_teacher_scoring_own_outer_train_occurrences",
+    "final_refit_opened": false,
+    "oof_full_refit_allowed": false,
+    "reason": "oof_and_in_sample_teacher_targets_are_materially_different",
+    "diagnostic_logit_mae_folds_0_1_3": [1.908, 1.358, 1.406],
+    "diagnostic_ambiguous_targets_t2_oof_folds_0_1_3": [108, 118, 135],
+    "diagnostic_ambiguous_targets_t2_in_sample_folds_0_1_3": [57, 26, 36]
+  },
+  "full_target_set_acceptance": "results/full_target_set_acceptance.json",
+  "full_target_set_acceptance_sha256": "7995429aedc2b0d90c82ef2ed2f31af113b0614b8b2b8fb730dde4d87d35c0fd",
+  "decision": "ACCEPT_FULL_TARGET_SET"
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "experiment_id": "677",
+  "outer_fold": 0,
+  "source_experiment_id": "641",
+  "source_runtime_contract_sha256": "38802115365cef7e3a0c1a82abc5efc5ce92a41e0046f1ddad4ab9e02647c568",
+  "source_train_occurrences": 4892,
+  "micro_batch_size": 2,
+  "gradient_accumulation": 8,
+  "optimizer_updates": 306,
+  "rounding_policy": "python_round_ties_to_even",
+  "fraction_to_optimizer_step": [
+    {"requested_training_fraction": 0.25, "optimizer_step": 76, "actual_training_fraction": 0.24836601307189543},
+    {"requested_training_fraction": 0.5, "optimizer_step": 153, "actual_training_fraction": 0.5},
+    {"requested_training_fraction": 0.75, "optimizer_step": 230, "actual_training_fraction": 0.7516339869281046},
+    {"requested_training_fraction": 1.0, "optimizer_step": 306, "actual_training_fraction": 1.0}
+  ],
+  "comparison_same_training_trajectory_required": true,
+  "required_final_optimizer_step": 306,
+  "outer0_labels_read": false,
+  "sealed_rows": 0,
+  "public_used": false,
+  "decision": "FROZEN_BEFORE_INNER_SELECTION",
+  "contract_sha256": "c2c5ca3f9a7cc9353d7c46e5978b85aeb32687abac14ec945cae498c9a1c591f"
+}

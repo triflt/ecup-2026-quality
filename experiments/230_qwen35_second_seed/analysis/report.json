@@ -1,0 +1,36 @@
+{
+  "rows": 12971,
+  "baseline_errors": 588,
+  "candidate_errors": 579,
+  "transitions": {
+    "right_in_both": 12324,
+    "wrong_in_both": 520,
+    "corrected": 68,
+    "regressed": 59
+  },
+  "by_category": {
+    "БАД": {
+      "rows": 7469,
+      "positive": 5564,
+      "baseline_errors": 536,
+      "candidate_errors": 535,
+      "corrected": 52,
+      "regressed": 51
+    },
+    "Легковоспламеняющиеся": {
+      "rows": 5502,
+      "positive": 198,
+      "baseline_errors": 52,
+      "candidate_errors": 44,
+      "corrected": 16,
+      "regressed": 8
+    }
+  },
+  "flammable_positive_families": 142,
+  "output_files": [
+    "changed_decisions.csv",
+    "remaining_errors.csv",
+    "cohort_metrics.csv",
+    "family_summary.csv"
+  ]
+}

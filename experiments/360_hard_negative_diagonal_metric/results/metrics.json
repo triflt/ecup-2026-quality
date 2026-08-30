@@ -1,0 +1,41 @@
+{
+  "experiment_id": "360",
+  "status": "rejected_stage1",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "connected_hard_negative_metric_screen_v1",
+  "parent_experiment": "190_shingle_neighbor_prior",
+  "frozen_recipe": {
+    "embedding": "Qwen3-VL first-image 2048d already computed by 190",
+    "hard_pairs_per_family": {"same": 1, "opposite": 1},
+    "selected_dimensions": 256,
+    "pair_logistic_c": 0.1,
+    "confidence_quantile": 0.98,
+    "seed": 36042,
+    "source_sha256": "8f24c3943aef821db7a3168d154700dc46c031a15d39560fbd08cfb3dbdf0101"
+  },
+  "validation": {
+    "connected_safe": {
+      "baseline_macro_f1": 0.9193528162236431,
+      "candidate_macro_f1": 0.9193528162236431,
+      "delta_macro_f1": 0.0,
+      "folds_won": 0,
+      "changed": 0,
+      "corrected": 0,
+      "regressed": 0
+    },
+    "metric_disagreements_diagnostic_not_selection": {
+      "bad_rows": 643,
+      "bad_top_10_percent_corrected": 16,
+      "bad_top_10_percent_regressed": 49,
+      "flammable_rows": 87,
+      "flammable_top_10_percent_corrected": 7,
+      "flammable_top_10_percent_regressed": 2
+    },
+    "accepted_for_repeated_gate": false
+  },
+  "artifacts": {
+    "stage1_audit_sha256": "7a65b400cfd81b54ede256e2f12de19409ebab5badf3fda82995f20af65cdfd5",
+    "stage1_predictions_sha256": "d4d23dd2ed7ec257a775d9d70e75be9c2a242cc7b0b32acb2f6fe760fd5aba90"
+  },
+  "decision": "Rejected as frozen stage-1 gate: the top 2 percent of total category confidence contains no metric disagreements, so no predictions change. Post-result diagnostics suggest a flammable-only top-disagreement mechanism; it must be treated as a new exploratory hypothesis and replicated on untouched topologies."
+}

@@ -1,0 +1,134 @@
+{
+  "schema_version": "exp682_bad_only_seed632_route_v1",
+  "experiment_id": "682",
+  "parent_full_system": "140",
+  "upstream_component_experiment": "632",
+  "upstream_seed": 31415,
+  "scientific_factor": "replace the frozen Qwen3.5 score with seed-632 only for БАД; leave every other full-system input and rule unchanged",
+  "validation": "semantic_family_v3",
+  "folds": [0, 1, 2, 3, 4],
+  "categories": ["БАД", "Легковоспламеняющиеся"],
+  "uses_public_for_selection": false,
+  "sealed_rows_allowed": 0,
+  "auxiliary_head_used_for_verdict": false,
+  "candidate_route": {
+    "БАД": "qwen35_seed632_logit",
+    "Легковоспламеняющиеся": "qwen35_original_logit"
+  },
+  "route": {
+    "БАД": {
+      "weights": {
+        "robust_base_rank": 0.5,
+        "qwen3vl_rank": 0.25,
+        "qwen35_rank": 0.25
+      },
+      "threshold": 0.27193570137023926
+    },
+    "Легковоспламеняющиеся": {
+      "weights": {
+        "robust_base_rank": 0.15,
+        "qwen3vl_rank": 0.1,
+        "qwen35_rank": 0.75
+      },
+      "threshold": 0.953912615776062
+    }
+  },
+  "frozen_system_invariants": {
+    "robust_base_score": "unchanged",
+    "qwen3vl_score": "unchanged",
+    "rank_transform": "stable fold-category rank01",
+    "weights": "byte-for-byte equal to experiment 140 replay contract",
+    "thresholds": "byte-for-byte equal to experiment 140 replay contract",
+    "postprocess": "same donor-only exact/name prior override",
+    "flammable_original_logit": "byte-identical",
+    "flammable_final_score": "byte-identical",
+    "flammable_final_prediction": "byte-identical"
+  },
+  "frozen_inputs": {
+    "replay_bundle_sha256": "f2a7c40bad91170c515c1461f6e04c11e4957694f69a815c8e2b8fe80656ec3d",
+    "replay_contract_file_sha256": "1771dceda26996529b9f70f46a97653c2d29afa099983260c3b40a62fca518b0",
+    "replay_contract_canonical_sha256": "77582f4512b959abffed1aad9ec27e92314aa689a79f85eecf74e5146ff4692e",
+    "accepted_632_report_sha256": "2ccf3340ab1b9332c5c8fb174c3be8863a91f6afe9bace03bef7d3f482194957",
+    "semantic_v3_registry_sha256": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+    "exp635_evaluator_sha256": "b3e410f83799a2375269935796aca71efde66bf1b0d9696b511af151c11f07d4",
+    "exp635_frozen_spec_sha256": "7b1075d06f2be73510b5c7069ff60e59e027f210b2ad8a6cf953f7dcfba083a5",
+    "champion_archive_sha256": "6cc2fda9d17d959880050889d964c3b971b92adbfa606505df7f04b46a819cd3",
+    "champion_run_sha256": "9318db4cc0f26eabaa73ae9856dbf9daffd06787a162e6f5db71f249f6db7146",
+    "qwen35_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "acceptance": {
+    "minimum_macro_delta": 0.0025,
+    "minimum_mean_fold_delta": 0.0025,
+    "minimum_winning_folds": 5,
+    "minimum_bad_delta": 0.005,
+    "minimum_corrected_to_regressed_ratio": 2.0,
+    "minimum_component_bootstrap_probability_positive": 0.95,
+    "maximum_flammable_delta_abs": 0.0,
+    "maximum_flammable_false_negative_increase": 0,
+    "maximum_all_positive_false_negative_increase": 0
+  },
+  "bootstrap": {
+    "unit": "semantic_component",
+    "iterations": 10000,
+    "seed": 63531415,
+    "batch_size": 256
+  },
+  "training_recipe_evidence": {
+    "fold_runner": "experiment 632 delegates to experiment 623 with seed 31415",
+    "verdict": "token-1 minus token-0 logit; auxiliary span/concept head is training-only",
+    "loss": "BCE verdict 1.0 plus exact-span CE 0.1 plus concept CE 0.05",
+    "optimizer": "AdamW, lr 0.0002, weight_decay 0.01, gradient_clip 1.0",
+    "schedule": "5 percent warmup then cosine",
+    "batch_semantics": "microbatch 4, gradient accumulation 4, one epoch",
+    "lora": "r=16 alpha=32 dropout=0.05 rsLoRA q/k/v/o projections",
+    "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "status": "outer-fold recipe plus the pre-existing parent FULL_TRAIN branch are source-hash frozen for one development-only refit"
+  },
+  "full_refit": {
+    "enabled": true,
+    "decision": "GO_DEVELOPMENT_ONLY_POST_VALIDATION_REFIT",
+    "required_policy_schema": "exp682_post_validation_refit_policy_v1",
+    "policy_must_be_verified_before_supervised_source_access": true,
+    "permitted_splits": ["development"],
+    "development_rows": 11118,
+    "sealed_rows_allowed": 0,
+    "public_feedback_allowed": false,
+    "seed": 31415,
+    "parent_full_train_limits": {
+      "bad_per_class_max": 1900,
+      "flammable_negative_max": 2000,
+      "flammable_positive_repeat": 5
+    },
+    "selected_records": 6116,
+    "selected_unique_rows": 5436,
+    "selected_id_multiset_sha256": "f4734df62119ca67d86e22681fb09544b8c56761c6ffaf7617875cccdb983e9f",
+    "selected_indices_sha256": "bbd55ede003b70408505edf59b661d024b5cf16308ed1a5c69aead788852bf13",
+    "selected_class_occurrences": {
+      "БАД|0": 1633,
+      "БАД|1": 1633,
+      "Легковоспламеняющиеся|0": 2000,
+      "Легковоспламеняющиеся|1": 850
+    },
+    "microbatches": 1529,
+    "optimizer_updates": 383,
+    "warmup_updates": 19,
+    "runtime_source_manifest_file_sha256": "46dc1a0eddfb54aed304ad58d599190c5252820432aed23915f80bad95f6a688",
+    "runtime_source_manifest_canonical_sha256": "f85efa23fa5fbd832b0f6efa243cc04283c4eacbd232eab1c4a7cc32a5d4cc28",
+    "full_runtime_builder_sha256": "0f145552543f6f2170cd5787827ebc5411ffc3a9fda9d9414519bb36910eed87",
+    "full_train_runner_sha256": "b8d223c07c72ec5bbbd44e9f76200140d8bad4d8e44dd16f108151a50193464a",
+    "old_12971_four_head_oof_allowed": false,
+    "rationale": "reconstruct only development supervision from five accepted outer-train runtimes; exact parent FULL_TRAIN selector predated this analysis"
+  },
+  "production_design": {
+    "champion_archive": "experiment 140",
+    "preserve_original_adapter_for": "Легковоспламеняющиеся",
+    "new_adapter_for": "БАД",
+    "scoring_order": "run original adapter on all rows, then overwrite only БАД positions with the seed-632 full adapter",
+    "auxiliary_head_packaged": false,
+    "direct_600_row_runtime_smoke_required": true,
+    "optimized_predictions_must_match_unoptimized": true,
+    "maximum_public_runtime_minutes": 20.0,
+    "maximum_private_runtime_minutes": 40.0
+  },
+  "spec_sha256": "a7d0150257924bec89e7b29954b137f9c3d2a66f14d0b1181a6e0ac142270772"
+}

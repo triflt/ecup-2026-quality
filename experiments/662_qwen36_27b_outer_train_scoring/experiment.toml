@@ -1,0 +1,26 @@
+id = "662"
+name = "qwen36_27b_outer_train_scoring"
+status = "accepted_full_target_set"
+parent = "659_qwen36_27b_flammable_equal_logit_blend"
+data_version = "competition_train_v1"
+evaluation_version = "semantic_family_v3"
+model_id = "Qwen/Qwen3.6-27B"
+model_revision = "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9"
+training = false
+submission_eligible = false
+public_used = false
+sealed_rows = 0
+
+[contract]
+source_experiment = "654"
+source_rows = "outer_train_occurrences_only"
+score = "raw_last_token_logit_1_minus_logit_0"
+validation_rows_read = 0
+validation_labels_read = 0
+first_gate = "fold0_smoke8"
+
+[usage_constraints]
+cv_train_targets_only = true
+opens_final_refit = false
+oof_full_refit_requires_separate_experiment = true
+recipe_equivalent_final_teacher = "full_data_teacher_scoring_own_train_occurrences"

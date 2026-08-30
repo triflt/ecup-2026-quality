@@ -1,0 +1,63 @@
+{
+  "schema": "exp699_retrieval_pair_verifier_terminal_v1",
+  "self_hash_algorithm": "sha256_canonical_json_without_self_sha256",
+  "self_sha256": "b010742a7ef751c6051ab3d162764e103317432b49dff7d7df9f2b3c36402389",
+  "experiment": 699,
+  "created_at": "2026-08-28T19:12:00+03:00",
+  "status": "TERMINAL_REJECT",
+  "decision": "REJECT_CONNECTED_SAFE_PAIR_SCREEN",
+  "public_used": false,
+  "ods_submit_authorized": false,
+  "package_authorized": false,
+  "screen_folds": [0, 3],
+  "runtime_seconds": 638,
+  "technical_retry": {
+    "count": 1,
+    "first_attempt_metrics_read": false,
+    "cause": "accepted legacy component-audit omitted self_hash_algorithm",
+    "fix": "verify the exact manifest-bound legacy canonical self-hash without weakening current contracts",
+    "science_changed": false
+  },
+  "bindings": {
+    "preregister_commit": "635bd64beea520aee6a1d2d9cdfe94a739896806",
+    "preregister_self_sha256": "d1358a630c5a83aa4765cef764701400182d40b537e7e4706c2259920caea689",
+    "implementation_commit": "66a15a506244ac4379f97901afc193ec874701fb",
+    "evaluation_file_sha256": "1fd2b3b63b74acfa9f516f2b10f667f9a34815a829347ab2980b8c3bc740ecb5",
+    "evaluation_self_sha256": "f69c34989b42dc0c697393cc7f5dc28614227fd702c6d11500449889384dceb5"
+  },
+  "metrics": {
+    "rows": 4448,
+    "baseline_macro_f1": 0.9568949027529112,
+    "candidate_macro_f1": 0.9568949027529112,
+    "macro_delta": 0.0,
+    "corrections": 0,
+    "regressions": 0,
+    "final_changed_decisions": 0,
+    "flammable_f1_before": 0.948905109489051,
+    "flammable_f1_after": 0.948905109489051,
+    "flammable_fp_before": 4,
+    "flammable_fp_after": 4,
+    "flammable_fn_before": 3,
+    "flammable_fn_after": 3,
+    "query_only_macro_delta": 0.0,
+    "donor_label_permutation_macro_delta": 0.0,
+    "fold0_net": 0,
+    "fold3_net": 0,
+    "candidate_gate_rows": {
+      "0": 908,
+      "3": 893
+    }
+  },
+  "mechanistic_result": {
+    "v1_harmful_screen_rows": 5,
+    "v1_baseline_decisions_restored": 5,
+    "v1_harmful_decisions_repeated": 0,
+    "useful_final_changes_survived": 0,
+    "interpretation": "The verifier successfully abstained from the known harmful v1 transfers, but the frozen compatibility, consensus and query-boundary gates authorized no new final decisions. The mechanism is safe but non-informative."
+  },
+  "failed_gates": [
+    "candidate_final_macro_greater_than_query_only_final_macro",
+    "at_least_one_useful_surviving_final_decision_change"
+  ],
+  "next_action": "Do not tune pair-verifier v1. Move to one separately preregistered larger orthogonal mechanism; keep the already-built soft-cache package as the sole ExploratoryReadyNotSubmitted retrieval artifact until a stronger candidate exists."
+}

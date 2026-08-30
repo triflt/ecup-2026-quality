@@ -1,0 +1,55 @@
+[experiment]
+id = "430"
+slug = "qwen35_flammable_adapter_soup"
+title = "One-pass interpolation of the original and flammable-helpful Qwen3.5 adapters"
+status = "rejected_offline_promising_signal"
+entrypoint = "research/qwen35_flammable_adapter_soup_oof.py"
+result_file = "experiments/430_qwen35_flammable_adapter_soup/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "locked_190_category_routing_soup_v1"
+selection_guard = "connected_family_guard_v2"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+changed_factor = "Replace the pure experiment-260 flammable adapter by an exact one-pass weight interpolation of adapters 190 and 260"
+mechanism = "Conservative weight-space movement may import the known flammable specialization without the recall damage caused by new gradient updates"
+expected_macro_f1_delta = 0.003
+falsification = "Reject if nested alpha selection fails the frozen Macro, fold-win, false-negative, connected-bootstrap, correction-ratio, or prior-survival gates"
+
+[selection]
+alpha_260_grid = [0.0, 0.25, 0.5, 0.75, 1.0]
+tie_break = "smallest alpha_260"
+nested = true
+weights = [0.15, 0.10, 0.75]
+
+[acceptance]
+baseline_macro_f1 = 0.9316449231243215
+required_macro_f1_delta = 0.003
+required_flammable_f1_delta = 0.006
+required_fold_wins = 4
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+min_corrected_to_regressed_ratio = 1.5
+required_connected_bootstrap_probability = 0.90
+required_prior_survival_rate = 0.80
+
+[budget]
+planned_gpu_hours = 3.0
+planned_public_submissions = 0
+runtime_limit_minutes = 120
+
+[execution]
+jobs = ["redacted-job", "redacted-job", "redacted-job"]
+hardware = "three independent one-H100 jobs; no training, five OOF folds per alpha"
+result = "all jobs succeeded; nested alpha selected 0.50 on all folds; positive mean but failed three frozen stability gates"
+
+[artifacts]
+directory = "artifacts"
+publish = false

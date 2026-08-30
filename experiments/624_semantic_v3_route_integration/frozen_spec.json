@@ -1,0 +1,34 @@
+{
+  "schema_version": "exp624_route_integration_v1",
+  "experiment_id": "624",
+  "winner_component_experiment": "623",
+  "source_seed": 42,
+  "validation": "semantic_family_v3",
+  "outer_folds": [0, 1, 2, 3, 4],
+  "uses_sealed_holdout": false,
+  "maximum_new_components": 1,
+  "reference_route_weights_unchanged": true,
+  "trained_second_level_router_allowed": false,
+  "threshold_calibration": "leave_target_fold_out_donor_only",
+  "experiment_603_protocol_sha256": "9a713a650e02979cb3f22f29be0be5eb58a28247a879b7dfbf3678720df9b6c0",
+  "experiment_623_frozen_spec_sha256": "8e54f442c4ea16704ad6588f36f8e6fa949443a63be4c699564b61838208bbb9",
+  "experiment_623_full_threshold_contract_sha256": "c89899069890b514331243fb71b27fec1890749d3dc40032e4e1ce96db03810a",
+  "source_recipe_sha256": {
+    "alignment.py": "ae092f047cad23fa42b820d6f3fb209f464bfebf1a9e22fd2c8fa44b5d39c926",
+    "frozen_spec.json": "8e54f442c4ea16704ad6588f36f8e6fa949443a63be4c699564b61838208bbb9",
+    "model.py": "20d2d1a95e9d711f33eb356e67ba2037525c1e8c842185e03c39c7adcece2300",
+    "multitask_head.py": "75014ed23d1aaa67823329ce14e7faf5a0a3d8ff6e8130759a1470edf1ca16b1",
+    "protocol.py": "abe01ed810399369e82651aacaac779a858b8a7e31c60106c59751fcb36edef0",
+    "renderer.py": "072138d1c4acf9ce411a44f8d49aaf0457c130f1015b21a213a6f072f2ac2a63",
+    "run_fold.py": "24410ad5267d3c2586280a48241c20dc5e982dc9df15657b1ce8ed33091c6ebe"
+  },
+  "acceptance": {
+    "minimum_macro_delta": 0.003,
+    "minimum_winning_folds": 4,
+    "minimum_category_delta": 0.0,
+    "minimum_corrected_to_regressed_ratio": 1.5,
+    "minimum_component_bootstrap_probability_positive": 0.9,
+    "maximum_flammable_false_negative_increase": 0,
+    "maximum_all_positive_false_negative_increase": 0
+  }
+}

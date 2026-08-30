@@ -1,0 +1,35 @@
+# Experiment 624 — semantic-v3 route integration
+
+Status: `completed_fallback`.
+
+No upstream component passed its complete frozen gate: 621 failed before
+validation, 622 has a confirmed external human-review blocker, and 623 won only
+`3/5` full folds. Per the predeclared fallback, the cycle winner is therefore
+the original route 603 unchanged (`0.9136312475` on semantic-v3). No integration
+manifest, weak fusion, new threshold, or second-level router was created.
+
+This stage integrates **one** component only after experiment 621, 622, or 623
+passes its frozen development gates. The reference-route weights remain those
+of original route 603. Any new threshold must be calibrated donor-only; a
+second-level router trained on historical OOF scores is forbidden.
+
+If none of 621/622/623 passes, this stage records original route 603 as the
+cycle winner and performs no speculative fusion. No metric or artifact is
+claimed while the upstream decision is unresolved.
+
+## Frozen integration evaluator
+
+`evaluate.py` is the fail-closed evaluator for the only currently eligible
+component, experiment 623. It first recomputes the complete experiment-623
+five-fold acceptance result from checksum-verified runtimes and artifacts. It
+then replaces only the original Qwen3.5 logits in route 603. The two visual
+rank components and every route weight remain exactly unchanged.
+
+For each target fold and category, both reference and candidate route
+thresholds are fitted exclusively on the other four folds. There is no trained
+second-level router and no second candidate variant. The full route is accepted
+only if all frozen classification, component-bootstrap, category and false
+negative gates pass. On acceptance, the evaluator emits a canonically signed
+`exp624_route_recipe_v1` manifest for a possible independent-seed continuation.
+The actual gate rejected the candidate, so no manifest was emitted and the
+unlaunched experiment-625 scaffold was removed. Original route 603 is preserved.

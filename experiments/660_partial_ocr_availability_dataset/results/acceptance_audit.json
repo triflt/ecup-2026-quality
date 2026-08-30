@@ -1,0 +1,14 @@
+{
+  "decision": "ACCEPT_PARTIAL_FAIL_CLOSED_OCR_DATASET",
+  "duplicate_global_indices": 0,
+  "expected_images": 49456,
+  "expected_items": 12971,
+  "manifest_images": 49456,
+  "manifest_items": 12971,
+  "ocr_available": 41691,
+  "ocr_unavailable": 7765,
+  "source_archive_crc_failures": 0,
+  "source_archives_checked": 32,
+  "source_inner_checksum_failures": 0,
+  "unavailable_payload_violations": 0
+}

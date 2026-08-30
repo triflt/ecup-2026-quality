@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "experiment_id": "678",
+  "status": "complete",
+  "decision": "REJECT_ANALYTIC_PRIOR_SHIFT",
+  "changed_factor": "fixed blend threshold 0.0 to log(5)",
+  "threshold": 1.6094379124341003,
+  "derivation": "known five-fold positive occurrence oversampling inside outer-train",
+  "folds": {
+    "0": {
+      "at_zero": {"f1": 0.918918918918919, "tp": 34, "fp": 6, "fn": 0},
+      "at_log5": {"f1": 0.8787878787878788, "tp": 29, "fp": 3, "fn": 5},
+      "flammable_f1_delta": -0.040131040131040185
+    },
+    "3": {
+      "at_zero": {"f1": 0.9142857142857143, "tp": 32, "fp": 4, "fn": 2},
+      "at_log5": {"f1": 0.8615384615384616, "tp": 28, "fp": 3, "fn": 6},
+      "flammable_f1_delta": -0.05274725274725267
+    }
+  },
+  "mean_flammable_f1_delta": -0.04643914643914643,
+  "outer_validation_used_to_tune_threshold": false,
+  "public_used": false,
+  "sealed_rows_used": 0,
+  "gpu_hours": 0.0
+}

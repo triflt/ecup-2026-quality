@@ -1,0 +1,47 @@
+{
+  "accepted_repeat1": {
+    "corrections": 54,
+    "flammable_ap_delta": -0.011078834597515907,
+    "flammable_f1": 0.9037037037037037,
+    "flammable_fn": 7,
+    "flammable_fp": 6,
+    "fold_macro_delta": {
+      "0": 0.06349712018818932,
+      "3": 0.016264275335623468
+    },
+    "macro_delta": 0.03941483737622187,
+    "regressions": 7,
+    "report_file_sha256": "d8c01f4a390131ad697cf7069bed53721724582738a04fd8487efbfdb47a61aa",
+    "report_self_sha256": "b716fc7a0934986039201b673bcfbacc68b79fd27b46c0ffde27dd6679105331"
+  },
+  "candidate_repeat4": {
+    "contract_self_sha256": {
+      "0": "22c13166624d5dc3877e710fcca9f8de5b5c69014c594a58ba079237a047a820",
+      "3": "30f69994212e58ffbfa4204e637c820e6e4768f9cbfe3dcab179f33f476c0ee7"
+    },
+    "corrections": 54,
+    "flammable_ap_delta": -0.07028598909818762,
+    "flammable_f1": 0.9,
+    "flammable_fn": 5,
+    "flammable_fp": 9,
+    "fold_macro_delta": {
+      "0": 0.05917923197683406,
+      "3": 0.017013983618743955
+    },
+    "macro_delta": 0.03757300646676698,
+    "regressions": 8,
+    "report_file_sha256": "7b51ceb9079128a313ec6f9efea2b00fb8a67035a57a08ffa2bc86e0e1c896db",
+    "report_self_sha256": "e8c88d67eed31940651b9821b32c74d9062e4df382ac8cd8a538de7a7fdbbc46"
+  },
+  "decision": "REJECT_AT_SCREEN_NO_FULL5",
+  "experiment_id": "699",
+  "folds": [
+    0,
+    3
+  ],
+  "public_rows_used": 0,
+  "reason": "repeat4 reduces FN by two but is worse than accepted repeat1 on Macro, flammable F1, FP, AP and regressions",
+  "schema": "exp699_q35_v2p10_repeat4_f03_terminal_v1",
+  "sealed_rows_used": 0,
+  "self_sha256": "86340b4960fb187d9595f0ee110d71b41b06ca07e9834cf0d297c49229ca7934"
+}

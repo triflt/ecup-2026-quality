@@ -1,0 +1,87 @@
+{
+  "experiment_id": "241",
+  "status": "rejected_offline",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "seed": 42,
+  "changed_factor": "family-balanced positive flammable sampling with isolated RNG",
+  "primary_comparison": "isolated_family_seed42 + fixed_seed31415 mean probability",
+  "baseline_macro_f1": 0.9192367220630797,
+  "implementation_audit": {
+    "experiment_240_changed_negative_rows_range": [587, 625],
+    "experiment_241_expected_changed_negative_rows": 0,
+    "separate_family_rng_seed": 24043,
+    "all_five_non_target_training_multisets_exact": true,
+    "audit_path": "analysis/isolation_audit.json"
+  },
+  "validation": {
+    "bad_f1": 0.9534841954022989,
+    "flammable_f1": 0.8967254408060453,
+    "macro_f1": 0.9251048181041721,
+    "delta_macro_f1": 0.005868096041092397,
+    "category_delta": {
+      "БАД": 0.0016086894204692115,
+      "Легковоспламеняющиеся": 0.01012750266171547
+    },
+    "folds_won": 3,
+    "fold_scores": [
+      0.9154073463416332,
+      0.898217815383124,
+      0.9331330256363387,
+      0.931247963506028,
+      0.9483589280337248
+    ],
+    "fold_deltas": [
+      0.019635705270081738,
+      0.009698093285409937,
+      -0.010954897261322705,
+      0.017001758563656155,
+      -0.005196376706681494
+    ],
+    "group_bootstrap": {
+      "iterations": 10000,
+      "probability_delta_positive": 0.8403,
+      "delta_ci95": [-0.005638639387799196, 0.01839091145179312]
+    }
+  },
+  "runtime": {
+    "fold_minutes": [
+      30.831367589036624,
+      30.38518923651427,
+      30.678431515271466,
+      31.064243231806905,
+      31.71014348771423
+    ],
+    "full_minutes": 35.27930684871971,
+    "total_training_minutes": 189.94868190906323
+  },
+  "reproducibility": {
+    "job": "redacted-job",
+    "hardware": "one H100",
+    "training_code_sha256": "71476a8e32e71f35bde608e54c2fcf3a0d51ab343c8dc15ab1b041c0118c6786",
+    "cycle_code_sha256": "f9ee62f37f28263a089cdc8baa69dc8d0450ac9ec17c1bc9247339cfcad1fcba",
+    "output_bundle_at_root": true,
+    "recursive_output_mask": true,
+    "oof_input_sha256": "5d7467c48fc8a5a73f947f5aa1300071c77ba699b29c12250caf1bcd3176d7ac",
+    "image_manifest_sha256": "d6193215ce2d6145440bd484ea225e77fe10784c4c2c06b7c6b0b85dc8efc7d9"
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/qwen_famiso_private_compute.zip",
+      "size_bytes": 279978682,
+      "sha256": "76af902c7afa4f387a1ba7d4c90424b3ec01a100535afaaa6330c92e7b7cedf2"
+    },
+    {
+      "path": "artifacts/seed_42_balanced/full/adapter/adapter_model.safetensors",
+      "size_bytes": 12592424,
+      "sha256": "5cff5c1dbbf7132944037048b03160e7125ec62d3b0f73e507a8909908b22128"
+    },
+    {
+      "path": "results/ensemble_report.json"
+    },
+    {
+      "path": "results/acceptance_audit.json"
+    }
+  ],
+  "decision": "rejected: mean Macro F1 improved, but only 3 of 5 outer folds beat experiment 230; the parent 230 recipe also failed Public transfer"
+}

@@ -1,0 +1,71 @@
+{
+  "schema": "exp699_tfidf_full5_terminal_summary_v1",
+  "experiment_id": "699",
+  "decision": "REJECT_TFIDF_SYNTH_FULL5",
+  "source_report_file_sha256": "e7ef62d9e57d1c1dd53ac21f9a6c670181cad1487901a450cea2b731282ceb8f",
+  "source_report_self_sha256": "e2b60efa37b4dab5ba2552903942440b2d26cdb56e7493c82f79617cabdade74",
+  "source_report_self_hash_ok": true,
+  "runtime_minutes": 5.403376541286707,
+  "folds": [0, 1, 2, 3, 4],
+  "production_macro_f1": 0.9141866542067973,
+  "real_control": {
+    "component_macro_f1": 0.8628369611780042,
+    "routed_macro_f1": 0.9152459323123436,
+    "routed_flammable_f1": 0.8797653958944281,
+    "flammable_confusion": {"tp": 150, "fp": 21, "fn": 20, "tn": 4525}
+  },
+  "variants": {
+    "v1_positive40": {
+      "component_macro_delta": 0.010587520610952028,
+      "flammable_ap_delta": 0.0030832292719054077,
+      "routed_macro_delta_vs_real": -0.006356686386520538,
+      "routed_macro_delta_vs_production": -0.005297408280974247,
+      "routed_flammable_f1_delta": -0.012713372773040854,
+      "fold_wins": 0,
+      "corrections": 1,
+      "regressions": 6,
+      "fn_delta": 0,
+      "full5_pass": false
+    },
+    "v2_positive19": {
+      "component_macro_delta": 0.0024165319213206304,
+      "flammable_ap_delta": 0.008557740825204774,
+      "routed_macro_delta_vs_real": -0.010487885267098873,
+      "routed_macro_delta_vs_production": -0.009428607161552582,
+      "routed_flammable_f1_delta": -0.020975770534197635,
+      "fold_wins": 0,
+      "corrections": 3,
+      "regressions": 11,
+      "fn_delta": 1,
+      "full5_pass": false
+    },
+    "both_positive20": {
+      "component_macro_delta": 0.003599942971200587,
+      "flammable_ap_delta": 0.009554240620781251,
+      "routed_macro_delta_vs_real": -0.010487885267098873,
+      "routed_macro_delta_vs_production": -0.009428607161552582,
+      "routed_flammable_f1_delta": -0.020975770534197635,
+      "fold_wins": 0,
+      "corrections": 2,
+      "regressions": 10,
+      "fn_delta": 1,
+      "full5_pass": false
+    },
+    "both_balanced80": {
+      "component_macro_delta": 0.020692559834459612,
+      "flammable_ap_delta": 0.013976664553818297,
+      "routed_macro_delta_vs_real": -0.010504166873767762,
+      "routed_macro_delta_vs_production": -0.009444888768221471,
+      "routed_flammable_f1_delta": -0.021008333747535524,
+      "fold_wins": 0,
+      "corrections": 4,
+      "regressions": 13,
+      "fn_delta": -2,
+      "full5_pass": false
+    }
+  },
+  "interpretation": "Synthetic data improves the standalone TF-IDF component, but every variant degrades the frozen routed solution on all non-tied folds. The TF-IDF synthesis route is closed without further tuning.",
+  "validation_labels_read_by_training": 0,
+  "sealed_rows_used": 0,
+  "public_rows_used": 0
+}

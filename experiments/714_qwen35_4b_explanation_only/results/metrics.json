@@ -1,0 +1,11 @@
+{
+  "status": "primary_submission_candidate_waiting_user_approval",
+  "screen_folds_completed": 0,
+  "public_submissions": 0,
+  "screen_folds": [0, 3],
+  "classifier_verdict_frozen": true,
+  "min_target_coverage": 0.85,
+  "target_rows": 11400,
+  "classification_scores_changed": 0,
+  "image_contract": "solution140_source_image0_runtime_preprocessing"
+}

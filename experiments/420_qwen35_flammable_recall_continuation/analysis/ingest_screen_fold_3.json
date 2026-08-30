@@ -1,0 +1,21 @@
+{
+  "bundle": "/tmp/qwen-recall-f3.bf1XD3/qwen_recall_fold3.zip",
+  "bundle_bytes": 46671304,
+  "bundle_sha256": "7a9d10444cd58a538bf8db24d8058ec25f2d3100f52d1b88aaee039907bd3aa7",
+  "payload_location": "outer",
+  "stage": {
+    "stage": "fold_3",
+    "adapter_bytes": 12592424,
+    "adapter_sha256": "9ffa6b56b12fb014442d8de90056c66feaaa28c81bb22e2fc7378f7dc30f22db",
+    "adapter_config_sha256": "dcfbd6ccb55c1ac61393698b15eb73270efd9fff5c11e72c22dbd02938c0b702",
+    "prediction_rows": 1100,
+    "predictions_sha256": "80f2b63d7ec36ff39508fec32ba72550863b4b8984424b975b044adf26d5990f",
+    "report_sha256": "05991da08777221a5ad2ff4ad3f32e7ba7620e490e977526d5fe8f8a0ae6f79c",
+    "standalone_flammable_f1": 0.8378378378378378,
+    "training_runtime_minutes": 8.751129549617568,
+    "total_runtime_minutes": 9.953917673354347,
+    "training_manifest_sha256": "b24dde15bc6d643b9c804c09ab0f9b2e79b83170de2019f88169fa4850cd90e3",
+    "parent_adapter_config_sha256": "29acdf9bf40c37354a0c998825cd01c70039452146d02696f7742527bb1c49ce"
+  },
+  "passed": true
+}

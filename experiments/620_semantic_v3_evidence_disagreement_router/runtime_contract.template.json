@@ -1,0 +1,49 @@
+{
+  "version": "semantic_v3_evidence_router_runtime_contract_v2",
+  "status": "placeholder",
+  "feature_bundle": {
+    "format": "npz",
+    "required_arrays": [
+      "ids",
+      "hypothesis_ids",
+      "hypothesis_scores",
+      "hypothesis_supports_verdict",
+      "hypothesis_concept_compatibility",
+      "span_retained_in_model_input_for_0",
+      "span_retained_in_model_input_for_1",
+      "direct_span_for_0",
+      "direct_span_for_1",
+      "protocol_version",
+      "manifest_sha256",
+      "backbone_decision_sha256"
+    ],
+    "forbidden_arrays": ["labels", "gold", "targets", "sealed_ids"],
+    "rows": 11118,
+    "sealed_rows": 0,
+    "finite_scores_required": true
+  },
+  "router_output": {
+    "format": "npz",
+    "required_arrays": [
+      "ids",
+      "folds",
+      "baseline_predictions",
+      "candidate_predictions",
+      "eligible",
+      "router_probabilities",
+      "router_proposals",
+      "support_from_robust",
+      "support_from_qwen3vl",
+      "evidence_manifest_sha256",
+      "feature_bundle_sha256"
+    ],
+    "rows": 11118,
+    "sealed_rows": 0
+  },
+  "dependencies": {
+    "experiment_600": "complete five-fold original and specialist Qwen3.5 OOF bundle",
+    "experiment_601": "complete five-fold robust and Qwen3-VL component bundle",
+    "backbone_decision": "accepted compatibility decision, not this template",
+    "meta_router": "none; frozen label-independent logical router only"
+  }
+}

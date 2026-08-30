@@ -1,0 +1,45 @@
+{
+  "experiment_id": "570",
+  "status": "rejected_screen",
+  "launched": true,
+  "training_parent": "520_qwen35_grounded_auxiliary_sft",
+  "parent_screen_mean_delta_macro_f1": -0.03434412542799947,
+  "changed_factor": {
+    "first_atomic_verdict_weight": 1.0,
+    "subsequent_evidence_token_weight": 0.05
+  },
+  "screen_folds": [0, 3],
+  "implementation_null_control_passed": true,
+  "route400_null_control_launched": true,
+  "runtime_contracts_passed": true,
+  "artifact_sha256": {
+    "fold_0": "7e25cf91abcc39632e67dfcddfd1f6d65adb2037fd61e83501a1ca186fa839a1",
+    "fold_3": "829e5417cc4113d93cd53a874459e127dd02c49ae1717a87e13b9e0dc48854fd"
+  },
+  "folds": {
+    "0": {
+      "delta_macro_f1": -0.019290123456790154,
+      "delta_flammable_f1": -0.038580246913580196,
+      "corrected": 5,
+      "regressed": 8,
+      "flammable_false_negative_delta": 2,
+      "safety_false_negative_delta": -1,
+      "passed": false
+    },
+    "3": {
+      "delta_macro_f1": 0.022170151405912053,
+      "delta_flammable_f1": 0.044340302811824106,
+      "corrected": 3,
+      "regressed": 0,
+      "flammable_false_negative_delta": -3,
+      "safety_false_negative_delta": -3,
+      "passed": true
+    }
+  },
+  "mean_screen_delta_macro_f1": 0.0014400139745609497,
+  "corrected": 8,
+  "regressed": 8,
+  "screen_passed": false,
+  "decision": "REJECT_SIGN_INSTABILITY",
+  "note": "The mean is positive but fold 0 is negative and increases flammable false negatives; no weight tuning, remaining folds or seed repeat is allowed."
+}

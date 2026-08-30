@@ -1,0 +1,128 @@
+{
+  "schema": "exp699_retrieval_learned_pair_preregister_v1",
+  "self_hash_algorithm": "sha256_canonical_json_without_self_sha256",
+  "self_sha256": "0762ff0c76064f0ab2d7e842ad9d324aeaaf83d567f035f35a6c3f030670776b",
+  "created_at": "2026-08-28T19:27:00+03:00",
+  "experiment": 699,
+  "stage": "frozen_before_cpu_pair_inventory_and_gpu_metrics",
+  "candidate_name": "solution140_flammable_learned_pair_geometry_v1",
+  "public_used": false,
+  "sealed_used": false,
+  "hypothesis": "A supervised pair geometry trained on balanced hard same-label and opposite-label flammable neighbors can identify transferable donors that fixed Qwen/text/image similarities cannot, enabling a confidence-weighted residual over frozen solution140 without repeating the negative-class collapse of soft-cache v1.",
+  "gap_evidence": {
+    "soft_cache_v1_changes": 28,
+    "soft_cache_v1_direction": "all_1_to_0",
+    "soft_cache_v1_corrections": 5,
+    "soft_cache_v1_regressions": 23,
+    "soft_cache_v1_text_only_changes": 27,
+    "handcrafted_pair_training_same_label": 107570,
+    "handcrafted_pair_training_opposite_label": 5620,
+    "handcrafted_pair_final_changes": 0
+  },
+  "target_cohort": {
+    "screen_folds": [0, 3],
+    "solution140_flammable_fp": 4,
+    "solution140_flammable_fn": 3,
+    "soft_cache_v1_harmful_screen_rows": 5,
+    "expected_only": "correct at least one FP and one FN with at most one regression"
+  },
+  "source_bindings": {
+    "retrieval_source_manifest_self_sha256": "b06f3e3d98637239b227ae946ca690c2c65dc72addfd71fe8fb8801bd24767a0",
+    "solution140_run_sha256": "9318db4cc0f26eabaa73ae9856dbf9daffd06787a162e6f5db71f249f6db7146",
+    "component_outputs_sha256": "bc20bb68bed78f67621e0d02f57a780b4475434df05ae3525d5d23b610c17df8",
+    "topology_sha256": "7e16f6665ca4fb552e65145fe52b578ae3706dcd274027754851e24c827b90c1",
+    "qwen_train_embeddings_sha256": "63e42fcb83316ec213e455250277e4370aa85363b741c8de001ed1bf7e34b695",
+    "pair_verifier_terminal_self_sha256": "b010742a7ef751c6051ab3d162764e103317432b49dff7d7df9f2b3c36402389"
+  },
+  "candidate_generation": {
+    "top_k": 30,
+    "channels": [
+      "exact_text",
+      "normalized_text",
+      "tfidf",
+      "bm25",
+      "qwen_2048_cosine",
+      "exact_image",
+      "near_image"
+    ],
+    "labels_enter_after_candidate_lists_frozen": true,
+    "same_fold_donors_excluded": true,
+    "same_connected_component_donors_excluded": true
+  },
+  "pair_sampling": {
+    "queries": "outer_train_flammable_only",
+    "hard_order": "frozen_hybrid_rrf_order",
+    "same_label_donors_max_per_query": 4,
+    "opposite_label_donors_max_per_query": 4,
+    "require_both_targets_per_query": true,
+    "exact_balance_per_query": true,
+    "deterministic_tie_break": "global_index_ascending"
+  },
+  "learned_pair_model": {
+    "seed": 42,
+    "embedding_projection": "shared_linear_2048_to_256_without_bias_then_l2_normalize",
+    "pair_input": "projected_query,projected_donor,absolute_difference,elementwise_product,frozen_channel_rank_score_and_critical_cue_features",
+    "pair_mlp": [256, 64, 1],
+    "activation": "gelu",
+    "dropout": 0.1,
+    "target": "query_and_donor_flammable_labels_are_equal",
+    "loss": "binary_cross_entropy_with_logits",
+    "optimizer": "adamw",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size": 512,
+    "epochs": 10,
+    "gradient_clip_norm": 1.0,
+    "checkpoint_selection": "final_epoch_only",
+    "mixed_precision": "bfloat16_autocast_with_float32_loss"
+  },
+  "controls": {
+    "query_only": "exact same projection, pair-input width, MLP, training pair rows, optimizer steps and seed; donor-dependent inputs are zero and target is query label",
+    "fixed_embedding": "same pair architecture and training pairs with the 2048-to-256 projection initialized identically and frozen",
+    "donor_label_permutation": "within each outer-train fold, flammable category and query candidate set; deterministic seed42; exact per-query pair-label balance preserved"
+  },
+  "aggregation": {
+    "compatible_probability_min": 0.5,
+    "neighbors_max": 5,
+    "neighbors_min": 2,
+    "weighted_label_agreement_min": 0.75,
+    "mean_compatibility_min": 0.6,
+    "donor_weight": "sigmoid_compatibility",
+    "soft_residual": "0.10 * sign(weighted_vote_minus_0.5) * mean_compatibility * abs(2*weighted_vote_minus_1)",
+    "score_clip": [0.0, 1.0],
+    "flammable_threshold": 0.953912615776062,
+    "abstention": "retain exact solution140 score and decision",
+    "production_prior": "exact frozen solution140",
+    "bad_route": "byte_identical_solution140"
+  },
+  "screen_gate": {
+    "required": [
+      "at_least_one_original_solution140_fp_corrected",
+      "at_least_one_original_solution140_fn_corrected",
+      "pooled_corrections_minus_regressions_greater_than_zero",
+      "pooled_regressions_at_most_one",
+      "aggregate_flammable_fn_nonincrease",
+      "learned_pair_final_macro_greater_than_query_only_final_macro",
+      "learned_pair_final_macro_greater_than_fixed_embedding_final_macro",
+      "donor_label_permutation_has_no_positive_surviving_gain",
+      "bad_predictions_exact_array_identity"
+    ],
+    "on_fail": "terminal_reject_without_grid_cutoff_or_residual_tuning",
+    "on_pass": "run_exact_frozen_full_five_fold_confirmation"
+  },
+  "compute": {
+    "cpu_preflight_required": true,
+    "gpu_jobs": 1,
+    "gpu_type": "H100",
+    "gpu_count": 1,
+    "wall_clock_limit_minutes": 30,
+    "h100_hour_limit": 0.5
+  },
+  "authorizations": {
+    "cpu_preflight": true,
+    "single_gpu_screen_after_preflight_pass": true,
+    "full_five_fold": false,
+    "package": false,
+    "public": false
+  }
+}

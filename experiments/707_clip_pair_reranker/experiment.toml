@@ -1,0 +1,8 @@
+id = 707
+slug = "clip_pair_reranker"
+status = "RUNNING"
+public_used = false
+screen_folds = [0, 3]
+gpu = 2
+model = "openai/clip-vit-base-patch32"
+arms = ["multimodal", "text_only"]

@@ -1,0 +1,197 @@
+{
+  "experiment_id": "470",
+  "evaluation_version": "qwen35_adapter_soup_seed_repeat_screen_v1",
+  "seed": 31415,
+  "folds": [
+    0,
+    3
+  ],
+  "alpha_specialist": 0.5,
+  "weights": [
+    0.15,
+    0.1,
+    0.75
+  ],
+  "threshold_source_sha256": "ca7086f2a971bed708c9f6a3cc6672589a73dee05812dd7368e98c2193afb74f",
+  "fold_reports": [
+    {
+      "fold": 0,
+      "threshold": 0.9558810591697693,
+      "pure_macro_f1": 0.8770664491405566,
+      "soup_macro_f1": 0.8769080709333981,
+      "delta_macro_f1": -0.00015837820715858264,
+      "pure_flammable_f1": 0.8051948051948052,
+      "soup_flammable_f1": 0.8048780487804879
+    },
+    {
+      "fold": 3,
+      "threshold": 0.9558810591697693,
+      "pure_macro_f1": 0.915819783197832,
+      "soup_macro_f1": 0.9198782247562736,
+      "delta_macro_f1": 0.0040584415584415945,
+      "pure_flammable_f1": 0.875,
+      "soup_flammable_f1": 0.8831168831168831
+    }
+  ],
+  "screen_audit": {
+    "candidate": "fixed_alpha_seed31415_two_fold_screen",
+    "baseline_macro_f1": 0.8967770153905033,
+    "candidate_macro_f1": 0.8977784975841498,
+    "delta_macro_f1": 0.0010014821936465967,
+    "baseline_category_f1": {
+      "БАД": 0.9527896995708155,
+      "Легковоспламеняющиеся": 0.8407643312101911
+    },
+    "candidate_category_f1": {
+      "БАД": 0.9527896995708155,
+      "Легковоспламеняющиеся": 0.8427672955974843
+    },
+    "category_delta": {
+      "БАД": 0.0,
+      "Легковоспламеняющиеся": 0.0020029643872931935
+    },
+    "folds_won": 1,
+    "folds": [
+      {
+        "fold": 0,
+        "baseline_macro_f1": 0.8770664491405566,
+        "candidate_macro_f1": 0.8769080709333981,
+        "delta": -0.00015837820715858264,
+        "baseline_category_f1": {
+          "БАД": 0.9489380930863082,
+          "Легковоспламеняющиеся": 0.8051948051948052
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9489380930863082,
+          "Легковоспламеняющиеся": 0.8048780487804879
+        }
+      },
+      {
+        "fold": 3,
+        "baseline_macro_f1": 0.915819783197832,
+        "candidate_macro_f1": 0.9198782247562736,
+        "delta": 0.0040584415584415945,
+        "baseline_category_f1": {
+          "БАД": 0.9566395663956639,
+          "Легковоспламеняющиеся": 0.875
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9566395663956639,
+          "Легковоспламеняющиеся": 0.8831168831168831
+        }
+      }
+    ],
+    "changed_predictions": 8,
+    "corrected": 4,
+    "regressed": 4,
+    "group_bootstrap": {
+      "iterations": 10000,
+      "seed": 470,
+      "delta_mean": 0.0013004189744911195,
+      "delta_ci95": [
+        -0.018689703512729656,
+        0.021018582509404356
+      ],
+      "probability_delta_positive": 0.5397
+    },
+    "acceptance": {
+      "delta_at_least_0_001": true,
+      "wins_at_least_4_of_5_folds": false,
+      "no_category_drop_over_0_005": true
+    }
+  },
+  "connected_safe_audit": {
+    "candidate": "fixed_alpha_seed31415_two_fold_connected_safe",
+    "baseline_macro_f1": 0.8894407158836689,
+    "candidate_macro_f1": 0.8905518763796909,
+    "delta_macro_f1": 0.0011111604960220012,
+    "baseline_category_f1": {
+      "БАД": 0.9466666666666667,
+      "Легковоспламеняющиеся": 0.8322147651006712
+    },
+    "candidate_category_f1": {
+      "БАД": 0.9466666666666667,
+      "Легковоспламеняющиеся": 0.8344370860927153
+    },
+    "category_delta": {
+      "БАД": 0.0,
+      "Легковоспламеняющиеся": 0.0022223209920441134
+    },
+    "folds_won": 1,
+    "folds": [
+      {
+        "fold": 0,
+        "baseline_macro_f1": 0.8715274081958488,
+        "candidate_macro_f1": 0.8715274081958488,
+        "delta": 0.0,
+        "baseline_category_f1": {
+          "БАД": 0.9430548163916977,
+          "Легковоспламеняющиеся": 0.8
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9430548163916977,
+          "Легковоспламеняющиеся": 0.8
+        }
+      },
+      {
+        "fold": 3,
+        "baseline_macro_f1": 0.9075794126569113,
+        "candidate_macro_f1": 0.911766698534338,
+        "delta": 0.004187285877426672,
+        "baseline_category_f1": {
+          "БАД": 0.9502939604489578,
+          "Легковоспламеняющиеся": 0.8648648648648649
+        },
+        "candidate_category_f1": {
+          "БАД": 0.9502939604489578,
+          "Легковоспламеняющиеся": 0.8732394366197183
+        }
+      }
+    ],
+    "changed_predictions": 8,
+    "corrected": 4,
+    "regressed": 4,
+    "group_bootstrap": {
+      "iterations": 10000,
+      "seed": 471,
+      "delta_mean": 0.0015916699188429657,
+      "delta_ci95": [
+        -0.018639779935664336,
+        0.021967530883112346
+      ],
+      "probability_delta_positive": 0.5444
+    },
+    "acceptance": {
+      "delta_at_least_0_001": true,
+      "wins_at_least_4_of_5_folds": false,
+      "no_category_drop_over_0_005": true
+    }
+  },
+  "false_negatives": {
+    "flammable": {
+      "pure": 14,
+      "soup": 13,
+      "delta": -1
+    },
+    "safety_union": {
+      "positive_rows": 70,
+      "pure": 9,
+      "soup": 8,
+      "delta": -1
+    }
+  },
+  "gates": {
+    "both_folds_positive": false,
+    "mean_macro_delta_positive": true,
+    "flammable_false_negatives_not_increased": true,
+    "safety_union_false_negatives_not_increased": true,
+    "corrected_greater_than_regressed": false
+  },
+  "accepted": false,
+  "input_sha256": {
+    "fold_0_lora_holdout_predictions.csv": "1b6cd2e175068d7c117075cb94c66aebde784bcc8062f3dc90c18ad9264925d6",
+    "fold_0_soup_holdout_predictions.csv": "0d053daecba848d2376aac12e0bc0fb7ad15292a5fcc379fd8c80408a923d358",
+    "fold_3_lora_holdout_predictions.csv": "3980395c18d945618912e42312a252d4641a0b276f23ae9a0a6bbbd7dbc88fc6",
+    "fold_3_soup_holdout_predictions.csv": "47b9ac87b2d56a3cd4d93abe1cc390715caad2d4d2f73cfffcf7aed064fbb497"
+  }
+}

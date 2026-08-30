@@ -1,0 +1,44 @@
+[experiment]
+id = "400"
+slug = "qwen35_category_routed_adapters"
+title = "Category-routed Qwen3.5 adapters in the locked Public-190 architecture"
+status = "former_public_champion"
+entrypoint = "experiments/400_qwen35_category_routed_adapters/run.py"
+result_file = "experiments/400_qwen35_category_routed_adapters/results/metrics.json"
+submission_source = "experiments/400_qwen35_category_routed_adapters/submission"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "locked_190_category_routing_v1"
+registry = "validation/registry.toml"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "280_bad_family_diverse_public190"
+changed_factor = "Use original 190 Qwen3.5 adapter for BAD and adapter 260 for flammable"
+mechanism = "Separate the opposing category effects observed locally and tested jointly by Public experiment 280"
+expected_macro_f1_delta = 0.008
+falsification = "Reject if locked delta is below 0.005, fewer than four folds win, connected-safe or downstream-prior delta is non-positive, or runtime smoke fails"
+
+[acceptance]
+minimum_macro_delta = 0.005
+minimum_folds_won = 4
+minimum_corrected_to_regressed = 1.5
+minimum_connected_safe_delta = 0.0
+minimum_post_prior_delta = 0.0
+
+[budget]
+planned_gpu_hours = 0.1
+planned_public_submissions = 1
+runtime_limit_minutes = 20
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false

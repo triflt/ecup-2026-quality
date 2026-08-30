@@ -1,0 +1,20 @@
+{
+  "assigned_rows_per_shard": 242,
+  "cancelled_jobs": 16,
+  "decision": "REJECT_FULL_REPAIR_USE_PARTIAL_AVAILABILITY_660",
+  "failed_rows_per_affected_shard_max": 5,
+  "failed_rows_per_affected_shard_min": 1,
+  "gpu_per_job": 1,
+  "job_time_limit_hours": 4.0,
+  "observed_after_minutes": 42,
+  "progress_rows_max": 20,
+  "progress_rows_min": 10,
+  "projected_hours_per_shard_max": 17.0,
+  "projected_hours_per_shard_min": 8.0,
+  "shards_with_failed_rows": 13,
+  "terminal_state_after_cancel": {
+    "CANCELLED": 16
+  },
+  "wave1_jobs": 16,
+  "wave2_jobs": 0
+}

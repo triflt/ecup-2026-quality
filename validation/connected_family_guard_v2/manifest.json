@@ -1,0 +1,53 @@
+{
+  "evaluation_version": "connected_family_guard_v2",
+  "dataset_version": "competition_train_v1",
+  "immutable": true,
+  "protocol": "Historical grouped_text_v1 folds with a sealed selection mask excluding every category-specific connected component that spans folds; edges are exact normalized full text or exact first-image fp16 embedding equality",
+  "base_folds": "validation/grouped_text_v1/folds.csv",
+  "edge_types": [
+    "exact_normalized_full_text",
+    "exact_first_image_fp16_embedding"
+  ],
+  "rows": 12971,
+  "safe_rows": 11207,
+  "unsafe_rows": 1764,
+  "components": 8690,
+  "cross_fold_components": 344,
+  "category_summary": {
+    "БАД": {
+      "rows": 7469,
+      "components": 5178,
+      "cross_fold_components": 161,
+      "unsafe_rows": 921,
+      "safe_rows": 6548,
+      "rows_in_exact_text_duplicates": 2924,
+      "rows_in_exact_image_duplicates": 2401
+    },
+    "Легковоспламеняющиеся": {
+      "rows": 5502,
+      "components": 3512,
+      "cross_fold_components": 183,
+      "unsafe_rows": 843,
+      "safe_rows": 4659,
+      "rows_in_exact_text_duplicates": 2477,
+      "rows_in_exact_image_duplicates": 2336
+    }
+  },
+  "basket_fold": 4,
+  "safe_basket_rows": 2249,
+  "invariants": {
+    "all_cross_fold_components_flagged_unsafe": true,
+    "safe_component_max_fold_count": 1,
+    "safe_components_crossing_folds": 0,
+    "all_ids_unique": true,
+    "all_rows_accounted_for": true
+  },
+  "input_sha256": {
+    "folds": "03baaa25bd5a3aef6ad94e02067cccda114041f98d7a35a9e06330a425166e4d",
+    "first_image_embeddings": "a893f93d12f6b9c48e3f11be9a78a75b15227d5965b32efc46483ab7e59c7557"
+  },
+  "output_sha256": {
+    "rows": "b2cd736226c05122f33aa0c898b31408ef469df0cfe7fe739a95c5b5b94a526a",
+    "basket": "7ae559241f9f43ffffddd78615c964254dcbe6d66e6c884be1d783918f533098"
+  }
+}

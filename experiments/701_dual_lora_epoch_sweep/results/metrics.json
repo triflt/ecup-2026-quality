@@ -1,0 +1,7 @@
+{
+  "schema": "exp701_metrics_v1",
+  "status": "RUNNING_FOLD0",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "grouped_text_v1",
+  "public_used": false
+}

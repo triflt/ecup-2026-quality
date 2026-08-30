@@ -1,0 +1,107 @@
+[experiment]
+id = "620"
+slug = "semantic_v3_evidence_disagreement_router"
+title = "Evidence-aware disagreement router on semantic-v3"
+status = "rejected_at_screen"
+entrypoint = "experiments/620_semantic_v3_evidence_disagreement_router/run.py"
+result_file = "experiments/620_semantic_v3_evidence_disagreement_router/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+scope = "physical_development_only"
+development_rows = 11118
+sealed_holdout_rows_available = 0
+labels_allowed_in_evidence_or_feature_runtime = false
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+folds = "validation/semantic_family_v3/folds.csv"
+primary_metric = "macro_f1"
+outer_folds = [0, 1, 2, 3, 4]
+sealed_holdout_used = false
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+changed_factor = "Allow only high-support label-independent hypothesis disagreements with a compatible exact text span and an independent robust or visual vote"
+mechanism = "Frozen semantic hypotheses distinguish the sold object and transaction scope; exact evidence plus an independent component vote blocks unsupported score-only flips"
+expected_macro_f1_delta = "0.003-0.008"
+falsification = "Evidence preflight or compatibility probes fail; either screen fold is non-positive; full delta is below 0.003; fewer than four folds win; any category drops; corrected/regressed is below 1.5; bootstrap probability is below 0.90; or any sealed/label/competition-adapter dependency enters feature runtime"
+precedents = [
+  "ERASER benchmark, ACL 2020",
+  "Faithful rationalization by construction, ACL 2020",
+  "CLARITY, StarSEM 2025",
+]
+
+[features]
+hypotheses = 10
+backbone_status = "accepted_qwen35_4b_exact_revision_synthetic_probe_passed"
+external_sentence_embeddings = false
+old_190_260_400_oof_as_head_features = false
+production_scores_during_head_fit = false
+teacher = false
+pseudo_labels = false
+competition_trained_adapter = false
+trainable_meta_router = false
+
+[router]
+minimum_binary_normalized_support_score = 0.90
+low_score_implies_opposite_verdict = false
+requires_exact_direct_span = true
+requires_hypothesis_concept_compatibility = true
+opposite_high_support_requires_abstention = true
+span_must_survive_model_input_truncation = true
+requires_robust_or_qwen3vl_support = true
+changes_outside_selector_allowed = 0
+
+[acceptance.preflight]
+minimum_direct_coverage_per_category = 0.15
+maximum_exact_offset_failures = 0
+maximum_unresolved_conflicts = 0
+maximum_forbidden_absence_evidence = 0
+
+[acceptance.screen]
+folds = [0, 3]
+minimum_each_fold_delta = 0.0
+minimum_mean_macro_delta = 0.0015
+minimum_corrected_to_regressed = 1.5
+maximum_category_f1_drop = 0.002
+maximum_flammable_false_negative_increase = 0
+maximum_safety_false_negative_increase = 0
+
+[acceptance.full]
+minimum_macro_delta = 0.003
+minimum_folds_won = 4
+minimum_category_delta = 0.0
+minimum_corrected_to_regressed = 1.5
+minimum_component_bootstrap_probability_positive = 0.90
+require_singleton_delta_positive = true
+require_repeated_delta_nonnegative = true
+require_post_prior_delta_positive = true
+
+[budget]
+gpu_jobs_launched = 17
+gpu_jobs_accepted_for_quality_evaluation = 5
+gpu_jobs_technical_only = 12
+parallel_one_gpu_limit = 32
+planned_gpu_hours_current_stage = 4.5
+maximum_private_runtime_minutes = 32
+
+[execution]
+launch_authorized = true
+blockers = []
+
+[results.screen]
+fold_0_delta = -0.0583120205
+fold_3_delta = -0.1133178175
+mean_fold_delta = -0.0858149190
+bad_f1_delta = -0.0002487055
+flammable_f1_delta = -0.1737872272
+corrected = 2
+regressed = 39
+decision = "NO_GO"
+
+[artifacts]
+directory = "artifacts"
+publish = false

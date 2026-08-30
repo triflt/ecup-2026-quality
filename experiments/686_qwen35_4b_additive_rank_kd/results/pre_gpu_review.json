@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "experiment_id": 686,
+  "branch": "codex/ecup-rank-kd",
+  "revision": "9899e2039d0063a8d503eade07be12cf7f1db729",
+  "main_sync_revision": "74943bbe59f554849bf7768a9c5cb22af2eb0b90",
+  "status": "PRE_GPU_REVIEW_PENDING_INTEGRATOR_GO",
+  "changed_factor": "candidate hard_BCE + 0.5*pair_rank_BCE; control hard_BCE",
+  "rank_loss_weight": 0.5,
+  "hard_loss_weight": 1.0,
+  "blind_screen_fold": 3,
+  "development_only_fold": 0,
+  "confirmation_folds": [1, 2, 4],
+  "owned_gpu_jobs": 0,
+  "training_bundle_scope": "training_label_packet_free",
+  "evaluation_bundle_scope": "evaluation_full_frozen_replay",
+  "promotion_authority": "independent_main_integrator_strict_job_bound_gate",
+  "bad_route_gate": "exact_prediction_array_equality_plus_sha256_not_metric_equality",
+  "frozen_replay": {
+    "bundle_sha256": "f2a7c40bad91170c515c1461f6e04c11e4957694f69a815c8e2b8fe80656ec3d",
+    "contract_sha256": "1771dceda26996529b9f70f46a97653c2d29afa099983260c3b40a62fca518b0",
+    "registry_sha256": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae"
+  },
+  "checks": {
+    "targeted_tests": "23_passed",
+    "ruff": "passed",
+    "compileall": "passed",
+    "git_diff_check": "passed",
+    "independent_review_blockers_addressed": true,
+    "gpu_launched": false,
+    "public_used": false
+  },
+  "review_packet_sha256": "f2e4063a86199b544ed064c99777366601c98261c07e2e0c5c20d2050b91dd28"
+}

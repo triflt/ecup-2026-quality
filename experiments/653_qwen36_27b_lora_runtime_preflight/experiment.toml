@@ -1,0 +1,51 @@
+[experiment]
+id = "653"
+slug = "qwen36_27b_lora_runtime_preflight"
+title = "Qwen3.6-27B model-parallel LoRA technical preflight"
+status = "technical_smoke_passed"
+entrypoint = "experiments/653_qwen36_27b_lora_runtime_preflight/technical_smoke.py"
+result_file = "experiments/653_qwen36_27b_lora_runtime_preflight/results/metrics.json"
+
+[data]
+version = "synthetic_runtime_smoke_v1"
+competition_rows = 0
+sealed_rows = 0
+
+[validation]
+primary_version = "technical_runtime_gate_v1"
+quality_metrics_released = false
+
+[model]
+id = "Qwen/Qwen3.6-27B"
+revision = "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9"
+
+[training]
+objective = "class_only_technical_smoke"
+seed = 42
+synthetic_rows = 2
+micro_batch_size = 1
+gradient_accumulation = 2
+effective_batch_size = 2
+learning_rate = 0.0002
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+[hypothesis]
+parent_experiment = "651"
+changed_factor = "Enable model-parallel LoRA training on the mature Qwen3.6 runtime"
+control = "651 Qwen3.6-27B prompting runtime"
+mechanism = "Sharding frozen weights across four GPUs should leave enough memory for checkpointed LoRA activations and optimizer state"
+falsification = "Reject the runtime if any weight is offloaded to CPU/disk or forward, backward, optimizer, save/reload, finite-score, or artifact gates fail"
+precedents = ["Qwen3.6-27B official model card", "experiment 651", "PEFT LoRA"]
+
+[budget]
+technical_jobs = 1
+gpu_per_job = 4
+time_limit_hours = 1
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

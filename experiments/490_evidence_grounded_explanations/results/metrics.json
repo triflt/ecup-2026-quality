@@ -1,0 +1,19 @@
+{
+  "experiment_id": "490",
+  "status": "rejected_manual_audit",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "explanation_manual_audit_200_v1",
+  "vocabulary_version": "policy_concepts_v1",
+  "family_graph_status": "not_accepted",
+  "frozen_200_status": "completed_no_go",
+  "metrics": {
+    "manual_rows": 200,
+    "verdict_and_format_pass": 200,
+    "strict_relevant_pass": 141,
+    "strict_relevant_required": 189,
+    "critical_unsupported_claims": 12,
+    "critical_unsupported_max": 0
+  },
+  "gpu_hours": 0.0,
+  "decision": "NO_GO: the frozen manual audit failed relevance and unsupported-claim gates"
+}

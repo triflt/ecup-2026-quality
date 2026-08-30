@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "experiment_id": "679",
+  "control_experiment_id": "641",
+  "decision": "CLOSED_TERMINAL_REJECT_AT_SCREEN",
+  "training_lane_open": false,
+  "allowed_folds": [],
+  "screen_folds": [0, 3],
+  "confirmation_folds": [1, 2, 4],
+  "standalone_screen_report_sha256": "8a37b1baeb728e0c9c7818e2c78a2617c8912a8363dc4fed0d38d5523fd9d0c0",
+  "production_screen_report_sha256": null,
+  "model_id": "Qwen/Qwen3.5-4B",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "objective": "class_only_binary_bce",
+  "changed_factor": "learning_rate_only",
+  "control_learning_rate": 0.0002,
+  "candidate_learning_rate": 0.0001,
+  "runtime_backend": "legacy_eager",
+  "micro_batch_size": 2,
+  "gradient_accumulation": 8,
+  "effective_batch_size": 16,
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "control_prediction_sha256": {
+    "1": "d7dff899b1af47858cd8855226f2688aad6756ed5472b175f0a7576891fe2ab1",
+    "2": "4ff669918b7bdcc9c1dddee458ce101f77d931c556171040e90794839a871211",
+    "4": "a0649d7f25db993211c758aa8f9158ef71701eefa2dd2dc6938de7f94353a435"
+  },
+  "runtime_contract_sha256": {
+    "1": "3d62eed9817bbbdb0ff4d55dd511904b4fa1dfef5db44deddb104dda0c60f576",
+    "2": "321b5e5165110fc729598956d121208ab14aee12af38e8f0b3ab81ddbd52f5e8",
+    "4": "22cad9c7a1510a73b6ec606826839328329a9c0469f2fb00c45fd24ed9dcf33f"
+  },
+  "runtime_payload_sha256": {
+    "1": {
+      "train.jsonl": "d074bcf1945e34f918c5e8a9301aa44cf7c7273c499250ecb252c72e556b98f6",
+      "validation.jsonl": "15abd402968a967eee4a0d7f49f6165b90124190aaf4db93b9821d2d79996390"
+    },
+    "2": {
+      "train.jsonl": "f50877ce65aa51ef19a0b18c85ae4529d20f551e9c3981c6d65fc65d1f6c1773",
+      "validation.jsonl": "0a885fbbd4e1a581f5e336f5fcb30a2f8835a2111bd83e0304efaa03ba284fd8"
+    },
+    "4": {
+      "train.jsonl": "55f90b7bb5ead8de58393e4f115d644faa43d3fefbcf9f9579bfc38bf8fc6ab8",
+      "validation.jsonl": "e33290bb7a884bbd8f37e4b1a6c3284cedd5bea997f8e9276f38a74ab4d8d715"
+    }
+  },
+  "public_used": false,
+  "sealed_rows": 0,
+  "prepared_commit": "e0a211c",
+  "screen_passed": false,
+  "production_replay_authorized": false,
+  "confirmation_authorized": false,
+  "gpu_jobs": 0
+}

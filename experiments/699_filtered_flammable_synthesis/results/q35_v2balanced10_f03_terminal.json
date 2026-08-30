@@ -1,0 +1,47 @@
+{
+  "accepted_repeat1": {
+    "corrections": 54,
+    "flammable_ap_delta": -0.011078834597515907,
+    "flammable_f1": 0.9037037037037037,
+    "flammable_fn": 7,
+    "flammable_fp": 6,
+    "fold_macro_delta": {
+      "0": 0.06349712018818932,
+      "3": 0.016264275335623468
+    },
+    "macro_delta": 0.03941483737622187,
+    "regressions": 7,
+    "report_file_sha256": "d8c01f4a390131ad697cf7069bed53721724582738a04fd8487efbfdb47a61aa",
+    "report_self_sha256": "b716fc7a0934986039201b673bcfbacc68b79fd27b46c0ffde27dd6679105331"
+  },
+  "candidate_balanced10": {
+    "contract_self_sha256": {
+      "0": "1bda3e43b2092d927683aff6b72a890643076b2ccc4ae5e4f877064650230dd5",
+      "3": "1bb65b81376b2144022d5642c8e44d8466d4bf0aabb89feaf8a0908838917a43"
+    },
+    "corrections": 54,
+    "flammable_ap_delta": 0.010375866443825377,
+    "flammable_f1": 0.8888888888888888,
+    "flammable_fn": 8,
+    "flammable_fp": 7,
+    "fold_macro_delta": {
+      "0": 0.04603948305304484,
+      "3": 0.01726525840859794
+    },
+    "macro_delta": 0.03202746136047474,
+    "regressions": 9,
+    "report_file_sha256": "dc4a45bd3e9b093934dc5ca91f575ca78c3ecacc5d3d136181c8dc74f9aefc24",
+    "report_self_sha256": "87ff3b67698935bfb60ade9c19bb83f4fe14f9ebbc933cfdf4b57f4bf4e9684e"
+  },
+  "decision": "REJECT_AT_SCREEN_NO_FULL5",
+  "experiment_id": "699",
+  "folds": [
+    0,
+    3
+  ],
+  "public_rows_used": 0,
+  "reason": "balanced10 improves component AP but is worse than accepted positive-only repeat1 on Macro, flammable F1, FP, FN and regressions",
+  "schema": "exp699_q35_v2balanced10_f03_terminal_v1",
+  "sealed_rows_used": 0,
+  "self_sha256": "2f25b6fed578d3229be71b68432d96a458026075e07a037b055c8917dd77b6f8"
+}

@@ -1,0 +1,49 @@
+[experiment]
+id = "655"
+slug = "paddleocr_truncation_repair"
+title = "Deterministic repair of truncated PaddleOCR-VL spotting outputs"
+status = "rejected_bounded_smoke"
+entrypoint = "experiments/655_paddleocr_truncation_repair/run_repair.py"
+result_file = "experiments/655_paddleocr_truncation_repair/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+source_experiment = "633_paddleocr_vl16_spotting"
+source_images = 49456
+labels_read = false
+
+[model]
+id = "PaddlePaddle/PaddleOCR-VL-1.6"
+revision = "c5630abae1d940eafe0697512a0325494b02ab42"
+prompt = "Spotting:"
+decoding = "greedy"
+source_max_new_tokens = 512
+repair_max_new_tokens = 1536
+
+[hypothesis]
+parent_experiment = "633_paddleocr_vl16_spotting"
+changed_factor = "Increase generation budget only for rows proven to have truncated source output"
+mechanism = "A longer deterministic decode completes coordinate blocks without changing the OCR model or non-truncated rows"
+expected_macro_f1_delta = 0.0
+falsification = "Reject the overlay if any selected row fails, lacks EOS, keeps a partial coordinate block, changes source identity, or requires classification labels"
+precedents = ["PaddleOCR-VL-1.6 structured spotting", "fail-closed weak-label preparation"]
+
+[validation]
+integrity_version = "ocr_truncation_repair_v1"
+source_shards = 32
+repair_shards = 32
+maximum_failed_rows = 0
+maximum_unaccepted_rows = 0
+sealed_membership_used = false
+public_used = false
+
+[budget]
+smoke_jobs = 1
+smoke_images = 8
+planned_full_jobs = 32
+gpu_per_job = 1
+planned_public_submissions = 0
+
+[artifacts]
+publish = false
+directory = "artifacts"

@@ -1,0 +1,10 @@
+{
+  "experiment_id": "626",
+  "status": "confirmed_external_blocker",
+  "validation_complete": false,
+  "sealed_holdout_used": false,
+  "metrics": {},
+  "packet": {"sample_rows": 300, "unique_row_ids": 300, "unique_semantic_components": 300, "excluded_prior_ids": 500, "overlap_with_excluded_ids": 0, "sample_sha256": "b4bdd3b83001921d530f041b1af1d27b1f7ec8c9136193aa974901cdc9058f7e", "packet_sha256": "52da3974fe712e3cc12086aea23f87c880004fafb19c201efed4ec7c1d1517ea", "human_ratings_present": false, "sealed_rows_read": 0},
+  "human_gate": {"minimum_strict_pass": 282, "maximum_critical_unsupported": 0, "maximum_scope_or_negation_failure": 0, "observed": null},
+  "decision": "CONFIRMED_EXTERNAL_BLOCKER_REAL_HUMAN_REVIEW_REQUIRED"
+}

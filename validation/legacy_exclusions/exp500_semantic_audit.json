@@ -1,0 +1,2275 @@
+{
+  "audit_scope": "union of real transformed rows in fold 0 and fold 3 manifests",
+  "audit_version": "exp500_transformed_pair_semantic_audit_v1",
+  "cross_fold_overlap_rows": 12,
+  "cue_type_counts": {
+    "compatible": 8,
+    "excluded": 52,
+    "included": 13
+  },
+  "decision": "NO_GO",
+  "decision_reason": "Strict semantic preservation is below the predeclared 98% gate; do not launch jobs.",
+  "distinct_transformed_rows": 73,
+  "experiment_id": "500",
+  "failure_reason_counts": {
+    "implicit_object_requires_title_context": 1,
+    "multiple_scope_relations": 4,
+    "operational_absence_not_transaction_scope": 3,
+    "orphaned_following_anaphora": 3
+  },
+  "fold_transformed_counts": {
+    "0": 39,
+    "3": 46
+  },
+  "label_blind": true,
+  "manifest_sha256": {
+    "0": "3cbc94e651aa97d4ba5d4830242b1ab3346cf56d9667d1cb298b9ee040d5f2d9",
+    "3": "c8cee9191704f09f4097942cd59d792d532fa304302d0caf307b699f059baf18"
+  },
+  "mechanical_pass_rows": 73,
+  "model_outputs_inspected": false,
+  "required_strict_pass_rate": 0.98,
+  "rows": [
+    {
+      "cue_type": "included",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Идеальное дополнение для новогоднего сувенира - в подарочной упаковке даже самый простой подарок на новый год \"заиграет\".",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входит наполнитель - ваш подарок будет полностью защищен от случайных повреждений.",
+      "name": "Ящик для подарка, коробка подарочная деревянная",
+      "row_id": "198",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "compatible",
+      "failure_reasons": [
+        "orphaned_following_anaphora"
+      ],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Это дает гибкость выбора источника топлива в зависимости от ваших предпочтений и возможностей.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Плита совместима с различными видами баллонов благодаря наличию переходника для больших газовых баллонов.",
+      "name": "Туристическая газовая плита с пьезоподжигом в кейсе",
+      "row_id": "459",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": false,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": false,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 7,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Тайник желаний 2 шт",
+      "row_id": "948",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 17,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "Идеальное дополнение для новогоднего сувенира - в подарочной упаковке даже самый простой подарок на новый год \"заиграет\".",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входит наполнитель - ваш подарок будет полностью защищен от случайных повреждений.",
+      "name": "Ящик для подарка, коробка подарочная деревянная",
+      "row_id": "1092",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магический конверт для денег Сестренке",
+      "row_id": "1132",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [
+        "multiple_scope_relations"
+      ],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "комплектация включает: Футляр для зажигалки (Зажигалка не входит в комплект)",
+      "name": "Чехол для зажигалки зиппо zippo",
+      "row_id": "1292",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": false
+      },
+      "sentence_index": 6,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Компактная газовая горелка устойчива на любой поверхности за счет подставки под баллон и легка в использовании.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Баллон с газом НЕ входит в комплект.",
+      "name": "Система приготовления пищи Starcamp 1100 Мл",
+      "row_id": "1452",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 10,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "Дротики издают забавный свист в полете, добавляя азарта каждой игре.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Просто наклони ствол, вставь один из трех входящих в комплект дротиков Nerf Accustrike Mega, закрой его, потяни рукоятку заряжания и жми на курок!",
+      "name": "Бластер Nerf Fortnite ракетница Флэр, F3367",
+      "row_id": "1727",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 3,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магический конверт для денег Воин",
+      "row_id": "1756",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Сердце День влюбленных",
+      "row_id": "1906",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 15,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Баллон в комплект не входит.",
+      "name": "Горелка универсальная газовая туристическая RUNIS №8",
+      "row_id": "1931",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 10,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Горелка отличный подарок на день рождение, новый год, на 23 февраля, мужчине, другу.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "баллон в комплект не входит, рекомендуем приобретать его отдельно.",
+      "name": "Газовая горелка туристическая с пьезоподжигом (без газа)",
+      "row_id": "2086",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 14,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Тайник желаний 5 шт",
+      "row_id": "2143",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 17,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Оснащен био-безопасным контейнером.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Безопасный розжиг при помощи пьезозажигалки (заказывается отдельно).",
+      "name": "Биокамин KRATKI ALPHA/ZG/TUV золото",
+      "row_id": "2170",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 9,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "Идеальное дополнение для новогоднего сувенира - в подарочной упаковке даже самый простой подарок на новый год \"заиграет\".",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входит наполнитель - ваш подарок будет полностью защищен от случайных повреждений.",
+      "name": "Ящик для подарка, коробка подарочная деревянная",
+      "row_id": "2506",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Баллон в комплект не входит.",
+      "name": "Горелка универсальная газовая туристическая RUNIS №10",
+      "row_id": "3134",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 9,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "compatible",
+      "failure_reasons": [
+        "multiple_scope_relations"
+      ],
+      "folds": [
+        0
+      ],
+      "following_sentence": "Размер конфорки плитки универсален и многофункционален - позволяет поставить посуду (кастрюлю, сковороду, угли для кальяна) больших размеров.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В качестве топлива используется стандартный одноразовый газовый баллон, подключаемый баллон бытового газа (В комплект не идет баллон).",
+      "name": "Туристическая газовая плитка, портативная походная газовая плита керамическая M-702 7шт горелок",
+      "row_id": "3308",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": false
+      },
+      "sentence_index": 2,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "При работе прибора некоторые части могут сильно нагреваться.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Характеристики *Расход газа: до 80 г/час *Мощность: 1,0 кВт *Температура горения: 1300 °С *Пьезоподжиг *Подача газа регулируется *Вес: 87 г *Подходит цанговый баллон (приобретается отдельно) Внимание!",
+      "name": "Горелка портативная SL-203, с пьезоподжигом, с газогенератором",
+      "row_id": "3560",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Тайник желаний 1 шт",
+      "row_id": "3711",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 16,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "compatible",
+      "failure_reasons": [],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "Плитка газовая туристическая хороший подарок для рыбаков, охотников, туристов, водителей дачников, геологов, дальнобойщиков.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В качестве топлива используется стандартный газовый баллон (картридж 220г) или подключаемый баллон бытового газа.",
+      "name": "Туристическая газовая горелка с пьезоподжигом",
+      "row_id": "4046",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "Идеальное дополнение для новогоднего сувенира - в подарочной упаковке даже самый простой подарок на новый год \"заиграет\".",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входит наполнитель - ваш подарок будет полностью защищен от случайных повреждений.",
+      "name": "Ящик для подарка, коробка подарочная деревянная",
+      "row_id": "4152",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "ЕСЛИ ТОВАР ВАМ ПОНРАВИЛСЯ, ТО МЫ БУДЕМ БЛАГОДАРНЫ ВАМ ЗА ХОРОШИЙ ОТЗЫВ!",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Газовый баллон в комплект не входит.",
+      "name": "Газовая горелка плита походная туристическая с пьезоподжигом",
+      "row_id": "4185",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 8,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Оснащен био-безопасным контейнером.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Безопасный розжиг при помощи пьезозажигалки (заказывается отдельно).",
+      "name": "Биокамин KRATKI BIOMISA/MINI/TUV черный ",
+      "row_id": "4336",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 9,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магический конверт для денег Жене",
+      "row_id": "4993",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [
+        "multiple_scope_relations"
+      ],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "При использовании переходного шланга (в комплект не входит!) можно подключить баллоны 5л, 27л, 50л и использовать плитку как стационарную плиту.",
+      "name": "Плита газовая FORESTER MOBILE туристическая с пьезоподжигом, в чехле",
+      "row_id": "5013",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": false
+      },
+      "sentence_index": 6,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Горелки продаются без баллона в комплекте!",
+      "name": "Горелка газовая Runis 4-039, с вентилем, малая",
+      "row_id": "5118",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 19,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магический конверт для денег для денег на 8 Марта - Тюльпан",
+      "row_id": "5382",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "При работе прибора некоторые части могут сильно нагреваться.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Характеристики *Расход газа: до 80 г/час *Мощность: 1,0 кВт *Температура горения: 1300 °С *Подача газа регулируется *Вес: 196 г *Подходит цанговый баллон (не входит в комплект) Внимание!",
+      "name": "Горелка газовая с пьезоподжигом 900",
+      "row_id": "5571",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка на Новый год Деревня",
+      "row_id": "5743",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 20,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [
+        "orphaned_following_anaphora"
+      ],
+      "folds": [
+        0
+      ],
+      "following_sentence": "Внутрь можно убрать сменный газовый картридж и горелку (например, FMS-102, FMS-103, HEAT CORE FMS-116T, MINI FMS-116 ).",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входят два котелка.",
+      "name": "Набор посуды с теплообменной системой Fire-Maple FMC-217",
+      "row_id": "5967",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": false,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": false,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 3,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Работает от стандартных цанговых баллонов 220/230 г.СПЕЦИФИКАЦИЯ:Тип прибора: газовый обогреватель-плитаТопливо: газовая смесь (бутан, изобутан, пропан)Максимальный расход газа: 90 г/чТепловая мощность: 1,3 кВт (1120 ккал/час)Тип баллона: цанговый 220/230 г (в комплект не входит)Давление газа (номинальное): 2,5-6,9 кПаВремя работы без выключения: до 2,4 чРазмер обогревателя: 290*240*230 ммВес обогревателя: 2,24 кгТип розжига: пьезоэлектрическийПоворот горелки на 90°",
+      "name": "Обогреватель-плита газовый портативный (HS-BDZ-193) Helios",
+      "row_id": "6091",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Маме - Букет Шаров",
+      "row_id": "6256",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "Тепловая мощность конфорки -2,0кВт.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Работает от газового баллона (в комплект не входит), который крепится снаружи плиты.",
+      "name": "Газовая печка туристическая/ походная/плитка походная",
+      "row_id": "6415",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 1,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Сердце",
+      "row_id": "6513",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 18,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Сердце Голуби",
+      "row_id": "6816",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 15,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Сердце Пара",
+      "row_id": "6979",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 15,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка для денег свадебная Wedding day",
+      "row_id": "7139",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "Идеальное дополнение для новогоднего сувенира - в подарочной упаковке даже самый простой подарок на новый год \"заиграет\".",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входит наполнитель - ваш подарок будет полностью защищен от случайных повреждений.",
+      "name": "Ящик для подарка, коробка подарочная деревянная",
+      "row_id": "7141",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Маме Сердце",
+      "row_id": "7458",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Газовый баллон в комплект не входит!",
+      "name": "Горелка газовая с узким соплом и регулировкой пламени, насадка на газовый баллон",
+      "row_id": "8553",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 16,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка на Новый год Деревня",
+      "row_id": "8631",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 20,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Сердце",
+      "row_id": "8855",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 18,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магический конверт для денег Подружке",
+      "row_id": "9593",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Тайник желаний 5 шт",
+      "row_id": "10936",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 17,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [
+        "orphaned_following_anaphora"
+      ],
+      "folds": [
+        0
+      ],
+      "following_sentence": "Внутрь можно убрать сменный газовый картридж и горелку (например, FMS-102, FMS-103, HEAT CORE FMS-116T, MINI FMS-116 ).",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входят два котелка.",
+      "name": "Набор посуды с теплообменной системой Fire-Maple FMC-217",
+      "row_id": "10976",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": false,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": false,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 3,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": ".",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Основные характеристики Диаметр: от 50 до 195 мм Рабочая нагрузка 1-го крепления: до 23 кг Монтажные размеры: 152 x 62 мм Монтаж: винты М8 (в комплект не входят) Комплект: 2 шт.",
+      "name": "Крепление универсальное Telawei (D50-195 мм)",
+      "row_id": "11007",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 1,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка для денег свадебная Пара",
+      "row_id": "11857",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "Не нуждается в подключении к электросетям.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входит дополнительное сопло.",
+      "name": "Горелка газовая TURBOJET TJ2500-M пьезо",
+      "row_id": "12809",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 11,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магический конверт для денег Воин",
+      "row_id": "12902",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "баллон в комплект не входит, рекомендуем приобретать его отдельно.",
+      "name": "Газовая горелка насадка на газовый баллон",
+      "row_id": "12933",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 18,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Горелка отличный подарок на день рождение, новый год, на 23 февраля, мужчине, другу.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "баллон в комплект не входит, рекомендуем приобретать его отдельно.",
+      "name": "Газовая горелка туристическая с пьезоподжигом (без газа)",
+      "row_id": "13092",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 14,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [
+        "operational_absence_not_transaction_scope"
+      ],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "Несомненным достоинством горелки при розжиге угля является ручка: горелку приходится подолгу держать в одном положении и рука устает гораздо меньше.Температура пламени    1300°CРасход газа    80гр/часПьезоподжиг    естьРегулировка подачи газа    естьМощность    1,0 кВтТип крепления    цанговый",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Горелка устанавливается на обычный цанговый баллон и может использоваться для туризма, отдыха на природе, домашнего ремонта.Горелка имеет плавную регулировку силы пламени, функция пьезоподжига позволяет обойтись без спичек или зажигалки, что делает розжиг угля более безопасным.Для горелки используются одноразовые баллоны 200/220 грамм, бутан/изобутан/пропан.",
+      "name": "Газовая горелка с пьезоподжигом",
+      "row_id": "13336",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": false,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 1,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [
+        "operational_absence_not_transaction_scope"
+      ],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Пьезоподжиг встроен в панель управления, что делает эксплуатацию максимально безопасной и комфортной даже для неопытного пользователя.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Конструкция настольная, с одной конфоркой, что позволяет использовать плиту как на открытом воздухе, так и в условиях ограниченного пространства.Газовая горелка оснащена системой пьезоподжига, благодаря чему розжиг осуществляется быстро и удобно без спичек и дополнительных устройств.",
+      "name": "Плитка газовая туристическая 2.9KWТ 1",
+      "row_id": "13464",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": false,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 3,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "compatible",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Плитка газовая туристическая хороший подарок для рыбаков, охотников, туристов, водителей дачников, геологов, дальнобойщиков.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В качестве топлива используется стандартный газовый баллон (картридж 220г) или подключаемый баллон бытового газа.",
+      "name": "Туристическая газовая горелка с пьезоподжигом",
+      "row_id": "13570",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Баллон в комплект не входит.",
+      "name": "Горелка универсальная газовая туристическая малая с вентилем",
+      "row_id": "13573",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 8,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка для денег свадебная Герб",
+      "row_id": "14012",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 21,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Внимание!",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Подходит цанговый баллон (приобретается отдельно).",
+      "name": "Горелка туристическая газовая, с ветрозащитой, 13,2 х 18,3 см",
+      "row_id": "14310",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 10,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка для денег на Новый год Деревня",
+      "row_id": "14344",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 20,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [
+        "operational_absence_not_transaction_scope"
+      ],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Тонкая регулировка мощности",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Встроенный пьезоподжиг для зажигания без спичек или зажигалки",
+      "name": "Газовая плита NaMilux PL2013PS под цанговый баллон",
+      "row_id": "14347",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": false,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 31,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "compatible",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Расход газа - 540 г/ч.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Для горелки используется сжиженный газ, бутан.",
+      "name": "Газовая горелка плита туристическая BRS-75 походная",
+      "row_id": "14636",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 1,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "Защищенный, зарегистрированный дизайн",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входит чехол для хранения, рукоятка для тостера и подставка для газового баллона",
+      "name": "Газовая горелка Мини Ridge Monkey (Ридж Манки) - Quad Stove Pro Mini Single, 1 шт",
+      "row_id": "14942",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 15,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [
+        "multiple_scope_relations"
+      ],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "комплектация включает: Футляр для зажигалки (Зажигалка не входит в комплект)",
+      "name": "Чехол для зажигалки зиппо zippo",
+      "row_id": "15272",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": false
+      },
+      "sentence_index": 6,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "Диаметр у лопастей в разложенном виде - 20 см.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Газовый баллон в комплект не входит!",
+      "name": "Походная газовая плита туристическая",
+      "row_id": "15635",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 11,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [
+        "implicit_object_requires_title_context"
+      ],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входит набор 2 штуки.",
+      "name": "Топливо для заправки бензин для зажигалки Zippo набор 2 шт.",
+      "row_id": "15700",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": false,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 4,
+      "strict_pass": false
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Спички не входят в комплект.",
+      "name": "Магическая открытка Тайник желаний 5 шт",
+      "row_id": "15730",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 17,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Характеристики: Тип баллонов: Резьбовой; Газовая смесь: Бутан, изобутан, пропан; (покупается отдельно!!!) Номинальная тепловая мощность: 2,2 кВт; Расход газа: 160 г/ч; Размер в сложенном состоянии: ⌀ 181*95 мм; Размер в разложенном состоянии: ⌀ 95*86 мм; Вес: 312 г",
+      "name": "Походная горелка ICE CUBE GS-125 3,2 кВт, 210 г/ч",
+      "row_id": "15894",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 7,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        0,
+        3
+      ],
+      "following_sentence": "Автоматический электронный пьезоподжиг, автоматическое определение предохранительного устройства отключения давления, легкая и портативная, подходит для наружного и домашнего использования Материал: корпус из нержавеющей стали, эмалированная рама плиты, горелка из алюминиевого сплава.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Газ в комплект не входит.",
+      "name": "Туристическая газовая плита без переходника",
+      "row_id": "16344",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 9,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "compatible",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Для хранения и транспортировки в комплекте имеется пластиковый чемодан кейс.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В качестве топлива используется стандартный одноразовый газовый баллон, подключаемый баллон бытового газа.",
+      "name": "Туристическая газовая плитка без переходника",
+      "row_id": "16663",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Не нуждается в подключении к электросетям.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входит дополнительное сопло.",
+      "name": "Горелка газовая TURBOJET TJ2500-M пьезо",
+      "row_id": "16905",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 11,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "compatible",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "Расход газа - 540 г/ч.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Для горелки используется сжиженный газ, бутан.",
+      "name": "Газовая горелка плита туристическая BRS-75 походная",
+      "row_id": "16928",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 1,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "included",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "В большой котелок можно убрать маленький, а в последний, в свою очередь, сменный газовый картридж и горелку.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В комплект входят два котелка с мисками, которые при необходимости можно использовать как крышки.",
+      "name": "Набор портативной посуды FMC-208, на 2-3 чел.",
+      "row_id": "17341",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 3,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "excluded",
+      "failure_reasons": [],
+      "folds": [
+        3
+      ],
+      "following_sentence": "",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "Горелки продаются без баллона в комплекте!",
+      "name": "Горелка газовая Runis PREMIUM 4-052, пьезо, цанг",
+      "row_id": "18008",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 19,
+      "strict_pass": true
+    },
+    {
+      "cue_type": "compatible",
+      "failure_reasons": [],
+      "folds": [
+        0
+      ],
+      "following_sentence": "Для хранения и транспортировки в комплекте имеется пластиковый чемодан кейс.",
+      "mechanical_checks": {
+        "character_multiset_preserved": true,
+        "moved_sentence_sha256_matches": true,
+        "original_sha256_matches": true,
+        "sentence_moved_intact": true,
+        "token_multiset_preserved": true,
+        "transformed_sha256_matches": true
+      },
+      "moved_sentence": "В качестве топлива используется стандартный одноразовый газовый баллон, подключаемый баллон бытового газа.",
+      "name": "Туристическая газовая плитка с переходником / Портативная походная газовая плита - арт. 5984",
+      "row_id": "18094",
+      "semantic_checks": {
+        "negation_and_modality_preserved": true,
+        "no_anaphora_or_implicit_object_dependency": true,
+        "object_text_preserved": true,
+        "relation_is_transaction_scope": true,
+        "scope_preserved_after_reordering": true,
+        "sentence_moved_intact": true,
+        "single_nonconflicting_scope_relation": true
+      },
+      "sentence_index": 2,
+      "strict_pass": true
+    }
+  ],
+  "rubric": {
+    "implicit_object_requires_title_context": "The moved sentence does not identify what the included set or units are without title context.",
+    "multiple_scope_relations": "One moved sentence contains more than the single closed relation recognized by the parser.",
+    "operational_absence_not_transaction_scope": "«Без спичек/зажигалки» describes operation or ignition method, not sale inclusion/exclusion.",
+    "orphaned_following_anaphora": "Removing the sentence from its original position leaves a following expression such as «это» or «внутрь» without its local antecedent.",
+    "strict_pass": "The exact sentence is moved intact; negation, modality, object text and scope survive; the relation is self-contained, nonconflicting and genuinely describes transaction scope."
+  },
+  "source_columns_read": [
+    "id",
+    "name",
+    "description",
+    "category"
+  ],
+  "source_text_view_sha256": "be6a8bb670c7150b1b874534c61b33ad22ad242b1b2de4a2b6fd2232bea24e00",
+  "strict_fail_rows": 11,
+  "strict_pass_rate": 0.8493150684931506,
+  "strict_pass_rows": 62
+}

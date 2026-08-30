@@ -60,7 +60,7 @@ experiments/*/submission/adapter_*/
 experiments/*/submission/annotator_prior.json
 experiments/*/submission/annotator_prior.json.gz
 quality-*-submit/
-research/qwen-train-attachment/
+research/*-attachment/
 research/audit_s3_images.py
 research/winning-strategy.md
 research/make_lora_image_manifest.py

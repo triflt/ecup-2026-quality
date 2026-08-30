@@ -1,0 +1,28 @@
+[experiment]
+id = "680"
+slug = "qwen35_4b_flammable_only_hard_bce"
+title = "Qwen3.5-4B flammable-only hard-BCE adapter"
+status = "terminal_reject_at_screen"
+entrypoint = "experiments/680_qwen35_4b_flammable_only_hard_bce/train_fold.py"
+result_file = "experiments/680_qwen35_4b_flammable_only_hard_bce/results/screen_evaluation.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+primary_metric = "flammable_average_precision_and_routed_macro_f1"
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false
+
+[lineage]
+parent = "641"
+changed_factor = "remove_bad_training_occurrences"
+public_used = false

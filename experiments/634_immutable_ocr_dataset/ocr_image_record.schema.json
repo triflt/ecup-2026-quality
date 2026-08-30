@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/schemas/competition_train_paddleocr_vl16_spotting_v1/image-record.json",
+  "title": "Immutable label-blind OCR image record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dataset_version",
+    "id",
+    "image_index",
+    "global_index",
+    "source_url_sha256",
+    "width",
+    "height",
+    "raw_generation",
+    "generation_confidence",
+    "parse_status",
+    "regions"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "dataset_version": {"const": "competition_train_paddleocr_vl16_spotting_v1"},
+    "id": {"type": "string", "minLength": 1},
+    "image_index": {"type": "integer", "minimum": 0},
+    "global_index": {"type": "integer", "minimum": 0, "maximum": 49455},
+    "source_url_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "width": {"type": "integer", "minimum": 1},
+    "height": {"type": "integer", "minimum": 1},
+    "raw_generation": {"type": "string"},
+    "generation_confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "type", "scope", "calibrated", "region_specific"],
+      "properties": {
+        "value": {"type": ["number", "null"], "minimum": 0.0, "maximum": 1.0},
+        "type": {"const": "sequence_geomean_token_probability"},
+        "scope": {"const": "complete_generated_sequence"},
+        "calibrated": {"const": false},
+        "region_specific": {"const": false}
+      }
+    },
+    "parse_status": {
+      "enum": ["regions_parsed", "no_location_tokens"]
+    },
+    "regions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/region"}
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "array",
+      "prefixItems": [
+        {"type": "integer", "minimum": 0, "maximum": 1000},
+        {"type": "integer", "minimum": 0, "maximum": 1000}
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "sourceOccurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detection_index", "text"],
+      "properties": {
+        "detection_index": {"type": "integer", "minimum": 0},
+        "text": {"type": "string", "minLength": 1}
+      }
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "region_id",
+        "text",
+        "normalized_text",
+        "quadrilateral_normalized",
+        "confidence_ref",
+        "source_occurrences",
+        "technical_duplicate_count"
+      ],
+      "properties": {
+        "region_id": {"type": "string", "pattern": "^ocr-[0-9]{5}-[0-9]{4}$"},
+        "text": {"type": "string", "minLength": 1},
+        "normalized_text": {"type": "string", "minLength": 1},
+        "quadrilateral_normalized": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/point"},
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "confidence_ref": {"const": "generation_confidence"},
+        "source_occurrences": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/sourceOccurrence"},
+          "minItems": 1
+        },
+        "technical_duplicate_count": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

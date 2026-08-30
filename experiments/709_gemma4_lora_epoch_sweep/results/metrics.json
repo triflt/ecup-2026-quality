@@ -1,0 +1,19 @@
+{
+  "schema": "experiment_metrics_v1",
+  "experiment_id": 709,
+  "evaluation_scope": "frozen_fold0_solution140_replay",
+  "checkpoints_evaluated": 30,
+  "baseline_macro_f1": 0.9425270781260014,
+  "candidate_macro_f1": 0.9494667769327647,
+  "macro_delta": 0.0069396988067632615,
+  "corrections": 16,
+  "regressions": 9,
+  "flammable_f1": 0.9397590361445783,
+  "flammable_fp": 4,
+  "flammable_fn": 1,
+  "selected_arm": "gemma4_e4b_r16",
+  "selected_epoch": 4,
+  "decision": "WINNER_REQUIRES_CONFIRMATION_BEFORE_REFIT_PACKAGE_PUBLIC",
+  "public_used": false,
+  "source": "results/terminal_summary.json"
+}

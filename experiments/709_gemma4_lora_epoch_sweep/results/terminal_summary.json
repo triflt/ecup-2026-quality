@@ -1,0 +1,28 @@
+{
+  "schema": "exp709_terminal_summary_v1",
+  "fold": 0,
+  "baseline_macro_f1": 0.9425270781260014,
+  "checkpoints_evaluated": 30,
+  "winner": {
+    "arm": "gemma4_e4b_r16",
+    "epoch": 4,
+    "macro_delta": 0.0069396988067632615,
+    "corrections": 16,
+    "regressions": 9,
+    "flammable_f1": 0.9397590361445783,
+    "flammable_fp": 4,
+    "flammable_fn": 1
+  },
+  "runner_up": {
+    "arm": "gemma4_e2b_r16",
+    "epoch": 3,
+    "macro_delta": 0.006761571548794421,
+    "corrections": 13,
+    "regressions": 7,
+    "flammable_f1": 0.9397590361445783,
+    "flammable_fp": 4,
+    "flammable_fn": 1
+  },
+  "decision": "WINNER_REQUIRES_CONFIRMATION_BEFORE_REFIT_PACKAGE_PUBLIC",
+  "public_used": false
+}

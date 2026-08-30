@@ -1,0 +1,123 @@
+{
+  "experiment_id": "260",
+  "status": "rejected_offline",
+  "data_version": "competition_train_v1",
+  "evaluation_version": "nested_grouped_v1",
+  "seed": 42,
+  "changed_factor": "family-diverse positive BAD sampling with control RNG consumption",
+  "primary_comparison": "bad_family_diverse_seed42 + fixed_seed31415 mean probability",
+  "baseline_macro_f1": 0.9192367220630797,
+  "selection_audit": {
+    "old_selected_rows": 1500,
+    "old_selected_families_range": [1231, 1260],
+    "old_duplicate_exposures_range": [240, 269],
+    "new_selected_rows": 1500,
+    "new_selected_families": 1500,
+    "non_target_training_multiset_exact_on_all_folds": true,
+    "audit_path": "analysis/isolation_audit.json"
+  },
+  "validation": {
+    "bad_f1": 0.9520381535139026,
+    "flammable_f1": 0.8905852417302799,
+    "macro_f1": 0.9213116976220912,
+    "delta_macro_f1": 0.0020749755590114827,
+    "category_delta": {
+      "БАД": 0.000162647532072957,
+      "Легковоспламеняющиеся": 0.003987303585950008
+    },
+    "folds_won": 3,
+    "fold_scores": [
+      0.9065072197921076,
+      0.8974279868801351,
+      0.9463022251592248,
+      0.9073079417126497,
+      0.9483963975998841
+    ],
+    "fold_deltas": [
+      0.010735578720556083,
+      0.008908264782421127,
+      0.0022143022615633834,
+      -0.00693826322972213,
+      -0.00515890714052214
+    ],
+    "group_bootstrap": {
+      "iterations": 10000,
+      "probability_delta_positive": 0.6616,
+      "delta_ci95": [-0.007498592685005611, 0.012019435033143157]
+    }
+  },
+  "locked_190_validation": {
+    "evaluation_version": "locked_190_nested_v1",
+    "baseline_macro_f1": 0.9234086336846878,
+    "bad_f1": 0.9525967551889786,
+    "flammable_f1": 0.9086294416243654,
+    "macro_f1": 0.9306130984066721,
+    "delta_macro_f1": 0.007204464721984216,
+    "category_delta": {
+      "БАД": -0.0020636494352989088,
+      "Легковоспламеняющиеся": 0.01647257887926734
+    },
+    "folds_won": 4,
+    "bootstrap_probability_delta_positive": 0.8275,
+    "bootstrap_delta_ci95": [-0.00807448462938323, 0.023215952705384575],
+    "selected_as_component_for": "280_bad_family_diverse_public190",
+    "public_result": {
+      "macro_f1": 0.8919244237,
+      "baseline_macro_f1": 0.8919244237,
+      "displayed_delta": 0.0,
+      "decision": "No measurable online improvement; retain only as a diagnostic component"
+    }
+  },
+  "downstream_prior_audit": {
+    "protocol": "donor-only outer-fold replay of Public-190 exact/name/numeric-family/shingle priors",
+    "changed_before_priors": 97,
+    "survived_after_priors": 92,
+    "survival_rate": 0.9484536082474226,
+    "delta_macro_f1_before_priors": 0.007204464721984216,
+    "delta_macro_f1_after_priors": 0.007357621162630834,
+    "conclusion": "Downstream priors do not explain the Public tie; hidden distribution shift or repeated selection on the same folds remains the leading explanation",
+    "report": "analysis/locked_190_errors/decision_survival_report.json",
+    "report_sha256": "966439324d3237856ff7369361b5a21ac5de4204ac6aedc18a38ec88eef0a153",
+    "script_sha256": "a4e4509bb5d2790ded2f0140c164957784d296d8aa773a7d7704f3ce4f0e5a98"
+  },
+  "runtime": {
+    "fold_minutes": [
+      36.0535923746104,
+      35.99925069430222,
+      35.882415662985295,
+      35.97226799580579,
+      35.44651089500015
+    ],
+    "full_minutes": 42.863058004714546,
+    "total_training_minutes": 222.21709562741842
+  },
+  "reproducibility": {
+    "job": "redacted-job",
+    "hardware": "one H100",
+    "training_code_sha256": "404f6d07965f551dfe7c7ee0120ce0a16132e1103f1db7d13b3622993f4fd6c0",
+    "cycle_code_sha256": "80868a1eec9274828c9bff50b5863e0adedbe9764b011c31c9269fbbfa693b8e",
+    "output_bundle_at_root": true,
+    "recursive_output_mask": true,
+    "oof_input_sha256": "5d7467c48fc8a5a73f947f5aa1300071c77ba699b29c12250caf1bcd3176d7ac",
+    "image_manifest_sha256": "d6193215ce2d6145440bd484ea225e77fe10784c4c2c06b7c6b0b85dc8efc7d9"
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/qwen_badfam_private_compute.zip",
+      "size_bytes": 279981138,
+      "sha256": "d9160168897b07d796cdcd7b0c49aa70045dd6cfbb789c92294c113cfaaa4572"
+    },
+    {
+      "path": "artifacts/seed_42_diverse_positives/full/adapter/adapter_model.safetensors",
+      "size_bytes": 12592424,
+      "sha256": "6a6ad2fe4eebafbb9658dc268e96bd872e9f76852b33b0fb31a6a3928b918bfa"
+    },
+    {
+      "path": "results/ensemble_report.json"
+    },
+    {
+      "path": "results/acceptance_audit.json"
+    }
+  ],
+  "decision": "Rejected for production: it passed locked Public-190 validation inside experiment 280 but tied experiment 190 on Public at 0.8919244237 to displayed precision. Retain for error analysis only."
+}

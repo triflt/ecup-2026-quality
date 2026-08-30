@@ -1,0 +1,89 @@
+[experiment]
+id = "440"
+slug = "qwen3vl_rdrop"
+title = "Qwen3-VL-2B R-Drop consistency adapter"
+status = "rejected_at_screen"
+entrypoint = "research/qwen3vl_rdrop_lora.py"
+result_file = "experiments/440_qwen3vl_rdrop/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "qwen3vl_rdrop_two_fold_screen_v1"
+full_version = "component_transfer_gate_v2"
+selection_guard = "connected_family_guard_v2"
+folds = "validation/grouped_text_v1/folds.csv"
+primary_metric = "macro_f1"
+
+[hypothesis]
+parent_experiment = "400_qwen35_category_routed_adapters"
+training_parent = "110_qwen3vl_lora"
+changed_factor = "Add R-Drop alpha 1.0 symmetric KL between two dropout passes to the unchanged experiment-110 assistant-suffix CE objective"
+mechanism = "Dropout consistency should reduce noisy-family calibration variance without changing class exposure or continuing the saturated Qwen3.5 adapter"
+expected_macro_f1_delta = 0.003
+falsification = "Reject if either screen fold delta is non-positive, mean delta is below 0.001, any category loses more than 0.005, flammable or safety false negatives increase, or corrections do not exceed regressions"
+precedents = ["R-Drop, NeurIPS 2021"]
+
+[training]
+model = "Qwen/Qwen3-VL-2B-Instruct"
+seed = 42
+training_mode = "hard"
+image_view = "first_image_448px"
+epochs = 1
+learning_rate = 0.0002
+weight_decay = 0.01
+batch_size = 4
+gradient_accumulation = 4
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+rdrop_alpha = 1.0
+rdrop_distribution = "binary class-token distribution over 0 and 1"
+uses_teacher = false
+uses_pseudo_labels = false
+
+[acceptance.screen]
+folds = [0, 3]
+reject_only = true
+required_each_fold_delta_positive = true
+required_mean_macro_f1_delta = 0.001
+max_category_f1_drop = 0.005
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+min_corrected_to_regressed_ratio = 1.0
+
+[acceptance.full]
+baseline_macro_f1 = 0.9316449231243215
+required_macro_f1_delta = 0.003
+required_fold_wins = 4
+max_category_f1_drop = 0.005
+max_flammable_false_negative_increase = 0
+max_safety_union_false_negative_increase = 0
+min_corrected_to_regressed_ratio = 1.5
+required_connected_bootstrap_probability = 0.90
+repeat_seed = 31415
+repeat_folds = [0, 3]
+required_prior_survival_rate = 0.80
+require_positive_post_prior_delta = true
+target_public_minutes = 16
+target_private_minutes = 32
+
+[budget]
+planned_screen_gpu_hours = 2.3
+planned_full_gpu_hours = 7.0
+planned_public_submissions = 0
+runtime_limit_minutes_per_fold = 120
+
+[execution]
+jobs = ["redacted-job", "redacted-job"]
+selector_probe_job = "redacted-job"
+superseded_infrastructure_attempts = ["redacted-job", "redacted-job", "redacted-job", "redacted-job"]
+hardware = "two independent h100-1x screen jobs on private-gpu-pool and private-gpu-pool"
+screen_presets = [".local/compute/screen-fold0.yml", ".local/compute/screen-fold3.yml"]
+decision = "Both frozen folds failed; full five-fold cycle, repeat seed, full refit and submission package are prohibited"
+
+[artifacts]
+directory = "artifacts"
+publish = false

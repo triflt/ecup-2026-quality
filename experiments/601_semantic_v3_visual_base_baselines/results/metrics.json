@@ -1,0 +1,65 @@
+{
+  "experiment_id": "601",
+  "status": "complete",
+  "training_launched": true,
+  "input_audit_status": "ready",
+  "input_audit_file": "analysis/input_audit.json",
+  "input_id_order_verified": true,
+  "development_sealed_id_overlap": 0,
+  "robust_base_status": "completed_strict_nested_v2_numpy_2_3_1",
+  "robust_base": {
+    "macro_f1": 0.8935380094,
+    "bad_f1": 0.9452849741,
+    "flammable_f1": 0.8417910448,
+    "artifact_sha256": "e84ae3549aa80aab40ae125c95c74cd975d9a08ba65ccbcebe3c1d8aa05c2f71"
+  },
+  "strict_v2_first_attempt": {
+    "accepted": false,
+    "artifact_created": false,
+    "cause": "known false floating-point flags from the ARM macOS BLAS path in NumPy 2.2.6",
+    "minimal_reproduction_finite_and_exact": true,
+    "rerun_numpy_version": "2.3.1",
+    "warnings_remain_fatal": true
+  },
+  "robust_base_required_protocol": "semantic_v3_robust_base_strict_nested_v2",
+  "invalidated_local_protocols": [
+    {
+      "protocol": "semantic_v3_robust_base_nested_v1",
+      "accepted": false,
+      "reason": "inner-validation text leaked into TF-IDF vocabulary and IDF"
+    }
+  ],
+  "qwen3vl_fold_status": {
+    "0": "complete",
+    "1": "complete",
+    "2": "complete",
+    "3": "complete",
+    "4": "complete"
+  },
+  "qwen3vl_strict_nested": {
+    "score_transform": "sigmoid_raw_logit",
+    "threshold_protocol": "fit_each_category_on_other_four_outer_folds",
+    "macro_f1": 0.8954056291,
+    "bad_f1": 0.9408112583,
+    "flammable_f1": 0.85,
+    "delta_vs_robust_base": 0.0018676197,
+    "fold_wins_vs_robust_base": 3,
+    "component_bootstrap_probability_positive": 0.5379,
+    "corrected": 273,
+    "regressed": 312,
+    "accepted_as_standalone_replacement": false,
+    "accepted_as_baseline_component": true,
+    "component_bundle_sha256": "b917ffe9f11702f7b041de4b2699dbe367682e02cfb19dc77d65d05be3b3a13d"
+  },
+  "sealed_holdout_used": false,
+  "development_rows": 11118,
+  "sealed_rows": 1853,
+  "runtime_estimate": {
+    "robust_base_cpu_minutes": "25-75",
+    "qwen_gpu_jobs": 5,
+    "gpu_per_job": 1,
+    "qwen_minutes_per_job": "20-40",
+    "parallel_wall_minutes": "25-50",
+    "serial_gpu_hours": "1.7-3.4"
+  }
+}

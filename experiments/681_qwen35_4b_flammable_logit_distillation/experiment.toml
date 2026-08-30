@@ -1,0 +1,30 @@
+[experiment]
+id = "681"
+slug = "qwen35_4b_flammable_logit_distillation"
+title = "Outer-safe 27B-to-4B flammable logit distillation"
+status = "terminal_reject_at_screen"
+entrypoint = "experiments/681_qwen35_4b_flammable_logit_distillation/train_fold.py"
+result_file = "experiments/681_qwen35_4b_flammable_logit_distillation/results/screen_terminal_summary.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+primary_metric = "flammable_average_precision_and_routed_macro_f1"
+
+[execution]
+arguments = []
+
+[artifacts]
+directory = "artifacts"
+publish = false
+
+[lineage]
+parent = "680"
+ranking_control = "641"
+teacher_probe = "659"
+teacher_scoring = "662"
+public_used = false

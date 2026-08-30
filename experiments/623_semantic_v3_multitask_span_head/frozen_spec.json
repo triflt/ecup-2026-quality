@@ -1,0 +1,62 @@
+{
+  "schema_version": "exp623_multitask_span_head_v1",
+  "experiment_id": "623",
+  "parent": "experiment_600_original_qwen35_seed42",
+  "parent_runner_sha256": "c30e690ad260af72fcc625c8d3e6d9ab9c5a096d8443d6d9f5f7adbcaa52123c",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "frozen_input_sha256": {
+    "data": "4bc59e640563160fa04572b570606ceb1dd3d31627c6cf7fd1750ae4ea61f510",
+    "folds": "16b9c47999c6c1e97b1317182adc356931db60a1156ec237fa496fa48c5387ae",
+    "evidence_manifest": "bae8b85912a62778a785126a5d3077a6449084f7d3daa10814e86a7277c699a6",
+    "selector": "107ef2bc83d77bc674c0734e8c1b62fc323eba9f9731d69b5e2353796e97c3be",
+    "image_manifest": "409e10a4035c5964a08bf2343603a1557148ec15e22674043c442a8c1bcea178"
+  },
+  "validation": "semantic_family_v3",
+  "screen_folds": [0, 3],
+  "remaining_folds_after_screen_only": [1, 2, 4],
+  "uses_sealed_holdout": false,
+  "uses_large_teacher": false,
+  "concepts": [
+    "OBJECT_OF_SALE",
+    "COMPOSITION",
+    "COMPLETENESS",
+    "FUEL_OR_IGNITION",
+    "NEGATION"
+  ],
+  "loss": {
+    "verdict_ce_weight": 1.0,
+    "span_ce_weight": 0.1,
+    "concept_ce_weight": 0.05,
+    "quality_weight_policy": "1.0 only for extractor SAFE exact spans; 0.0 otherwise",
+    "frozen_before_gpu": true
+  },
+  "rationale": {
+    "free_chain_of_thought": false,
+    "visual_claims": false,
+    "absence_as_opposite_class": false,
+    "no_evidence_token": "NO_EVIDENCE",
+    "renderer": "exact substring plus closed concept template"
+  },
+  "label_isolation": {
+    "sealed_rows_in_runtime": 0,
+    "validation_labels_in_training_process": false,
+    "validation_labels_written_to_runtime": false,
+    "rationale_membership_uses_outer_train_labels_only": true,
+    "semantic_components_must_not_cross_folds": true
+  },
+  "screen_acceptance": {
+    "require_each_fold_macro_delta_positive": true,
+    "minimum_mean_macro_delta": 0.0015,
+    "minimum_corrected_to_regressed_ratio": 1.5,
+    "maximum_category_f1_drop": 0.002,
+    "maximum_flammable_false_negative_increase": 0,
+    "maximum_safety_false_negative_increase": 0
+  },
+  "full_acceptance": {
+    "minimum_macro_delta": 0.003,
+    "minimum_winning_folds": 4,
+    "minimum_category_delta": 0.0,
+    "minimum_corrected_to_regressed_ratio": 1.5,
+    "minimum_component_bootstrap_probability_positive": 0.9
+  }
+}

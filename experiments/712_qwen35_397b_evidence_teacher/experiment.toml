@@ -1,0 +1,116 @@
+[experiment]
+id = "712"
+slug = "qwen35_397b_evidence_teacher"
+title = "Qwen3.5-397B source-label-conditioned explanation synth teacher"
+status = "teacher_corpus_accepted_waiting_user_approval"
+entrypoint = "experiments/712_qwen35_397b_evidence_teacher/generate_all.py"
+result_file = "experiments/712_qwen35_397b_evidence_teacher/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+rows = 12971
+images = 49456
+all_gallery_images = true
+label_sent_to_teacher = true
+current_prediction_sent_to_teacher = false
+external_retrieval = false
+
+[model]
+id = "Qwen/Qwen3.5-397B-A17B-FP8"
+revision = "ea5b4f81096f3901c91dea97f81324302495781d"
+license = "Apache-2.0"
+total_parameters_billion = 397
+active_parameters_billion = 17
+offline_teacher_only = true
+
+[generation]
+schema_version = "explanation_synth_v5"
+temperature = 0.0
+top_p = 1.0
+max_tokens = 384
+save_raw_output = true
+save_parsed_output = true
+save_input_hashes = true
+max_validation_attempts = 2
+failed_validation_policy = "not_enough_evidence"
+near_exact_text_span_repair_min_similarity = 0.92
+
+[pilot]
+rows = 20
+schema_valid_rows = 20
+useful_explanation_rows = 17
+not_enough_evidence_rows = 3
+mean_row_elapsed_seconds = 3.92797455
+challenger_useful_explanation_rows = 16
+challenger_mean_row_elapsed_seconds = 4.0015539
+selected_model_reason = "higher useful-explanation coverage and slightly lower inference latency"
+
+[student_scope_repair]
+student_inputs = "title+description+image0"
+repair_only_flagged_rows = true
+smoke_scope_rows_flagged = 11
+smoke_not_enough_evidence_recovery_requested = 3
+smoke_useful_repairs_accepted = 12
+smoke_repair_remained_not_enough_evidence = 1
+smoke_repair_validation_fallbacks = 1
+smoke_final_useful = 18
+smoke_final_not_enough_evidence = 2
+prompt_sha256 = "86f8b004f3e1a197bd33ac47c21d3f559a0e8518cfbb213b91749a840e60ad14"
+forbid_secondary_image_language = true
+forbid_unbound_visual_claims = true
+forbid_classifier_meta_language = true
+full_rows_requested = 6186
+full_not_enough_evidence_recovery_requested = 1424
+full_useful_repairs_accepted = 4615
+full_repair_validation_fallbacks = 417
+full_repair_remained_not_enough_evidence = 1154
+full_final_useful = 11400
+full_final_not_enough_evidence = 1571
+full_output_sha256 = "69a14886c4c8e9f83d584f6d15a7c9d6ece8ce7c556ebdc9f0668238f2bfc9e8"
+
+[hypothesis]
+changed_factor = "Use a <=400B frozen multimodal teacher to create one source-label-conditioned card-specific explanation for every training product"
+mechanism = "A much larger VLM can extract sold-object, marking, included-item and empty-equipment relations that the digit-only 4B objective does not supervise"
+falsification = "Reject student use if JSON validity is below 99.5%, exact text evidence is not 100%, grounded comment audit is below 90%, unsupported claims reach 1%, or accepted source-label-side target coverage is below 85%"
+
+[acceptance]
+min_json_valid_rate = 0.995
+required_exact_text_span_rate = 1.0
+min_human_grounded_comment_rate = 0.945
+max_unsupported_claim_rate = 0.0
+min_source_label_side_target_coverage = 0.85
+required_comment_length_min = 50
+required_comment_length_max = 300
+
+[budget]
+serving_gpus = 8
+gpu_type = "H100-80GB"
+planned_public_submissions = 0
+
+[execution]
+live_launch_requires_explicit_8_gpu_confirmation = true
+smoke_rows_before_full_pass = 20
+full_pass_allowed_only_after_smoke = true
+
+[artifacts]
+directory = "artifacts"
+publish = false
+
+[full_audit]
+valid_rows = 12971
+useful_rows = 11400
+useful_coverage = 0.878883663557166
+invalid_json = 0
+student_scope_errors = 0
+blind_packet_rows = 200
+blind_packet_sha256 = "b13a77bf8c7bc7b8e425bb42ef4d46781841abeb2d292e74c6de95e5b7bb0ab6"
+
+[handoff]
+decision = "TECHNICAL_ACCEPT_PENDING_USER_APPROVAL"
+training_authorized = false
+accepted_rows = 11400
+manifest_sha256 = "1ca83078dbdf3ac97f12f0b47fada80445686b369c6af2303344e3b45bac0fd5"
+acceptance_sha256 = "ef866fce947ddfb52dc9b8ba1b521407e0b0e35f57d46803245929b9abb23031"
+target_truncation = 0
+target_alteration = 0
+uses_unmodified_solution140_image0_source_bytes = true

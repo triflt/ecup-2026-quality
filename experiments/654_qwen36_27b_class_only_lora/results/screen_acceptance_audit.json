@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "experiment_id": "654",
+  "control_experiment_id": "641",
+  "evaluation_version": "semantic_family_v3",
+  "screen_folds": [0, 3],
+  "threshold": 0.0,
+  "threshold_tuned": false,
+  "mean_fold_delta": 0.020650465178049804,
+  "categories": {
+    "БАД": {"baseline_f1": 0.9531869875694261, "candidate_f1": 0.9502673796791444, "delta": -0.0029196078902816724},
+    "Легковоспламеняющиеся": {"baseline_f1": 0.8169014084507042, "candidate_f1": 0.8609271523178808, "delta": 0.0440257438671765}
+  },
+  "folds": {
+    "0": {"baseline_macro_f1": 0.87183004905629, "candidate_macro_f1": 0.8893, "delta": 0.017469950943709955},
+    "3": {"baseline_macro_f1": 0.9003316909799375, "candidate_macro_f1": 0.9241626703923271, "delta": 0.023830979412389652}
+  },
+  "corrected": 53,
+  "regressed": 57,
+  "corrected_to_regressed": 0.9298245614035088,
+  "flammable_false_negatives": {"baseline": 10, "candidate": 3, "delta": -7},
+  "gates": {
+    "each_screen_fold_positive": true,
+    "mean_delta_at_least_0_0015": true,
+    "no_category_drop_below_minus_0_002": false,
+    "corrected_to_regressed_at_least_1_5": false,
+    "flammable_false_negatives_do_not_increase": true
+  },
+  "passed": false,
+  "decision": "REJECT_AT_SCREEN",
+  "remaining_folds_launched": false,
+  "sealed_rows": 0,
+  "public_used": false
+}

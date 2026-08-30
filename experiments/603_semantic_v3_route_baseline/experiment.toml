@@ -1,0 +1,56 @@
+[experiment]
+id = "603"
+slug = "semantic_v3_route_baseline"
+title = "Frozen locked-190 route baselines on semantic-v3"
+status = "complete_reference_only_four_seed_not_promoted"
+entrypoint = "experiments/603_semantic_v3_route_baseline/evaluate.py"
+result_file = "experiments/603_semantic_v3_route_baseline/results/metrics.json"
+
+[data]
+version = "competition_train_v1"
+registry = "datasets/registry.toml"
+scope = "development_only_oof"
+development_rows = 11118
+sealed_holdout_used = false
+
+[validation]
+primary_version = "semantic_family_v3"
+registry = "validation/registry.toml"
+folds = "validation/semantic_family_v3/folds.csv"
+primary_metric = "macro_f1"
+threshold_protocol = "leave-one-fold-out calibration over fixed OOF scores"
+fully_nested_meta_validation = false
+limitation = "donor OOF base models may have trained on labels of the currently evaluated fold"
+
+[hypothesis]
+parent_experiments = ["600_semantic_v3_qwen35_baselines", "601_semantic_v3_visual_base_baselines", "602_semantic_v3_qwen35_seed_variance"]
+changed_factor = "Re-evaluate only original route, category-routed specialist, and fixed four-seed probability mean inside frozen locked-190 weights"
+mechanism = "A full-route replay measures component quality inside fixed multimodal fusion with leave-one-fold-out threshold calibration over already fixed OOF scores"
+expected_macro_f1 = [0.9136312475000699, 0.9068412317905219, 0.9196036380948726]
+falsification = "Reject the evaluator if any contract SHA ID fold category label or predeclared reference metric differs; do not tune"
+precedent = "Rakuten SIGIR 2020 decision-level fusion"
+
+[route.bad]
+robust_base_weight = 0.50
+qwen3vl_weight = 0.25
+qwen35_weight = 0.25
+
+[route.flammable]
+robust_base_weight = 0.15
+qwen3vl_weight = 0.10
+qwen35_weight = 0.75
+
+[comparisons]
+names = ["original_route_baseline", "category_routed_specialist_400", "fixed_four_seed_probability_mean_route"]
+additional_variants_allowed = false
+four_seed_weights = [0.25, 0.25, 0.25, 0.25]
+
+[budget]
+planned_gpu_hours = 0.0
+actual_gpu_hours = 0.0
+gpu_jobs_launched = 0
+planned_public_submissions = 0
+
+[artifacts]
+directory = "artifacts"
+publish = false

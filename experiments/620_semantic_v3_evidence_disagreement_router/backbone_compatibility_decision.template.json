@@ -1,0 +1,12 @@
+{
+  "version": "semantic_v3_evidence_router_backbone_decision_v1",
+  "status": "pending",
+  "model_id": null,
+  "revision": null,
+  "license": null,
+  "files_sha256": {},
+  "nli_label_order": null,
+  "label_free_probe_report_sha256": null,
+  "compatibility_passed": false,
+  "note": "A concrete backbone may be fixed only by a separate label-free compatibility decision. This template is intentionally not an accepted decision."
+}

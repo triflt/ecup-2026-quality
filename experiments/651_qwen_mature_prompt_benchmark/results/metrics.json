@@ -1,0 +1,118 @@
+{
+  "experiment_id": "651",
+  "status": "complete_both_mature_prompt_candidates_rejected",
+  "launched_at_utc": {
+    "Qwen/Qwen3.6-27B": "2026-08-23T17:42:28Z",
+    "Qwen/Qwen3.5-122B-A10B": "2026-08-23T17:42:33Z"
+  },
+  "gpus": {
+    "Qwen/Qwen3.6-27B": 1,
+    "Qwen/Qwen3.5-122B-A10B": 4
+  },
+  "technical_smoke": {
+    "Qwen/Qwen3.6-27B": {
+      "status": "passed",
+      "rows": 20,
+      "finite_scores": 20,
+      "elapsed_seconds": 8.613273551687598,
+      "rows_per_second": 2.321997540189746,
+      "thinking": false,
+      "artifact_sha256": "449df303070ecba52db217663619b1533b0b7845e40df36878fa1cf48279c8bb",
+      "output_sha256": "1d398e141961e0fa35540d863bca2bb77170c0ba1db0a94984f16dbda4a3659c",
+      "decision": "PASS_FULL_GRID_ALLOWED"
+    },
+    "Qwen/Qwen3.5-122B-A10B": {
+      "status": "passed",
+      "rows": 20,
+      "finite_scores": 20,
+      "elapsed_seconds": 10.08254336938262,
+      "rows_per_second": 1.9836264786852735,
+      "thinking": false,
+      "cuda_device_count": 4,
+      "all_layers_on_cuda": true,
+      "placement_devices": [0, 1, 2, 3],
+      "artifact_sha256": "edc489242a70e3124e3d498e45127dd93f1ce1e4cd45966c83ba3e907c31abfe",
+      "output_sha256": "3a26070c467ea840631b523f08aa768533860495957d4a84ce51081b29b9bf4d",
+      "decision": "PASS_FULL_GRID_ALLOWED"
+    }
+  },
+  "full_prompt_grid": {
+    "Qwen/Qwen3.6-27B": {
+      "status": "complete_rejected",
+      "num_shards": 4,
+      "verified_shards": [0, 1, 2, 3],
+      "verified_unique_rows": 11118,
+      "exact_global_index_cover": true,
+      "finite_scores": 11118,
+      "artifact_sha256": [
+        "8ea9bf17bdb1a2d938751fcd5068eb5c209411ff9d60e484fd3ce130bc3fdc2d",
+        "0f6fd4b431d0d4cdcf1321c8653de5951c64b8663c6b0c516c5412fef33d82b1",
+        "ea32430206a7c81fcb786230437b60adde1fe2fe98b5f9b600b1433de3fb01eb",
+        "a8e70c1e2c8c31f468838bf14a024dd81353c2e5488503827778204917d79fe0"
+      ],
+      "macro_f1": 0.5341306952730538,
+      "baseline_qwen38_macro_f1": 0.5527541862050617,
+      "delta_macro_f1": -0.01862349093200788,
+      "fold_deltas": [-0.014307551712947952, -0.022073438806607504, -0.02199405525488285, -0.02085381753691351, -0.01401417233164981],
+      "bad_f1": 0.9005194550622366,
+      "bad_delta": -0.020961139570108922,
+      "flammable_f1": 0.16774193548387098,
+      "flammable_delta": -0.01628584229390681,
+      "corrected": 506,
+      "regressed": 872,
+      "corrected_to_regressed": 0.5802752293577982,
+      "screen_gate_passed": false,
+      "decision": "REJECT_NO_PROMPT_OR_THRESHOLD_RETUNING",
+      "running_shards": [],
+      "not_launched_shards": [],
+      "fourth_shard_launched_at_utc": "2026-08-23T19:12:03Z"
+    },
+    "Qwen/Qwen3.5-122B-A10B": {
+      "status": "complete_rejected",
+      "num_shards": 4,
+      "gpus_per_shard": 4,
+      "submitted_shards": [0, 1, 2, 3],
+      "verified_shards": [0, 1, 2, 3],
+      "verified_unique_rows": 11118,
+      "exact_global_index_cover": true,
+      "finite_scores": 11118,
+      "artifact_sha256": [
+        "0beb88025167f208b87347a83c34a2530bc1428476290d10c1d1c26a7e082662",
+        "101ddc621ee2df369d1aa0ad9214aff5c5911bda521cecd5dd1d3b9254bbdf80",
+        "a1a7fcbc88783a561b357b55d1ada7007f2b213ad23a475e1887e466cdc3b94b",
+        "037fabc032254b998b85a20e9671cf83324a07c61fb5393f9d0f063e3eb065bf"
+      ],
+      "macro_f1": 0.5036278354356723,
+      "baseline_qwen38_macro_f1": 0.5527541862050617,
+      "delta_macro_f1": -0.04912635076938943,
+      "fold_deltas": [-0.0641592281346347, -0.041538076717552386, -0.04463737067639073, -0.05489404684687227, -0.04329215963017802],
+      "bad_f1": 0.9099302622532168,
+      "bad_delta": -0.011550332379128725,
+      "flammable_f1": 0.09732540861812779,
+      "flammable_delta": -0.08670236915965,
+      "corrected": 531,
+      "regressed": 1681,
+      "corrected_to_regressed": 0.31588340273646637,
+      "screen_gate_passed": false,
+      "decision": "REJECT_NO_PROMPT_OR_THRESHOLD_RETUNING",
+      "running_shards": [],
+      "not_launched_shards": [],
+      "submitted_at_utc": "2026-08-23T19:12:06Z",
+      "preset_audit_errors": 0,
+      "preset_audit_warnings": 0,
+      "dry_runs": "passed_4_of_4",
+      "preset_sha256": [
+        "df08d707b50b79d2a67b71e7dee00476d07efbcdd8064aae74e3a51f44cfaaad",
+        "14d7bed5c92fbe8690b848ebb43f83750c23e8cde9e89dc571c1cad6d3876ba3",
+        "3b0e00458fcef0ff5cfd06ca8184e2cb68e3b6cbc173af7ce4b69c596f1311f9",
+        "a141eddb239ba229eff4e2e4753e89959b600f43e3ad88f0fb7e93db73985750"
+      ]
+    }
+  },
+  "metrics": {
+    "best_fixed_prompt_model": "Qwen/Qwen3.8-27B",
+    "best_fixed_prompt_macro_f1": 0.5527541862050617,
+    "mature_candidates_winning_folds": 0
+  },
+  "decision": "BOTH_MATURE_ALTERNATIVES_REJECTED_QWEN38_REMAINS_PROMPT_REFERENCE"
+}

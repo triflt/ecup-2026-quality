@@ -1,0 +1,58 @@
+{
+  "decision": "ACCEPT_FOUR_PACKAGES_NO_PUBLIC_SUBMIT",
+  "experiment_id": "699",
+  "public_submissions": 0,
+  "variants": {
+    "A_v2p10_thumbnail448_all": {
+      "adapter_zip_sha256": "76c998b909b75cdee37207c71d7f02e64a6392b3e1e33455ae5222f26f083359",
+      "adapter_weights_sha256": "c38a8e7b548430b8a93b5723d55cd9b21645846fad053809ce23f98743126d67",
+      "output_contract_sha256": "92d04702f82476b088fe7d9ab55c65bfb6b8269536ae624d74af7e0ad27155ad",
+      "package_sha256": "d6c42c98cc4df05f802f0298dab1a48a35b13426dd8dc24832d717ab9b18eec1",
+      "package_size": 44135351,
+      "package_terminal_self_sha256": "79522bae723196179a7594b2dad92ac98a28f3f9e661fccb9fe2ac8318bb3bfa",
+      "preprocessing": "thumbnail448",
+      "route": "all",
+      "runtime_contract_sha256": "52c85048812b91a31065f0fa441ff6721d8c60047e1b355f3c3a12b1814f23d2",
+      "training_runtime_minutes": 69.16861330910275
+    },
+    "B_v2p5_thumbnail448_all": {
+      "adapter_zip_sha256": "5ee9d2289b13b9393ff7b11750f56a8ba2afc4a5cdf829c7718afcd5c9d50bc8",
+      "adapter_weights_sha256": "e10a5e43c99e95b9834068fab07915de9304e0b5377c9b48576efa1799f4406f",
+      "output_contract_sha256": "1303817e148e490389d4a3c5611d2a4090350c3ed851607ac9953b6d4b894c8e",
+      "package_sha256": "a00656d61b5e2f0871bf19d015694db32e77880d2d05ee259d6c7c0a66391078",
+      "package_size": 44136029,
+      "package_terminal_self_sha256": "9f6e0cfc3d13dfd29a4013d953d6d0d98821da180653ce86ac01ae635d936864",
+      "preprocessing": "thumbnail448",
+      "route": "all",
+      "runtime_contract_sha256": "8df06613efa02a37c1fe9fac8289904af1ef36e3f81cdb22154af666d1ad9844",
+      "training_runtime_minutes": 72.29290550854057
+    },
+    "C_v2p10_area262144_all": {
+      "adapter_zip_sha256": "171d946ff98bab5ed9310fcf6149acad584081b0c85e198d4dcbcca124329537",
+      "adapter_weights_sha256": "b7c9f5ad0d7f9f9bfefcd9568d1ce97b4f3d220f1b087c35e74a8e15f3d92d89",
+      "output_contract_sha256": "acf52e9108601b1ad07ffbb09dc8f2883a81d0746b64861f6e448263e43db5eb",
+      "package_sha256": "a78e982bca63d86a821d21a90393c0ee38d567c6bbd9ad199106b9f6e40d5e3f",
+      "package_size": 44134727,
+      "package_terminal_self_sha256": "a82b09dbf41cb7a701bdf862dc82ae1414f0c4236e723c8cae2e77d52e220f14",
+      "preprocessing": "area_cap262144",
+      "route": "all",
+      "runtime_contract_sha256": "7e37d392a003a7c46aad5c5818403803d19cb56cce5f27cf55b0754627aca0b4",
+      "training_runtime_minutes": 81.17034430516263
+    },
+    "D_v2p10_thumbnail448_flammable_only": {
+      "bad_original_adapter_weights_sha256": "75d4cb53fb05636d715f33ad88d2b420f5af4393977da113286133843a6db2a1",
+      "category_route_smoke_pass": true,
+      "flammable_adapter_weights_sha256": "c38a8e7b548430b8a93b5723d55cd9b21645846fad053809ce23f98743126d67",
+      "manifest_self_sha256": "fa480d2b1c8c4306270d8b662fe525348fcc0fbf56bcf2ac1842c45beb4f6ab3",
+      "package_sha256": "51c14c78d73c48e3d886ef39e7c254e35d4d70eb9c82a409f156ab4460245c3c",
+      "package_size": 55796314,
+      "package_terminal_self_sha256": "631e6981c803affe39d7cd0200ab0e7cafb4b3b6410257f669370703526d9df9",
+      "preprocessing": "thumbnail448",
+      "route": {
+        "БАД": "original_solution140_qwen35_adapter",
+        "Легковоспламеняющиеся": "A_refit_adapter"
+      },
+      "unrelated_solution140_members_changed": 0
+    }
+  }
+}

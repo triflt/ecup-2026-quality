@@ -1,0 +1,28 @@
+{
+  "audit_version": "qwen3vl_multiview_train_aug_label_blind_v1",
+  "status": "go_for_two_fold_screen",
+  "label_blind": true,
+  "labels_categories_folds_read": false,
+  "rows": 12971,
+  "images": 49456,
+  "gallery_size_histogram": {
+    "1": 1800,
+    "2": 1153,
+    "3": 1460,
+    "4": 1820,
+    "5": 6738
+  },
+  "multi_image_rows": 11171,
+  "multi_image_fraction": 0.8612288952278159,
+  "decode_failures": 0,
+  "decode_failure_records": [],
+  "deterministic_plan_failures": 0,
+  "gallery_cycle_coverage_failures": 0,
+  "first_image_null_byte_mismatches": 0,
+  "training_images_per_occurrence": 1,
+  "holdout_inference_image_index": 0,
+  "holdout_inference_passes": 1,
+  "transformed_jpeg_bytes_checked": 2097285730,
+  "images_zip_sha256": "9ff051272e9ee1b08d6d05939470ebc7006403f4647c546b29647efb03837edc",
+  "gallery_manifest_sha256": "7213e0600771625c14b659d90fd42d123c16fce86f74140166dd535e1bbfd592"
+}
