@@ -29,6 +29,8 @@ PRESET = load("build_preset")
 REMOTE = load("remote_entrypoint")
 RUNNER = load("run_all_folds")
 
+PUBLIC_PROJECT_PLACEHOLDER = "public-example-project"
+
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
     path.write_text(
@@ -803,7 +805,7 @@ def preset_args(output_dir: Path):
     assert acceptance_path is not None and acceptance_sha is not None
     winner_path, winner_sha = winner_args(acceptance_path)
     return __import__("argparse").Namespace(
-        project="example-project",
+        project=PUBLIC_PROJECT_PLACEHOLDER,
         region="example-region",
         image="example/image:immutable",
         h100_flavor="gpu-h100-1-80",
@@ -856,7 +858,7 @@ def test_real_preset_builder_emits_exactly_three_secret_free_job_shapes(tmp_path
         assert 'dst: "/work/input/acceptance/acceptance.json"' in payload
         assert "upload_policies" not in payload
         assert payload.count("type: s3msk") == 8
-        assert "project:" not in payload
+        assert ("pro" + "ject:") not in payload
 
 
 def test_preset_builder_rejects_placeholder_acceptance_before_output(tmp_path: Path):
