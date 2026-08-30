@@ -1,6 +1,6 @@
 # 714: Qwen3.5-4B только для объяснения
 
-Статус: **финальный пакет собран; Public pending**.
+Статус: **terminal Success на ODS**.
 
 Exp714 не меняет решение 140. TF-IDF, мультимодальный embedding-classifier,
 Qwen3-VL LoRA и Qwen3.5 LoRA сначала независимо считают признаки; затем
@@ -8,10 +8,10 @@ category-specific fusion, thresholds и recurrence exact-id/name prior форм�
 окончательный verdict. Reasoner не видит component scores и не участвует ни в
 scores, ни в fusion, ни в priors.
 
-Поэтому при успешном запуске с теми же classifier-артефактами Macro F1
-математически совпадает с solution140: в метрике участвует только неизменный
-verdict. Public `0.8923976821` измерен на исходном classifier-архиве; новый ZIP
-всё ещё должен подтвердить runtime на Public.
+Это подтвердилось на ODS: Public Macro F1 нового ZIP —
+`0.8923976821312729`, ровно как у solution140; дельта `0.0`. Терминальный
+результат зафиксирован `2026-08-30T15:34:05Z`, после отправки осталось 2
+попытки. Public не использовался для настройки решения.
 
 ## Обучение
 
@@ -65,5 +65,7 @@ Solution140 verdict — `0`.
 
 Пакет: `exp714-solution140-reasoner-4b-b192-final.zip`, 55 770 475 байт,
 SHA-256 `a0695a55a85ca835d18f23e3700ee3eccc9ba03b9d490653719f474c38861bce`.
-Пакет загружает пользователь. Public пока не измерен и не используется для
-настройки решения.
+ODS filename: `exp714-solution140-reasoner-4b-b192-final.zip`; статус
+`Success`, Public `0.8923976821312729`, дельта к solution140 `0.0`. Точное
+соответствие загруженных ODS bytes локальному SHA не заявляется: платформа не
+выдаёт hash-bearing receipt.

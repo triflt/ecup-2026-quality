@@ -1,6 +1,6 @@
 {
-  "status": "final_package_ready_public_pending",
-  "public_submissions": 0,
+  "status": "terminal_success",
+  "public_submissions": 1,
   "classifier_verdict_frozen": true,
   "explanation_training_target_rows": 11400,
   "classification_scores_changed": 0,
@@ -30,7 +30,14 @@
     "sha256": "a0695a55a85ca835d18f23e3700ee3eccc9ba03b9d490653719f474c38861bce",
     "size_bytes": 55770475,
     "upload_owner": "user",
-    "public_status": "pending",
+    "public_status": "success",
+    "public_score": 0.8923976821312729,
+    "solution140_public_score": 0.8923976821312729,
+    "delta_vs_solution140": 0.0,
+    "attempts_remaining_after_terminal": 2,
+    "terminal_observed_at": "2026-08-30T15:34:05Z",
+    "ui_age_at_observation": "53 minutes",
+    "artifact_sha_binding": "unverified_no_hash_bearing_ods_receipt",
     "public_used_for_tuning": false
   }
 }

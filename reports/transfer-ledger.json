@@ -1,6 +1,6 @@
 {
   "schema": "ecup_quality_transfer_ledger_v1",
-  "updated_at": "2026-08-28T18:10:00+03:00",
+  "updated_at": "2026-08-30T15:34:05Z",
   "baseline": {
     "experiment_id": "140",
     "filename": "quality-qwen3vl-qwen35-dual-lora-prior-submit.zip",
@@ -356,6 +356,31 @@
       },
       "decision": "terminal_reject_never_resubmit_or_tune",
       "interpretation": "The local negative direction transferred and amplified dramatically on Public. Broad donor-label transfer is unsafe; retrieval may be used only for abstention or exact-family evidence with an independently frozen mechanism."
+    },
+    {
+      "experiment_id": "714",
+      "change_type": "post_verdict_explanation_only_reasoner",
+      "local_evidence": {
+        "evaluation_scope": "frozen_label_free_600_row_end_to_end",
+        "classifier_verdict_changes": 0,
+        "schema_valid_rows": 600,
+        "rows": 600,
+        "projected_public_minutes": 15.155555555555557,
+        "projected_private_minutes": 35.99444444444445,
+        "archive_gate": "pass"
+      },
+      "public": {
+        "filename": "exp714-solution140-reasoner-4b-b192-final.zip",
+        "score": 0.8923976821312729,
+        "baseline_score": 0.8923976821312729,
+        "delta": 0.0,
+        "evidence": "verified_filename_level_ods_row",
+        "observed_at": "2026-08-30T15:34:05Z",
+        "attempts_remaining": 2,
+        "artifact_sha_binding": "unverified_no_hash_bearing_ods_receipt"
+      },
+      "decision": "terminal_accept_score_preserving_reasoner",
+      "interpretation": "Post-verdict reasoner preserved the exact solution140 classification score on Public; this validates architectural isolation, not reasoner language quality."
     }
   ]
 }

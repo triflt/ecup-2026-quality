@@ -2,7 +2,7 @@
 id = "714"
 slug = "qwen35_4b_explanation_only"
 title = "Primary submission candidate: frozen-ensemble grounded explanation generator"
-status = "final_package_ready_public_pending"
+status = "terminal_success"
 entrypoint = "experiments/714_qwen35_4b_explanation_only/trainer.py"
 result_file = "experiments/714_qwen35_4b_explanation_only/results/metrics.json"
 
@@ -58,7 +58,7 @@ max_unsupported_claim_rate = 0.0
 
 [budget]
 planned_gpu_hours = 2.5
-planned_public_submissions = 0
+planned_public_submissions = 1
 
 [artifacts]
 directory = "artifacts"
@@ -77,5 +77,10 @@ total_seconds = 341.0
 reasoner_seconds = 89.76
 public_projected_minutes = 15.16
 private_projected_minutes = 35.99
-public_status = "pending"
+public_status = "success"
+public_score = 0.8923976821312729
+solution140_public_score = 0.8923976821312729
+delta_vs_solution140 = 0.0
+attempts_remaining = 2
+terminal_observed_at = "2026-08-30T15:34:05Z"
 public_used_for_tuning = false
